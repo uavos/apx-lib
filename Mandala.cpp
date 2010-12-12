@@ -82,13 +82,13 @@ Mandala::Mandala()
 
 #include "MandalaVars.h"
 
-  //create signatures..
-  memset(sig_telemetry,0,sizeof(sig_telemetry));
-  memset(sig_cfg,0,sizeof(sig_cfg));
+  //init config signature..
   for (uint i=idxCFG;i<maxVars;i++){
     if (!var_bytes[i])break;
-    sig_cfg[1+sig_cfg[0]++]=i;
+    config[++config[0]]=i;
   }
+  var_bytes[idx_config]=archiveSize(config);
+
 }
 //===========================================================================
 #define SIGDEF(aname,...) uint8_t Mandala:: aname []={ VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__ };

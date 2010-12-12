@@ -50,7 +50,8 @@ typedef enum {vt_void,vt_uint,vt_double,vt_Vect,vt_sig}_var_type;
 #define C_WIE       7.2321151467e-05  // WGS-84 earth rotation rate (rad/s)
 #define C_WIE_F     7.2321151467e-05f
 //=============================================================================
-#define VA_NUM_ARGS(...) VA_NUM_ARGS_IMPL(__VA_ARGS__, 16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1)
+#define VA_NUM_ARGS(...) ( sizeof(#__VA_ARGS__)==sizeof("")?0:\
+  VA_NUM_ARGS_IMPL(__VA_ARGS__, 16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1) )
 #define VA_NUM_ARGS_IMPL(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,N,...) N
 //=============================================================================
 #endif
@@ -139,14 +140,15 @@ CMDDEF(Parachute,  1,par,    "open/close parachute")
 #endif
 SIGDEF(imu, idx_acc, idx_gyro, idx_mag)
 SIGDEF(gps, idx_gps_Lat, idx_gps_Lon, idx_gps_HMSL, idx_gps_course, idx_gps_velNED)
-// dynamic signature - telemetry
-SIGDEF(downlink)  //can be rewritten
-SIGDEF(uplink)    //always zero
+// dynamic signatures
+SIGDEF(downlink)  //telemetry - can be rewritten
+SIGDEF(uplink)    //telemetry - always zero
+SIGDEF(config)    //configuration - list all vars>=idxCFG
 //=============================================================================
 //    Mandala variables definitions
 // type:           variable type: [uint, double, Vect]
 // name:           variable name, used for text also. access: var.name
-// array:          VARDEFA only, array size
+// array:          for VARDEFA only (array size)
 // span:           value span (for exchange compression), <0 = signed
 // bytecount:      bytes number for data exchange compression
 // description:    text description of the variable, used mostly in GCU

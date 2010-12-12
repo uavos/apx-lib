@@ -99,7 +99,8 @@ public:
 #include "MandalaVars.h"
 
 
-#define SIGDEF(aname, ... )   static uint8_t aname [ VA_NUM_ARGS(__VA_ARGS__)+1 ];
+//#define SIGDEF(aname, ... )   static uint8_t aname [ VA_NUM_ARGS(__VA_ARGS__)+1 ];
+#define SIGDEF(aname, ... )   static uint8_t aname [ maxVars+1 ];
 #include "MandalaVars.h"
 
 
@@ -109,12 +110,6 @@ public:
   const char      *reg_names[regCnt];
   const char      *reg_descr[regCnt];
 
-
-
-  // common signatures
-  uint8_t sig_cfg[idx_cfg_top-idxCFG+1];
-  uint8_t sig_telemetry[idx_vars_top+1];
-  uint size_packed_telemetry;
 
 //=============================================================================
   Mandala();
@@ -126,7 +121,7 @@ public:
   uint extractVar(const uint8_t *buf,uint var_idx);
   uint archiveMandala(uint8_t *buf,const uint8_t *signature);
   uint archiveSize(const uint8_t *signature);
-  uint size(void);
+  uint size(void);          // size (bytes) of all archived mandala vars
   bool checkCommandBuf(const uint8_t *data,uint cnt);
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
   void print_report(void);
