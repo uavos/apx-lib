@@ -77,7 +77,8 @@ Mandala::Mandala()
 
   idx=idxSIG;
 #define SIGDEF(aname,...) \
-  VARDEFX(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,archiveSize(aname),#__VA_ARGS__)
+  VARDEFX(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,archiveSize(aname),#__VA_ARGS__) \
+  var_sig[idx-1]=aname;
 
 #include "MandalaVars.h"
 
@@ -90,7 +91,7 @@ Mandala::Mandala()
   }
 }
 //===========================================================================
-#define SIGDEF(aname,...) const uint8_t Mandala:: aname []={ VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__ };
+#define SIGDEF(aname,...) uint8_t Mandala:: aname []={ VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__ };
 #include "MandalaVars.h"
 //===========================================================================
 uint Mandala::archiveValue(uint8_t *ptr,uint i,double v)
@@ -186,36 +187,54 @@ double Mandala::extractValue(const uint8_t *ptr,uint i)
   return round(v/prec)*prec;
 }
 //=============================================================================
-void Mandala::extractMandala(const uint8_t *buf,const uint8_t *signature)
+uint Mandala::extractMandala(const uint8_t *buf,const uint8_t *signature)
 {
-  uint scnt=signature[0];
+  uint scnt=signature[0],cnt=0,sz;
   signature++;
-  while (scnt--) {
-    uint i=*signature++;
-    switch (var_type[i]) {
-      case vt_uint:
-        for (uint ai=0;ai<var_array[i];ai++) {
-          ((uint*)var_ptr[i])[ai]=(uint)extractValue(buf,i);
-          buf+=var_bytes[i];
-        }
-        break;
-      case vt_double:
-        for (uint ai=0;ai<var_array[i];ai++) {
-          ((double*)var_ptr[i])[ai]=extractValue(buf,i);
-          buf+=var_bytes[i];
-        }
-        break;
-      case vt_Vect:
-        for (uint ai=0;ai<var_array[i];ai++) {
-          for (uint iv=0;iv<3;iv++) {
-            (((Vect*)var_ptr[i])[ai])[iv]=extractValue(buf,i);
-            buf+=var_bytes[i];
-          }
-        }
-        break;
-      default: break;
-    }
+  while (scnt--){
+    sz=extractVar(buf,*signature++);
+    buf+=sz;
+    cnt+=sz;
   }
+  return cnt;
+}
+//=============================================================================
+uint Mandala::extractVar(const uint8_t *buf,uint var_idx)
+{
+  uint cnt=0,sz=var_bytes[var_idx];
+  switch (var_type[var_idx]) {
+    case vt_uint:
+      for (uint ai=0;ai<var_array[var_idx];ai++) {
+        ((uint*)var_ptr[var_idx])[ai]=(uint)extractValue(buf,var_idx);
+        buf+=sz;
+        cnt+=sz;
+      }
+      break;
+    case vt_double:
+      for (uint ai=0;ai<var_array[var_idx];ai++) {
+        ((double*)var_ptr[var_idx])[ai]=extractValue(buf,var_idx);
+        buf+=sz;
+        cnt+=sz;
+      }
+      break;
+    case vt_Vect:
+      for (uint ai=0;ai<var_array[var_idx];ai++) {
+        for (uint iv=0;iv<3;iv++) {
+          (((Vect*)var_ptr[var_idx])[ai])[iv]=extractValue(buf,var_idx);
+          buf+=sz;
+          cnt+=sz;
+        }
+      }
+      break;
+    case vt_sig:{
+      uint s=extractMandala(buf,var_sig[var_idx]);
+      buf+=s;
+      cnt+=s;
+    }
+    break;
+    default: break;
+  }
+  return cnt;
 }
 //=============================================================================
 uint Mandala::archiveMandala(uint8_t *buf,const uint8_t *signature)

@@ -40,6 +40,7 @@ public:
   uint            var_array[maxVars];
   void *          var_ptr[maxVars];
   _var_type       var_type[maxVars];
+  const uint8_t*  var_sig[maxVars];
 
   const char      *cmd_name[cmdCnt];
   const char      *cmd_alias[cmdCnt];
@@ -98,7 +99,7 @@ public:
 #include "MandalaVars.h"
 
 
-#define SIGDEF(aname, ... )   static const uint8_t aname [ VA_NUM_ARGS(__VA_ARGS__)+1 ];
+#define SIGDEF(aname, ... )   static uint8_t aname [ VA_NUM_ARGS(__VA_ARGS__)+1 ];
 #include "MandalaVars.h"
 
 
@@ -121,7 +122,8 @@ private:
   uint archiveValue(uint8_t *ptr,uint i,double v);
   double extractValue(const uint8_t *ptr,uint i);
 public:
-  void extractMandala(const uint8_t *buf,const uint8_t *signature);
+  uint extractMandala(const uint8_t *buf,const uint8_t *signature);
+  uint extractVar(const uint8_t *buf,uint var_idx);
   uint archiveMandala(uint8_t *buf,const uint8_t *signature);
   uint archiveSize(const uint8_t *signature);
   uint size(void);

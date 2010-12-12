@@ -139,6 +139,9 @@ CMDDEF(Parachute,  1,par,    "open/close parachute")
 #endif
 SIGDEF(imu, idx_acc, idx_gyro, idx_mag)
 SIGDEF(gps, idx_gps_Lat, idx_gps_Lon, idx_gps_HMSL, idx_gps_course, idx_gps_velNED)
+// dynamic signature - telemetry
+SIGDEF(downlink)  //can be rewritten
+SIGDEF(uplink)    //always zero
 //=============================================================================
 //    Mandala variables definitions
 // type:           variable type: [uint, double, Vect]
