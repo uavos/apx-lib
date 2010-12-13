@@ -290,7 +290,7 @@ uint Mandala::size(void)
   return cnt;
 }
 //=============================================================================
-bool Mandala::checkCommandBuf(const uint8_t *data,uint cnt)
+bool Mandala::checkCommand(const uint8_t *data,uint cnt)
 {
   uint cmd=data[0];
   if (cmd>=cmdCnt) {

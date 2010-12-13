@@ -49,10 +49,7 @@ public:
 
   uint  var_void;
 
-  uint8_t command[1024];
-  uint commandSize;
-
-  //    ---- Waypoints ----
+  //---- Waypoints ----
   struct {
     Vect    NED;
     _wptType type;
@@ -122,7 +119,7 @@ public:
   uint archiveMandala(uint8_t *buf,const uint8_t *signature);
   uint archiveSize(const uint8_t *signature);
   uint size(void);          // size (bytes) of all archived mandala vars
-  bool checkCommandBuf(const uint8_t *data,uint cnt);
+  bool checkCommand(const uint8_t *data,uint cnt);
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
   void print_report(void);
 

@@ -118,6 +118,7 @@ CMDDEF(TelemetrySet,   -1,telemetry,   "send telemetry signature")
 CMDDEF(TelemetryData,  -1,,   "telemetry [data] (downlink)")
 CMDDEF(Stdout,         -1,,   "text <stdout> from uav")
 CMDDEF(WPT,            -1,,   "waypoints config, uplink")
+
 CMDDEF(GOWPT,           4,gowpt,   "enter wpt mode, go to wpt#")
 
 // IFC commands
@@ -142,7 +143,7 @@ SIGDEF(imu, idx_acc, idx_gyro, idx_mag)
 SIGDEF(gps, idx_gps_Lat, idx_gps_Lon, idx_gps_HMSL, idx_gps_course, idx_gps_velNED)
 // dynamic signatures
 SIGDEF(downlink)  //telemetry - can be rewritten
-SIGDEF(uplink)    //telemetry - always zero
+SIGDEF(uplink)    //telemetry - always zero (packet sent from GCU)
 SIGDEF(config)    //configuration - list all vars>=idxCFG
 //=============================================================================
 //    Mandala variables definitions
