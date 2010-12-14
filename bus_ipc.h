@@ -15,8 +15,8 @@ enum{
   mtypeBusAll=0,  //reserved for receive all filter
   mtypeBusTx,     //transmit to uart bus
   mtypeBusRx,     //received from uart bus
-  mtypeUdpTx,     //transmit to UDP
-//  mtypeUdpRx,   //received from UDP
+  mtypeUdpTx,     //transmit to gcu (UDP)
+  mtypeSimTx,     //transmit to Simulator (UDP)
 };
 //------------------------------------------------------------------------------
 static inline int getMsgId(void){return msgget(ftok("/etc/fstab",'a'),0644|IPC_CREAT);};

@@ -117,6 +117,7 @@ public:
   uint extractMandala(const uint8_t *buf,const uint8_t *signature);
   uint extractVar(const uint8_t *buf,uint var_idx);
   uint archiveMandala(uint8_t *buf,const uint8_t *signature);
+  uint archiveVar(uint8_t *buf,uint var_idx);
   uint archiveSize(const uint8_t *signature);
   uint size(void);          // size (bytes) of all archived mandala vars
   bool checkCommand(const uint8_t *data,uint cnt);

@@ -201,7 +201,7 @@ uint Mandala::extractMandala(const uint8_t *buf,const uint8_t *signature)
 //=============================================================================
 uint Mandala::extractVar(const uint8_t *buf,uint var_idx)
 {
-  uint cnt=0,sz=var_bytes[var_idx];
+  uint cnt=0,sz=var_bytes[var_idx],szm;
   switch (var_type[var_idx]) {
     case vt_uint:
       for (uint ai=0;ai<var_array[var_idx];ai++) {
@@ -227,9 +227,9 @@ uint Mandala::extractVar(const uint8_t *buf,uint var_idx)
       }
       break;
     case vt_sig:{
-      uint s=extractMandala(buf,var_sig[var_idx]);
-      buf+=s;
-      cnt+=s;
+      szm=extractMandala(buf,var_sig[var_idx]);
+      buf+=szm;
+      cnt+=szm;
     }
     break;
     default: break;
@@ -241,30 +241,43 @@ uint Mandala::archiveMandala(uint8_t *buf,const uint8_t *signature)
 {
   uint scnt=signature[0];
   signature++;
-  uint cnt=0;
+  uint cnt=0,sz;
   while (scnt--) {
-    uint i=(uint8_t)*signature++;
-    switch (var_type[i]) {
-      case vt_uint:
-        for (uint ai=0;ai<var_array[i];ai++)
-          buf+=archiveValue(buf,i,((uint*)(var_ptr[i]))[ai]);
-        cnt+=var_bytes[i]*var_array[i];
-        break;
-      case vt_double:
-        for (uint ai=0;ai<var_array[i];ai++)
-          buf+=archiveValue(buf,i,((double*)(var_ptr[i]))[ai]);
-        cnt+=var_bytes[i]*var_array[i];
-        break;
-      case vt_Vect:
-        for (uint ai=0;ai<var_array[i];ai++)
-          for (uint iv=0;iv<3;iv++)
-            buf+=archiveValue(buf,i,(((Vect*)(var_ptr[i]))[ai])[iv]);
-        cnt+=var_bytes[i]*3*var_array[i];
-        break;
-      default: break;
-    }
+    sz=archiveVar(buf,*signature++);
+    buf+=sz;
+    cnt+=sz;
   }
   //dump(sbuf-cnt,cnt);
+  return cnt;
+}
+//=============================================================================
+uint Mandala::archiveVar(uint8_t *buf,uint var_idx)
+{
+  uint cnt=0,sz=var_bytes[var_idx],szm;
+  switch (var_type[var_idx]) {
+    case vt_uint:
+      for (uint ai=0;ai<var_array[var_idx];ai++)
+        buf+=archiveValue(buf,var_idx,((uint*)(var_ptr[var_idx]))[ai]);
+      cnt+=sz*var_array[var_idx];
+      break;
+    case vt_double:
+      for (uint ai=0;ai<var_array[var_idx];ai++)
+        buf+=archiveValue(buf,var_idx,((double*)(var_ptr[var_idx]))[ai]);
+      cnt+=sz*var_array[var_idx];
+      break;
+    case vt_Vect:
+      for (uint ai=0;ai<var_array[var_idx];ai++)
+        for (uint iv=0;iv<3;iv++)
+          buf+=archiveValue(buf,var_idx,(((Vect*)(var_ptr[var_idx]))[ai])[iv]);
+        cnt+=sz*3*var_array[var_idx];
+      break;
+    case vt_sig:
+      szm=archiveMandala(buf,var_sig[var_idx]);
+      buf+=szm;
+      cnt+=szm;
+      break;
+    default: break;
+  }
   return cnt;
 }
 //=============================================================================
