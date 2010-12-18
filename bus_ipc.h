@@ -6,11 +6,9 @@
 // messages from bus
 typedef struct{
   long    type;   //must be long (used by filter)
-  int     cnt;
   uint8_t data[1024];
 }_bus_msg;
-#define _bus_msg_size     (sizeof(_bus_msg)-offsetof(_bus_msg,cnt))
-#define _bus_msg_size_nd  (offsetof(_bus_msg,data)-offsetof(_bus_msg,cnt))
+#define _bus_msg_size     (sizeof(_bus_msg)-offsetof(_bus_msg,data))
 enum{
   mtypeBusAll=0,  //reserved for receive all filter
   mtypeBusTx,     //transmit to uart bus

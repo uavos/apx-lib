@@ -7,8 +7,9 @@
 #define idxCFG  200     //configuration variables
 #define idxSIG  190     //special variables - signatures
 //-----------------------------------------------------------------------------
-#define AHRS_FREQ       50      // AHRS Update [Hz]
-#define SERVO_FREQ      25      // Servo update rate [Hz]
+#define AHRS_FREQ       100      // AHRS Update [Hz]
+#define GPS_FREQ        4       // GPS Update [Hz]
+#define SERVO_FREQ      10      // Servo update rate [Hz]
 #define TELEMETRY_FREQ  10      // Telemetry send rate [Hz]
 #define SIM_FREQ        10      // Simulator servo send rate [Hz]
 //-----------------------------------------------------------------------------
@@ -181,7 +182,7 @@ VARDEF(Vect, gps_velNED,    -150,2,     "velocity north,east,down [m/s]")
 VARDEF(Vect, gps_deltaNED,  -10000,2,   "distance to desired north,east,down [m]")
 VARDEF(Vect, gps_velXYZ,    -150,2,     "velocity bodyframe x,y,z [m/s]")
 VARDEF(Vect, gps_deltaXYZ,  -10000,2,   "velocity bodyframe x,y,z [m]")
-VARDEF(Vect, gps_accXYZ,    -10000,2,   "accelerations bodyframe ax,ay,az [m/c2]")
+VARDEF(Vect, gps_accXYZ,    -100,2,   "accelerations bodyframe ax,ay,az [m/c2]")
 VARDEF(double, gps_distWPT, 0,2,    "distance to waypoint [m]")
 VARDEF(double, gps_distHome,0,2,    "distance to GCU [m]")
 VARDEF(double, gps_course,  -180,2,     "GPS course [deg]")
