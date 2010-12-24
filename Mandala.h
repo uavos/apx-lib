@@ -122,6 +122,7 @@ public:
   uint size(void);          // size (bytes) of all archived mandala vars
   bool checkCommand(const uint8_t *data,uint cnt);
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
+  void dump(const Vect &v,const char *str="");
   void print_report(void);
 
 

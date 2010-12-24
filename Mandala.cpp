@@ -329,6 +329,10 @@ void Mandala::dump(const uint8_t *ptr,uint cnt,bool hex)
   for (uint i=0;i<cnt;i++)printf(hex?"%.2X ":"%u ",*ptr++);
   printf("\n");
 }
+void Mandala::dump(const Vect &v,const char *str)
+{
+  printf("%s: %.2f\t%.2f\t%.2f\n",str,v[0],v[1],v[2]);
+}
 //=============================================================================
 //=============================================================================
 double Mandala::boundAngle(double v,double span)
