@@ -9,12 +9,13 @@
 //-----------------------------------------------------------------------------
 #define AHRS_FREQ       100      // AHRS Update [Hz]
 #define GPS_FREQ        4       // GPS Update [Hz]
-#define SERVO_FREQ      10      // Servo update rate [Hz]
+#define SERVO_FREQ      20      // Servo update rate [Hz]
 #define TELEMETRY_FREQ  10      // Telemetry send rate [Hz]
 #define SIM_FREQ        10      // Simulator servo send rate [Hz]
 //-----------------------------------------------------------------------------
 // Controls indexes
 enum {ciRoll,ciPitch,ciThr,ciYaw,ciColl};
+enum {ciFlaps=4,ciFlaperons,ciWheel};
 enum {ciR,ciP,ciT,ciY,ciC};
 enum {ciAilerons,ciElevator,ciThrottle,ciRudder,ciSw};
 typedef enum {vt_void,vt_uint,vt_double,vt_Vect,vt_sig}_var_type;
