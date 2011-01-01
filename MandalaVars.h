@@ -110,6 +110,7 @@ CMDDEF(IMU,    0,imu,  "calibrate IMU alignment")
 CMDDEF(NED,    0,ned,  "set home to current UAV position")
 // flight control commands
 CMDDEF(JSW,    jswCnt,, "joystick axis values 0..255 (cmd not acknowleged)")
+CMDDEF(PPM,    ppmCnt,, "ppm decoded axis values from GCU modem")
 CMDDEF(Turn,   4,turn,  "adjust heading [+/- deg]")
 CMDDEF(Climb,  4,climb, "adjust altitude [+/- m]")
 
