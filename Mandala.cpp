@@ -75,15 +75,20 @@ Mandala::Mandala()
 
 #include "MandalaVars.h"
 
+  //signatures..
   idx=idxSIG;
 #define SIGDEF(aname,...) \
   VARDEFX(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,archiveSize(aname),#__VA_ARGS__) \
-  var_sig[idx-1]=aname;
+  var_sig[idx-1]=aname; \
+  const uint8_t aname##_t []={ __VA_ARGS__ };\
+  aname[0]=var_array[idx-1]; \
+  for(uint i=0;i<aname[0];i++)aname[i+1]=aname##_t[i];
 
 #include "MandalaVars.h"
 
+
   //reinit config signature..
-  config[0]=0;  //erase because its 'static'
+  config[0]=0;
   for (uint i=idxCFG;i<maxVars;i++){
     if (!var_bytes[i])break;
     config[++(config[0])]=i;
@@ -91,8 +96,6 @@ Mandala::Mandala()
   var_bytes[idx_config]=archiveSize(config);
 }
 //===========================================================================
-#define SIGDEF(aname,...) uint8_t Mandala:: aname []={ VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__ };
-#include "MandalaVars.h"
 //===========================================================================
 uint Mandala::archiveValue(uint8_t *ptr,uint i,double v)
 {

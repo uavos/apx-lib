@@ -96,8 +96,7 @@ public:
 #include "MandalaVars.h"
 
 
-//#define SIGDEF(aname, ... )   static uint8_t aname [ VA_NUM_ARGS(__VA_ARGS__)+1 ];
-#define SIGDEF(aname, ... )   static uint8_t aname [ maxVars+1 ];
+#define SIGDEF(aname, ... )   uint8_t aname [ maxVars+1 ];
 #include "MandalaVars.h"
 
 
