@@ -89,7 +89,7 @@ REGDEF(Thr,      "Airspeed to Throttle / RPM to Throttle")
 REGDEF(Yaw,      "Yaw angle to Rudder")
 REGDEF(RollH,    "Course to Desired Roll angle")
 REGDEF(PitchH,   "Altitude to Desired Pitch angle")
-REGDEF(Alt,      "Altitude to Collective Pitch")
+REGDEF(Alt,      "VSpeed to Throttle/Altitude to Collective Pitch")
 REGDEF(Runway,   "Line Flight to Desired Course")
 REGDEF(Circle,   "Loiter Flight to Desired Course")
 //=============================================================================
@@ -219,7 +219,8 @@ VARDEF(uint,   baro_fix,     0,1,     "barometric sensor data received")
 //--------- AUTOPILOT COMMAND --------------
 VARDEF(Vect, desired_theta,   -180,2,   "desired roll,pitch,yaw [deg]")
 VARDEF(Vect, desired_NED,     -10000,2, "desired north,east,down [m]")
-VARDEF(double, desired_rpm,   0,2,  "desired RPM [rpm]")
+VARDEF(double, desired_rpm,    0,2,     "desired RPM [rpm]")
+VARDEF(double, desired_vspeed,-12.7,1,  "desired vertical speed [m/s]")
 
 //--------- GPIO --------------
 VARDEF(uint, gpio,      0,1,       "GPIO bitfield [char]")
@@ -231,6 +232,7 @@ VARDEF(uint,  wptcnt,    0,1,       "number of waypoints [0...]")
 VARDEF(Vect,  wptNED,    -10000,2,  "current waypoint NED [m]")
 VARDEF(uint,  rwcnt,     0,1,       "number of runways[0...]")
 VARDEF(Vect,  rwNED,     -10000,2,  "current runway NED [m]")
+VARDEF(double,rwHDG,     -180,2,    "current runway heading [deg]")
 
 
 //--------- OTHER SENSORS--------------
@@ -299,8 +301,12 @@ CFGDEF(double,  takeoff_Lp,      90,1,1,    "pitch limit [deg]")
 CFGDEF(double,  takeoff_throttle,-1,1,0.1,  "throttle setting [-1..0..+1]")
 CFGDEF(double,  takeoff_altitude,2550,1,10, "altitude to go WPT mode [m]")
 
-CFGDEF(double,  landing_pitch,   90,1,1,    "Landing: stall pitch [deg]")
-CFGDEF(double,  landing_speed,   255,1,1,   "airspeed to open parachute [m/s]")
+CFGDEF(double,  pland_pitch,   90,1,1,    "Parachute Landing: stall pitch [deg]")
+CFGDEF(double,  pland_speed,   255,1,1,   "airspeed to open parachute [m/s]")
+
+CFGDEF(double,  land_pitch,    -12.7,1,0.1, "Runway Landing: descend pitch bias [deg]")
+CFGDEF(double,  land_tdPitch,  0,1,1,       "touchdown pitch bias [deg]")
+CFGDEF(double,  land_tdAGL,    -127,1,1,    "AGL altitude before touchdown [m]")
 
 
 CFGDEF(double,  flaps_speed,     2.55,1,0.01, "Flaps: flaps speed [0..1]")

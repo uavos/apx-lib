@@ -30,15 +30,19 @@ enum {
 //=============================================================================
 typedef enum { wtHdg=0,wtLine } _wpt_type;
 typedef struct {
-  Vect    LLH;
+  Vect    LLA;  //lat,lon,agl
   _wpt_type type;
-  uint8_t cmd[9];
+  uint8_t cmd[9]; //TODO: implement wpt commands
   uint    cmdSize;
 }_waypoint;
 //----------------------
+typedef enum { rwApproach=0,rwParachute } _rw_type;
 typedef struct {
-  Vect    LLH1;
-  Vect    LLH2;
+  Vect    LLA;  //start pos [lat lon agl]
+  Vect    dNED;
+  _rw_type type;
+  //calculated
+  double hdg;
 }_runway;
 //=============================================================================
 class Mandala
@@ -146,6 +150,7 @@ public:
   double limit(double v,double vMin,double vMax);
 
   const Vect llh2ned(const Vect llh);
+  const Vect llh2ned(const Vect llh,const Vect home_llh);
   const Vect rotate(const Vect &v_in,const double theta);
   const Vect rotate(const Vect &v_in,const Vect &theta);
   const Vect LLH_dist(const Vect &llh1,const Vect &llh2,const double lat,const double lon);
