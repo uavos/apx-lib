@@ -28,9 +28,10 @@ enum {
   regCnt
 };
 //=============================================================================
+typedef enum { wtHdg=0,wtLine } _wpt_type;
 typedef struct {
   Vect    LLH;
-  enum { wtHdg=0,wtLine } type;
+  _wpt_type type;
   uint8_t cmd[9];
   uint    cmdSize;
 }_waypoint;
