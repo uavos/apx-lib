@@ -19,6 +19,7 @@ Mandala::Mandala()
   for (uint i=0;i<cmdCnt;i++) {
     cmd_alias[i]="";
   }
+  memset(waypoints,0,sizeof(waypoints));
 
   uint idx=0;
   //------------------------  idx_##aname=idx;
@@ -325,6 +326,78 @@ bool Mandala::checkCommand(const uint8_t *data,uint cnt)
   else return true;
   return false;
 }
+//=============================================================================
+uint Mandala::archiveFlightPlan(uint8_t *buf,uint bufSize)
+{
+  const uint wptPackedSz=var_bytes[idx_gps_Lat]+var_bytes[idx_gps_Lon]+var_bytes[idx_gps_HMSL];
+  const uint sz=wptPackedSz*wptcnt+wptPackedSz*2*rwcnt+2;
+  if(bufSize<sz){
+    printf("Can't archive flight plan, wrong buffer size (%u) need (%u).\n",bufSize,sz);
+    return 0;
+  }
+  uint8_t *sbuf=buf;
+  *buf++=wptcnt;
+  *buf++=rwcnt;
+  for(uint i=0;i<wptcnt;i++){
+    buf+=archiveValue(buf,idx_gps_Lat,waypoints[i].LLH[0]);
+    buf+=archiveValue(buf,idx_gps_Lon,waypoints[i].LLH[1]);
+    buf+=archiveValue(buf,idx_gps_HMSL,waypoints[i].LLH[2]);
+  }
+  for(uint i=0;i<rwcnt;i++){
+    buf+=archiveValue(buf,idx_gps_Lat,runways[i].LLH1[0]);
+    buf+=archiveValue(buf,idx_gps_Lon,runways[i].LLH1[1]);
+    buf+=archiveValue(buf,idx_gps_HMSL,runways[i].LLH1[2]);
+    buf+=archiveValue(buf,idx_gps_Lat,runways[i].LLH2[0]);
+    buf+=archiveValue(buf,idx_gps_Lon,runways[i].LLH2[1]);
+    buf+=archiveValue(buf,idx_gps_HMSL,runways[i].LLH2[2]);
+  }
+  return buf-sbuf;
+}
+//=============================================================================
+void Mandala::extractFlightPlan(uint8_t *buf,uint bufSize)
+{
+  const uint wptPackedSz=var_bytes[idx_gps_Lat]+var_bytes[idx_gps_Lon]+var_bytes[idx_gps_HMSL];
+  const uint sz=wptPackedSz*buf[0]+wptPackedSz*2*buf[1]+2;
+  if(bufSize!=sz){
+    printf("Can't extract flight plan, wrong data size (%u) need (%u).\n",bufSize,sz);
+    return;
+  }
+  wptcnt=buf[0];
+  rwcnt=buf[1];
+  const uint8_t *data=buf+2;
+  double lat,lon,alt;
+  // unpack [cnt] waypoints from [*data]
+  for (uint i=0;i<wptcnt;i++) {
+    lat=extractValue(data,idx_gps_Lat);
+    data+=var_bytes[idx_gps_Lat];
+    lon=extractValue(data,idx_gps_Lon);
+    data+=var_bytes[idx_gps_Lon];
+    alt=extractValue(data,idx_gps_HMSL);
+    data+=var_bytes[idx_gps_HMSL];
+    waypoints[i].LLH=Vect(lat,lon,alt);
+    waypoints[i].cmd[0]=0;
+    const Vect ned=llh2ned(Vect(lat*D2R,lon*D2R,gps_home_HMSL+alt));
+    printf("WPT%u NED(%.0f, %.0f, %.0f)\n",i+1,ned[0],ned[1],ned[2]);
+  }
+  //unpack runways
+  for (uint i=0;i<rwcnt;i++) {
+    lat=extractValue(data,idx_gps_Lat);
+    data+=var_bytes[idx_gps_Lat];
+    lon=extractValue(data,idx_gps_Lon);
+    data+=var_bytes[idx_gps_Lon];
+    alt=extractValue(data,idx_gps_HMSL);
+    data+=var_bytes[idx_gps_HMSL];
+    runways[i].LLH1=Vect(lat,lon,alt);
+    lat=extractValue(data,idx_gps_Lat);
+    data+=var_bytes[idx_gps_Lat];
+    lon=extractValue(data,idx_gps_Lon);
+    data+=var_bytes[idx_gps_Lon];
+    alt=extractValue(data,idx_gps_HMSL);
+    data+=var_bytes[idx_gps_HMSL];
+    runways[i].LLH2=Vect(lat,lon,alt);
+  }
+}
+//=============================================================================
 //=============================================================================
 void Mandala::dump(const uint8_t *ptr,uint cnt,bool hex)
 {

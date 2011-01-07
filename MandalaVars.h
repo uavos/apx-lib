@@ -227,7 +227,11 @@ VARDEF(uint, gpio_cfg,  0,1,       "GPIO config (1=out) [char]")
 VARDEF(uint, gpiov,     0,1,       "GPIO input [char]")
 
 //--------- WAYPOINTS --------------
-VARDEF(uint,  wptcnt,    0,1,       "waypoints number [0...]")
+VARDEF(uint,  wptcnt,    0,1,       "number of waypoints [0...]")
+VARDEF(Vect,  wptNED,    -10000,2,  "current waypoint NED [m]")
+VARDEF(uint,  rwcnt,     0,1,       "number of runways[0...]")
+VARDEF(Vect,  rwNED,     -10000,2,  "current runway NED [m]")
+
 
 //--------- OTHER SENSORS--------------
 VARDEF(double, rpm,     0,2,     "engine RPM [1/min]")

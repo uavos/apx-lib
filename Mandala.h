@@ -7,6 +7,7 @@
 #include <string.h>
 #include <sys/types.h>
 //=============================================================================
+#define printf(...) fprintf(stdout, __VA_ARGS__ )
 //=============================================================================
 //commands enum
 #define CMDDEF(aname,aargs,aalias,adescr) cmd##aname,
@@ -27,7 +28,17 @@ enum {
   regCnt
 };
 //=============================================================================
-typedef enum {   wtHdg=0,wtLine,wtRunway } _wptType;
+typedef struct {
+  Vect    LLH;
+  enum { wtHdg=0,wtLine } type;
+  uint8_t cmd[9];
+  uint    cmdSize;
+}_waypoint;
+//----------------------
+typedef struct {
+  Vect    LLH1;
+  Vect    LLH2;
+}_runway;
 //=============================================================================
 class Mandala
 {
@@ -50,12 +61,8 @@ public:
   uint  var_void;
 
   //---- Waypoints ----
-  struct {
-    Vect    NED;
-    _wptType type;
-    int     param;
-    uint8_t command[9];
-  } waypoints[100];
+  _waypoint waypoints[100];
+  _runway   runways[10];
 
 
 
@@ -124,6 +131,9 @@ public:
   void dump(const Vect &v,const char *str="");
   void print_report(void);
 
+  //some special protocols
+  uint archiveFlightPlan(uint8_t *buf,uint bufSize); //pack wypoints to buf, return size
+  void extractFlightPlan(uint8_t *buf,uint bufSize); //read packed waypoints from buf
 
   // math operations
   double boundAngle(double v,double span=180.0);
