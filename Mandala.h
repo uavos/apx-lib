@@ -56,7 +56,7 @@ public:
   uint            var_array[maxVars];
   void *          var_ptr[maxVars];
   _var_type       var_type[maxVars];
-  const uint8_t*  var_sig[maxVars];
+  uint8_t*        var_sig[maxVars];
 
   const char      *cmd_name[cmdCnt];
   const char      *cmd_alias[cmdCnt];
@@ -131,6 +131,7 @@ public:
   uint archiveVar(uint8_t *buf,uint var_idx);
   uint archiveSize(const uint8_t *signature);
   uint size(void);          // size (bytes) of all archived mandala vars
+  void setSignature(uint i,const uint8_t *signature);
   bool checkCommand(const uint8_t *data,uint cnt);
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
   void dump(const Vect &v,const char *str="");

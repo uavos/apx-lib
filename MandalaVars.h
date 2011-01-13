@@ -117,12 +117,15 @@ CMDDEF(Climb,  4,climb, "adjust altitude [+/- m]")
 //special commands
 CMDDEF(MandalaSet,     -1,,   "Mandala variables set [signature,vars] (uplink)")
 CMDDEF(MandalaReq,     -1,,   "Mandala variables request [signature] (uplink/downlink)")
-CMDDEF(TelemetrySet,   -1,telemetry,   "send telemetry signature")
 CMDDEF(ACK,            -1,,   "send from uav to acknowlege last command")
 CMDDEF(TelemetryData,  -1,,   "telemetry [data] (downlink)")
 CMDDEF(Stdout,         -1,,   "text <stdout> from uav")
-CMDDEF(WPT,            -1,,   "waypoints config, uplink")
+CMDDEF(SignatureSet,   -1,,   "Set signature <var_idx>")
+CMDDEF(SignatureReq,    1,,   "Request signature <var_idx>")
 
+
+// flight plan
+CMDDEF(WPT,            -1,,   "waypoints upload, uplink")
 CMDDEF(GOWPT,           4,gowpt,   "enter wpt mode, go to wpt#")
 
 // IFC commands

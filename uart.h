@@ -13,6 +13,8 @@ public:
 
   bool open(const char *portname="",int baudrate=0,const char *name="",int timeout=0);
   void close();
+  bool isOpen(void);
+  int handle(void);
 
   void write(const uint8_t v);
   void write(const uint8_t *buf,uint cnt);

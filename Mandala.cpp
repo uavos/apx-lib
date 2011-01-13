@@ -23,7 +23,7 @@ Mandala::Mandala()
   memset(runways,0,sizeof(runways));
 
   uint idx=0;
-  //------------------------  idx_##aname=idx;
+  //------------------------
 
 #define VARDEFX(atype,aname,asize,aspan,abytes,adescr) \
   var_name[idx]=#aname; \
@@ -80,11 +80,12 @@ Mandala::Mandala()
   //signatures..
   idx=idxSIG;
 #define SIGDEF(aname,...) \
-  VARDEFX(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,archiveSize(aname),#__VA_ARGS__) \
+  VARDEFX(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,0,#__VA_ARGS__) \
   var_sig[idx-1]=aname; \
   const uint8_t aname##_t []={ __VA_ARGS__ };\
   aname[0]=var_array[idx-1]; \
-  for(uint i=0;i<aname[0];i++)aname[i+1]=aname##_t[i];
+  for(uint i=0;i<aname[0];i++)aname[i+1]=aname##_t[i]; \
+  var_bytes[idx-1]=archiveSize(aname);
 
 #include "MandalaVars.h"
 
@@ -98,6 +99,14 @@ Mandala::Mandala()
   var_bytes[idx_config]=archiveSize(config);
 }
 //===========================================================================
+//===========================================================================
+void Mandala::setSignature(uint i,const uint8_t *signature)
+{
+  if(var_type[i]!=vt_sig)return;
+  memcpy(var_sig[i],signature,signature[0]+1);
+  var_array[i]=signature[0];
+  var_bytes[i]=archiveSize(signature);
+}
 //===========================================================================
 uint Mandala::archiveValue(uint8_t *ptr,uint i,double v)
 {
@@ -319,8 +328,9 @@ bool Mandala::checkCommand(const uint8_t *data,uint cnt)
   // guess some known command sizes..
   if (cmd==cmdMandalaReq)size=data[1]+1;
   else if (cmd==cmdMandalaSet)size=data[1]+1+archiveSize(data+1);
-  else if (cmd==cmdWPT)size=data[1]*(4+4+2)+1;
-  else if (cmd==cmdTelemetrySet)size=data[1]+1;
+  //else if (cmd==cmdWPT)size=data[1]*(4+4+2)+1;
+  else if (cmd==cmdSignatureSet)size=(var_type[data[1]]==vt_sig)?(data[2]+1+1):0;
+  //else if (cmd==cmdTelemetryData)size=2+var_bytes[idx_downlink];
   // check size..
   if ((size>=0) && ((size+1)!=(int)cnt))
     printf("Wrong %s size (%u) need %u\n",cmd_name[cmd],cnt-1,size);
