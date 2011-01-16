@@ -53,8 +53,9 @@ bool Uart::open(const char *portname,int baudrate,const char *name,int timeout)
   tio_serial.c_lflag = 0;
   tio_serial.c_cc[VMIN] = 0;
   tio_serial.c_cc[VTIME] = timeout;
-  cfsetispeed(&tio_serial, baudrate);
-  cfsetospeed(&tio_serial, baudrate);
+  cfsetspeed(&tio_serial, baudrate);
+  //cfsetispeed(&tio_serial, baudrate);
+  //cfsetospeed(&tio_serial, baudrate);
   tcflush(fd, TCIFLUSH);
   tcsetattr(fd, TCSANOW, &tio_serial);
 
@@ -167,7 +168,7 @@ uint Uart::readEscaped(uint8_t *buf,uint max_len)
       if (bcnt) {
         printf("Received %u bytes.\n",bcnt);
         //dump(buf,bcnt);
-      }else usleep(100000);
+      }//else usleep(10000);
       //printf("nc\n");
       return 0;
     }

@@ -11,7 +11,7 @@ public:
   Uart();
   ~Uart();
 
-  bool open(const char *portname="",int baudrate=0,const char *name="",int timeout=0);
+  bool open(const char *portname="",int baudrate=0,const char *name="",int timeout=1);
   void close();
   bool isOpen(void);
   int handle(void);
