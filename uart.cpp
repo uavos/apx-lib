@@ -183,7 +183,7 @@ uint Uart::readEscaped(uint8_t *buf,uint max_len)
           stage=2;
           continue;
         }
-        case_1:
+      case_DATA:
           if (++cnt>max_len)break;
           *ptr++=v;
           crc+=v;
@@ -192,7 +192,7 @@ uint Uart::readEscaped(uint8_t *buf,uint max_len)
         if (v==0x02) {
           v=0x55;
           stage=1;
-          goto case_1;
+          goto case_DATA;
         }
         if (v==0x03) {
           ptr--;
