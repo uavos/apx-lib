@@ -170,7 +170,7 @@ bool Xsens::open(const char *portname)
   tio_serial.c_oflag = 1;
   tio_serial.c_lflag = 0;
   tio_serial.c_cc[VMIN] = 0;
-  tio_serial.c_cc[VTIME] = 1;
+  tio_serial.c_cc[VTIME] = 10;
   cfsetspeed(&tio_serial,baudrate);
   //cfsetospeed(&tio_serial,baudrate);
   tcflush(fd, TCIFLUSH);

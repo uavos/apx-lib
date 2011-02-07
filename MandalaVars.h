@@ -15,7 +15,7 @@
 //-----------------------------------------------------------------------------
 // Controls indexes
 enum {ciRoll,ciPitch,ciThr,ciYaw,ciColl};
-enum {ciFlaps=4,ciFlaperons,ciWheel};
+enum {ciFlaps=4,ciFlaperons,ciBrakes,ciWheel};
 enum {ciR,ciP,ciT,ciY,ciC};
 enum {ciAilerons,ciElevator,ciThrottle,ciRudder,ciSw};
 typedef enum {vt_void,vt_uint,vt_double,vt_Vect,vt_sig}_var_type;
