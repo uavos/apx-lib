@@ -65,7 +65,7 @@ bool Xsens::readMessage(bool wait)
 {
   uint8_t *ptr=msg.data,v,crc=0;
   uint stage=0,cnt=0;
-  char *err="";
+  const char *err="";
   //## BIG-ENDIAN! ##
   do {
     if (getRxCnt())
@@ -100,9 +100,10 @@ bool Xsens::readMessage(bool wait)
             continue;
         }
         //error
-        printf("xsens: error (%s)\n",err);
+        fprintf(stderr,"xsens: error (%s)\n",err);
+        fflush(stderr);
         err="";
-        stage=0;
+        //stage=0;
       }
     //error
     //err="no data";
