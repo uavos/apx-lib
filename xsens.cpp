@@ -68,7 +68,7 @@ bool Xsens::readMessage(bool wait)
   const char *err="";
   //## BIG-ENDIAN! ##
   do {
-    if (getRxCnt())
+    //if (getRxCnt())
       while (::read(fd,&v,1)>0) {
         //printf("%.2X ",v);fflush(stdout);
         crc+=v;
@@ -100,8 +100,8 @@ bool Xsens::readMessage(bool wait)
             continue;
         }
         //error
-        fprintf(stderr,"xsens: error (%s)\n",err);
-        fflush(stderr);
+        //fprintf(stderr,"xsens: error (%s)\n",err);
+        //fflush(stderr);
         err="";
         //stage=0;
       }
