@@ -678,7 +678,18 @@ void Mandala::print_report(void)
            var_array[i],
            var_span[i],
            var_bytes[i]
-          );
+    );
+  }
+  printf("=========== Commands ========================\n");
+  printf("#\tCommandName\tDescription\tAlias\tArgSize\n");
+  for (uint i=0;i<cmdCnt;i++) {
+    printf("%u\t%s\t%s\t%s\t%i\n",
+           i,
+           cmd_name[i],
+           cmd_descr[i],
+           cmd_alias[i],
+           cmd_size[i]
+    );
   }
 }
 //=============================================================================

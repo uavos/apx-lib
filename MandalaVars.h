@@ -29,11 +29,12 @@
 #define idxCFG  200     //configuration variables
 #define idxSIG  190     //special variables - signatures
 //-----------------------------------------------------------------------------
-#define AHRS_FREQ       100      // AHRS Update [Hz]
+#define AHRS_FREQ       100     // AHRS Update [Hz]
 #define GPS_FREQ        4       // GPS Update [Hz]
 #define SERVO_FREQ      20      // Servo update rate [Hz]
 #define TELEMETRY_FREQ  10      // Telemetry send rate [Hz]
 #define SIM_FREQ        10      // Simulator servo send rate [Hz]
+#define MAX_TELEMETRY   100     // max telemetry packet size [bytes]
 //-----------------------------------------------------------------------------
 // Controls indexes
 enum {ciRoll,ciPitch,ciThr,ciYaw,ciColl};
@@ -46,9 +47,20 @@ typedef enum {vt_void,vt_uint,vt_double,vt_Vect,vt_sig}_var_type;
 #define   jswCnt    4     // joystick axes
 #define   ppmCnt    5     // RC PPM channels cnt
 //-----------------------------------------------------------------------------
+// BitFields definitions
+//
 // gps_status variable bitmask
 #define gps_status_valid  1 // GPS coordinates are valid
 #define gps_status_fix    2 // GPS fix received (4Hz) used by AHRS
+// power status bitfield mask
+#define power_ap          1   // avionics
+#define power_servo       2   // servo
+#define power_payload     4   // payload
+#define power_agl         8   // AGL sensor
+#define power_ignition    16  // engine ignition
+#define power_lights      32  // lights
+#define power_reserved1   64  // reserved
+#define power_reserved2   128 // reserved
 //=============================================================================
 #define EARTH_RATE   0.00007292115   // rotation rate of earth (rad/sec)
 #define EARTH_RADIUS 6378137         // earth semi-major axis radius (m)
@@ -144,6 +156,10 @@ CMDDEF(TelemetryData,  -1,,   "telemetry [data] (downlink)")
 CMDDEF(Stdout,         -1,,   "text <stdout> from uav")
 CMDDEF(SignatureSet,   -1,,   "Set signature <var_idx>")
 CMDDEF(SignatureReq,    1,,   "Request signature <var_idx>")
+CMDDEF(DownlinkSet1,   -1,,   "downlink variables 0...31 (telemetry)")
+CMDDEF(DownlinkSet2,   -1,,   "downlink variables 32..63 (telemetry)")
+CMDDEF(DownlinkSet3,   -1,,   "downlink variables 64..95 (telemetry)")
+CMDDEF(DownlinkSet4,   -1,,   "downlink variables 96..127 (telemetry)")
 
 
 // flight plan
@@ -220,9 +236,11 @@ VARDEF(double, gps_home_Lon,     -180,4,     "home longitude [deg]")
 VARDEF(double, gps_home_HMSL,    -10000,2,   "home altitde above sea [m]")
 
 //--------- BATTERY --------------
+VARDEF(uint,   power,  0,1,          "power status bitfield [8bit]")
 VARDEF(double, Ve,     655.35,2,     "autopilot battery voltage [v]")
 VARDEF(double, Vs,     655.35,2,     "servo battery voltage [v]")
-VARDEF(double, Vp,     0,2,     "payload battery voltage [v]")
+VARDEF(double, Vp,     0,2,          "payload battery voltage [v]")
+
 
 //--------- TEMPERATURES --------------
 VARDEF(double, AT,    -100,1,      "ambient temperature [deg C]")
@@ -245,12 +263,13 @@ VARDEF(uint,   baro_fix,     0,1,     "barometric sensor data received")
 VARDEF(Vect, desired_theta,   -180,2,   "desired roll,pitch,yaw [deg]")
 VARDEF(Vect, desired_NED,     -10000,2, "desired north,east,down [m]")
 VARDEF(double, desired_rpm,    0,2,     "desired RPM [rpm]")
-VARDEF(double, desired_vspeed,-12.7,1,  "desired vertical speed [m/s]")
+VARDEF(double, desired_airspeed,  0,1,  "desired airspeed (for regThr) [m/s]")
+VARDEF(double, desired_vspeed,-12.7,1,  "desired vertical speed (for regPitchH) [m/s]")
 
 //--------- GPIO --------------
-VARDEF(uint, gpio,      0,1,       "GPIO bitfield [char]")
-VARDEF(uint, gpio_cfg,  0,1,       "GPIO config (1=out) [char]")
-VARDEF(uint, gpiov,     0,1,       "GPIO input [char]")
+VARDEF(uint, gpio,      0,1,       "GPIO bitfield [8bit]")
+VARDEF(uint, gpio_cfg,  0,1,       "GPIO config (1=out) [8bit]")
+VARDEF(uint, gpiov,     0,1,       "GPIO input [8bit]")
 
 //--------- WAYPOINTS --------------
 VARDEF(uint,  wptcnt,    0,1,       "number of waypoints [0...]")
@@ -262,9 +281,9 @@ VARDEF(double,rwHDG,     -180,2,    "current runway heading [deg]")
 
 //--------- OTHER SENSORS--------------
 VARDEF(double, rpm,     0,2,     "engine RPM [1/min]")
-VARDEF(double, AGL,       25.5,1,      "Above Ground Level altitude [m]")
+VARDEF(double, agl,       25.5,1,      "Above Ground Level altitude [m]")
 VARDEF(double, fuel,      1.0,1,       "Fuel [0..1]")
-VARDEFA(double,tsens,10,  120.0,1,     "temperature sensors")
+VARDEFA(double,tsens,10,  120.0,1,     "temperature sensors [C]")
 
 //--------- PAYLOAD --------------
 VARDEFA(uint,   pld_status,     8,0,2,  "payload status [16 bits]")
@@ -315,23 +334,27 @@ CFGDEF(double,  hyst_spd,   25.5,1,0.1,     "speed hold [m/s]")
 CFGDEF(double,  hyst_yaw,   25.5,1,0.1,     "heading hold [deg]")
 
 CFGDEF(double,  flight_speed,   0,1,0,      "Flight: cruise speed [m/s]")
+CFGDEF(double,  flight_speedFlaps,0,1,0,    "airspeed limit with flaps down [m/s]")
 CFGDEF(double,  flight_rpm,     25500,1,100,"cruise rpm [1/min]")
 CFGDEF(double,  flight_rpmIdle, 25500,1,100,"idle rpm [1/min]")
-CFGDEF(double,  flight_safeAlt, 2550,1,10,  "safe altitude, HOME mode [m]")
+CFGDEF(double,  flight_safeAlt, 2550,1,10,  "safe altitude, HOME, TA mode [m]")
 CFGDEF(double,  flight_throttle,-1,1,0.01,  "cruise throttle setting [-1..0..+1]")
 CFGDEF(double,  flight_stbyR,   2550,1,10,  "standby mode radius [m]")
 
 CFGDEF(double,  takeoff_Kp,      25.5,1,0.1,"Takeoff: alt error coeffitient [deg]")
 CFGDEF(double,  takeoff_Lp,      90,1,1,    "pitch limit [deg]")
 CFGDEF(double,  takeoff_throttle,-1,1,0.1,  "throttle setting [-1..0..+1]")
-CFGDEF(double,  takeoff_altitude,2550,1,10, "altitude to go WPT mode [m]")
 
 CFGDEF(double,  pland_pitch,   90,1,1,    "Parachute Landing: stall pitch [deg]")
 CFGDEF(double,  pland_speed,   255,1,1,   "airspeed to open parachute [m/s]")
 
-CFGDEF(double,  land_pitch,    -12.7,1,0.1, "Runway Landing: descend pitch bias [deg]")
-CFGDEF(double,  land_tdPitch,  0,1,1,       "touchdown pitch bias [deg]")
-CFGDEF(double,  land_tdAGL,    -127,1,1,    "AGL altitude before touchdown [m]")
+CFGDEF(double,  rw_dist,     2550,1,10,   "Runway Landing: approach distance [m]")
+CFGDEF(double,  rw_turnDist, -1270,1,10,  "approach turn distance [m]")
+CFGDEF(double,  rw_finAGL,   255,1,0,     "approach final altitude AGL [m]")
+CFGDEF(double,  rw_finPitch, -12.7,1,0.1, "final pitch bias [deg]")
+CFGDEF(double,  rw_finSpeed, 0,1,0,       "final speed [m/s]")
+CFGDEF(double,  rw_tdPitch,  0,1,1,       "touchdown pitch bias [deg]")
+CFGDEF(double,  rw_tdAGL,    -127,1,1,    "AGL altitude before touchdown [m]")
 
 
 CFGDEF(double,  flaps_speed,     2.55,1,0.01, "Flaps: flaps speed [0..1]")
