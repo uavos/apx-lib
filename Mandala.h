@@ -50,7 +50,8 @@ enum {
   regCnt
 };
 //=============================================================================
-typedef enum { wtHdg=0,wtLine } _wpt_type;
+typedef enum { wtHdg=0,wtLine,  wtCnt } _wpt_type;
+#define wt_str_def "Hdg","Line"
 typedef struct {
   Vect    LLA;  //lat,lon,agl
   _wpt_type type;
@@ -58,7 +59,8 @@ typedef struct {
   uint    cmdSize;
 }_waypoint;
 //----------------------
-typedef enum { rwApproach=0,rwParachute } _rw_type;
+typedef enum { rwtApproach=0,rwtParachute,  rwtCnt } _rw_type;
+#define rwt_str_def "Approach","Parachute"
 typedef struct {
   Vect    LLA;  //start pos [lat lon agl]
   Vect    dNED;
@@ -90,8 +92,22 @@ public:
   //---- Waypoints ----
   _waypoint waypoints[100];
   _runway   runways[10];
+  const char *wt_str[wtCnt];  //wt_type string descr
+  const char *rwt_str[rwtCnt];  //wt_type string descr
 
-
+  //---- Internal use -----
+  // telemetry framework
+  uint8_t snapshot[2048];       // all archived variables (first 128) snapshot
+  uint8_t buf_var[32];          // one var max size (tmp buf)
+  uint    dl_frcnt;             // downlink frame cnt for eeror check (inc by archiveTelemety)
+  uint    dl_errcnt;            // errors counter (by extractTelemetry)
+  uint    dl_timestamp;         // time[ms]
+  uint    dl_dt;                // dt[ms] by extractTelemetry
+  uint    dl_size;              // last telemetry size statistics
+  // derivatives calc by calcDGPS
+  bool    derivatives_init;
+  Vect    last_velNED;
+  double  last_course;
 
 
   // names, descriptions;
@@ -153,15 +169,17 @@ public:
   uint archiveVar(uint8_t *buf,uint var_idx);
   uint archiveSize(const uint8_t *signature);
   uint size(void);          // size (bytes) of all archived mandala vars
-  void setSignature(uint i,const uint8_t *signature);
   bool checkCommand(const uint8_t *data,uint cnt);
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
   void dump(const Vect &v,const char *str="");
   void print_report(void);
 
   //some special protocols
-  uint archiveFlightPlan(uint8_t *buf,uint bufSize); //pack wypoints to buf, return size
-  void extractFlightPlan(uint8_t *buf,uint bufSize); //read packed waypoints from buf
+  uint archiveFlightPlan(uint8_t *buf,uint bufSize);  //pack wypoints to buf, return size
+  void extractFlightPlan(const uint8_t *buf,uint cnt);//read packed waypoints from buf
+  uint archiveTelemety(uint8_t *buf,uint maxSize);    //pack telemetry DownlinkStream (128 vars)
+  void extractTelemety(const uint8_t *buf,uint cnt);  //read telemetry DownlinkStream
+
 
   // math operations
   double boundAngle(double v,double span=180.0);
@@ -171,6 +189,11 @@ public:
   double hyst(double err,double hyst);
   double limit(double v,double vL=1.0);
   double limit(double v,double vMin,double vMax);
+  double ned2hdg(const Vect &ned); //return heading to NED frm (0,0,0)
+  const Vect lla2ned(const Vect &lla);  // return NED from Lat Lon AGL
+
+  void calcDGPS(const double dt=(1.0/(double)GPS_FREQ)); //calculate GPS derivatives
+  void calcDist(void); // calculate distances (some vars) from GPS NED
 
   const Vect llh2ned(const Vect llh);
   const Vect llh2ned(const Vect llh,const Vect home_llh);

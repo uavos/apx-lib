@@ -32,9 +32,9 @@
 #define AHRS_FREQ       100     // AHRS Update [Hz]
 #define GPS_FREQ        4       // GPS Update [Hz]
 #define SERVO_FREQ      20      // Servo update rate [Hz]
-#define TELEMETRY_FREQ  10      // Telemetry send rate [Hz]
+#define TELEMETRY_FREQ  10      // Telemetry send rate [Hz] MAX 10Hz!
 #define SIM_FREQ        10      // Simulator servo send rate [Hz]
-#define MAX_TELEMETRY   100     // max telemetry packet size [bytes]
+#define MAX_TELEMETRY   90      // max telemetry packet size [bytes]
 //-----------------------------------------------------------------------------
 // Controls indexes
 enum {ciRoll,ciPitch,ciThr,ciYaw,ciColl};
@@ -124,8 +124,6 @@ REGDEF(Yaw,      "Yaw angle to Rudder")
 REGDEF(RollH,    "Course to Desired Roll angle")
 REGDEF(PitchH,   "Altitude to Desired Pitch angle")
 REGDEF(Alt,      "VSpeed to Throttle/Altitude to Collective Pitch")
-REGDEF(Runway,   "Line Flight to Desired Course")
-REGDEF(Circle,   "Loiter Flight to Desired Course")
 //=============================================================================
 
 //=============================================================================
@@ -152,15 +150,8 @@ CMDDEF(Climb,  4,climb, "adjust altitude [+/- m]")
 CMDDEF(MandalaSet,     -1,,   "Mandala variables set [signature,vars] (uplink)")
 CMDDEF(MandalaReq,     -1,,   "Mandala variables request [signature] (uplink/downlink)")
 CMDDEF(ACK,            -1,,   "send from uav to acknowlege last command")
-CMDDEF(TelemetryData,  -1,,   "telemetry [data] (downlink)")
+CMDDEF(DownlinkStream, -1,,   "downlink variables stream (telemetry), or reset filter (upink)")
 CMDDEF(Stdout,         -1,,   "text <stdout> from uav")
-CMDDEF(SignatureSet,   -1,,   "Set signature <var_idx>")
-CMDDEF(SignatureReq,    1,,   "Request signature <var_idx>")
-CMDDEF(DownlinkSet1,   -1,,   "downlink variables 0...31 (telemetry)")
-CMDDEF(DownlinkSet2,   -1,,   "downlink variables 32..63 (telemetry)")
-CMDDEF(DownlinkSet3,   -1,,   "downlink variables 64..95 (telemetry)")
-CMDDEF(DownlinkSet4,   -1,,   "downlink variables 96..127 (telemetry)")
-
 
 // flight plan
 CMDDEF(WPT,            -1,,   "waypoints upload, uplink")
@@ -186,9 +177,19 @@ CMDDEF(Parachute,  1,par,    "open/close parachute")
 #endif
 SIGDEF(imu, idx_acc, idx_gyro, idx_mag)
 SIGDEF(gps, idx_gps_Lat, idx_gps_Lon, idx_gps_HMSL, idx_gps_course, idx_gps_velNED)
+//telemetry filter (send with skip factor X), if changed fast but no need for update
+#define dl_slow_factor  10
+SIGDEF(dl_slow, idx_Ve,idx_Vs,idx_Vp,idx_AT,idx_ET,idx_fuel,idx_tsens)
+#define dl_reset_interval  10000    //reset snapshot interval [ms]
+//telemetry filter (don't send at all), calculated by mandala.extractTelemetry()
+SIGDEF(dl_filter, \
+  idx_gps_deltaNED,idx_gps_deltaXYZ,\
+  idx_gps_distWPT,idx_gps_distHome,\
+  idx_wpHDG,idx_rwDelta,\
+  idx_wpcnt,idx_rwcnt)
 // dynamic signatures
-SIGDEF(downlink)  //telemetry - can be rewritten
-SIGDEF(uplink)    //telemetry - always zero (packet sent from GCU)
+SIGDEF(downlink)  //telemetry - always zero (packet sent from UAV to GCU)
+SIGDEF(uplink)    //telemetry - always zero (packet sent from GCU to UAV)
 SIGDEF(config)    //configuration - list all vars>=idxCFG
 //=============================================================================
 //    Mandala variables definitions
@@ -211,29 +212,29 @@ VARDEF(uint, modeStage, 0,1,  "auto set to zero by mode change, wpt index")
 
 //--------- IMU --------------
 VARDEF(Vect, theta, -180,2,  "roll,pitch,yaw [deg]")
-VARDEF(Vect, acc,   -100,2, "Ax,Ay,Az accelerations [m/s2]")
-VARDEF(Vect, gyro,  -300,2, "p,q,r angular rates [deg/s]")
+VARDEF(Vect, acc,   -100,1, "Ax,Ay,Az accelerations [m/s2]")
+VARDEF(Vect, gyro,  -300,1, "p,q,r angular rates [deg/s]")
 VARDEF(Vect, mag,   -2,1,   "Hx,Hy,Hz magnetic field vector [gauss]")
 
 //--------- GPS --------------
-VARDEF(uint,   gps_status,  0,1,    "gps status flags")
+VARDEF(uint,   gps_status,  0,1,        "gps status flags")
 VARDEF(double, gps_Lat,     -180,4,     "latitude [deg]")
 VARDEF(double, gps_Lon,     -180,4,     "longitude [deg]")
 VARDEF(double, gps_HMSL,    -10000,2,   "altitde above sea [m]")
 VARDEF(Vect, gps_NED,       -10000,2,   "north,east,down [m]")
 VARDEF(Vect, gps_velNED,    -150,2,     "velocity north,east,down [m/s]")
 VARDEF(Vect, gps_deltaNED,  -10000,2,   "distance to desired north,east,down [m]")
-VARDEF(Vect, gps_velXYZ,    -150,2,     "velocity bodyframe x,y,z [m/s]")
-VARDEF(Vect, gps_deltaXYZ,  -10000,2,   "velocity bodyframe x,y,z [m]")
-VARDEF(Vect, gps_accXYZ,    -100,2,   "accelerations bodyframe ax,ay,az [m/c2]")
-VARDEF(double, gps_distWPT, 0,2,    "distance to waypoint [m]")
-VARDEF(double, gps_distHome,0,2,    "distance to GCU [m]")
+VARDEF(Vect, gps_velXYZ,    -50,1,      "velocity bodyframe x,y,z [m/s]")
+VARDEF(Vect, gps_deltaXYZ,  -10000,2,   "delta bodyframe x,y,z [m]")
+VARDEF(Vect, gps_accXYZ,    -100,1,     "accelerations bodyframe ax,ay,az [m/c2]")
+VARDEF(double, gps_distWPT, 0,2,        "distance to waypoint [m]")
+VARDEF(double, gps_distHome,0,2,        "distance to GCU [m]")
 VARDEF(double, gps_course,  -180,2,     "GPS course [deg]")
 VARDEF(double, gps_crsRate, -50,1,      "GPS course change rate [deg/s]")
-VARDEF(Vect, gps_accuracy, 2.55,1,     "GPS accuracy estimation Hrz[m],Ver[m],Spd[m/s]")
-VARDEF(double, gps_home_Lat,     -180,4,     "home latitude [deg]")
-VARDEF(double, gps_home_Lon,     -180,4,     "home longitude [deg]")
-VARDEF(double, gps_home_HMSL,    -10000,2,   "home altitde above sea [m]")
+VARDEF(Vect, gps_accuracy, 2.55,1,      "GPS accuracy estimation Hrz[m],Ver[m],Spd[m/s]")
+VARDEF(double, gps_home_Lat, -180,4,    "home latitude [deg]")
+VARDEF(double, gps_home_Lon, -180,4,    "home longitude [deg]")
+VARDEF(double, gps_home_HMSL,-10000,2,  "home altitde above sea [m]")
 
 //--------- BATTERY --------------
 VARDEF(uint,   power,  0,1,          "power status bitfield [8bit]")
@@ -257,7 +258,6 @@ VARDEF(uint,    jsw_valid,      0,1,  "joystick connected")
 VARDEF(double, baro_airspeed,   100,1,    "barometric airspeed [m/s]")
 VARDEF(double, baro_altitude,   10000,2,  "barometric altitude [m]")
 VARDEF(double, baro_vspeed,     10,1,     "barometric vertical speed [m/s]")
-VARDEF(uint,   baro_fix,     0,1,     "barometric sensor data received")
 
 //--------- AUTOPILOT COMMAND --------------
 VARDEF(Vect, desired_theta,   -180,2,   "desired roll,pitch,yaw [deg]")
@@ -272,12 +272,16 @@ VARDEF(uint, gpio_cfg,  0,1,       "GPIO config (1=out) [8bit]")
 VARDEF(uint, gpiov,     0,1,       "GPIO input [8bit]")
 
 //--------- WAYPOINTS --------------
-VARDEF(uint,  wptcnt,    0,1,       "number of waypoints [0...]")
-VARDEF(Vect,  wptNED,    -10000,2,  "current waypoint NED [m]")
+VARDEF(uint,  wpcnt,     0,1,       "number of waypoints [0...]")
+VARDEF(Vect,  wpNED,     -10000,2,  "current waypoint NED [m]")
+VARDEF(double,wpHDG,     -180,2,    "current waypoint heading [deg]")
+VARDEF(uint,  wpType,    0,1,       "current waypoint type [wp_type]")
+
 VARDEF(uint,  rwcnt,     0,1,       "number of runways[0...]")
 VARDEF(Vect,  rwNED,     -10000,2,  "current runway NED [m]")
 VARDEF(double,rwHDG,     -180,2,    "current runway heading [deg]")
-
+VARDEF(double,rwDelta,   -127,1,    "runway horizontal displacement [m]")
+VARDEF(double,rwDeltaH,  -127,1,    "runway altitude displacement [m]")
 
 //--------- OTHER SENSORS--------------
 VARDEF(double, rpm,     0,2,     "engine RPM [1/min]")
@@ -339,7 +343,6 @@ CFGDEF(double,  flight_rpm,     25500,1,100,"cruise rpm [1/min]")
 CFGDEF(double,  flight_rpmIdle, 25500,1,100,"idle rpm [1/min]")
 CFGDEF(double,  flight_safeAlt, 2550,1,10,  "safe altitude, HOME, TA mode [m]")
 CFGDEF(double,  flight_throttle,-1,1,0.01,  "cruise throttle setting [-1..0..+1]")
-CFGDEF(double,  flight_stbyR,   2550,1,10,  "standby mode radius [m]")
 
 CFGDEF(double,  takeoff_Kp,      25.5,1,0.1,"Takeoff: alt error coeffitient [deg]")
 CFGDEF(double,  takeoff_Lp,      90,1,1,    "pitch limit [deg]")
@@ -355,7 +358,12 @@ CFGDEF(double,  rw_finPitch, -12.7,1,0.1, "final pitch bias [deg]")
 CFGDEF(double,  rw_finSpeed, 0,1,0,       "final speed [m/s]")
 CFGDEF(double,  rw_tdPitch,  0,1,1,       "touchdown pitch bias [deg]")
 CFGDEF(double,  rw_tdAGL,    -127,1,1,    "AGL altitude before touchdown [m]")
+CFGDEF(double,  rw_Kp,       2.55,1,0.01, "error multiplier [m]")
+CFGDEF(double,  rw_Lp,       255,1,1,     "heading limit [deg]")
 
+CFGDEF(double,  stby_R,  2550,1,10,     "Standby mode: radius [m]")
+CFGDEF(double,  stby_Kp, 2.55,1,0.01,   "error multiplier [m]")
+CFGDEF(double,  stby_Lp, 255,1,1,       "heading limit [deg]")
 
 CFGDEF(double,  flaps_speed,     2.55,1,0.01, "Flaps: flaps speed [0..1]")
 CFGDEF(double,  flaps_level,     2.55,1,0.01, "flaps level [0..1]")
