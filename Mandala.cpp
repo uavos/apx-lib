@@ -49,7 +49,8 @@ Mandala::Mandala()
   dl_timestamp=0;
   dl_dt=1000/TELEMETRY_FREQ;
   dl_size=0;
-  memset(snapshot,0,sizeof(snapshot));
+  //memset(snapshot,0,sizeof(snapshot));
+  dl_reset=true;
 
   derivatives_init=false;
 
@@ -366,10 +367,24 @@ bool Mandala::checkCommand(const uint8_t *data,uint cnt)
   return false;
 }
 //=============================================================================
+void Mandala::set_flag(uint flag,bool value)
+{
+  if(value)flags|=flag; else flags&=~flag;
+}
+void Mandala::clear_flag(uint flag)
+{
+  set_flag(flag,false);
+}
+bool Mandala::flag(uint flag)
+{
+  return flags&flag;
+}
+//=============================================================================
+//=============================================================================
 uint Mandala::archiveFlightPlan(uint8_t *buf,uint bufSize) // call by GCU only
 {
   const uint wptPackedSz=var_bytes[idx_gps_Lat]+var_bytes[idx_gps_Lon]+var_bytes[idx_gps_HMSL]+1;
-  const uint rwPackedSz=wptPackedSz+var_bytes[idx_gps_NED]*3;
+  const uint rwPackedSz=wptPackedSz+var_bytes[idx_NED]*3;
   const uint sz=wptPackedSz*wpcnt+rwPackedSz*rwcnt+2;
   if(bufSize<sz){
     printf("Can't archive flight plan, wrong buffer size (%u) need (%u).\n",bufSize,sz);
@@ -389,9 +404,9 @@ uint Mandala::archiveFlightPlan(uint8_t *buf,uint bufSize) // call by GCU only
     buf+=archiveValue(buf,idx_gps_Lon,runways[i].LLA[1]);
     buf+=archiveValue(buf,idx_gps_HMSL,runways[i].LLA[2]);
     *buf++=runways[i].type;
-    buf+=archiveValue(buf,idx_gps_NED,runways[i].dNED[0]);
-    buf+=archiveValue(buf,idx_gps_NED,runways[i].dNED[1]);
-    buf+=archiveValue(buf,idx_gps_NED,runways[i].dNED[2]);
+    buf+=archiveValue(buf,idx_NED,runways[i].dNED[0]);
+    buf+=archiveValue(buf,idx_NED,runways[i].dNED[1]);
+    buf+=archiveValue(buf,idx_NED,runways[i].dNED[2]);
   }
   return buf-sbuf;
 }
@@ -399,7 +414,7 @@ uint Mandala::archiveFlightPlan(uint8_t *buf,uint bufSize) // call by GCU only
 void Mandala::extractFlightPlan(const uint8_t *buf,uint cnt) // call by UAV only
 {
   const uint wptPackedSz=var_bytes[idx_gps_Lat]+var_bytes[idx_gps_Lon]+var_bytes[idx_gps_HMSL]+1;
-  const uint rwPackedSz=wptPackedSz+var_bytes[idx_gps_NED]*3;
+  const uint rwPackedSz=wptPackedSz+var_bytes[idx_NED]*3;
   const uint sz=wptPackedSz*buf[0]+rwPackedSz*buf[1]+2;
   if(cnt!=sz){
     printf("Can't extract flight plan, wrong data size (%u) need (%u).\n",cnt,sz);
@@ -433,12 +448,12 @@ void Mandala::extractFlightPlan(const uint8_t *buf,uint cnt) // call by UAV only
     runways[i].LLA[2]=extractValue(data,idx_gps_HMSL);
     data+=var_bytes[idx_gps_HMSL];
     runways[i].type=(_rw_type)*data++;
-    runways[i].dNED[0]=extractValue(data,idx_gps_NED);
-    data+=var_bytes[idx_gps_NED];
-    runways[i].dNED[1]=extractValue(data,idx_gps_NED);
-    data+=var_bytes[idx_gps_NED];
-    runways[i].dNED[2]=extractValue(data,idx_gps_NED);
-    data+=var_bytes[idx_gps_NED];
+    runways[i].dNED[0]=extractValue(data,idx_NED);
+    data+=var_bytes[idx_NED];
+    runways[i].dNED[1]=extractValue(data,idx_NED);
+    data+=var_bytes[idx_NED];
+    runways[i].dNED[2]=extractValue(data,idx_NED);
+    data+=var_bytes[idx_NED];
     printf("Runway%u (%s)\n",i+1,rwt_str[runways[i].type]);
   }
 }
@@ -452,9 +467,14 @@ uint Mandala::archiveTelemety(uint8_t *buf,uint maxSize) // call by UAV only
   // timestamp - every call increments by 10/TELEMETRY_FREQ (time in 100ms units)
   // bitsig - LSBF bitfield, on/off next 8 variables starting from 0
   // skip vars in sig 'dl_filter' as they are calculated by 'extractTelemety'
+  if(dl_reset){
+    memset(dl_reset_mask,0xFF,sizeof(dl_reset_mask));
+    dl_reset=false;
+  }
+  uint8_t *reset_mask_ptr=dl_reset_mask;
   uint cnt=0,mask_cnt=0,mask_cnt_zero=1;
-  uint8_t *snapshot=this->snapshot;
-  uint8_t *buf_var=this->buf_var;
+  uint8_t *snapshot=dl_snapshot;
+  uint8_t *buf_var=dl_var;
   uint mask=1;
   uint8_t *mask_ptr=buf+2;      //start of data
   uint8_t *ptr=mask_ptr+1;
@@ -463,9 +483,13 @@ uint Mandala::archiveTelemety(uint8_t *buf,uint maxSize) // call by UAV only
     uint sz=archiveVar(buf_var,i);
     //check if filtered var
     bool filtered=memchr(dl_filter+1,i,dl_filter[0]);
-    filtered|=(dl_frcnt%dl_slow_factor)&&memchr(dl_slow+1,i,dl_slow[0]);
-    //test changed
-    filtered|=memcmp(snapshot,buf_var,sz)==0;
+    bool rst=(*reset_mask_ptr)&mask;
+    if(rst) (*reset_mask_ptr)&=~mask;
+    else{
+      filtered|=(dl_frcnt%dl_slow_factor)&&memchr(dl_slow+1,i,dl_slow[0]);
+      //test changed
+      filtered|=(memcmp(snapshot,buf_var,sz)==0);
+    }
     //pack if not filtered
     if(!filtered){
       //check buf overflow
@@ -486,17 +510,19 @@ uint Mandala::archiveTelemety(uint8_t *buf,uint maxSize) // call by UAV only
       mask_cnt_zero++;
       mask_ptr=ptr;
       *mask_ptr=0;
+      reset_mask_ptr++;
       ptr++;
     }
   }
 
   if(!(dl_timestamp%dl_reset_interval)) // periodically send everything
-    memset(snapshot,0,sizeof(snapshot));
+    dl_reset=true;
 
-  if(!cnt){
+  clear_flag(flag_gps_fix);
+  /*if(!cnt){
     dl_timestamp+=dl_dt;
     return 0;
-  }
+  }*/
   buf[0]=dl_frcnt++;
   buf[1]=dl_timestamp/100;
   dl_timestamp+=1000/TELEMETRY_FREQ;
@@ -541,64 +567,61 @@ void Mandala::extractTelemety(const uint8_t *buf,uint cnt) //call by GCU only
   }while(tcnt>0);
   // calculate vars filtered by sig dl_filter:
   // gps_velXYZ,gps_accXYZ,gps_crsRate
-  //calcDGPS(dl_dt/1000.0);
+  if(flag(flag_gps_fix))calcDGPS();
   // gps_deltaNED,gps_deltaXYZ,gps_distWPT,gps_distHome,
-  calcDist();
-}
-//=============================================================================
-//=============================================================================
-//=============================================================================
-void Mandala::dump(const uint8_t *ptr,uint cnt,bool hex)
-{
-  //printf("\n");
-  for (uint i=0;i<cnt;i++)printf(hex?"%.2X ":"%u ",*ptr++);
-  printf("\n");
-}
-void Mandala::dump(const Vect &v,const char *str)
-{
-  printf("%s: %.2f\t%.2f\t%.2f\n",str,v[0],v[1],v[2]);
+  calc();
 }
 //=============================================================================
 //=============================================================================
 void Mandala::calcDGPS(const double dt)
 {
-  // vars should be filtered by dl_filter
+  // calculate NED
+  NED=llh2ned(Vect(gps_Lat*D2R,gps_Lon*D2R,gps_HMSL));
+
   Vect theta_r=theta*D2R;
   // calculate frame velocities
   theta_r[2]=gps_course*D2R;
-  gps_velXYZ=rotate(gps_velNED,theta_r);
+  vXYZ=rotate(gps_velNED,theta_r);
 
   if(derivatives_init)
-    gps_accXYZ=rotate((gps_velNED-last_velNED)/dt,theta_r);
+    aXYZ=rotate((gps_velNED-last_velNED)/dt,theta_r);
   last_velNED=gps_velNED;
 
   //calc course rate (derivative)
   if(derivatives_init)
-    gps_crsRate=boundAngle(gps_course-last_course)/dt;
+    crsRate=boundAngle(gps_course-last_course)/dt;
   last_course=gps_course;
 
   derivatives_init=true;
 }
 //=============================================================================
-void Mandala::calcDist(void)
+void Mandala::calc(void)
 {
   // vars should be filtered by dl_filter
-  gps_deltaNED=gps_NED-desired_NED;
-  gps_deltaXYZ=rotate(gps_deltaNED,theta[2]*D2R);
-  gps_distWPT=sqrt(pow(gps_deltaNED[0],2)+pow(gps_deltaNED[1],2));
-  gps_distHome=sqrt(pow(gps_NED[0],2)+pow(gps_NED[1],2));
-  wpHDG=ned2hdg(gps_deltaNED);
-  rwDelta=gps_distWPT*sin((wpHDG+180.0-rwHDG)*D2R);
+  dNED=cmd_NED-NED;
+  dXYZ=rotate(dNED,theta[2]*D2R);
+  dWPT=ned2dist(dNED);
+  dHome=ned2dist(NED);
+  wpHDG=ned2hdg(dNED);
+  homeHDG=ned2hdg(NED,true);
+  rwDelta=dWPT*sin((wpHDG+180.0-rwHDG)*D2R);
 }
 //=============================================================================
-double Mandala::ned2hdg(const Vect &ned)
+double Mandala::ned2hdg(const Vect &ned,bool back)
 {
-  return boundAngle(atan2(-ned[1],-ned[0])*R2D);
+  double v=atan2(ned[1],ned[0])*R2D;
+  if(back)return boundAngle(v+180.0);
+  else return boundAngle(v);
 }
 //=============================================================================
 const Vect Mandala::lla2ned(const Vect &lla)
 {
   return llh2ned(Vect(lla[0]*D2R,lla[1]*D2R,gps_home_HMSL+lla[2]));
+}
+//=============================================================================
+double Mandala::ned2dist(const Vect &ned)
+{
+  return sqrt(pow(ned[0],2)+pow(ned[1],2));
 }
 //=============================================================================
 double Mandala::boundAngle(double v,double span)
@@ -803,6 +826,19 @@ const Vect Mandala::llh2ECEF(const Vect &llh)
   ECEF[1]=(N+llh[2])*cos(llh[0])*sin(llh[1]);
   ECEF[2]=(N*(1-e*e)+llh[2])*sin(llh[0]);
   return ECEF;
+}
+//=============================================================================
+//=============================================================================
+//=============================================================================
+void Mandala::dump(const uint8_t *ptr,uint cnt,bool hex)
+{
+  //printf("\n");
+  for (uint i=0;i<cnt;i++)printf(hex?"%.2X ":"%u ",*ptr++);
+  printf("\n");
+}
+void Mandala::dump(const Vect &v,const char *str)
+{
+  printf("%s: %.2f\t%.2f\t%.2f\n",str,v[0],v[1],v[2]);
 }
 //=============================================================================
 //=============================================================================

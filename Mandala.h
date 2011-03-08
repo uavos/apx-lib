@@ -97,8 +97,10 @@ public:
 
   //---- Internal use -----
   // telemetry framework
-  uint8_t snapshot[2048];       // all archived variables (first 128) snapshot
-  uint8_t buf_var[32];          // one var max size (tmp buf)
+  uint8_t dl_snapshot[2048];    // all archived variables (first 128) snapshot
+  bool    dl_reset;             // set true to send everything next time
+  uint8_t dl_reset_mask[128/8]; // bitmask 1=var send anyway, auto clear after sent
+  uint8_t dl_var[32];           // one var max size (tmp buf)
   uint    dl_frcnt;             // downlink frame cnt for eeror check (inc by archiveTelemety)
   uint    dl_errcnt;            // errors counter (by extractTelemetry)
   uint    dl_timestamp;         // time[ms]
@@ -174,12 +176,16 @@ public:
   void dump(const Vect &v,const char *str="");
   void print_report(void);
 
-  //some special protocols
+  // some special protocols
   uint archiveFlightPlan(uint8_t *buf,uint bufSize);  //pack wypoints to buf, return size
   void extractFlightPlan(const uint8_t *buf,uint cnt);//read packed waypoints from buf
   uint archiveTelemety(uint8_t *buf,uint maxSize);    //pack telemetry DownlinkStream (128 vars)
   void extractTelemety(const uint8_t *buf,uint cnt);  //read telemetry DownlinkStream
 
+  // flags
+  void set_flag(uint flag,bool value=true);
+  void clear_flag(uint flag);
+  bool flag(uint flag);
 
   // math operations
   double boundAngle(double v,double span=180.0);
@@ -189,11 +195,12 @@ public:
   double hyst(double err,double hyst);
   double limit(double v,double vL=1.0);
   double limit(double v,double vMin,double vMax);
-  double ned2hdg(const Vect &ned); //return heading to NED frm (0,0,0)
+  double ned2hdg(const Vect &ned,bool back=false); //return heading to NED frm (0,0,0)
+  double ned2dist(const Vect &ned); //return distance to to NED frm (0,0,0)
   const Vect lla2ned(const Vect &lla);  // return NED from Lat Lon AGL
 
   void calcDGPS(const double dt=(1.0/(double)GPS_FREQ)); //calculate GPS derivatives
-  void calcDist(void); // calculate distances (some vars) from GPS NED
+  void calc(void); // calculate vars dependent on current and desired UAV position
 
   const Vect llh2ned(const Vect llh);
   const Vect llh2ned(const Vect llh,const Vect home_llh);
