@@ -186,7 +186,7 @@ SIGDEF(dl_slow, idx_Ve,idx_Vs,idx_Vp,idx_AT,idx_ET,idx_fuel,idx_tsens)
 SIGDEF(dl_filter, \
   idx_NED,idx_homeHDG,idx_dHome,idx_dWPT,idx_dNED,\
   idx_vXYZ,idx_dXYZ,idx_aXYZ,idx_crsRate,\
-  idx_wpHDG,idx_rwDelta,idx_rwDeltaH,\
+  idx_wpHDG,idx_rwDelta,\
   idx_wpcnt,idx_rwcnt)
 // dynamic signatures
 SIGDEF(downlink)  //telemetry - always zero (packet sent from UAV to GCU)
@@ -209,7 +209,7 @@ SIGDEF(config)    //configuration - list all vars>=idxCFG
 #endif
 //--------- SPECIAL --------------
 VARDEF(uint, mode,      0,1,       "mode of operation: EMG,RPV,UAV...")
-VARDEF(uint, modeStage, 0,1,       "auto set to zero by mode change, wpt index")
+VARDEF(uint, stage,     0,1,       "auto set to zero by mode change (wpt index, maneuver stage)")
 VARDEF(uint, flags,     0,1,       "status flags bitfield[flag_XXX]")
 
 //--------- IMU --------------
@@ -285,9 +285,8 @@ VARDEF(Vect,  dXYZ,    -10000,2, "delta bodyframe x,y,z [m]")
 VARDEF(Vect,  aXYZ,    -100,1,   "accelerations by trajectory ax,ay,az [m/c2]")
 VARDEF(double,crsRate, -50,1,    "trajectory course change rate [deg/s]")
 VARDEF(double,wpHDG,   -180,2,   "current waypoint heading [deg]")
-VARDEF(double,rwHDG,     -180,2,    "current runway heading [deg]")
+VARDEF(double,rwHDG,   -180,2,   "current runway heading [deg]")
 VARDEF(double,rwDelta, -127,1,   "runway horizontal displacement [m]")
-VARDEF(double,rwDeltaH,-127,1,   "runway altitude displacement [m]")
 
 //--------- OTHER SENSORS--------------
 VARDEF(double, rpm,     0,2,     "engine RPM [1/min]")
