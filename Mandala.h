@@ -31,12 +31,6 @@
 //=============================================================================
 #define printf(...) fprintf(stdout, __VA_ARGS__ )
 //=============================================================================
-//commands enum
-#define CMDDEF(aname,aargs,aalias,adescr) cmd##aname,
-enum {
-#include "MandalaVars.h"
-  cmdCnt
-};
 //modes enum
 #define MODEDEF(aname,adescr) fm##aname,
 enum {
@@ -49,6 +43,10 @@ enum {
 #include "MandalaVars.h"
   regCnt
 };
+
+//bitfield constants
+#define BITDEF(avarname,abitname,amask,adescr) enum{ avarname##_##abitname=amask };
+#include "MandalaVars.h"
 //=============================================================================
 typedef enum { wtHdg=0,wtLine,  wtCnt } _wpt_type;
 #define wt_str_def "Hdg","Line"
@@ -69,6 +67,7 @@ typedef struct {
   double hdg;
 }_runway;
 //=============================================================================
+//=============================================================================
 class Mandala
 {
 public:
@@ -82,12 +81,9 @@ public:
   _var_type       var_type[maxVars];
   uint8_t*        var_sig[maxVars];
 
-  const char      *cmd_name[cmdCnt];
-  const char      *cmd_alias[cmdCnt];
-  const char      *cmd_descr[cmdCnt];
-  int             cmd_size[cmdCnt];
-
-  uint  var_void;
+  uint            var_bits[maxVars];    // number of bitfield bits
+  const char      *var_bits_name[maxVars][32];  // bit descriptions
+  const char      *var_bits_descr[maxVars][32];  // bit descriptions
 
   //---- Waypoints ----
   _waypoint waypoints[100];
@@ -115,7 +111,7 @@ public:
   // names, descriptions;
 
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr)        VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
-#define SIGDEF(aname,...)                                     VARDEF( ,aname, , , )
+#define SIGDEF(aname,adescr,...)                              VARDEF( ,aname, , , )
 #define VARDEF(atype,aname,aspan,abytes,adescr)               const char *name_##aname,*descr_##aname;
 #include "MandalaVars.h"
 
@@ -132,7 +128,7 @@ public:
 #include "MandalaVars.h"
     idx_cfg_top
   };
-#define SIGDEF(aname, ... ) idx_##aname,
+#define SIGDEF(aname,adescr, ... ) idx_##aname,
   enum {
     idx_sig_start=idxSIG-1,
 #include "MandalaVars.h"
@@ -148,7 +144,7 @@ public:
 #include "MandalaVars.h"
 
 
-#define SIGDEF(aname, ... )   uint8_t aname [ maxVars+1 ];
+#define SIGDEF(aname,adescr, ... )   uint8_t aname [ maxVars+1 ];
 #include "MandalaVars.h"
 
 
@@ -161,31 +157,21 @@ public:
 
 //=============================================================================
   Mandala();
-private:
-  uint archiveValue(uint8_t *ptr,uint i,double v);
-  double extractValue(const uint8_t *ptr,uint i);
 public:
-  uint extractMandala(const uint8_t *buf,const uint8_t *signature);
-  uint extractVar(const uint8_t *buf,uint var_idx);
-  uint archiveMandala(uint8_t *buf,const uint8_t *signature);
-  uint archiveVar(uint8_t *buf,uint var_idx);
-  uint archiveSize(const uint8_t *signature);
+  uint extract(const uint8_t *buf,uint size,uint var_idx); //return buf size released
+  uint extract(const uint8_t *buf,uint size); //overloaded - first byte=var_idx
+  uint archive(uint8_t *buf,uint size,uint var_idx);
+
   uint size(void);          // size (bytes) of all archived mandala vars
-  bool checkCommand(const uint8_t *data,uint cnt);
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
   void dump(const Vect &v,const char *str="");
+  void dump(const uint var_idx);
   void print_report(void);
 
-  // some special protocols
-  uint archiveFlightPlan(uint8_t *buf,uint bufSize);  //pack wypoints to buf, return size
-  void extractFlightPlan(const uint8_t *buf,uint cnt);//read packed waypoints from buf
-  uint archiveTelemety(uint8_t *buf,uint maxSize);    //pack telemetry DownlinkStream (128 vars)
-  void extractTelemety(const uint8_t *buf,uint cnt);  //read telemetry DownlinkStream
-
   // flags
-  void set_flag(uint flag,bool value=true);
-  void clear_flag(uint flag);
-  bool flag(uint flag);
+  uint status_set(uint mask,bool value=true);
+  uint status_clear(uint mask);
+  bool status_get(uint mask);
 
   // math operations
   double boundAngle(double v,double span=180.0);
@@ -193,8 +179,10 @@ public:
   uint snap(uint v, uint snapv=10);
   void filterValue(double v,double *vLast,double S,double L);
   double hyst(double err,double hyst);
-  double limit(double v,double vL=1.0);
-  double limit(double v,double vMin,double vMax);
+  double limit(const double v,const double vL=1.0);
+  double limit(const double v,const double vMin,const double vMax);
+  int64_t limit_i(const int64_t v,const int64_t vL=255);
+  int64_t limit_i(const int64_t v,const int64_t vMin,const int64_t vMax);
   double ned2hdg(const Vect &ned,bool back=false); //return heading to NED frm (0,0,0)
   double ned2dist(const Vect &ned); //return distance to to NED frm (0,0,0)
   const Vect lla2ned(const Vect &lla);  // return NED from Lat Lon AGL
@@ -212,6 +200,23 @@ public:
   const Vect Tangent2ECEF(const Vect &Local,const double latitude,const double longitude);
   const Vect ECEF2llh(const Vect &ECEF);
   const Vect llh2ECEF(const Vect &llh);
+
+private:
+  uint extract_sig(const uint8_t *buf,uint size,const uint8_t *signature);
+  uint archive_sig(uint8_t *buf,uint size,const uint8_t *signature);
+  uint archive_f(uint8_t *buf,const double v,const uint bytes,const double span);
+  uint archive_u(uint8_t *buf,const uint v,const uint bytes);
+  double extract_f(const uint8_t *buf,const uint bytes,const double span,const double prec=0.0);
+  uint extract_u(const uint8_t *buf,const uint bytes);
+
+  uint archiveSize(const uint8_t *signature);
+
+  // some special protocols
+  uint archive_flightplan(uint8_t *buf,uint bufSize);  //pack wypoints to buf, return size
+  uint extract_flightplan(const uint8_t *buf,uint cnt);//read packed waypoints from buf
+  uint archive_downstream(uint8_t *buf,uint maxSize);    //pack telemetry DownlinkStream (128 vars)
+  uint extract_downstream(const uint8_t *buf,uint cnt);  //read telemetry DownlinkStream
+
 };
 //=============================================================================
 #endif // MANDALA_H
