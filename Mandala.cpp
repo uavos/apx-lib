@@ -438,6 +438,10 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
   // timestamp - every call increments by 10/TELEMETRY_FREQ (time in 100ms units)
   // bitsig - LSBF bitfield, on/off next 8 variables starting from 0
   // skip vars in sig 'dl_filter' as they are calculated by 'extractTelemety'
+
+  //limit maxSize
+  if(maxSize>MAX_TELEMETRY)maxSize=MAX_TELEMETRY;
+
   if(dl_reset){
     memset(dl_reset_mask,0xFF,sizeof(dl_reset_mask));
     dl_reset=false;
@@ -538,11 +542,12 @@ uint Mandala::extract_downstream(const uint8_t *buf,uint cnt)
   // calculate vars filtered by sig dl_filter:
   // gps_velXYZ,gps_accXYZ,gps_crsRate
   //check if to calc derivatives (gps fix)
-  static Vect gps_velNED_s(gps_velNED);
-  if(gps_velNED_s==gps_velNED){
-    gps_velNED_s=gps_velNED;
+  //static Vect gps_velNED_s(gps_velNED);
+  //if(gps_velNED_s==gps_velNED){
+    //gps_velNED_s=gps_velNED;
     calcDGPS();
-  }
+    //printf("gpsd\n");
+  //}
   // gps_deltaNED,gps_deltaXYZ,gps_distWPT,gps_distHome,
   calc();
   return ptr-buf;
@@ -649,7 +654,7 @@ double Mandala::limit(const double v,const double vMin,const double vMax)
 }
 int64_t Mandala::limit_i(const int64_t v,const int64_t vL)
 {
-  return limit(v,-vL,vL);
+  return limit_i(v,-vL,vL);
 }
 int64_t Mandala::limit_i(const int64_t v,const int64_t vMin,const int64_t vMax)
 {

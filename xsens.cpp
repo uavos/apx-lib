@@ -37,9 +37,9 @@ void Xsens::threadRx()
     }
     lvar.AT=data.temperature;
     msg.data[1]=Mandala::idx_imu;
-    msgsnd(msqid,&msg,lvar.archiveVar(&msg.data[2],msg.data[1])+2,0);
+    msgsnd(msqid,&msg,lvar.archive(&msg.data[2],_bus_msg_size,msg.data[1])+2,0);
     msg.data[1]=Mandala::idx_AT;
-    msgsnd(msqid,&msg,lvar.archiveVar(&msg.data[2],msg.data[1])+2,0);
+    msgsnd(msqid,&msg,lvar.archive(&msg.data[2],_bus_msg_size,msg.data[1])+2,0);
   } // forever
   pthread_exit(NULL);
 }
