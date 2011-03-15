@@ -109,24 +109,6 @@ REGDEF(RollH,    "Course to Desired Roll angle")
 REGDEF(PitchH,   "Altitude to Desired Pitch angle")
 REGDEF(Alt,      "VSpeed to Throttle/Altitude to Collective Pitch")
 //=============================================================================
-
-//=============================================================================
-// Autopilot commands.
-// name, alias, "description"
-// names are accessed as enum "cmdName"
-// alias used on GCU console only, set to enable command in GCU console
-//=============================================================================
-#ifndef CMDDEF
-#define CMDDEF(aname,aalias,adescr)
-#endif
-/*
-CMDDEF(Mode,   ,        "set flight mode")
-CMDDEF(IMU,    imu,     "calibrate IMU alignment")
-CMDDEF(NED,    ned,     "set home to current UAV position")
-// flight control commands
-CMDDEF(JSW,    ,        "joystick axis values 0..255 (cmd not acknowleged)")
-CMDDEF(PPM,    ,        "ppm decoded axis values from GCU modem")
-*/
 //=============================================================================
 //-----------------------------------------------------------------------------
 // special variables - signatures
@@ -136,7 +118,7 @@ CMDDEF(PPM,    ,        "ppm decoded axis values from GCU modem")
 SIGDEF(imu, "IMU sensors data pack",\
        idx_acc, idx_gyro, idx_mag)
 SIGDEF(gps, "GPS fix data pack",\
-      idx_gps_Lat, idx_gps_Lon, idx_gps_HMSL, idx_gps_course, idx_gps_velNED)
+      idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED)
 SIGDEF(ctr, "Fast controls",\
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_wheel)
 //telemetry filter (send with skip factor X), if changed fast but no need for update
@@ -194,15 +176,15 @@ VARDEF(Vect, gyro,  -300,1, "p,q,r angular rates [deg/s]")
 VARDEF(Vect, mag,   -2,1,   "Hx,Hy,Hz magnetic field vector [gauss]")
 
 //--------- Measured by GPS --------------
-VARDEF(double, gps_Lat,     -180,4,     "latitude [deg]")
-VARDEF(double, gps_Lon,     -180,4,     "longitude [deg]")
-VARDEF(double, gps_HMSL,    -10000,2,   "altitde above sea [m]")
-VARDEF(Vect,   gps_velNED,  -150,2,     "velocity north,east,down [m/s]")
+VARDEF(double, gps_lat,     -180,4,     "latitude [deg]")
+VARDEF(double, gps_lon,     -180,4,     "longitude [deg]")
+VARDEF(double, gps_hmsl,    -10000,2,   "altitde above sea [m]")
+VARDEF(Vect,   gps_vNED,    -150,2,     "velocity north,east,down [m/s]")
 VARDEF(double, gps_course,  -180,2,     "GPS course [deg]")
 VARDEF(Vect,   gps_accuracy, 2.55,1,    "GPS accuracy estimation Hrz[m],Ver[m],Spd[m/s]")
-VARDEF(double, gps_home_Lat, -180,4,    "home latitude [deg]")
-VARDEF(double, gps_home_Lon, -180,4,    "home longitude [deg]")
-VARDEF(double, gps_home_HMSL,-10000,2,  "home altitde above sea [m]")
+VARDEF(double, gps_home_lat, -180,4,    "home latitude [deg]")
+VARDEF(double, gps_home_lon, -180,4,    "home longitude [deg]")
+VARDEF(double, gps_home_hmsl,-10000,2,  "home altitde above sea [m]")
 
 //--------- PRESSURE --------------
 VARDEF(double, airspeed,        100,1,    "barometric airspeed [m/s]")

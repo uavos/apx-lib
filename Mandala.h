@@ -75,7 +75,8 @@ public:
   const char *    var_descr[maxVars];
   double          var_span[maxVars];
   double          var_round[maxVars];
-  uint            var_bytes[maxVars];
+  uint            var_bytes[maxVars]; //size of packed member
+  uint            var_size[maxVars];  //size of whole packed var
   uint            var_array[maxVars];
   void *          var_ptr[maxVars];
   _var_type       var_type[maxVars];
@@ -104,11 +105,8 @@ public:
   uint    dl_size;              // last telemetry size statistics
   // derivatives calc by calcDGPS
   bool    derivatives_init;
-  Vect    last_velNED;
+  Vect    last_vNED;
   double  last_course;
-
-
-  // names, descriptions;
 
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr)        VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
 #define SIGDEF(aname,adescr,...)                              VARDEF( ,aname, , , )
@@ -158,11 +156,13 @@ public:
 //=============================================================================
   Mandala();
 public:
+  uint archive(uint8_t *buf,uint size,uint var_idx);
   uint extract(const uint8_t *buf,uint size,uint var_idx); //return buf size released
   uint extract(const uint8_t *buf,uint size); //overloaded - first byte=var_idx
-  uint archive(uint8_t *buf,uint size,uint var_idx);
 
   uint size(void);          // size (bytes) of all archived mandala vars
+  uint size(const uint8_t *signature);
+
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
   void dump(const Vect &v,const char *str="");
   void dump(const uint var_idx);
@@ -208,8 +208,6 @@ private:
   uint archive_u(uint8_t *buf,const uint v,const uint bytes);
   double extract_f(const uint8_t *buf,const uint bytes,const double span,const double prec=0.0);
   uint extract_u(const uint8_t *buf,const uint bytes);
-
-  uint archiveSize(const uint8_t *signature);
 
   // some special protocols
   uint archive_flightplan(uint8_t *buf,uint bufSize);  //pack wypoints to buf, return size

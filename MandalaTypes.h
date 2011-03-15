@@ -130,6 +130,7 @@ public:
 
   //compare vectors
   bool operator==(const Vector &v)const{for(index_t i=0;i<n;i++)if((*this)[i]!=v[i])return false;return true;}
+  bool operator!=(const Vector &v)const{for(index_t i=0;i<n;i++)if((*this)[i]==v[i])return false;return true;}
 };
 //Multiplication is commutative.
 template<const int n,class T1,class T2>Vector<n,T1>&operator *(const T2 &s,const Vector<n,T1>&v){return v * s;}
