@@ -31,11 +31,6 @@ enum {
   #include "MandalaVars.h"
   idx_sig_top
 };
-#define CMDDEF(aname,aargs,aalias,adescr) cmd##aname,
-enum {
-  #include "MandalaVars.h"
-  cmdCnt
-};
 #define MODEDEF(aname,adescr) fm##aname,
 enum {
   #include "MandalaVars.h"
@@ -80,9 +75,12 @@ static const unsigned int var_array[]={
 #include "MandalaVars.h"
 //-----------------------------------------------------------------------------
 // special signature vars..
-#define SIGDEF(aname, ... )   static const unsigned char aname [ VA_NUM_ARGS(__VA_ARGS__)+1 ]={VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__ };
+#define SIGDEF(aname, adescr, ... )   static const unsigned char aname [ VA_NUM_ARGS(__VA_ARGS__)+1 ]={VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__ };
 #include "MandalaVars.h"
 
+//bitfield constants
+#define BITDEF(avarname,abitname,amask,adescr) enum{ avarname##_##abitname=amask };
+#include "MandalaVars.h"
 //-----------------------------------------------------------------------------
 static unsigned int archiveSize(const unsigned char *signature)
 {
