@@ -75,6 +75,7 @@ public:
   const char *    var_descr[maxVars];
   double          var_span[maxVars];
   double          var_round[maxVars];
+  double          var_mult[maxVars];  //multiplier to pack and fit to bytes
   uint            var_bytes[maxVars]; //size of packed member
   uint            var_size[maxVars];  //size of whole packed var
   uint            var_array[maxVars];
@@ -181,8 +182,6 @@ public:
   double hyst(double err,double hyst);
   double limit(const double v,const double vL=1.0);
   double limit(const double v,const double vMin,const double vMax);
-  int64_t limit_i(const int64_t v,const int64_t vL=255);
-  int64_t limit_i(const int64_t v,const int64_t vMin,const int64_t vMax);
   double ned2hdg(const Vect &ned,bool back=false); //return heading to NED frm (0,0,0)
   double ned2dist(const Vect &ned); //return distance to to NED frm (0,0,0)
   const Vect lla2ned(const Vect &lla);  // return NED from Lat Lon AGL
@@ -204,10 +203,16 @@ public:
 private:
   uint extract_sig(const uint8_t *buf,uint size,const uint8_t *signature);
   uint archive_sig(uint8_t *buf,uint size,const uint8_t *signature);
-  uint archive_f(uint8_t *buf,const double v,const uint bytes,const double span);
-  uint archive_u(uint8_t *buf,const uint v,const uint bytes);
-  double extract_f(const uint8_t *buf,const uint bytes,const double span,const double prec=0.0);
-  uint extract_u(const uint8_t *buf,const uint bytes);
+
+  uint archive_f(uint8_t *buf,const double v,const uint var_idx);
+  uint archive_u(uint8_t *buf,const uint v,const uint var_idx);
+  uint archive_s(uint8_t *buf,const int v,const uint var_idx);
+  double extract_f(const uint8_t *buf,const uint var_idx);
+  uint extract_u(const uint8_t *buf,const uint var_idx);
+  int extract_s(const uint8_t *buf,const uint var_idx);
+
+  uint limit_u(const uint v,const uint vL=255);
+  int limit_s(const int v,const int vL=127);
 
   // some special protocols
   uint archive_flightplan(uint8_t *buf,uint bufSize);  //pack wypoints to buf, return size

@@ -171,8 +171,8 @@ BITDEF(status,    gps,     2,   "GPS available/lost")
 
 //--------- IMU --------------
 VARDEF(Vect, theta, -180,2,  "roll,pitch,yaw [deg]")
-VARDEF(Vect, acc,   -100,1, "Ax,Ay,Az accelerations [m/s2]")
-VARDEF(Vect, gyro,  -300,1, "p,q,r angular rates [deg/s]")
+VARDEF(Vect, acc,   -100,2, "Ax,Ay,Az accelerations [m/s2]")
+VARDEF(Vect, gyro,  -300,2, "p,q,r angular rates [deg/s]")
 VARDEF(Vect, mag,   -2,1,   "Hx,Hy,Hz magnetic field vector [gauss]")
 
 //--------- Measured by GPS --------------
