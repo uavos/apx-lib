@@ -191,8 +191,8 @@ VARDEF(double, airspeed,        100,1,    "barometric airspeed [m/s]")
 VARDEF(double, pstatic,         10000,2,  "barometric altitude [m]")
 
 //--------- BATTERY --------------
-VARDEF(double, Ve,     655.35,2,     "autopilot battery voltage [v]")
-VARDEF(double, Vs,     655.35,2,     "servo battery voltage [v]")
+VARDEF(double, Ve,     25.5,2,     "autopilot battery voltage [v]")
+VARDEF(double, Vs,     45,2,     "servo battery voltage [v]")
 VARDEF(double, Vp,     0,2,          "payload battery voltage [v]")
 VARDEF(uint,   power,  0,1,          "power status bitfield [on/off]")
 BITDEF(power,   ap,      1,   "Avionics")
