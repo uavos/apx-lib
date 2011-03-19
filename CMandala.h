@@ -1,13 +1,6 @@
 #ifndef _CMANDALA_H_
 #define _CMANDALA_H_
 //=============================================================================
-/*typedef unsigned int uint;
-typedef union{
-  float data[3];
-  struct{float x,y,z;};
-} Vect;
-#define double  float
-#define vt_float vt_double*/
 #ifndef INTTYPES
 #define INTTYPES
 typedef unsigned int uint;
@@ -18,7 +11,15 @@ typedef signed char  int8_t;
 typedef signed short int16_t;
 typedef signed long  int32_t;
 #endif
-//-----------------------------------------------------------------------------
+#ifndef MANDALATYPES
+#define MANDALATYPES
+typedef float Vect [3];
+#endif
+//=============================================================================
+extern uint archive_sig(uint8_t *buf,const uint8_t *signature);
+extern uint archive_var(uint8_t *buf,uint var_idx);
+//=============================================================================
+//=============================================================================
 #include "MandalaVars.h"
 //-----------------------------------------------------------------------------
 // enum indexes idx_VARNAME
@@ -29,6 +30,8 @@ enum {
   #include "MandalaVars.h"
   idx_vars_top
 };
+
+
 #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr) idx_cfg_##aname,
 enum {
@@ -52,20 +55,12 @@ enum {
   #include "MandalaVars.h"
   regCnt
 };
-/*
-//-----------------------------------------------------------------------------
-// variable definitions: vartype VARNAME;
-#define VARDEF(atype,aname,aspan,abytes,adescr)               atype aname;
-#define VARDEFA(atype,aname,asize,aspan,abytes,adescr)        atype aname [ asize ];
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr)        VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
-#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) VARDEFA(atype,cfg_##aname,asize,aspan,abytes,adescr)
-#include "MandalaVars.h"
-*/
 
 //-----------------------------------------------------------------------------
 //variable parameters
 #define VARDEF(atype,aname,aspan,abytes,adescr) VARDEFA(atype,aname,1,aspan,abytes,adescr)
 #define VARDEFA(atype,aname,asize,aspan,abytes,adescr) \
+  enum{ var_type_##aname=vt_##atype }; \
   enum{ var_bytes_##aname=(aspan<0)?(-abytes):(abytes) }; \
   enum{ var_array_##aname=asize }; \
   enum{ var_max_##aname=(aspan>0)?(((abytes==1)?0xFF:((abytes==2)?0xFFFF:((abytes==4)?0xFFFFFFFF:0)))): \
@@ -73,27 +68,12 @@ enum {
   static const float var_span_##aname=(aspan<0)?(-aspan):(aspan);
 #include "MandalaVars.h"
 
-/*#define VARDEF(atype,aname,aspan,abytes,adescr) vt_##atype,
-static const _var_type var_type[]={
-  #include "MandalaVars.h"
-};
-#define VARDEF(atype,aname,aspan,abytes,adescr) aspan,
-static const float var_span[]={
-  #include "MandalaVars.h"
-};
-#define VARDEF(atype,aname,aspan,abytes,adescr) abytes,
-static const uint var_bytes[]={
-  #include "MandalaVars.h"
-};
-#define VARDEF(atype,aname,aspan,abytes,adescr) VARDEFA(atype,aname,1,aspan,abytes,adescr)
-#define VARDEFA(atype,aname,asize,aspan,abytes,adescr) asize,
-static const uint var_array[]={
-  #include "MandalaVars.h"
-};
-
-#define VARDEF(atype,aname,aspan,abytes,adescr) static const float var_span_##aname=aspan;
+//-----------------------------------------------------------------------------
+// variable typedefs
+#define VARDEFA(atype,aname,asize,aspan,abytes,adescr) VARDEF(atype,aname,aspan,abytes,adescr)
+#define VARDEF(atype,aname,aspan,abytes,adescr) typedef atype var_typedef_##aname;
 #include "MandalaVars.h"
-*/
+
 //-----------------------------------------------------------------------------
 // special signature vars..
 #define SIGDEF(aname, adescr, ... )   static const uint8_t aname [ VA_NUM_ARGS(__VA_ARGS__)+1 ]={VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__ };
@@ -103,12 +83,16 @@ static const uint var_array[]={
 #define BITDEF(avarname,abitname,amask,adescr) enum{ avarname##_##abitname=amask };
 #include "MandalaVars.h"
 //-----------------------------------------------------------------------------
-extern uint archive_size(const uint8_t *signature);
-extern uint archive_sig(uint8_t *buf,const uint8_t *signature);
+
 //-----------------------------------------------------------------------------
-#define archive_f(abuf,avalue,aname) archive_f_impl(abuf,avalue,var_bytes_##aname,var_span_##aname,var_max_##aname)
-extern uint archive_f_impl(uint8_t *buf,float v,const int sbytes,const float span,const uint32_t max);
-//-----------------------------------------------------------------------------
-extern uint archive_var(uint8_t *buf,uint var_idx);
+// main structure of all used variables
+typedef struct{
+  #define USEVAR(aname) var_typedef_##aname aname;
+  #include <mandala_vars.h>
+  #undef USEVAR
+}Mandala;
+extern Mandala var;
+
+
 //=============================================================================
 #endif

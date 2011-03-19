@@ -31,7 +31,7 @@
 #define idxCMD  200     //special variables - commands
 //-----------------------------------------------------------------------------
 #define AHRS_FREQ       100     // AHRS Update [Hz]
-#define GPS_FREQ        4       // GPS Update [Hz]
+#define GPS_FREQ        5       // GPS Update [Hz]
 #define CTR_FREQ        20      // RPTY (fast servo) update rate [Hz]
 #define TELEMETRY_FREQ  10      // Telemetry send rate [Hz] MAX 10Hz!
 #define SIM_FREQ        10      // Simulator servo send rate [Hz]
@@ -118,7 +118,7 @@ REGDEF(Alt,      "VSpeed to Throttle/Altitude to Collective Pitch")
 SIGDEF(imu, "IMU sensors data pack",\
        idx_acc, idx_gyro, idx_mag)
 SIGDEF(gps, "GPS fix data pack",\
-      idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED)
+      idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED, idx_gps_accuracy)
 SIGDEF(ctr, "Fast controls",\
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_wheel)
 //telemetry filter (send with skip factor X), if changed fast but no need for update
