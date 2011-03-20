@@ -70,7 +70,7 @@ enum {
 
 //-----------------------------------------------------------------------------
 // variable typedefs
-#define VARDEFA(atype,aname,asize,aspan,abytes,adescr) VARDEF(atype,aname,aspan,abytes,adescr)
+#define VARDEFA(atype,aname,asize,aspan,abytes,adescr) typedef atype var_typedef_##aname [asize];
 #define VARDEF(atype,aname,aspan,abytes,adescr) typedef atype var_typedef_##aname;
 #include "MandalaVars.h"
 
