@@ -1,13 +1,37 @@
 #include "CMandala.h"
 #include <math.h>
 //=============================================================================
-uint archive_size(const uint8_t *signature)
+typedef struct {
+  uint8_t *buf;         //buffer to store/extract
+  void    *ptr;         //pointer to local var.VARNAME
+  int     sbytes;       //archived bytes cnt (if < 0 => signed)
+  float   span;         //variable span (absolute, always >0)
+  uint    array;        //count of bytes in array
+  uint    type;         //type of variable
+  uint32_t max;         //max archived integer value (unsigned)
+  uint    size;         //total size of archived data
+}_variable_descriptor;
+static _variable_descriptor vdsc;
+//=============================================================================
+uint vdsc_fill(uint8_t *buf,uint var_idx)
 {
-  uint scnt=signature[0];
-  signature++;
-  uint cnt=0;
-  while (scnt--) cnt+=archive_var(0,*signature++);
-  return cnt;
+#define USEVAR(aname) case idx_##aname:\
+  vdsc.ptr=&(var. aname);\
+  vdsc.sbytes=var_bytes_##aname;\
+  vdsc.span=var_span_##aname;\
+  vdsc.array=var_array_##aname;\
+  vdsc.type=var_type_##aname;\
+  vdsc.max=var_max_##aname;\
+  vdsc.size=var_size_##aname;\
+  break;
+  vdsc.buf=buf;
+  switch (var_idx) {
+#include <mandala_vars.h>
+#undef USEVAR
+    default:
+      return 0;
+  }
+  return vdsc.size;
 }
 //=============================================================================
 uint archive_sig(uint8_t *buf,const uint8_t *signature)
@@ -16,7 +40,7 @@ uint archive_sig(uint8_t *buf,const uint8_t *signature)
   signature++;
   uint cnt=0,sz;
   while (scnt--) {
-    sz=archive_var(buf,*signature++);
+    sz=archive(buf,*signature++);
     if (!sz)return 0; //error
     buf+=sz;
     cnt+=sz;
@@ -24,18 +48,18 @@ uint archive_sig(uint8_t *buf,const uint8_t *signature)
   return cnt;
 }
 //=============================================================================
-uint32_t limit_u(const float v,const uint32_t max)
+static uint32_t limit_u(const float v,const uint32_t max)
 {
   if (v<0)return 0;
   if (v>max)return max;
   return v;
 }
-uint32_t limit_ui(const uint32_t v,const uint32_t max)
+static uint32_t limit_ui(const uint32_t v,const uint32_t max)
 {
   if (v>max)return max;
   return v;
 }
-int32_t limit_s(const float v,const uint32_t max)
+static int32_t limit_s(const float v,const uint32_t max)
 {
   float min=-((float)max);
   if (v<min)return min;
@@ -43,99 +67,252 @@ int32_t limit_s(const float v,const uint32_t max)
   return v;
 }
 //=============================================================================
-uint archive_f_impl(uint8_t *buf,void* vptr,const int sbytes,const float span,const uint32_t max)
+static void archive_float(void)
 { //little endian (LSB first)
-  float v=*((double*)vptr);
-  if (!buf)return (sbytes>0)?sbytes:(-sbytes); //used for archive_size
-  if (span!=0.0)v=max*v/span;
-  switch (sbytes) {
+  if (vdsc.array>1) {
+    uint ai,sz=vdsc.array;
+    vdsc.array=1;
+    typedef double var_double_array [];
+    var_double_array *v=((var_double_array*)vdsc.ptr);
+    for (ai=0;ai<sz;ai++) {
+      vdsc.ptr=&((*v)[ai]);
+      archive_float();
+    }
+    return;
+  }
+  float v=*((double*)vdsc.ptr);
+  if (vdsc.span!=0.0)v=vdsc.max*v/vdsc.span;
+  switch (vdsc.sbytes) {
     case -4: {    //int32
-      int32_t vs=limit_s(v,max);
+      int32_t vs=limit_s(v,vdsc.max);
       uint32_t vi=*((uint32_t*)&vs);
-      *(buf++)=vi;
-      *(buf++)=vi>>8;
-      *(buf++)=vi>>16;
-      *(buf)=vi>>24;
+      *(vdsc.buf++)=vi;
+      *(vdsc.buf++)=vi>>8;
+      *(vdsc.buf++)=vi>>16;
+      *(vdsc.buf++)=vi>>24;
     }break;
     case -2: {    //int16
-      int32_t vs=limit_s(v,max);
-      uint32_t vi=*((uint32_t*)&vs);
-      *(buf++)=vi;
-      *(buf)=vi>>8;
+      int16_t vs=limit_s(v,vdsc.max);
+      uint16_t vi=*((uint16_t*)&vs);
+      *(vdsc.buf++)=vi;
+      *(vdsc.buf++)=vi>>8;
     }break;
     case -1:     //int8
-      *((int8_t*)buf)=limit_s(v,max);
+      *((int8_t*)(vdsc.buf++))=limit_s(v,vdsc.max);
       break;
     case 1:     //uint8
-      *((uint8_t*)buf)=limit_u(v,max);
+      *((uint8_t*)(vdsc.buf++))=limit_u(v,vdsc.max);
       break;
     case 2: {    //uint16
-      uint16_t vi=limit_u(v,max);
-      *(buf++)=vi;
-      *(buf)=vi>>8;
+      uint16_t vi=limit_u(v,vdsc.max);
+      *(vdsc.buf++)=vi;
+      *(vdsc.buf++)=vi>>8;
     }break;
     case 4: {    //uint32
-      uint32_t vi=limit_u(v,max);
-      *(buf++)=vi;
-      *(buf++)=vi>>8;
-      *(buf++)=vi>>16;
-      *(buf)=vi>>24;
+      uint32_t vi=limit_u(v,vdsc.max);
+      *(vdsc.buf++)=vi;
+      *(vdsc.buf++)=vi>>8;
+      *(vdsc.buf++)=vi>>16;
+      *(vdsc.buf++)=vi>>24;
     }break;
   }
-  return (sbytes>0)?sbytes:(-sbytes);
 }
-uint archive_u_impl(uint8_t *buf,void* vptr,const int sbytes,const uint32_t max)
+static void archive_uint(void)
 { //little endian (LSB first)
-  uint v=*((uint*)vptr);
-  if (!buf)return sbytes; //used for archive_size
-  switch (sbytes) {
+  if (vdsc.array>1) {
+    uint ai,sz=vdsc.array;
+    vdsc.array=1;
+    typedef uint var_uint_array [];
+    var_uint_array *v=((var_uint_array*)vdsc.ptr);
+    for (ai=0;ai<sz;ai++) {
+      vdsc.ptr=&((*v)[ai]);
+      archive_uint();
+    }
+    return;
+  }
+  uint v=*((uint*)vdsc.ptr);
+  switch (vdsc.sbytes) {
     case 1:     //uint8
-      *((uint8_t*)buf)=limit_ui(v,max);
+      *(vdsc.buf++)=limit_ui(v,vdsc.max);
       break;
     case 2: {    //uint16
-      uint16_t vi=limit_ui(v,max);
-      *(buf++)=vi;
-      *(buf)=vi>>8;
+      uint16_t vi=limit_ui(v,vdsc.max);
+      *(vdsc.buf++)=vi;
+      *(vdsc.buf++)=vi>>8;
     }break;
     case 4: {    //uint32
-      uint32_t vi=limit_ui(v,max);
-      *(buf++)=vi;
-      *(buf++)=vi>>8;
-      *(buf++)=vi>>16;
-      *(buf)=vi>>24;
+      uint32_t vi=limit_ui(v,vdsc.max);
+      *(vdsc.buf++)=vi;
+      *(vdsc.buf++)=vi>>8;
+      *(vdsc.buf++)=vi>>16;
+      *(vdsc.buf++)=vi>>24;
     }break;
   }
-  return sbytes;
 }
-uint archive_v_impl(uint8_t *buf,void* vptr,const int sbytes,const float span,const uint32_t max)
+static void archive_vect(void)
 {
-  Vect *v=((Vect*)vptr);
-  uint sz,cnt;
-  sz=archive_f_impl(buf,&((*v)[0]),sbytes,span,max);
-  cnt=sz;
-  buf+=sz;
-  sz=archive_f_impl(buf,&((*v)[1]),sbytes,span,max);
-  cnt+=sz;
-  buf+=sz;
-  sz=archive_f_impl(buf,&((*v)[2]),sbytes,span,max);
-  return cnt+sz;
+  if (vdsc.array>1) {
+    uint ai,sz=vdsc.array;
+    vdsc.array=1;
+    typedef Vect var_vect_array [];
+    var_vect_array *v=((var_vect_array*)vdsc.ptr);
+    for (ai=0;ai<sz;ai++) {
+      vdsc.ptr=&((*v)[ai][0]);
+      archive_vect();
+    }
+    return;
+  }
+  Vect *v=((Vect*)vdsc.ptr);
+  vdsc.ptr=&((*v)[0]);
+  archive_float();
+  vdsc.ptr=&((*v)[1]);
+  archive_float();
+  vdsc.ptr=&((*v)[2]);
+  archive_float();
 }
 //-----------------------------------------------------------------------------
-#define archive_f(abuf,avalue,aname) archive_f_impl(abuf,avalue,var_bytes_##aname,var_span_##aname,var_max_##aname)
-#define archive_u(abuf,avalue,aname) archive_u_impl(abuf,avalue,var_bytes_##aname,var_max_##aname)
-#define archive_v(abuf,avalue,aname) archive_v_impl(abuf,avalue,var_bytes_##aname,var_span_##aname,var_max_##aname)
-#define USEVAR(aname) case idx_##aname: return \
-(var_type_##aname == vt_double)?archive_f(buf,&(var. aname),aname): \
-( (var_type_##aname == vt_uint)?archive_u(buf,&(var. aname),aname): \
-( (var_type_##aname == vt_Vect)?archive_v(buf,&(var. aname),aname): 0 ) );
-
-uint archive_var(uint8_t *buf,uint var_idx)
-{ // idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED, idx_gps_accuracy
-  switch (var_idx) {
-#include <mandala_vars.h>
+uint archive(uint8_t *buf,uint var_idx)
+{
+  if (!vdsc_fill(buf,var_idx))return 0;
+  switch (vdsc.type) {
+    case vt_double:
+      archive_float();
+      break;
+    case vt_uint:
+      archive_uint();
+      break;
+    case vt_Vect:
+      archive_vect();
+      break;
   }
-  return 0;
+  return vdsc.size;
 }
-#undef USEVAR
 //=============================================================================
 //=============================================================================
+//=============================================================================
+static void extract_float(void)
+{
+  if (vdsc.array>1) {
+    uint ai,sz=vdsc.array;
+    vdsc.array=1;
+    typedef double var_double_array [];
+    var_double_array *v=((var_double_array*)vdsc.ptr);
+    for (ai=0;ai<sz;ai++) {
+      vdsc.ptr=&((*v)[ai]);
+      extract_float();
+    }
+    return;
+  }
+  double *v=(double*)vdsc.ptr;
+  switch (vdsc.sbytes) {
+    case -4: {    //int32
+      uint32_t vi=*(vdsc.buf++);
+      vi|=(uint32_t)(*(vdsc.buf++))<<8;
+      vi|=(uint32_t)(*(vdsc.buf++))<<16;
+      vi|=(uint32_t)(*(vdsc.buf++))<<24;
+      *v=*((int32_t*)&vi);
+    }break;
+    case -2: {    //int16
+      uint16_t vi=*(vdsc.buf++);
+      vi|=(uint16_t)(*(vdsc.buf++))<<8;
+      *v=*((int16_t*)&vi);
+    }break;
+    case -1:     //int8
+      *v=*((int8_t*)(vdsc.buf++));
+      break;
+    case 1:     //uint8
+      *v=*((uint8_t*)(vdsc.buf++));
+      break;
+    case 2: {    //uint16
+      uint16_t vi=*(vdsc.buf++);
+      vi|=(uint16_t)(*(vdsc.buf++))<<8;
+      *v=vi;
+    }break;
+    case 4: {    //uint32
+      uint32_t vi=*(vdsc.buf++);
+      vi|=(uint32_t)(*(vdsc.buf++))<<8;
+      vi|=(uint32_t)(*(vdsc.buf++))<<16;
+      vi|=(uint32_t)(*(vdsc.buf++))<<24;
+      *v=vi;
+    }break;
+  }
+  if (vdsc.span!=0.0)
+    *v=(*v)/vdsc.max*vdsc.span;
+}
+static void extract_uint(void)
+{
+  if (vdsc.array>1) {
+    uint ai,sz=vdsc.array;
+    vdsc.array=1;
+    typedef uint var_uint_array [];
+    var_uint_array *v=((var_uint_array*)vdsc.ptr);
+    for (ai=0;ai<sz;ai++) {
+      vdsc.ptr=&((*v)[ai]);
+      extract_uint();
+    }
+    return;
+  }
+  uint *v=(uint*)vdsc.ptr;
+  switch (vdsc.sbytes) {
+    case 1:     //uint8
+      *v=*(vdsc.buf++);
+      break;
+    case 2: {    //uint16
+      *v=*(vdsc.buf++);
+      *v|=(uint16_t)(*(vdsc.buf++))<<8;
+    }break;
+    case 4: {    //uint32
+      *v=*(vdsc.buf++);
+      *v|=(uint32_t)(*(vdsc.buf++))<<8;
+      *v|=(uint32_t)(*(vdsc.buf++))<<16;
+      *v|=(uint32_t)(*(vdsc.buf++))<<24;
+    }break;
+  }
+}
+static void extract_vect(void)
+{
+  if (vdsc.array>1) {
+    uint ai,sz=vdsc.array;
+    vdsc.array=1;
+    typedef Vect var_vect_array [];
+    var_vect_array *v=((var_vect_array*)vdsc.ptr);
+    for (ai=0;ai<sz;ai++) {
+      vdsc.ptr=&((*v)[ai][0]);
+      extract_vect();
+    }
+    return;
+  }
+  Vect *v=((Vect*)vdsc.ptr);
+  vdsc.ptr=&((*v)[0]);
+  extract_float();
+  vdsc.ptr=&((*v)[1]);
+  extract_float();
+  vdsc.ptr=&((*v)[2]);
+  extract_float();
+}
+//-----------------------------------------------------------------------------
+uint extract_var(uint8_t *buf,uint cnt,uint var_idx)
+{
+  if (!vdsc_fill(buf,var_idx))return 0;
+  if (cnt!=vdsc.size)return 0;
+  switch (vdsc.type) {
+    case vt_double:
+      extract_float();
+      break;
+    case vt_uint:
+      extract_uint();
+      break;
+    case vt_Vect:
+      extract_vect();
+      break;
+  }
+  return vdsc.size;
+}
+//=============================================================================
+uint extract(uint8_t *buf,uint cnt)
+{
+  return extract_var(buf+1,cnt-1,buf[0]);
+}
+//=============================================================================
+
+

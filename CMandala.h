@@ -13,11 +13,14 @@ typedef signed long  int32_t;
 #endif
 #ifndef MANDALATYPES
 #define MANDALATYPES
-typedef float Vect [3];
+typedef double Vect [3];
 #endif
 //=============================================================================
+extern uint archive(uint8_t *buf,uint var_idx);
+extern uint extract(uint8_t *buf,uint cnt); //first byte = var_idx
+//overload
 extern uint archive_sig(uint8_t *buf,const uint8_t *signature);
-extern uint archive_var(uint8_t *buf,uint var_idx);
+extern uint extract_var(uint8_t *buf,uint cnt,uint var_idx);
 //=============================================================================
 //=============================================================================
 #include "MandalaVars.h"
@@ -30,8 +33,6 @@ enum {
   #include "MandalaVars.h"
   idx_vars_top
 };
-
-
 #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr) idx_cfg_##aname,
 enum {
@@ -55,17 +56,24 @@ enum {
   #include "MandalaVars.h"
   regCnt
 };
-
 //-----------------------------------------------------------------------------
 //variable parameters
 #define VARDEF(atype,aname,aspan,abytes,adescr) VARDEFA(atype,aname,1,aspan,abytes,adescr)
 #define VARDEFA(atype,aname,asize,aspan,abytes,adescr) \
-  enum{ var_type_##aname=vt_##atype }; \
-  enum{ var_bytes_##aname=(aspan<0)?(-abytes):(abytes) }; \
-  enum{ var_array_##aname=asize }; \
-  enum{ var_max_##aname=(aspan>0)?(((abytes==1)?0xFF:((abytes==2)?0xFFFF:((abytes==4)?0xFFFFFFFF:0)))): \
-  ( (aspan<0)?((abytes==1)?0x7F:((abytes==2)?0x7FFF:((abytes==4)?0x7FFFFFFF:0))):0 ) }; \
-  static const float var_span_##aname=(aspan<0)?(-aspan):(aspan);
+  var_type_##aname=vt_##atype, \
+  var_bytes_##aname=(aspan<0)?(-abytes):(abytes), \
+  var_array_##aname=asize, \
+  var_size_##aname=((asize)*(abytes)*((vt_##atype==vt_Vect)?3:1)), \
+  var_max_##aname=(aspan>0)?(((abytes==1)?0xFF:((abytes==2)?0xFFFF:((abytes==4)?0xFFFFFFFF:0)))): \
+  ( (aspan<0)?((abytes==1)?0x7F:((abytes==2)?0x7FFF:((abytes==4)?0x7FFFFFFF:0))):0 ), \
+
+enum{
+#include "MandalaVars.h"
+};
+
+#define VARDEF(atype,aname,aspan,abytes,adescr) VARDEFA(atype,aname,1,aspan,abytes,adescr)
+#define VARDEFA(atype,aname,asize,aspan,abytes,adescr) \
+static const float var_span_##aname=(aspan<0)?(-aspan):(aspan);
 #include "MandalaVars.h"
 
 //-----------------------------------------------------------------------------
