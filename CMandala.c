@@ -12,6 +12,9 @@ typedef struct {
   uint    size;         //total size of archived data
 }_variable_descriptor;
 static _variable_descriptor vdsc;
+typedef double var_double_array [];
+typedef uint var_uint_array [];
+typedef Vect var_vect_array [];
 //=============================================================================
 uint vdsc_fill(uint8_t *buf,uint var_idx)
 {
@@ -72,7 +75,6 @@ static void archive_float(void)
   if (vdsc.array>1) {
     uint ai,sz=vdsc.array;
     vdsc.array=1;
-    typedef double var_double_array [];
     var_double_array *v=((var_double_array*)vdsc.ptr);
     for (ai=0;ai<sz;ai++) {
       vdsc.ptr=&((*v)[ai]);
@@ -122,7 +124,6 @@ static void archive_uint(void)
   if (vdsc.array>1) {
     uint ai,sz=vdsc.array;
     vdsc.array=1;
-    typedef uint var_uint_array [];
     var_uint_array *v=((var_uint_array*)vdsc.ptr);
     for (ai=0;ai<sz;ai++) {
       vdsc.ptr=&((*v)[ai]);
@@ -154,7 +155,6 @@ static void archive_vect(void)
   if (vdsc.array>1) {
     uint ai,sz=vdsc.array;
     vdsc.array=1;
-    typedef Vect var_vect_array [];
     var_vect_array *v=((var_vect_array*)vdsc.ptr);
     for (ai=0;ai<sz;ai++) {
       vdsc.ptr=&((*v)[ai][0]);
@@ -195,7 +195,6 @@ static void extract_float(void)
   if (vdsc.array>1) {
     uint ai,sz=vdsc.array;
     vdsc.array=1;
-    typedef double var_double_array [];
     var_double_array *v=((var_double_array*)vdsc.ptr);
     for (ai=0;ai<sz;ai++) {
       vdsc.ptr=&((*v)[ai]);
@@ -244,7 +243,6 @@ static void extract_uint(void)
   if (vdsc.array>1) {
     uint ai,sz=vdsc.array;
     vdsc.array=1;
-    typedef uint var_uint_array [];
     var_uint_array *v=((var_uint_array*)vdsc.ptr);
     for (ai=0;ai<sz;ai++) {
       vdsc.ptr=&((*v)[ai]);
@@ -274,7 +272,6 @@ static void extract_vect(void)
   if (vdsc.array>1) {
     uint ai,sz=vdsc.array;
     vdsc.array=1;
-    typedef Vect var_vect_array [];
     var_vect_array *v=((var_vect_array*)vdsc.ptr);
     for (ai=0;ai<sz;ai++) {
       vdsc.ptr=&((*v)[ai][0]);
@@ -313,6 +310,26 @@ uint extract(uint8_t *buf,uint cnt)
 {
   return extract_var(buf+1,cnt-1,buf[0]);
 }
+//=============================================================================
+//=============================================================================
+double var_value(uint var_idx,uint member_idx)
+{
+  if (!vdsc_fill(0,var_idx))return 0;
+  if(vdsc.type==vt_double){
+    if (vdsc.array>1) return (*((var_double_array*)vdsc.ptr))[member_idx];
+    return *(double*)vdsc.ptr;
+  }
+  if(vdsc.type==vt_Vect){
+    return (*(Vect*)vdsc.ptr)[member_idx];
+  }
+  if(vdsc.type==vt_uint){
+    if (vdsc.array>1) return (*((var_uint_array*)vdsc.ptr))[member_idx];
+    if(member_idx) return ((*(uint*)vdsc.ptr)&member_idx)?1.0:0.0;
+    return *(uint*)vdsc.ptr;
+  }
+  return 0;
+}
+//=============================================================================
 //=============================================================================
 
 

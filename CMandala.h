@@ -16,6 +16,9 @@ typedef signed long  int32_t;
 typedef double Vect [3];
 #endif
 //=============================================================================
+//mask if var bitfield or vect idx or array idx
+extern double var_value(uint var_idx,uint member_idx);
+//-----------------------------------------------------------------------------
 extern uint archive(uint8_t *buf,uint var_idx);
 extern uint extract(uint8_t *buf,uint cnt); //first byte = var_idx
 //overload
