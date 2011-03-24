@@ -1,6 +1,19 @@
 #include "CMandala.h"
 #include <math.h>
 //=============================================================================
+// special signature vars..
+#define SIGDEF(aname, adescr, ... )   static const uint8_t signature_##aname [ VA_NUM_ARGS(__VA_ARGS__)+1 ]={VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__ };
+#include "MandalaVars.h"
+//-----------------------------------------------------------------------------
+//global struct
+Mandala var={
+#define USEVAR(aname)
+#define USESIG(aname)   . aname = signature_##aname,
+#include <mandala_vars.h>
+#undef USEVAR
+#undef USESIG
+};
+//=============================================================================
 typedef struct {
   uint8_t *buf;         //buffer to store/extract
   void    *ptr;         //pointer to local var.VARNAME
@@ -18,37 +31,26 @@ typedef Vect var_vect_array [];
 //=============================================================================
 uint vdsc_fill(uint8_t *buf,uint var_idx)
 {
-#define USEVAR(aname) case idx_##aname:\
-  vdsc.ptr=&(var. aname);\
-  vdsc.sbytes=var_bytes_##aname;\
-  vdsc.span=var_span_##aname;\
-  vdsc.array=var_array_##aname;\
-  vdsc.type=var_type_##aname;\
-  vdsc.max=var_max_##aname;\
-  vdsc.size=var_size_##aname;\
+#define USESIG(aname) USEVAR(aname)
+#define USEVAR(aname) \
+  case idx_##aname:\
+    vdsc.ptr=&(var. aname);\
+    vdsc.sbytes=var_bytes_##aname;\
+    vdsc.span=var_span_##aname;\
+    vdsc.array=var_array_##aname;\
+    vdsc.type=var_type_##aname;\
+    vdsc.max=var_max_##aname;\
+    vdsc.size=var_size_##aname;\
   break;
   vdsc.buf=buf;
   switch (var_idx) {
 #include <mandala_vars.h>
 #undef USEVAR
+#undef USESIG
     default:
       return 0;
   }
   return vdsc.size;
-}
-//=============================================================================
-uint archive_sig(uint8_t *buf,const uint8_t *signature)
-{
-  uint scnt=signature[0];
-  signature++;
-  uint cnt=0,sz;
-  while (scnt--) {
-    sz=archive(buf,*signature++);
-    if (!sz)return 0; //error
-    buf+=sz;
-    cnt+=sz;
-  }
-  return cnt;
 }
 //=============================================================================
 static uint32_t limit_u(const float v,const uint32_t max)
@@ -170,6 +172,21 @@ static void archive_vect(void)
   vdsc.ptr=&((*v)[2]);
   archive_float();
 }
+static void archive_sig()
+{
+  const uint8_t *signature=*((const uint8_t **)vdsc.ptr);
+  uint sz,cnt=0,scnt=signature[0];
+  signature++;
+  while (scnt--) {
+    sz=archive(vdsc.buf,*signature++);
+    if (!sz){ //error, var not found in USEVAR()
+      vdsc.size=0;
+      return;
+    }
+    cnt+=sz;
+  }
+  vdsc.size=cnt;
+}
 //-----------------------------------------------------------------------------
 uint archive(uint8_t *buf,uint var_idx)
 {
@@ -183,6 +200,9 @@ uint archive(uint8_t *buf,uint var_idx)
       break;
     case vt_Vect:
       archive_vect();
+      break;
+    case vt_sig:
+      archive_sig();
       break;
   }
   return vdsc.size;
@@ -287,11 +307,27 @@ static void extract_vect(void)
   vdsc.ptr=&((*v)[2]);
   extract_float();
 }
+static void extract_sig(uint buf_cnt)
+{
+  const uint8_t *signature=*((const uint8_t **)vdsc.ptr);
+  uint sz,cnt=0,scnt=signature[0];
+  signature++;
+  while (scnt--) {
+    sz=extract(vdsc.buf,buf_cnt,*signature++);
+    if (!sz){ //error, var not found in USEVAR()
+      vdsc.size=0;
+      return;
+    }
+    cnt+=sz;
+    buf_cnt-=sz;
+  }
+  vdsc.size=cnt;
+}
 //-----------------------------------------------------------------------------
-uint extract_var(uint8_t *buf,uint cnt,uint var_idx)
+uint extract(uint8_t *buf,uint cnt,uint var_idx)
 {
   if (!vdsc_fill(buf,var_idx))return 0;
-  if (cnt!=vdsc.size)return 0;
+  if (cnt<vdsc.size)return 0;
   switch (vdsc.type) {
     case vt_double:
       extract_float();
@@ -302,13 +338,16 @@ uint extract_var(uint8_t *buf,uint cnt,uint var_idx)
     case vt_Vect:
       extract_vect();
       break;
+    case vt_sig:
+      extract_sig(cnt);
+      break;
   }
   return vdsc.size;
 }
 //=============================================================================
-uint extract(uint8_t *buf,uint cnt)
+uint extract_packet(uint8_t *buf,uint cnt)
 {
-  return extract_var(buf+1,cnt-1,buf[0]);
+  return extract(buf+1,cnt-1,buf[0]);
 }
 //=============================================================================
 //=============================================================================
