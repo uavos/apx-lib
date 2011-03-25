@@ -135,14 +135,14 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",\
 // telemetry variables
 SIGDEF(downstream,"Downlink stream, all variables")
 SIGDEF(debug,     "Debug <stdout> string forward to GCU")
-SIGDEF(down_data, "Any custom downlink data")
+SIGDEF(service,   "Servive packet down/up link <src>,<dadr>,<data..>")
 SIGDEF(flightplan,"Flight plan packed data")
 //SIGDEF(uplink)    // special command uplink
 // static signatures
 SIGDEF(config,    "List of all configuration vars (>=idxCFG)")
 //modem special
 SIGDEF(autosend,  "Automatically forwarded variables to GCU",\
-      idx_downstream, idx_debug, idx_down_data, idx_flightplan, idx_config )
+      idx_downstream, idx_debug, idx_service, idx_flightplan, idx_config )
 //=============================================================================
 //    Mandala variables definitions
 // type:           variable type: [uint, double, Vect]
