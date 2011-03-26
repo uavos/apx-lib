@@ -7,7 +7,7 @@
 enum{
   apc_ACK,
   apc_Info,     //return _node_info
-  apc_SetAdr,   //set new address[dadr] _node_serial+<dadr>
+  apc_SetAdr,   //set new address[_node_id] dtype and FUID used to filter
 
   //node configuration
   apc_ReadConfig,
