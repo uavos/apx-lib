@@ -24,6 +24,7 @@ typedef struct{
   unsigned char dtype;          //device type (stored in flash @end of page 0)
   unsigned char FUID[3];        //device serial number (set during loader prg)
   unsigned char dadr;           //device address (dynamically assigned)
+  char          name[16];       //device name string
 }__attribute__((packed)) _node_id;
 //-------------------------------------------------
 typedef struct {

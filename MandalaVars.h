@@ -202,7 +202,6 @@ BITDEF(power,   agl,     8,   "AGL sensor")
 BITDEF(power,   ignition,16,  "Engine on/off")
 BITDEF(power,   lights,  32,  "Lights on/off")
 BITDEF(power,   taxi,    64,  "Taxi lights on/off")
-BITDEF(power,   r8,      128, "reserved")
 
 //--------- TEMPERATURES --------------
 VARDEF(double, AT,    -100,1,      "ambient temperature [deg C]")
