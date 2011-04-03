@@ -18,7 +18,8 @@ typedef double Vect [3];
 #endif
 //=============================================================================
 //mask if var bitfield or vect idx or array idx
-extern double var_value(uint var_idx,uint member_idx);
+extern double var_get_value(uint var_idx,uint member_idx);
+extern void var_set_value(uint var_idx,uint member_idx,double value);
 //-----------------------------------------------------------------------------
 extern uint archive(uint8_t *buf,uint var_idx);
 extern uint extract(uint8_t *buf,uint cnt,uint var_idx);

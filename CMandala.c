@@ -351,7 +351,7 @@ uint extract_packet(uint8_t *buf,uint cnt)
 }
 //=============================================================================
 //=============================================================================
-double var_value(uint var_idx,uint member_idx)
+double var_get_value(uint var_idx,uint member_idx)
 {
   if (!vdsc_fill(0,var_idx))return 0;
   if(vdsc.type==vt_double){
@@ -367,6 +367,22 @@ double var_value(uint var_idx,uint member_idx)
     return *(uint*)vdsc.ptr;
   }
   return 0;
+}
+//=============================================================================
+void var_set_value(uint var_idx,uint member_idx,double value)
+{
+  if (!vdsc_fill(0,var_idx))return;
+  if(vdsc.type==vt_double){
+    if (vdsc.array>1) (*((var_double_array*)vdsc.ptr))[member_idx]=value;
+    else *(double*)vdsc.ptr=value;
+  }else if(vdsc.type==vt_Vect){
+    (*(Vect*)vdsc.ptr)[member_idx]=value;
+  }else if(vdsc.type==vt_uint){
+    if (vdsc.array>1) (*((var_uint_array*)vdsc.ptr))[member_idx]=value;
+    else if(member_idx)
+      (*(uint*)vdsc.ptr)=(value==0.0)?((*(uint*)vdsc.ptr)&(~member_idx)):((*(uint*)vdsc.ptr)|member_idx);
+    else *(uint*)vdsc.ptr=value;
+  }
 }
 //=============================================================================
 //=============================================================================
