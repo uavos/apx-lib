@@ -323,7 +323,7 @@ CFGDEF(double,  rw_finAGL,   255,1,0,     "approach final altitude AGL [m]")
 CFGDEF(double,  rw_finPitch, -12.7,1,0.1, "final pitch bias [deg]")
 CFGDEF(double,  rw_finSpeed, 0,1,0,       "final speed [m/s]")
 CFGDEF(double,  rw_tdPitch,  0,1,1,       "touchdown pitch bias [deg]")
-CFGDEF(double,  rw_tdAGL,    -127,1,1,    "AGL altitude before touchdown [m]")
+CFGDEF(double,  rw_tdAGL,    12.7,1,0.1,    "AGL altitude before touchdown [m]")
 CFGDEF(double,  rw_Kp,       2.55,1,0.01, "error multiplier [m]")
 CFGDEF(double,  rw_Lp,       255,1,1,     "heading limit [deg]")
 

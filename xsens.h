@@ -9,7 +9,7 @@
 typedef struct {
   uint      msgID;  //must clear to release buffer
   uint      msgSize;
-  uint8_t   data[2048];
+  uint8_t   data[2048*16];
 }_xsens_message;
 //==============================================================================
 class Xsens
