@@ -227,7 +227,7 @@ bool Xsens::sendMessage(const uint8_t *buf,uint cnt,bool ack)
   //var.dump(msgBuf,cnt+5);
   if (!ack)return true;
   //sleep(1);
-  while (readMessage(true)) {
+  while (readMessage()) {
     if ((int)this->msg.msgID==(buf[0]+1)) {
       return true;
     }

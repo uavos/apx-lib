@@ -53,6 +53,8 @@ Mandala::Mandala()
   dl_reset=true;
 
   derivatives_init=false;
+  gps_lat_s=0;
+  gps_lon_s=0;
 
   uint idx=0;
   //------------------------
@@ -203,7 +205,7 @@ uint Mandala::extract(const uint8_t *buf,uint size,uint var_idx)
 
   //printf("extracting: %s\n",var_name[var_idx]);
   uint vsz=var_size[var_idx];
-  if(vsz>size){
+  if((!vsz)||(vsz>size)){
     fprintf(stderr,"Error: extract %s  #%u (sz: %u, buf: %u)\n",var_name[var_idx],var_idx,vsz,size);
     return 0;
   }
@@ -238,7 +240,8 @@ uint Mandala::extract(const uint8_t *buf,uint size,uint var_idx)
   }
   if(!vsz)return 0; //error from extract_sig
   size-=vsz;
-  if(size)return vsz+extract(buf,size,var_idx+1);
+  var_idx++;
+  if(size&&(var_idx<idxSIG))return vsz+extract(buf,size,var_idx+1);
   else return vsz;
 }
 //=============================================================================
@@ -249,7 +252,7 @@ uint Mandala::extract_sig(const uint8_t *buf,uint size,const uint8_t *signature)
   while (scnt--){
     uint var_idx=*signature++;
     sz=var_size[var_idx];
-    if(sz>size)sz=size; //error
+    if(sz>size)sz=0; //error
     sz=extract(buf,sz,var_idx);
     if(!sz)return 0; //error
     buf+=sz;
@@ -586,7 +589,6 @@ uint Mandala::extract_downstream(const uint8_t *buf,uint cnt)
   // calculate vars filtered by sig dl_filter:
   // gps_velXYZ,gps_accXYZ,gps_crsRate
   //check if to calc derivatives (gps fix)
-  static double gps_lat_s=gps_lat,gps_lon_s=gps_lon;
   if((gps_lat_s!=gps_lat)||(gps_lon_s!=gps_lon)){
     gps_lat_s=gps_lat;
     gps_lon_s=gps_lon;
@@ -700,14 +702,8 @@ double Mandala::limit(const double v,const double vMin,const double vMax)
 //===========================================================================
 const Vect Mandala::rotate(const Vect &v_in,const double theta)
 {
-  static double cos_theta=1.0;
-  static double sin_theta=0.0;
-  static double last_theta=0.0;
-  if (last_theta!=theta) {
-    last_theta=theta;
-    cos_theta=cos(theta);
-    sin_theta=sin(theta);
-  }
+  double cos_theta=cos(theta);
+  double sin_theta=sin(theta);
   return Vect(v_in[0]*cos_theta+v_in[1]*sin_theta,
               v_in[1]*cos_theta-v_in[0]*sin_theta,
               v_in[2]);
@@ -817,7 +813,7 @@ const Vect Mandala::Tangent2ECEF(const Vect &Local,const double latitude,const d
   return c;
 }
 //=============================================================================
-static inline double sqr(double x) {
+double Mandala::sqr(double x) {
   return x*x;
 }
 const Vect Mandala::ECEF2llh(const Vect &ECEF)

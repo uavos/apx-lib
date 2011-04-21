@@ -9,7 +9,7 @@
 typedef struct {
   uint      msgID;  //must clear to release buffer
   uint      msgSize;
-  uint8_t   data[2048*16];
+  uint8_t   data[2048];
 }_xsens_message;
 //==============================================================================
 class Xsens
@@ -31,7 +31,7 @@ private:
   unsigned int getRxCnt(void);
   _xsens_message msg;
   bool setup();
-  bool readMessage(bool wait=false);
+  bool readMessage(bool wait=true);
   bool sendMessage(const uint8_t *buf,uint cnt,bool ack=true);
   double extractFloat(void* ptr);
   //--- thread ----

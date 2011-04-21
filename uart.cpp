@@ -93,9 +93,9 @@ void Uart::write(const uint8_t *buf,uint cnt)
 //==============================================================================
 uint8_t Uart::getCRC(const uint8_t *buf,uint cnt)
 {
-  uint8_t crc=0;
+  uint crc=0;
   while (cnt--)crc += *buf++;
-  return crc;
+  return crc&0x00FF;
 }
 //==============================================================================
 unsigned int Uart::getRxCnt(void)
@@ -139,14 +139,15 @@ void Uart::flush(void)
 //==============================================================================
 void Uart::writeEscaped(const uint8_t *tbuf,uint dcnt)
 {
-  uint8_t *buf,bcnt=0,v;
-  buf=new uint8_t[dcnt*2];
+  uint8_t *buf=txBuf,v;
+  uint max=sizeof(txBuf)-6,bcnt=0;
   buf[bcnt++]=0x55;
   buf[bcnt++]=0x01;
-  for (unsigned short i=0;i<dcnt;i++) {
+  for (uint i=0;i<dcnt;i++) {
     v=tbuf[i];
     buf[bcnt++]=v;
     if (v==0x55)buf[bcnt++]=0x02;
+    if(bcnt>=max)return;
   }
   v=getCRC(tbuf,dcnt);
   buf[bcnt++]=v;
@@ -154,13 +155,12 @@ void Uart::writeEscaped(const uint8_t *tbuf,uint dcnt)
   buf[bcnt++]=0x55;
   buf[bcnt++]=0x03;
   write(buf,bcnt);
-  delete buf;
 }
 //==============================================================================
 uint Uart::readEscaped(uint8_t *buf,uint max_len)
 // 0x55..0x01..DATA(0x55.0x02)..CRC..0x55..0x03
 {
-  unsigned short cnt=0,stage=0,bcnt=0,crc=0;
+  uint cnt=0,stage=0,bcnt=0,crc=0;
   unsigned char v,*ptr=buf;
   while (1)//GetRxCnt())
   {

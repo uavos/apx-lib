@@ -108,6 +108,7 @@ public:
   bool    derivatives_init;
   Vect    last_vNED;
   double  last_course;
+  double  gps_lat_s,gps_lon_s; //change detect
 
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr)        VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
 #define SIGDEF(aname,adescr,...)                              VARDEF( ,aname, , , )
@@ -199,7 +200,7 @@ public:
   const Vect Tangent2ECEF(const Vect &Local,const double latitude,const double longitude);
   const Vect ECEF2llh(const Vect &ECEF);
   const Vect llh2ECEF(const Vect &llh);
-
+  double sqr(double x);
 private:
   uint extract_sig(const uint8_t *buf,uint size,const uint8_t *signature);
   uint archive_sig(uint8_t *buf,uint size,const uint8_t *signature);

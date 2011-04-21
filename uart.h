@@ -33,6 +33,7 @@ public:
 private:
   int   fd;
   const char    *name;
+  uint8_t txBuf[4096];
 };
 //=============================================================
 #endif
