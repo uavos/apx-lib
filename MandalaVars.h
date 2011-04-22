@@ -188,7 +188,7 @@ VARDEF(double, gps_home_hmsl,-10000,2,  "home altitde above sea [m]")
 
 //--------- PRESSURE --------------
 VARDEF(double, airspeed,        100,1,    "barometric airspeed [m/s]")
-VARDEF(double, pstatic,         10000,2,  "barometric altitude [m]")
+VARDEF(double, pstatic,         65535.0,2,  "barometric pressure [kPa]")
 
 //--------- BATTERY --------------
 VARDEF(double, Ve,     25.5,2,     "autopilot battery voltage [v]")
@@ -205,7 +205,7 @@ BITDEF(power,   taxi,    64,  "Taxi lights on/off")
 
 //--------- TEMPERATURES --------------
 VARDEF(double, AT,    -100,1,      "ambient temperature [deg C]")
-VARDEF(double, ET,     0,1,       "engine temperature [deg C]")
+VARDEF(double, ET,     0,1,        "engine temperature [deg C]")
 
 //--------- CONTROLS --------------
 // fast controls
