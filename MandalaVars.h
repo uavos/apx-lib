@@ -188,7 +188,7 @@ VARDEF(double, gps_home_hmsl,-10000,2,  "home altitde above sea [m]")
 
 //--------- PRESSURE --------------
 VARDEF(double, airspeed,        100,1,    "barometric airspeed [m/s]")
-VARDEF(double, pstatic,         65535.0,2,  "barometric pressure [kPa]")
+VARDEF(double, pstatic,         6553.5,2,  "barometric pressure AGL [m]")
 
 //--------- BATTERY --------------
 VARDEF(double, Ve,     25.5,2,     "autopilot battery voltage [v]")

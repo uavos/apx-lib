@@ -29,7 +29,7 @@ typedef double var_double_array [];
 typedef uint var_uint_array [];
 typedef Vect var_vect_array [];
 //=============================================================================
-uint vdsc_fill(uint8_t *buf,uint var_idx)
+static uint vdsc_fill(uint8_t *buf,uint var_idx)
 {
 #define USESIG(aname) USEVAR(aname)
 #define USEVAR(aname) \

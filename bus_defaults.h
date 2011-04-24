@@ -36,6 +36,7 @@ typedef struct {
     unsigned char inp;      //logical inputs
     unsigned char adc;      //analog inputs
   }ports;
+  unsigned char vars[32];   //bitmask of known variables
 }__attribute__((packed)) _node_info;
 //=============================================================================
 //=============================================================================
