@@ -5,7 +5,7 @@
 //=============================================================================
 //default bus commands
 enum{
-  apc_ACK,
+  apc_ACK=0,
   apc_Info,     //return _node_info
   apc_SetAdr,   //set new address[_node_id] dtype and FUID used to filter
 
@@ -15,7 +15,7 @@ enum{
   apc_ResetConfig,
 
   //user commands
-  apc_user,
+  apc_user=100,
   apc_loader=0xFF
 };
 //=============================================================================
