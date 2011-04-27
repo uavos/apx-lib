@@ -168,7 +168,7 @@ public:
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
   void dump(const Vect &v,const char *str="");
   void dump(const uint var_idx);
-  void print_report(void);
+  void print_report(FILE *stream);
 
   // flags
   uint status_set(uint mask,bool value=true);

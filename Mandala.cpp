@@ -882,14 +882,14 @@ void Mandala::dump(const uint var_idx)
 }
 //=============================================================================
 //=============================================================================
-void Mandala::print_report(void)
+void Mandala::print_report(FILE *stream)
 {
-  printf("======= Mandala Variables ===================\n");
-  printf("#\tVariableName\tDescription\tType\tArray\tSpan\tBytes\n");
+  fprintf(stream,"======= Mandala Variables ===================\n");
+  fprintf(stream,"#\tVariableName\tDescription\tType\tArray\tSpan\tBytes\n");
   for (uint i=0;i<maxVars;i++) {
     if ((!var_bytes[i])&&(var_type[i]!=vt_sig))continue;
-    if (i==idxSIG) printf("== Signature Variables (internal use only) ==\n");
-    if (i==idxCFG) printf("======= Configuration Variables =============\n");
+    if (i==idxSIG) fprintf(stream,"== Signature Variables (internal use only) ==\n");
+    if (i==idxCFG) fprintf(stream,"======= Configuration Variables =============\n");
     const char *vt="";
     switch(var_type[i]){
       case vt_void:   vt="UNKNOWN";break;
@@ -898,7 +898,7 @@ void Mandala::print_report(void)
       case vt_Vect:   vt="Vect";break;
       case vt_sig:    vt="signature";break;
     }
-    printf("%u\t%s\t%s\t%s\t%u\t%g\t%u\n",
+    fprintf(stream,"%u\t%s\t%s\t%s\t%u\t%g\t%u\n",
            i,
            var_name[i],
            var_descr[i],
@@ -908,26 +908,26 @@ void Mandala::print_report(void)
            var_bytes[i]
     );
   }
-  printf("=========== Bitfields =======================\n");
-  printf("VariableName\tBitNumber\tBitName\tDescription\n");
+  fprintf(stream,"=========== Bitfields =======================\n");
+  fprintf(stream,"VariableName\tBitNumber\tBitName\tDescription\n");
   for (uint i=0;i<maxVars;i++) {
     if (!var_bits[i])continue;
     for(uint ib=0;ib<var_bits[i];ib++)
-      printf("%s\t%u\t%s\t%s\n",
+      fprintf(stream,"%s\t%u\t%s\t%s\n",
              var_name[i],
              ib,
              var_bits_name[i][ib],
              var_bits_descr[i][ib]
       );
   }
-  printf("=========== Content of Signature Variables ==\n");
-  printf("VariableName\tContent\n");
+  fprintf(stream,"=========== Content of Signature Variables ==\n");
+  fprintf(stream,"VariableName\tContent\n");
   for (uint i=0;i<maxVars;i++) {
     if ((var_type[i]!=vt_sig)||(!var_sig[i][0]))continue;
-    printf("%s\t",var_name[i]);
+    fprintf(stream,"%s\t",var_name[i]);
     for(uint ib=0;ib<var_sig[i][0];ib++)
-      printf("%s,",var_name[var_sig[i][ib]]);
-    printf("\n");
+      fprintf(stream,"%s,",var_name[var_sig[i][ib]]);
+    fprintf(stream,"\n");
   }
 }
 //=============================================================================
