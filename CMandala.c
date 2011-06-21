@@ -55,17 +55,20 @@ static uint vdsc_fill(uint8_t *buf,uint var_idx)
 //=============================================================================
 static uint32_t limit_u(const float v,const uint32_t max)
 {
+  if(max==0)return v;
   if (v<0)return 0;
   if (v>max)return max;
   return v;
 }
 static uint32_t limit_ui(const uint32_t v,const uint32_t max)
 {
+  if(max==0)return v;
   if (v>max)return max;
   return v;
 }
 static int32_t limit_s(const float v,const uint32_t max)
 {
+  if(max==0)return v;
   float min=-((float)max);
   if (v<min)return min;
   if (v>max)return max;
