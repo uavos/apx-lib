@@ -21,17 +21,19 @@
 Uart::Uart()
 {
   fd=-1;
+  pname=DEFAULT_PORTNAME;
+  brate=DEFAULT_BAUDRATE;
 }
 Uart::~Uart()
 {
   close();
 }
 //==============================================================================
-bool Uart::open(const char *portname,int baudrate,const char *name,int timeout)
+bool Uart::open(const char *portname,int baudrate,const char *name,int timeout,uint parity)
 {
-  if(!portname[0])portname=DEFAULT_PORTNAME;
+  if(!portname[0])portname=pname;
   if(!name[0])name=portname;
-  if(!baudrate)baudrate=DEFAULT_BAUDRATE;
+  if(!baudrate)baudrate=brate;
   this->name=name;
 
   fd = ::open(portname, O_RDWR | O_NOCTTY );// | O_NONBLOCK | O_NDELAY);
@@ -47,8 +49,8 @@ bool Uart::open(const char *portname,int baudrate,const char *name,int timeout)
   //fcntl(fd, F_SETFL, O_NONBLOCK);
   struct termios tio_serial;
   bzero(&tio_serial, sizeof(tio_serial));
-  tio_serial.c_cflag = CS8 | CLOCAL | CREAD;
-  tio_serial.c_iflag = IGNBRK | IGNPAR;
+  tio_serial.c_cflag = CS8 | CLOCAL | CREAD | parity;
+  tio_serial.c_iflag = IGNBRK | IGNPAR;//(parity?INPCK:IGNPAR);
   tio_serial.c_oflag = 1;
   tio_serial.c_lflag = 0;
   tio_serial.c_cc[VMIN] = 0;
@@ -58,6 +60,9 @@ bool Uart::open(const char *portname,int baudrate,const char *name,int timeout)
   //cfsetospeed(&tio_serial, baudrate);
   tcflush(fd, TCIFLUSH);
   tcsetattr(fd, TCSANOW, &tio_serial);
+
+  brate=baudrate;
+  pname=portname;
 
   return true;
 }

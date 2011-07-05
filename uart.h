@@ -11,7 +11,7 @@ public:
   Uart();
   ~Uart();
 
-  bool open(const char *portname="",int baudrate=0,const char *name="",int timeout=1);
+  bool open(const char *portname="",int baudrate=0,const char *name="",int timeout=1,uint parity=0);
   void close();
   bool isOpen(void);
   int handle(void);
@@ -29,10 +29,13 @@ public:
   unsigned int getTxCnt(void);
   uint isBusy(void);
   void flush(void);
+  
+  const char *name; //debug name
+  uint brate; //baudrate
+  const char *pname; //device name
 
 private:
   int   fd;
-  const char    *name;
   uint8_t txBuf[4096];
 };
 //=============================================================

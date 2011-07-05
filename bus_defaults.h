@@ -3,7 +3,7 @@
 //=============================================================================
 #define BUS_MAX_PACKET          1024
 //=============================================================================
-//default bus commands
+//default bus commands (service packets)
 enum{
   apc_ACK=0,
   apc_Info,     //return _node_info
