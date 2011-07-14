@@ -20,6 +20,7 @@ public:
   void write(const uint8_t *buf,uint cnt);
   void writeEscaped(const uint8_t *tbuf,uint dcnt);
 
+  uint8_t read_char(void);
   uint read(uint8_t *buf,uint cnt);
   uint readEscaped(uint8_t *buf,uint max_len);
 
@@ -29,7 +30,7 @@ public:
   unsigned int getTxCnt(void);
   uint isBusy(void);
   void flush(void);
-  
+
   const char *name; //debug name
   uint brate; //baudrate
   const char *pname; //device name
