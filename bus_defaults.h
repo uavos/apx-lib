@@ -1,6 +1,7 @@
 #ifndef _BUS_DEFAULTS_H_
 #define _BUS_DEFAULTS_H_
 #include <inttypes.h>
+#include <sys/types.h>
 //=============================================================================
 #define BUS_MAX_PACKET          1024
 //=============================================================================
