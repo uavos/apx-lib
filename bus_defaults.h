@@ -5,12 +5,18 @@
 //=============================================================================
 #define BUS_MAX_PACKET          1024
 //=============================================================================
+typedef struct{
+  uint8_t       src;    //source node <dadr> or service <dest>|0x80
+  uint8_t       adr;    //destination <var_idx> or service <cmd>
+  uint8_t       data[BUS_MAX_PACKET-2];   //payload
+}__attribute__((packed)) _bus_packet;
+//=============================================================================
 //default bus commands (service packets)
 enum{
   apc_ACK=0,
   apc_ID,       //return _node_id
   apc_Info,     //return _node_info
-  apc_SetAdr,   //set new address[_node_id] dtype and FUID used to filter
+  apc_SetAdr,   //set new address[dadr] _node_sn used to filter
 
   //node configuration
   apc_ReadConfig,
@@ -22,13 +28,22 @@ enum{
   apc_loader=0xFF
 };
 //=============================================================================
-// node configuration. saved in EEPROM
+// node information, dynamically assigned values
 typedef uint8_t _node_sn[12]; //chip serial number
+typedef uint8_t _node_name[16]; //device name string
+typedef uint8_t _node_version[8]; //fw version string
+//-------------------------------------------------
+// firmware information, saved in FLASH section [CONFIG]
+typedef struct {
+  _node_name    name;
+  _node_version version;
+}__attribute__((packed)) _fw_info;
+//-------------------------------------------------
 typedef struct{
-  _node_sn      sn;
-  uint32_t      mcu_id;         //MCU DEV_ID code
-  uint8_t       dadr;           //device address (dynamically assigned)
-  uint8_t       name[16];       //device name string
+  _node_sn      sn;             //MCU SN (hardware reg)
+  uint32_t      mcu_id;         //MCU DEV_ID code (hardware reg)
+  uint8_t       dadr;           //device address (opt byte)
+  _fw_info      fw;
 }__attribute__((packed)) _node_id; //filled by hwInit;
 //-------------------------------------------------
 typedef struct {
@@ -56,11 +71,13 @@ typedef enum {
   ldc_init=0,   // start loader, re: <_ldc_file> =flash size
   ldc_file,     // set file info <_ldc_file>, re: <_ldc_file>
   ldc_write,    // write file data <_ldc_write>, re: <_ldc_write::hdr>
+  ldc_erase,    // force erase all user_app flash memory
 } _ldr_cmd;
 //loader data
 typedef struct{
   uint32_t      start_address;
   uint16_t      size;        // flash size in kB
+  uint8_t       xor_crc;     // all file data XORed
 }__attribute__((packed)) _ldc_file;
 typedef struct{
   struct{
