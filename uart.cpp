@@ -162,6 +162,7 @@ void Uart::writeEscaped(const uint8_t *tbuf,uint dcnt)
   write(buf,bcnt);
 }
 //==============================================================================
+//extern void dump(const uint8_t *buf,uint cnt);
 uint Uart::readEscaped(uint8_t *buf,uint max_len)
 // 0x55..0x01..DATA(0x55.0x02)..CRC..0x55..0x03
 {
