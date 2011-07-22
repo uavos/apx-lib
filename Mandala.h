@@ -24,12 +24,13 @@
 #define MANDALA_H
 //=============================================================================
 //=============================================================================
-#include "MandalaTypes.h"
 #include "MandalaVars.h"
 #include <string.h>
+#include <inttypes.h>
 #include <sys/types.h>
-//=============================================================================
+#include <stdio.h>
 #define printf(...) fprintf(stdout, __VA_ARGS__ )
+#include "MandalaTypes.h"
 //=============================================================================
 //modes enum
 #define MODEDEF(aname,adescr) fm##aname,

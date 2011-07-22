@@ -39,7 +39,7 @@
 //-----------------------------------------------------------------------------
 // Controls indexes
 enum {jRoll,jPitch,jThr,jYaw,jFlaps};
-typedef enum {vt_void,vt_uint,vt_double,vt_Vect,vt_sig}_var_type;
+typedef enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig}_var_type;
 //-----------------------------------------------------------------------------
 //#define   srvCnt    10    // servos cnt
 #define   jswCnt    4     // joystick axes
@@ -145,7 +145,7 @@ SIGDEF(autosend,  "Automatically forwarded variables to GCU",\
       idx_downstream, idx_debug, idx_service, idx_flightplan, idx_config )
 //=============================================================================
 //    Mandala variables definitions
-// type:           variable type: [uint, double, Vect]
+// type:           variable type: [uint, float, vect]
 // name:           variable name, used for text also. access: var.name
 // array:          for VARDEFA only (array size)
 // span:           value span (for exchange compression), <0 = signed
@@ -170,30 +170,30 @@ BITDEF(status,    rc,      1,   "RC on/off")
 BITDEF(status,    gps,     2,   "GPS available/lost")
 
 //--------- IMU --------------
-VARDEF(Vect, theta, -180,2,  "roll,pitch,yaw [deg]")
-VARDEF(Vect, acc,   -100,2, "Ax,Ay,Az accelerations [m/s2]")
-VARDEF(Vect, gyro,  -300,2, "p,q,r angular rates [deg/s]")
-VARDEF(Vect, mag,   -1.25,1,   "Hx,Hy,Hz magnetic field vector [gauss]")
+VARDEF(vect, theta, -180,2,  "roll,pitch,yaw [deg]")
+VARDEF(vect, acc,   -100,2, "Ax,Ay,Az accelerations [m/s2]")
+VARDEF(vect, gyro,  -300,2, "p,q,r angular rates [deg/s]")
+VARDEF(vect, mag,   -1.25,1,   "Hx,Hy,Hz magnetic field vector [gauss]")
 
 //--------- Measured by GPS --------------
-VARDEF(double, gps_lat,     -180,4,     "latitude [deg]")
-VARDEF(double, gps_lon,     -180,4,     "longitude [deg]")
-VARDEF(double, gps_hmsl,    -10000,2,   "altitde above sea [m]")
-VARDEF(Vect,   gps_vNED,    -150,2,     "velocity north,east,down [m/s]")
-VARDEF(double, gps_course,  -180,2,     "GPS course [deg]")
-VARDEF(Vect,   gps_accuracy, 2.55,1,    "GPS accuracy estimation Hrz[m],Ver[m],Spd[m/s]")
-VARDEF(double, gps_home_lat, -180,4,    "home latitude [deg]")
-VARDEF(double, gps_home_lon, -180,4,    "home longitude [deg]")
-VARDEF(double, gps_home_hmsl,-10000,2,  "home altitde above sea [m]")
+VARDEF(float, gps_lat,     -180,4,     "latitude [deg]")
+VARDEF(float, gps_lon,     -180,4,     "longitude [deg]")
+VARDEF(float, gps_hmsl,    -10000,2,   "altitde above sea [m]")
+VARDEF(vect,   gps_vNED,    -150,2,     "velocity north,east,down [m/s]")
+VARDEF(float, gps_course,  -180,2,     "GPS course [deg]")
+VARDEF(vect,   gps_accuracy, 2.55,1,    "GPS accuracy estimation Hrz[m],Ver[m],Spd[m/s]")
+VARDEF(float, gps_home_lat, -180,4,    "home latitude [deg]")
+VARDEF(float, gps_home_lon, -180,4,    "home longitude [deg]")
+VARDEF(float, gps_home_hmsl,-10000,2,  "home altitde above sea [m]")
 
 //--------- PRESSURE --------------
-VARDEF(double, airspeed,        100,1,    "barometric airspeed [m/s]")
-VARDEF(double, pstatic,         6553.5,2,  "barometric pressure AGL [m]")
+VARDEF(float, airspeed,        100,1,    "barometric airspeed [m/s]")
+VARDEF(float, pstatic,         6553.5,2,  "barometric pressure AGL [m]")
 
 //--------- BATTERY --------------
-VARDEF(double, Ve,     25.5,2,     "autopilot battery voltage [v]")
-VARDEF(double, Vs,     45,2,     "servo battery voltage [v]")
-VARDEF(double, Vp,     0,2,          "payload battery voltage [v]")
+VARDEF(float, Ve,     25.5,2,     "autopilot battery voltage [v]")
+VARDEF(float, Vs,     45,2,     "servo battery voltage [v]")
+VARDEF(float, Vp,     0,2,          "payload battery voltage [v]")
 VARDEF(uint,   power,  0,1,          "power status bitfield [on/off]")
 BITDEF(power,   ap,      1,   "Avionics")
 BITDEF(power,   servo,   2,   "Servo on/off")
@@ -204,33 +204,33 @@ BITDEF(power,   lights,  32,  "Lights on/off")
 BITDEF(power,   taxi,    64,  "Taxi lights on/off")
 
 //--------- TEMPERATURES --------------
-VARDEF(double, AT,    -100,1,      "ambient temperature [deg C]")
-VARDEF(double, ET,     0,1,        "engine temperature [deg C]")
+VARDEF(float, AT,    -100,1,      "ambient temperature [deg C]")
+VARDEF(float, ET,     0,1,        "engine temperature [deg C]")
 
 //--------- CONTROLS --------------
 // fast controls
-VARDEFA(double, jsw,jswCnt,    -1.0,1, "joystick command [-1..0..+1]")
-VARDEFA(double, ppm,ppmCnt,    -1.0,1, "RC PPM command [-1..0..+1]")
-VARDEF(double,  ctr_ailerons,  -1.0,1, "ailerons [-1..0..+1]")
-VARDEF(double,  ctr_elevator,  -1.0,1, "elevator [-1..0..+1]")
-VARDEF(double,  ctr_throttle,   1.0,1, "throttle [0..1]")
-VARDEF(double,  ctr_rudder,    -1.0,1, "rudder [-1..0..+1]")
-VARDEF(double,  ctr_wheel,     -1.0,1, "front wheel [-1..0..+1]")
+VARDEFA(float, jsw,jswCnt,    -1.0,1, "joystick command [-1..0..+1]")
+VARDEFA(float, ppm,ppmCnt,    -1.0,1, "RC PPM command [-1..0..+1]")
+VARDEF(float,  ctr_ailerons,  -1.0,1, "ailerons [-1..0..+1]")
+VARDEF(float,  ctr_elevator,  -1.0,1, "elevator [-1..0..+1]")
+VARDEF(float,  ctr_throttle,   1.0,1, "throttle [0..1]")
+VARDEF(float,  ctr_rudder,    -1.0,1, "rudder [-1..0..+1]")
+VARDEF(float,  ctr_wheel,     -1.0,1, "front wheel [-1..0..+1]")
 // slow controls
-VARDEF(double,  ctr_flaps,      1.0,1, "flaps [0..1]")
-VARDEF(double,  ctr_airbrk,     1.0,1, "airbrakes [0..1]")
+VARDEF(float,  ctr_flaps,      1.0,1, "flaps [0..1]")
+VARDEF(float,  ctr_airbrk,     1.0,1, "airbrakes [0..1]")
 VARDEF(uint,    ctrb,           0,1,   "controls bitfield [on/off]")
 BITDEF(ctrb,  gear,      1, "Landing gear retracted/extracted")
 BITDEF(ctrb,  brake,     2, "Parking brake on/off")
 BITDEF(ctrb,  ers,       4, "Parachute launched/off")
 
 //--------- AUTOPILOT COMMAND --------------
-VARDEF(Vect,   cmd_theta,    -180,2,   "desired roll,pitch,yaw [deg]")
-VARDEF(Vect,   cmd_NED,      -10000,2, "desired north,east,down [m]")
-VARDEF(double, cmd_course,   -180,2,   "desired course [deg]")
-VARDEF(double, cmd_rpm,      25500,1,  "desired RPM [rpm]")
-VARDEF(double, cmd_airspeed, 0,1,      "desired airspeed (for regThr) [m/s]")
-VARDEF(double, cmd_vspeed,   -12.7,1,  "desired vertical speed (for regPitchH) [m/s]")
+VARDEF(vect,   cmd_theta,    -180,2,   "desired roll,pitch,yaw [deg]")
+VARDEF(vect,   cmd_NED,      -10000,2, "desired north,east,down [m]")
+VARDEF(float, cmd_course,   -180,2,   "desired course [deg]")
+VARDEF(float, cmd_rpm,      25500,1,  "desired RPM [rpm]")
+VARDEF(float, cmd_airspeed, 0,1,      "desired airspeed (for regThr) [m/s]")
+VARDEF(float, cmd_vspeed,   -12.7,1,  "desired vertical speed (for regPitchH) [m/s]")
 
 //--------- WAYPOINTS --------------
 VARDEF(uint,  wpcnt,     0,1,       "number of waypoints [0...]")
@@ -239,24 +239,24 @@ VARDEF(uint,  wpidx,     0,1,       "current waypoint [0...]")
 VARDEF(uint,  rwcnt,     0,1,       "number of runways[0...]")
 
 //--------- calculated by Mandala::calc() --------------
-VARDEF(Vect,  NED,     -10000,2, "north,east,down position [m]")
-VARDEF(double,homeHDG, -180,2,   "heading to home position [deg]")
-VARDEF(double,dHome,   0,2,      "distance to GCU [m]")
-VARDEF(double,dWPT,    0,2,      "distance to waypoint [m]")
-VARDEF(Vect,  dNED,    -10000,2, "delta north,east,down [m]")
-VARDEF(Vect,  vXYZ,    -50,1,    "velocity bodyframe x,y,z [m/s]")
-VARDEF(Vect,  dXYZ,    -10000,2, "delta bodyframe x,y,z [m]")
-VARDEF(Vect,  aXYZ,    -100,1,   "accelerations by trajectory ax,ay,az [m/c2]")
-VARDEF(double,crsRate, -50,1,    "trajectory course change rate [deg/s]")
-VARDEF(double,wpHDG,   -180,2,   "current waypoint heading [deg]")
-VARDEF(double,rwHDG,   -180,2,   "current runway heading [deg]")
-VARDEF(double,rwDelta, -127,1,   "runway horizontal displacement [m]")
+VARDEF(vect,  NED,     -10000,2, "north,east,down position [m]")
+VARDEF(float,homeHDG, -180,2,   "heading to home position [deg]")
+VARDEF(float,dHome,   0,2,      "distance to GCU [m]")
+VARDEF(float,dWPT,    0,2,      "distance to waypoint [m]")
+VARDEF(vect,  dNED,    -10000,2, "delta north,east,down [m]")
+VARDEF(vect,  vXYZ,    -50,1,    "velocity bodyframe x,y,z [m/s]")
+VARDEF(vect,  dXYZ,    -10000,2, "delta bodyframe x,y,z [m]")
+VARDEF(vect,  aXYZ,    -100,1,   "accelerations by trajectory ax,ay,az [m/c2]")
+VARDEF(float,crsRate, -50,1,    "trajectory course change rate [deg/s]")
+VARDEF(float,wpHDG,   -180,2,   "current waypoint heading [deg]")
+VARDEF(float,rwHDG,   -180,2,   "current runway heading [deg]")
+VARDEF(float,rwDelta, -127,1,   "runway horizontal displacement [m]")
 
 //--------- OTHER SENSORS--------------
-VARDEF(double, rpm,     0,2,     "engine RPM [1/min]")
-VARDEF(double, agl,       25.5,1,      "Above Ground Level altitude [m]")
-VARDEF(double, fuel,      1.0,1,       "Fuel [0..1]")
-VARDEFA(double,tsens,10,  120.0,1,     "temperature sensors [C]")
+VARDEF(float, rpm,     0,2,     "engine RPM [1/min]")
+VARDEF(float, agl,       25.5,1,      "Above Ground Level altitude [m]")
+VARDEF(float, fuel,      1.0,1,       "Fuel [0..1]")
+VARDEFA(float,tsens,10,  120.0,1,     "temperature sensors [C]")
 
 //=============================================================================
 //--------- CONFIG --------------
@@ -269,71 +269,71 @@ VARDEFA(double,tsens,10,  120.0,1,     "temperature sensors [C]")
 #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
 #endif
 // PID variables (the first 3 vars are hardcoded in GCU ConfigModel)
-CFGDEFA(Vect,       pidK,regCnt,   655.35,2,0.01, "PID coeffitients Kp,Ki,Kd")
-CFGDEFA(Vect,       pidL,regCnt,   100,1,1,       "PID limits Lp,Li,Ld [%]")
-CFGDEFA(double,     pidLo,regCnt,  100,1,1,       "PID out limits Lo [%]")
+CFGDEFA(vect,       pidK,regCnt,   655.35,2,0.01, "PID coeffitients Kp,Ki,Kd")
+CFGDEFA(vect,       pidL,regCnt,   100,1,1,       "PID limits Lp,Li,Ld [%]")
+CFGDEFA(float,     pidLo,regCnt,  100,1,1,       "PID out limits Lo [%]")
 
 // other variables (added to ConfigModel) automatically.
 // description format:
-// <Group>: text (Vect axis names if any)
-// Vect axis names used to create text names in ConfigModel
+// <Group>: text (vect axis names if any)
+// vect axis names used to create text names in ConfigModel
 // <Group> may be ommited if repeated
-// Vect arrays not allowed (by ConfigModel)
-CFGDEF(double,  mix_elv_Kp,   2.55,1,0.01,  "Mixer: Roll angle to Elevator mix")
-CFGDEF(double,  mix_elv_Lo,   100,1,1,      "Roll angle to Elevator limit")
-CFGDEF(double,  mix_rud_Kp,   -12.7,1,0.1,  "Roll angle to Rudder mix")
-CFGDEF(double,  mix_rud_Lo,   100,1,1,      "Roll angle to Rudder limit (+/-) [%]")
-CFGDEF(double,  mix_thr_Kp,   25.5,1,0.1,   "Pitch angle to Throttle mix")
-CFGDEF(double,  mix_thr_Lo,   100,1,1,      "Pitch angle to Throttle limit (+/-) [%]")
+// vect arrays not allowed (by ConfigModel)
+CFGDEF(float,  mix_elv_Kp,   2.55,1,0.01,  "Mixer: Roll angle to Elevator mix")
+CFGDEF(float,  mix_elv_Lo,   100,1,1,      "Roll angle to Elevator limit")
+CFGDEF(float,  mix_rud_Kp,   -12.7,1,0.1,  "Roll angle to Rudder mix")
+CFGDEF(float,  mix_rud_Lo,   100,1,1,      "Roll angle to Rudder limit (+/-) [%]")
+CFGDEF(float,  mix_thr_Kp,   25.5,1,0.1,   "Pitch angle to Throttle mix")
+CFGDEF(float,  mix_thr_Lo,   100,1,1,      "Pitch angle to Throttle limit (+/-) [%]")
 
-CFGDEF(Vect,    imu_align,    -180,2,0.1,   "AHRS: body frame align (roll,pitch,yaw) [-180..0..+180]")
-CFGDEF(Vect,    theta_bias,   -180,2,0.1,   "AHRS: theta bias (roll,pitch,yaw) [-180..0..+180]")
+CFGDEF(vect,    imu_align,    -180,2,0.1,   "AHRS: body frame align (roll,pitch,yaw) [-180..0..+180]")
+CFGDEF(vect,    theta_bias,   -180,2,0.1,   "AHRS: theta bias (roll,pitch,yaw) [-180..0..+180]")
 
-CFGDEF(double,  wptSnap,      0,1,0,        "Waypoints: waypoint snap distance [m]")
+CFGDEF(float,  wptSnap,      0,1,0,        "Waypoints: waypoint snap distance [m]")
 
-CFGDEF(double,  distHome,   255000,1,1000,  "Safety: turn home distance [m]")
-CFGDEF(double,  distKill,   255000,1,1000,  "Safety: self-kill distance [m]")
+CFGDEF(float,  distHome,   255000,1,1000,  "Safety: turn home distance [m]")
+CFGDEF(float,  distKill,   255000,1,1000,  "Safety: self-kill distance [m]")
 
-CFGDEF(double,  turnRate,   25.5,1,0.1,     "Sim: max turn rate [deg/s]")
+CFGDEF(float,  turnRate,   25.5,1,0.1,     "Sim: max turn rate [deg/s]")
 
-CFGDEF(double,  hyst_dist,  25.5,1,0.1,     "Hysterezis: distance [m]")
-CFGDEF(double,  hyst_spd,   25.5,1,0.1,     "speed hold [m/s]")
-CFGDEF(double,  hyst_yaw,   25.5,1,0.1,     "heading hold [deg]")
+CFGDEF(float,  hyst_dist,  25.5,1,0.1,     "Hysterezis: distance [m]")
+CFGDEF(float,  hyst_spd,   25.5,1,0.1,     "speed hold [m/s]")
+CFGDEF(float,  hyst_yaw,   25.5,1,0.1,     "heading hold [deg]")
 
-CFGDEF(double,  eng_rpm,     25500,1,100,   "Engine: cruise rpm [1/min]")
-CFGDEF(double,  eng_rpm_idle,25500,1,100,   "idle rpm [1/min]")
-CFGDEF(double,  eng_rpm_max, 25500,1,100,   "max rpm [1/min]")
+CFGDEF(float,  eng_rpm,     25500,1,100,   "Engine: cruise rpm [1/min]")
+CFGDEF(float,  eng_rpm_idle,25500,1,100,   "idle rpm [1/min]")
+CFGDEF(float,  eng_rpm_max, 25500,1,100,   "max rpm [1/min]")
 
 
-CFGDEF(double,  flight_speed,   0,1,0,      "Flight: cruise speed [m/s]")
-CFGDEF(double,  flight_speedFlaps,0,1,0,    "airspeed limit with flaps down [m/s]")
-CFGDEF(double,  flight_safeAlt, 2550,1,10,  "safe altitude, HOME, TA mode [m]")
-CFGDEF(double,  flight_throttle, 0,1,0.01,  "cruise throttle setting [0..1]")
+CFGDEF(float,  flight_speed,   0,1,0,      "Flight: cruise speed [m/s]")
+CFGDEF(float,  flight_speedFlaps,0,1,0,    "airspeed limit with flaps down [m/s]")
+CFGDEF(float,  flight_safeAlt, 2550,1,10,  "safe altitude, HOME, TA mode [m]")
+CFGDEF(float,  flight_throttle, 0,1,0.01,  "cruise throttle setting [0..1]")
 
-CFGDEF(double,  takeoff_Kp,      25.5,1,0.1,"Takeoff: alt error coeffitient [deg]")
-CFGDEF(double,  takeoff_Lp,      90,1,1,    "pitch limit [deg]")
-CFGDEF(double,  takeoff_throttle,1,1,0.1,   "throttle setting [0..1]")
+CFGDEF(float,  takeoff_Kp,      25.5,1,0.1,"Takeoff: alt error coeffitient [deg]")
+CFGDEF(float,  takeoff_Lp,      90,1,1,    "pitch limit [deg]")
+CFGDEF(float,  takeoff_throttle,1,1,0.1,   "throttle setting [0..1]")
 
-CFGDEF(double,  pland_pitch,   90,1,1,    "Parachute Landing: stall pitch [deg]")
-CFGDEF(double,  pland_speed,   255,1,1,   "airspeed to open parachute [m/s]")
+CFGDEF(float,  pland_pitch,   90,1,1,    "Parachute Landing: stall pitch [deg]")
+CFGDEF(float,  pland_speed,   255,1,1,   "airspeed to open parachute [m/s]")
 
-CFGDEF(double,  rw_dist,     2550,1,10,   "Runway Landing: approach distance [m]")
-CFGDEF(double,  rw_turnDist, -1270,1,10,  "approach turn distance [m]")
-CFGDEF(double,  rw_finAGL,   255,1,0,     "approach final altitude AGL [m]")
-CFGDEF(double,  rw_finPitch, -12.7,1,0.1, "final pitch bias [deg]")
-CFGDEF(double,  rw_finSpeed, 0,1,0,       "final speed [m/s]")
-CFGDEF(double,  rw_tdPitch,  0,1,1,       "touchdown pitch bias [deg]")
-CFGDEF(double,  rw_tdAGL,    12.7,1,0.1,    "AGL altitude before touchdown [m]")
-CFGDEF(double,  rw_Kp,       2.55,1,0.01, "error multiplier [m]")
-CFGDEF(double,  rw_Lp,       255,1,1,     "heading limit [deg]")
+CFGDEF(float,  rw_dist,     2550,1,10,   "Runway Landing: approach distance [m]")
+CFGDEF(float,  rw_turnDist, -1270,1,10,  "approach turn distance [m]")
+CFGDEF(float,  rw_finAGL,   255,1,0,     "approach final altitude AGL [m]")
+CFGDEF(float,  rw_finPitch, -12.7,1,0.1, "final pitch bias [deg]")
+CFGDEF(float,  rw_finSpeed, 0,1,0,       "final speed [m/s]")
+CFGDEF(float,  rw_tdPitch,  0,1,1,       "touchdown pitch bias [deg]")
+CFGDEF(float,  rw_tdAGL,    12.7,1,0.1,    "AGL altitude before touchdown [m]")
+CFGDEF(float,  rw_Kp,       2.55,1,0.01, "error multiplier [m]")
+CFGDEF(float,  rw_Lp,       255,1,1,     "heading limit [deg]")
 
-CFGDEF(double,  stby_R,  2550,1,10,     "Standby mode: radius [m]")
-CFGDEF(double,  stby_Kp, 2.55,1,0.01,   "error multiplier [m]")
-CFGDEF(double,  stby_Lp, 255,1,1,       "heading limit [deg]")
+CFGDEF(float,  stby_R,  2550,1,10,     "Standby mode: radius [m]")
+CFGDEF(float,  stby_Kp, 2.55,1,0.01,   "error multiplier [m]")
+CFGDEF(float,  stby_Lp, 255,1,1,       "heading limit [deg]")
 
-CFGDEF(double,  flaps_speed,     2.55,1,0.01, "Flaps: flaps speed [0..1]")
-CFGDEF(double,  flaps_level,     2.55,1,0.01, "flaps level [0..1]")
-CFGDEF(double,  flaps_levelTO,   2.55,1,0.01, "flaps level for TAKEOFF mode [0..1]")
+CFGDEF(float,  flaps_speed,     2.55,1,0.01, "Flaps: flaps speed [0..1]")
+CFGDEF(float,  flaps_level,     2.55,1,0.01, "flaps level [0..1]")
+CFGDEF(float,  flaps_levelTO,   2.55,1,0.01, "flaps level for TAKEOFF mode [0..1]")
 //=============================================================================
 #undef MODEDEF
 #undef REGDEF

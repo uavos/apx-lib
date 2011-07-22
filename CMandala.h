@@ -1,5 +1,8 @@
 #ifndef _CMANDALA_H_
 #define _CMANDALA_H_
+#ifdef __cplusplus
+extern "C" {
+#endif
 //=============================================================================
 #ifndef INTTYPES
 #define INTTYPES
@@ -81,7 +84,7 @@ enum {
 // variable typedefs
 #define VARDEFA(atype,aname,asize,aspan,abytes,adescr) typedef atype var_typedef_##aname [asize];
 #define VARDEF(atype,aname,aspan,abytes,adescr) typedef atype var_typedef_##aname;
-#define SIGDEF(aname, adescr, ... ) typedef uint8_t* var_typedef_##aname;
+#define SIGDEF(aname, adescr, ... ) typedef const uint8_t* var_typedef_##aname;
 #include "MandalaVars.h"
 
 
@@ -94,7 +97,7 @@ enum {
 //-----------------------------------------------------------------------------
 // main structure of all used variables
 typedef struct {
-#define USESIG(aname) const uint8_t * aname;
+#define USESIG(aname) var_typedef_##aname aname;
 #define USEVAR(aname) var_typedef_##aname aname;
 #include <mandala_vars.h>
 #undef USEVAR
@@ -106,4 +109,7 @@ extern Mandala var;
 
 
 //=============================================================================
+#ifdef __cplusplus
+}
+#endif
 #endif
