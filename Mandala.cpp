@@ -72,7 +72,7 @@ Mandala::Mandala()
   name_##aname=#aname; \
   descr_##aname=adescr; \
   var_size[idx]=var_bytes[idx]*var_array[idx]; \
-  if(var_type[idx]==vt_Vect)var_size[idx]*=3; \
+  if(var_type[idx]==vt_vect)var_size[idx]*=3; \
   idx++;
 
 #define VARDEF(atype,aname,aspan,abytes,adescr) \
@@ -170,11 +170,11 @@ uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
       for (uint ai=0;ai<var_array[var_idx];ai++)
         buf+=archive_u(buf,((uint*)(var_ptr[var_idx]))[ai],var_idx);
       break;
-    case vt_double:
+    case vt_float:
       for (uint ai=0;ai<var_array[var_idx];ai++)
         buf+=archive_f(buf,((double*)(var_ptr[var_idx]))[ai],var_idx);
       break;
-    case vt_Vect:
+    case vt_vect:
       for (uint ai=0;ai<var_array[var_idx];ai++)
         for (uint iv=0;iv<3;iv++)
           buf+=archive_f(buf,(((Vect*)(var_ptr[var_idx]))[ai])[iv],var_idx);
@@ -217,13 +217,13 @@ uint Mandala::extract(const uint8_t *buf,uint size,uint var_idx)
         buf+=var_bytes[var_idx];
       }
       break;
-    case vt_double:
+    case vt_float:
       for (uint ai=0;ai<var_array[var_idx];ai++){
         ((double*)var_ptr[var_idx])[ai]=extract_f(buf,var_idx);
         buf+=var_bytes[var_idx];
       }
       break;
-    case vt_Vect:
+    case vt_vect:
       for (uint ai=0;ai<var_array[var_idx];ai++)
         for (uint iv=0;iv<3;iv++){
           (((Vect*)var_ptr[var_idx])[ai])[iv]=extract_f(buf,var_idx);
@@ -866,8 +866,8 @@ void Mandala::dump(const uint var_idx)
   printf("%s: ",var_name[var_idx]);
   switch(var_type[var_idx]){
     case vt_uint:   printf("%u",*((uint*)(var_ptr[var_idx])));break;
-    case vt_double: printf("%.2f",*((double*)(var_ptr[var_idx])));break;
-    case vt_Vect:   printf("(%.2f,%.2f,%.2f)",(*((Vect*)(var_ptr[var_idx])))[0],(*((Vect*)(var_ptr[var_idx])))[1],(*((Vect*)(var_ptr[var_idx])))[2] );break;
+    case vt_float: printf("%.2f",*((double*)(var_ptr[var_idx])));break;
+    case vt_vect:   printf("(%.2f,%.2f,%.2f)",(*((Vect*)(var_ptr[var_idx])))[0],(*((Vect*)(var_ptr[var_idx])))[1],(*((Vect*)(var_ptr[var_idx])))[2] );break;
     case vt_sig:{
       printf("+sig+\n");
       uint8_t *signature=var_sig[var_idx];
@@ -894,8 +894,8 @@ void Mandala::print_report(FILE *stream)
     switch(var_type[i]){
       case vt_void:   vt="UNKNOWN";break;
       case vt_uint:   vt="uint";break;
-      case vt_double: vt="double";break;
-      case vt_Vect:   vt="Vect";break;
+      case vt_float: vt="double";break;
+      case vt_vect:   vt="Vect";break;
       case vt_sig:    vt="signature";break;
     }
     fprintf(stream,"%u\t%s\t%s\t%s\t%u\t%g\t%u\n",

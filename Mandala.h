@@ -23,14 +23,18 @@
 #ifndef MANDALA_H
 #define MANDALA_H
 //=============================================================================
+#include <inttypes.h>
+#include <sys/types.h>
+#include "MandalaTypes.h"
+typedef Vect _var_vect;
+typedef uint    _var_uint;
+typedef const uint8_t*  _var_signature;
+typedef double   _var_float;
 //=============================================================================
 #include "MandalaVars.h"
 #include <string.h>
-#include <inttypes.h>
-#include <sys/types.h>
 #include <stdio.h>
 #define printf(...) fprintf(stdout, __VA_ARGS__ )
-#include "MandalaTypes.h"
 //=============================================================================
 //modes enum
 #define MODEDEF(aname,adescr) fm##aname,
@@ -138,8 +142,8 @@ public:
 
 
   // variable definitions: vartype VARNAME;
-#define VARDEF(atype,aname,aspan,abytes,adescr)               atype aname;
-#define VARDEFA(atype,aname,asize,aspan,abytes,adescr)        atype aname [ asize ];
+#define VARDEF(atype,aname,aspan,abytes,adescr)               _var_##atype aname;
+#define VARDEFA(atype,aname,asize,aspan,abytes,adescr)        _var_##atype aname [ asize ];
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr)        VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
 #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) VARDEFA(atype,cfg_##aname,asize,aspan,abytes,adescr)
 #include "MandalaVars.h"
