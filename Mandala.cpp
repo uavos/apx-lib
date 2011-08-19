@@ -241,7 +241,7 @@ uint Mandala::extract(const uint8_t *buf,uint size,uint var_idx)
   if(!vsz)return 0; //error from extract_sig
   size-=vsz;
   var_idx++;
-  if(size&&(var_idx<idxSIG))return vsz+extract(buf,size,var_idx+1);
+  if(size&&(var_idx<idxSIG))return vsz+extract(buf,size,var_idx);
   else return vsz;
 }
 //=============================================================================
