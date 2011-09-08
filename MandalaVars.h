@@ -135,7 +135,7 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",\
 // telemetry variables
 SIGDEF(downstream,"Downlink stream, all variables")
 SIGDEF(debug,     "Debug <stdout> string forward to GCU")
-SIGDEF(service,   "Servive packet down/up link <src-dadr>,<dadr-cmd>,<data..>")
+SIGDEF(service,   "Service packet down/up link <src-dadr>,<dadr-cmd>,<data..>")
 SIGDEF(flightplan,"Flight plan packed data")
 //SIGDEF(uplink)    // special command uplink
 // static signatures
