@@ -175,16 +175,22 @@ VARDEF(vect, acc,   -100,2, "Ax,Ay,Az accelerations [m/s2]")
 VARDEF(vect, gyro,  -300,2, "p,q,r angular rates [deg/s]")
 VARDEF(vect, mag,   -1.25,1,   "Hx,Hy,Hz magnetic field vector [gauss]")
 
+//--------- Filtered NAV --------------
+//VARDEF(float,altitude,  6553.5,2, "local altitude [m]")
+//VARDEF(float,vspeed,    -100,2, "Ax,Ay,Az accelerations [m/s2]")
+
 //--------- Measured by GPS --------------
 VARDEF(float, gps_lat,     -180,4,     "latitude [deg]")
 VARDEF(float, gps_lon,     -180,4,     "longitude [deg]")
 VARDEF(float, gps_hmsl,    -10000,2,   "altitde above sea [m]")
 VARDEF(vect,   gps_vNED,    -150,2,     "velocity north,east,down [m/s]")
 VARDEF(float, gps_course,  -180,2,     "GPS course [deg]")
-VARDEF(vect,   gps_accuracy, 2.55,1,    "GPS accuracy estimation Hrz[m],Ver[m],Spd[m/s]")
 VARDEF(float, gps_home_lat, -180,4,    "home latitude [deg]")
 VARDEF(float, gps_home_lon, -180,4,    "home longitude [deg]")
 VARDEF(float, gps_home_hmsl,-10000,2,  "home altitde above sea [m]")
+VARDEF(uint,  gps_time, 0,4,            "GPS UTC Time from 1970 1st Jan [sec]")
+VARDEF(float, gps_SV, 0,1,              "GPS Satellites visible [number]")
+VARDEF(vect,  gps_accuracy, 2.55,1,     "GPS accuracy estimation Hrz[m],Ver[m],Spd[m/s]")
 
 //--------- PRESSURE --------------
 VARDEF(float, airspeed,        100,1,    "barometric airspeed [m/s]")
@@ -202,10 +208,16 @@ BITDEF(power,   agl,     8,   "AGL sensor")
 BITDEF(power,   ignition,16,  "Engine on/off")
 BITDEF(power,   lights,  32,  "Lights on/off")
 BITDEF(power,   taxi,    64,  "Taxi lights on/off")
+BITDEF(power,   heating, 128, "Sensors heating on/off")
+
+//--------- OTHER AP SENSORS --------------
+VARDEF(float,   rpm,    0,2,     "engine RPM [1/min]")
+VARDEF(float,   agl,    25.5,1,  "Above Ground Level altitude [m]")
 
 //--------- TEMPERATURES --------------
-VARDEF(float, AT,    -100,1,      "ambient temperature [deg C]")
-VARDEF(float, ET,     0,1,        "engine temperature [deg C]")
+VARDEF(float, AT,    -100,1,    "ambient temperature [deg C]")
+VARDEF(float, ET,     0,1,      "engine temperature [deg C]")
+VARDEFA(float,  tsens,8,0,1,    "temperature sensors [C]")
 
 //--------- CONTROLS --------------
 // fast controls
@@ -252,11 +264,10 @@ VARDEF(float,wpHDG,   -180,2,   "current waypoint heading [deg]")
 VARDEF(float,rwHDG,   -180,2,   "current runway heading [deg]")
 VARDEF(float,rwDelta, -127,1,   "runway horizontal displacement [m]")
 
-//--------- OTHER SENSORS--------------
-VARDEF(float, rpm,     0,2,     "engine RPM [1/min]")
-VARDEF(float, agl,       25.5,1,      "Above Ground Level altitude [m]")
-VARDEF(float, fuel,      1.0,1,       "Fuel [0..1]")
-VARDEFA(float,tsens,10,  120.0,1,     "temperature sensors [C]")
+//--------- OTHER SENSORS (information) --------------
+VARDEF(float,   RSS,   1.0,1,   "Modem Receiver signal strength [0..1]")
+VARDEF(float,   RSS_gcu,1.0,1,  "Modem GCU Receiver signal strength [0..1]")
+VARDEF(float,   fuel,   1.0,1,  "Fuel [0..1]")
 
 //=============================================================================
 //--------- CONFIG --------------
@@ -292,7 +303,7 @@ CFGDEF(vect,    theta_bias,   -180,2,0.1,   "AHRS: theta bias (roll,pitch,yaw) [
 CFGDEF(float,  wptSnap,      0,1,0,        "Waypoints: waypoint snap distance [m]")
 
 CFGDEF(float,  distHome,   255000,1,1000,  "Safety: turn home distance [m]")
-CFGDEF(float,  distKill,   255000,1,1000,  "Safety: self-kill distance [m]")
+CFGDEF(float,  distKill,   255000,1,1000,  "Safety: suicide distance [m]")
 
 CFGDEF(float,  turnRate,   25.5,1,0.1,     "Sim: max turn rate [deg/s]")
 
