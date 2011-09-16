@@ -111,7 +111,7 @@ public:
   uint    dl_size;              // last telemetry size statistics
   // derivatives calc by calcDGPS
   bool    derivatives_init;
-  Vect    last_vNED;
+  Vect    last_vNED,last_aXYZ;
   double  last_course;
   double  gps_lat_s,gps_lon_s; //change detect
 
