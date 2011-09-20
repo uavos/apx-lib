@@ -52,7 +52,10 @@ public:
   Vector &operator+=(const Vector &that);
   const Vector operator-(const Vector &that)const;
   Vector &operator-=(const Vector &that);
-
+  const Vector operator*(const _var_float &scale)const;
+  Vector &operator*=(const _var_float &scale);
+  const Vector operator/(const _var_float &scale)const;
+  Vector &operator/=(const _var_float &scale);
 protected:
   _var_float v[3];
 };
@@ -98,6 +101,8 @@ enum {
 //variable parameters
 #define SIGDEF(aname, adescr, ... ) VARDEFA(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,1,adescr)
 #define VARDEF(atype,aname,aspan,abytes,adescr) VARDEFA(atype,aname,1,aspan,abytes,adescr)
+#define CFGDEF(atype,aname,aspan,abytes,around,adescr) VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
+#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) VARDEFA(atype,cfg_##aname,asize,aspan,abytes,adescr)
 #define VARDEFA(atype,aname,asize,aspan,abytes,adescr) \
   enum{\
       var_type_##aname=vt_##atype, \
@@ -113,6 +118,8 @@ enum {
 
 //-----------------------------------------------------------------------------
 // variable typedefs
+#define CFGDEF(atype,aname,aspan,abytes,around,adescr) VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
+#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) VARDEFA(atype,cfg_##aname,asize,aspan,abytes,adescr)
 #define VARDEFA(atype,aname,asize,aspan,abytes,adescr) typedef _var_##atype var_typedef_##aname [asize];
 #define VARDEF(atype,aname,aspan,abytes,adescr) typedef _var_##atype var_typedef_##aname;
 #define SIGDEF(aname, adescr, ... ) typedef _var_signature var_typedef_##aname;
@@ -132,15 +139,20 @@ public:
   double get_value(uint var_idx,uint member_idx);
   void set_value(uint var_idx,uint member_idx,double value);
   //-----------------------------------------------------------------------------
-  uint archive(uint8_t *buf,uint var_idx);
-  uint extract(uint8_t *buf,uint cnt,uint var_idx);
+  virtual uint archive(uint8_t *buf,uint var_idx){return do_archive(buf,var_idx);}
+  virtual uint extract(uint8_t *buf,uint cnt,uint var_idx){return do_extract(buf,cnt,var_idx);}
 
   #define VARDEF(atype,aname,aspan,abytes,adescr)         var_typedef_##aname aname;
   #define VARDEFA(atype,aname,asize,aspan,abytes,adescr)  VARDEF( atype,aname,aspan,abytes,adescr )
   #define SIGDEF(aname,adescr,...)                        static var_typedef_##aname aname;
+  #define CFGDEF(atype,aname,aspan,abytes,around,adescr) VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
+  #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) VARDEFA(atype,cfg_##aname,asize,aspan,abytes,adescr)
   #include "MandalaVars.h"
+  uint do_archive(uint8_t *buf,uint var_idx);
+  uint do_extract(uint8_t *buf,uint cnt,uint var_idx);
 
 private:
+
   uint vdsc_fill(uint8_t *buf,uint var_idx);
   uint32_t limit_u(const _var_float v,const uint32_t max);
   uint32_t limit_ui(const uint32_t v,const uint32_t max);
@@ -155,4 +167,4 @@ private:
   void extract_sig(uint buf_cnt);
 };
 //=============================================================================
-#endif // MANDALA_H
+#endif // MANDALA_CORE_H

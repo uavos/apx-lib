@@ -206,7 +206,7 @@ void MandalaCore::archive_sig()
   uint sz,cnt=0,scnt=signature[0];
   signature++;
   while (scnt--) {
-    sz=archive(vdsc.buf,*signature++);
+    sz=do_archive(vdsc.buf,*signature++);
     if (!sz){ //error, var not found in USEVAR()
       vdsc.size=0;
       return;
@@ -216,7 +216,7 @@ void MandalaCore::archive_sig()
   vdsc.size=cnt;
 }
 //-----------------------------------------------------------------------------
-uint MandalaCore::archive(uint8_t *buf,uint var_idx)
+uint MandalaCore::do_archive(uint8_t *buf,uint var_idx)
 {
   if (!vdsc_fill(buf,var_idx))return 0;
   switch (vdsc.type) {
@@ -339,7 +339,7 @@ void MandalaCore::extract_sig(uint buf_cnt)
   uint sz,cnt=0,scnt=signature[0];
   signature++;
   while (scnt--) {
-    sz=extract(vdsc.buf,buf_cnt,*signature++);
+    sz=do_extract(vdsc.buf,buf_cnt,*signature++);
     if (!sz){ //error, var not found in USEVAR()
       vdsc.size=0;
       return;
@@ -350,7 +350,7 @@ void MandalaCore::extract_sig(uint buf_cnt)
   vdsc.size=cnt;
 }
 //-----------------------------------------------------------------------------
-uint MandalaCore::extract(uint8_t *buf,uint cnt,uint var_idx)
+uint MandalaCore::do_extract(uint8_t *buf,uint cnt,uint var_idx)
 {
   if (!vdsc_fill(buf,var_idx))return 0;
   if (cnt<vdsc.size)return 0;
@@ -440,6 +440,14 @@ const Vector Vector::operator-(const Vector &that)const
 {return Vector(*this)-=that;}
 Vector &Vector::operator-=(const Vector &that)
 {for(uint i=0;i<3;i++)(*this)[i]-=that[i];return(*this);}
+const Vector Vector::operator*(const _var_float &scale)const
+{return Vector(*this)*=scale;}
+Vector &Vector::operator*=(const _var_float &scale)
+{for(uint i=0;i<3;i++)(*this)[i]*=scale;return (*this);}
+const Vector Vector::operator/(const _var_float &scale)const
+{return Vector(*this)/=scale;}
+Vector &Vector::operator/=(const _var_float &scale)
+{for(uint i=0;i<3;i++)(*this)[i]/=scale;return (*this);}
 //=============================================================================
 //=============================================================================
 //=============================================================================

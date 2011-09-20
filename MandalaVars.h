@@ -38,13 +38,11 @@
 #define MAX_TELEMETRY   90      // max telemetry packet size [bytes]
 //-----------------------------------------------------------------------------
 // Controls indexes
-enum {jRoll,jPitch,jThr,jYaw,jFlaps};
+enum {jswRoll,jswPitch,jswThr,jswYaw,   jswCnt};
+enum {ppmRoll,ppmPitch,ppmThr,ppmYaw,ppmSW,ppmFlaps,ppmBrake,   ppmCnt};
+//-----------------------------------------------------------------------------
+//variable type index
 typedef enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig}_var_type;
-//-----------------------------------------------------------------------------
-//#define   srvCnt    10    // servos cnt
-#define   jswCnt    4     // joystick axes
-#define   ppmCnt    5     // RC PPM channels cnt
-//-----------------------------------------------------------------------------
 //=============================================================================
 #define EARTH_RATE   0.00007292115   // rotation rate of earth (rad/sec)
 #define EARTH_RADIUS 6378137         // earth semi-major axis radius (m)
@@ -137,9 +135,9 @@ SIGDEF(downstream,"Downlink stream, all variables")
 SIGDEF(debug,     "Debug <stdout> string forward to GCU")
 SIGDEF(service,   "Service packet down/up link <src-dadr>,<dadr-cmd>,<data..>")
 SIGDEF(flightplan,"Flight plan packed data")
+SIGDEF(config,    "All configuration vars (>=idxCFG)")
 //SIGDEF(uplink)    // special command uplink
 // static signatures
-SIGDEF(config,    "List of all configuration vars (>=idxCFG)")
 //modem special
 SIGDEF(autosend,  "Automatically forwarded variables to GCU",\
       idx_downstream, idx_debug, idx_service, idx_flightplan, idx_config )
@@ -158,6 +156,12 @@ SIGDEF(autosend,  "Automatically forwarded variables to GCU",\
 #endif
 #ifndef VARDEFA
 #define VARDEFA(atype,aname,asize,aspan,abytes,adescr) VARDEF(atype,aname,aspan,abytes,adescr)
+#endif
+#ifndef CFGDEF
+#define CFGDEF(atype,aname,aspan,abytes,around,adescr)
+#endif
+#ifndef CFGDEFA
+#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
 #endif
 #ifndef BITDEF
 #define BITDEF(avarname,abitname,amask,adescr)
@@ -197,18 +201,18 @@ VARDEF(float, airspeed,        100,1,    "barometric airspeed [m/s]")
 VARDEF(float, pstatic,         6553.5,2,  "barometric pressure AGL [m]")
 
 //--------- BATTERY --------------
-VARDEF(float, Ve,     25.5,2,     "autopilot battery voltage [v]")
-VARDEF(float, Vs,     45,2,     "servo battery voltage [v]")
-VARDEF(float, Vp,     0,2,          "payload battery voltage [v]")
+VARDEF(float, Ve,     25.5,1,     "autopilot battery voltage [v]")
+VARDEF(float, Vs,     45,1,     "servo battery voltage [v]")
+VARDEF(float, Vp,     0,1,          "payload battery voltage [v]")
 VARDEF(uint,   power,  0,1,          "power status bitfield [on/off]")
-BITDEF(power,   ap,      1,   "Avionics")
-BITDEF(power,   servo,   2,   "Servo on/off")
-BITDEF(power,   payload, 4,   "Payload activated/off")
-BITDEF(power,   agl,     8,   "AGL sensor")
-BITDEF(power,   ignition,16,  "Engine on/off")
-BITDEF(power,   lights,  32,  "Lights on/off")
-BITDEF(power,   taxi,    64,  "Taxi lights on/off")
-BITDEF(power,   heating, 128, "Sensors heating on/off")
+BITDEF(power,   ap,      1,     "Avionics")
+BITDEF(power,   servo,   2,     "Servo on/off")
+BITDEF(power,   payload, 4,     "Payload activated/off")
+BITDEF(power,   agl,     8,     "AGL sensor")
+BITDEF(power,   ignition,16,    "Engine on/off")
+BITDEF(power,   lights,  32,    "Lights on/off")
+BITDEF(power,   taxi,    64,    "Taxi lights on/off")
+BITDEF(power,   ice,    128,    "Anti-ice on/off")
 
 //--------- OTHER AP SENSORS --------------
 VARDEF(float,   rpm,    0,2,     "engine RPM [1/min]")
@@ -273,13 +277,7 @@ VARDEF(float,   fuel,   1.0,1,  "Fuel [0..1]")
 //--------- CONFIG --------------
 // IDX START FROM idxCFG (200)
 //-------------------------------
-#ifndef CFGDEF
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr)
-#endif
-#ifndef CFGDEFA
-#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
-#endif
-// PID variables (the first 3 vars are hardcoded in GCU ConfigModel)
+// PID variables (the first 3 vars are hardcoded to GCU ConfigModel)
 CFGDEFA(vect,       pidK,regCnt,   655.35,2,0.01, "PID coeffitients Kp,Ki,Kd")
 CFGDEFA(vect,       pidL,regCnt,   100,1,1,       "PID limits Lp,Li,Ld [%]")
 CFGDEFA(float,     pidLo,regCnt,  100,1,1,       "PID out limits Lo [%]")
@@ -352,6 +350,6 @@ CFGDEF(float,  flaps_levelTO,   2.55,1,0.01, "flaps level for TAKEOFF mode [0..1
 #undef SIGDEF
 #undef VARDEF
 #undef VARDEFA
-#undef BITDEF
 #undef CFGDEF
 #undef CFGDEFA
+#undef BITDEF

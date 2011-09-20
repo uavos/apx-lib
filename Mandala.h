@@ -23,74 +23,60 @@
 #ifndef MANDALA_H
 #define MANDALA_H
 //=============================================================================
-#include <inttypes.h>
-#include <sys/types.h>
-#include "MandalaTypes.h"
-typedef Vect _var_vect;
-typedef uint    _var_uint;
-typedef const uint8_t*  _var_signature;
-typedef double   _var_float;
-//=============================================================================
-#include "MandalaVars.h"
 #include <string.h>
 #include <stdio.h>
+#include <iostream>
+//#include <stdint.h>
+#include <math.h>
+//-----------------------------------------------------------------------------
+#include "MandalaCore.h"
 #define printf(...) fprintf(stdout, __VA_ARGS__ )
 //=============================================================================
-//modes enum
-#define MODEDEF(aname,adescr) fm##aname,
-enum {
-#include "MandalaVars.h"
-  fmCnt
-};
-//PID regs enum
-#define REGDEF(aname,adescr) reg##aname,
-enum {
-#include "MandalaVars.h"
-  regCnt
-};
-
-//bitfield constants
-#define BITDEF(avarname,abitname,amask,adescr) enum{ avarname##_##abitname=amask };
-#include "MandalaVars.h"
-//=============================================================================
+// flight plan types
 typedef enum { wtHdg=0,wtLine,  wtCnt } _wpt_type;
 #define wt_str_def "Hdg","Line"
 typedef struct {
-  Vect    LLA;  //lat,lon,agl
-  _wpt_type type;
-  uint8_t cmd[9]; //TODO: implement wpt commands
-  uint    cmdSize;
+  Vector        LLA;  //lat,lon,agl
+  _wpt_type     type;
+  uint8_t       cmd[9]; //TODO: implement wpt commands
+  uint          cmdSize;
 }_waypoint;
 //----------------------
 typedef enum { rwtApproach=0,rwtParachute,  rwtCnt } _rw_type;
 #define rwt_str_def "Approach","Parachute"
 typedef struct {
-  Vect    LLA;  //start pos [lat lon agl]
-  Vect    dNED;
-  _rw_type type;
+  Vector        LLA;  //start pos [lat lon agl]
+  Vector        dNED;
+  _rw_type      type;
   //calculated
-  double hdg;
+  double        hdg;
 }_runway;
 //=============================================================================
-//=============================================================================
-class Mandala
+class Mandala : public MandalaCore
 {
 public:
-  const char *    var_name[maxVars];
-  const char *    var_descr[maxVars];
-  double          var_span[maxVars];
-  double          var_round[maxVars];
-  double          var_mult[maxVars];  //multiplier to pack and fit to bytes
-  uint            var_bytes[maxVars]; //size of packed member
+  const char *    var_name[maxVars];  //text name
+  const char *    var_descr[maxVars]; //text description
+  double          var_round[maxVars]; //round value for CFG vars
   uint            var_size[maxVars];  //size of whole packed var
-  uint            var_array[maxVars];
+  //double          var_mult[maxVars];  //multiplier to pack and fit to bytes
+  //uint            var_bytes[maxVars]; //size of packed member
+  //uint8_t*        var_sig[maxVars];
   void *          var_ptr[maxVars];
   _var_type       var_type[maxVars];
-  uint8_t*        var_sig[maxVars];
+  uint            var_array[maxVars];
+  double          var_span[maxVars];
 
   uint            var_bits[maxVars];    // number of bitfield bits
   const char      *var_bits_name[maxVars][32];  // bit descriptions
   const char      *var_bits_descr[maxVars][32];  // bit descriptions
+
+
+  //---- CFG Vars ----
+#define CFGDEF(atype,aname,aspan,abytes,around,adescr)  var_typedef_cfg_##aname aname;
+#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
+#include "MandalaVars.h"
+
 
   //---- Waypoints ----
   _waypoint waypoints[100];
@@ -109,69 +95,44 @@ public:
   uint    dl_timestamp;         // time[ms]
   uint    dl_dt;                // dt[ms] by extractTelemetry
   uint    dl_size;              // last telemetry size statistics
-  // derivatives calc by calcDGPS
+  //---- derivatives calc by calcDGPS ----
   bool    derivatives_init;
-  Vect    last_vNED,last_aXYZ;
+  Vector  last_vNED,last_aXYZ;
   double  last_course;
   double  gps_lat_s,gps_lon_s; //change detect
 
+  //---- strings ----
+  // var names and descriptions string declarations: name_XXXX, descr_XXX
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr)        VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
 #define SIGDEF(aname,adescr,...)                              VARDEF( ,aname, , , )
 #define VARDEF(atype,aname,aspan,abytes,adescr)               const char *name_##aname,*descr_##aname;
 #include "MandalaVars.h"
-
-  // enum indexes idx_VARNAME
-#define VARDEF(atype,aname,aspan,abytes,adescr) idx_##aname,
-  enum {
-    idx_vars_start=-1,
-#include "MandalaVars.h"
-    idx_vars_top
-  };
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr) idx_cfg_##aname,
-  enum {
-    idx_cfg_start=idxCFG-1,
-#include "MandalaVars.h"
-    idx_cfg_top
-  };
-#define SIGDEF(aname,adescr, ... ) idx_##aname,
-  enum {
-    idx_sig_start=idxSIG-1,
-#include "MandalaVars.h"
-    idx_sig_top
-  };
-
-
-  // variable definitions: vartype VARNAME;
-#define VARDEF(atype,aname,aspan,abytes,adescr)               _var_##atype aname;
-#define VARDEFA(atype,aname,asize,aspan,abytes,adescr)        _var_##atype aname [ asize ];
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr)        VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
-#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) VARDEFA(atype,cfg_##aname,asize,aspan,abytes,adescr)
-#include "MandalaVars.h"
-
-
-#define SIGDEF(aname,adescr, ... )   uint8_t aname [ maxVars+1 ];
-#include "MandalaVars.h"
-
-
   const char      *mode_names[fmCnt];
   const char      *mode_descr[fmCnt];
 
   const char      *reg_names[regCnt];
   const char      *reg_descr[regCnt];
 
-
 //=============================================================================
   Mandala();
-public:
+  //-----------------------------------------------------------------------------
+  // Core overload
+  //uint archive(uint8_t *buf,uint var_idx);
+  uint extract(uint8_t *buf,uint cnt,uint var_idx);
+//public:
+  //-----------------------------------------------------------------------------
+  //overload - check buf size
   uint archive(uint8_t *buf,uint size,uint var_idx);
-  uint extract(const uint8_t *buf,uint size,uint var_idx); //return buf size released
-  uint extract(const uint8_t *buf,uint size); //overloaded - first byte=var_idx
+  uint extract(uint8_t *buf,uint size); //overloaded - first byte=var_idx
+  //-----------------------------------------------------------------------------
 
-  uint size(void);          // size (bytes) of all archived mandala vars
-  uint size(const uint8_t *signature);
+  //uint size(void);          // size (bytes) of all archived mandala vars
+  uint sig_size(_var_signature signature);
 
+  //-----------------------------------------------------------------------------
+  // additional methods (debug, math, NAV helper functions)
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
-  void dump(const Vect &v,const char *str="");
+  void dump(const Vector &v,const char *str="");
   void dump(const uint var_idx);
   void print_report(FILE *stream);
 
@@ -182,49 +143,36 @@ public:
 
   // math operations
   double boundAngle(double v,double span=180.0);
-  Vect boundAngle(const Vect &v,double span=180.0);
+  Vector boundAngle(const Vector &v,double span=180.0);
   uint snap(uint v, uint snapv=10);
   void filterValue(double v,double *vLast,double S,double L);
   double hyst(double err,double hyst);
   double limit(const double v,const double vL=1.0);
   double limit(const double v,const double vMin,const double vMax);
-  double ned2hdg(const Vect &ned,bool back=false); //return heading to NED frm (0,0,0)
-  double ned2dist(const Vect &ned); //return distance to to NED frm (0,0,0)
-  const Vect lla2ned(const Vect &lla);  // return NED from Lat Lon AGL
+  double ned2hdg(const Vector &ned,bool back=false); //return heading to NED frm (0,0,0)
+  double ned2dist(const Vector &ned); //return distance to to NED frm (0,0,0)
+  const Vector lla2ned(const Vector &lla);  // return NED from Lat Lon AGL
 
   void calcDGPS(const double dt=(1.0/(double)GPS_FREQ)); //calculate GPS derivatives
   void calc(void); // calculate vars dependent on current and desired UAV position
 
-  const Vect llh2ned(const Vect llh);
-  const Vect llh2ned(const Vect llh,const Vect home_llh);
-  const Vect rotate(const Vect &v_in,const double theta);
-  const Vect rotate(const Vect &v_in,const Vect &theta);
-  const Vect LLH_dist(const Vect &llh1,const Vect &llh2,const double lat,const double lon);
-  const Vect ECEF_dist(const Vect &ecef1,const Vect &ecef2,const double lat,const double lon);
-  const Vect ECEF2Tangent(const Vect &ECEF,const double latitude,const double longitude);
-  const Vect Tangent2ECEF(const Vect &Local,const double latitude,const double longitude);
-  const Vect ECEF2llh(const Vect &ECEF);
-  const Vect llh2ECEF(const Vect &llh);
+  const Vector llh2ned(const Vector llh);
+  const Vector llh2ned(const Vector llh,const Vector home_llh);
+  const Vector rotate(const Vector &v_in,const double theta);
+  const Vector rotate(const Vector &v_in,const Vector &theta);
+  const Vector LLH_dist(const Vector &llh1,const Vector &llh2,const double lat,const double lon);
+  const Vector ECEF_dist(const Vector &ecef1,const Vector &ecef2,const double lat,const double lon);
+  const Vector ECEF2Tangent(const Vector &ECEF,const double latitude,const double longitude);
+  const Vector Tangent2ECEF(const Vector &Local,const double latitude,const double longitude);
+  const Vector ECEF2llh(const Vector &ECEF);
+  const Vector llh2ECEF(const Vector &llh);
   double sqr(double x);
 private:
-  uint extract_sig(const uint8_t *buf,uint size,const uint8_t *signature);
-  uint archive_sig(uint8_t *buf,uint size,const uint8_t *signature);
-
-  uint archive_f(uint8_t *buf,const double v,const uint var_idx);
-  uint archive_u(uint8_t *buf,const uint v,const uint var_idx);
-  uint archive_s(uint8_t *buf,const int v,const uint var_idx);
-  double extract_f(const uint8_t *buf,const uint var_idx);
-  uint extract_u(const uint8_t *buf,const uint var_idx);
-  int extract_s(const uint8_t *buf,const uint var_idx);
-
-  uint limit_u(const uint v,const uint vL=255);
-  int limit_s(const int v,const int vL=127);
-
   // some special protocols
   uint archive_flightplan(uint8_t *buf,uint bufSize);  //pack wypoints to buf, return size
-  uint extract_flightplan(const uint8_t *buf,uint cnt);//read packed waypoints from buf
+  uint extract_flightplan(uint8_t *buf,uint cnt);//read packed waypoints from buf
   uint archive_downstream(uint8_t *buf,uint maxSize);    //pack telemetry DownlinkStream (128 vars)
-  uint extract_downstream(const uint8_t *buf,uint cnt);  //read telemetry DownlinkStream
+  uint extract_downstream(uint8_t *buf,uint cnt);  //read telemetry DownlinkStream
 
 };
 //=============================================================================
