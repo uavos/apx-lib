@@ -67,42 +67,22 @@ typedef const uint8_t*  _var_signature;
 #include "MandalaVars.h" //get constants
 //-----------------------------------------------------------------------------
 // enum indexes idx_VARNAME
-#define VARDEFA(atype,aname,asize,aspan,abytes,adescr) VARDEF(atype,aname,aspan,abytes,adescr)
-#define VARDEF(atype,aname,aspan,abytes,adescr) idx_##aname,
-enum {
-  idx_vars_start=-1,
-  #include "MandalaVars.h"
-  idx_vars_top
-};
-#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr) idx_cfg_##aname,
-enum {
-  idx_cfg_start=idxCFG-1,
-  #include "MandalaVars.h"
-  idx_cfg_top
-};
 #define SIGDEF(aname, ... ) idx_##aname,
 enum {
-  idx_sig_start=idxSIG-1,
   #include "MandalaVars.h"
-  idx_sig_top
+  sigCnt
 };
-#define MODEDEF(aname,adescr) fm##aname,
+#define VARDEF(atype,aname,aspan,abytes,adescr) idx_##aname,
 enum {
+  idx_vars_start=idxPAD-1,
   #include "MandalaVars.h"
-  fmCnt
-};
-#define REGDEF(aname,adescr) reg##aname,
-enum {
-  #include "MandalaVars.h"
-  regCnt
+  idx_vars_top,
+  varsCnt=(idx_vars_top-idx_vars_start+1)
 };
 //-----------------------------------------------------------------------------
 //variable parameters
-#define SIGDEF(aname, adescr, ... ) VARDEFA(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,1,adescr)
+/*#define SIGDEF(aname, adescr, ... ) VARDEFA(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,1,adescr)
 #define VARDEF(atype,aname,aspan,abytes,adescr) VARDEFA(atype,aname,1,aspan,abytes,adescr)
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr) VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
-#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) VARDEFA(atype,cfg_##aname,asize,aspan,abytes,adescr)
 #define VARDEFA(atype,aname,asize,aspan,abytes,adescr) \
   enum{\
       var_type_##aname=vt_##atype, \
@@ -115,11 +95,9 @@ enum {
       };
 
 #include "MandalaVars.h"
-
+*/
 //-----------------------------------------------------------------------------
 // variable typedefs
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr) VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
-#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) VARDEFA(atype,cfg_##aname,asize,aspan,abytes,adescr)
 #define VARDEFA(atype,aname,asize,aspan,abytes,adescr) typedef _var_##atype var_typedef_##aname [asize];
 #define VARDEF(atype,aname,aspan,abytes,adescr) typedef _var_##atype var_typedef_##aname;
 #define SIGDEF(aname, adescr, ... ) typedef _var_signature var_typedef_##aname;
@@ -145,15 +123,24 @@ public:
   #define VARDEF(atype,aname,aspan,abytes,adescr)         var_typedef_##aname aname;
   #define VARDEFA(atype,aname,asize,aspan,abytes,adescr)  VARDEF( atype,aname,aspan,abytes,adescr )
   #define SIGDEF(aname,adescr,...)                        static var_typedef_##aname aname;
-  #define CFGDEF(atype,aname,aspan,abytes,around,adescr) VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
-  #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) VARDEFA(atype,cfg_##aname,asize,aspan,abytes,adescr)
   #include "MandalaVars.h"
   uint do_archive(uint8_t *buf,uint var_idx);
   uint do_extract(uint8_t *buf,uint cnt,uint var_idx);
 
 private:
 
+  struct {
+    uint8_t *buf;         //buffer to store/extract
+    void    *ptr;         //pointer to local var.VARNAME
+    int     sbytes;       //archived bytes cnt (if < 0 => signed)
+    _var_float   span;         //variable span (absolute, always >0)
+    uint    array;        //count of bytes in array
+    uint    type;         //type of variable
+    uint32_t max;         //max archived integer value (unsigned)
+    uint    size;         //total size of archived data
+  }vdsc;
   uint vdsc_fill(uint8_t *buf,uint var_idx);
+
   uint32_t limit_u(const _var_float v,const uint32_t max);
   uint32_t limit_ui(const uint32_t v,const uint32_t max);
   int32_t limit_s(const _var_float v,const uint32_t max);

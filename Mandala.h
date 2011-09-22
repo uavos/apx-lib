@@ -26,7 +26,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <iostream>
-//#include <stdint.h>
 #include <math.h>
 //-----------------------------------------------------------------------------
 #include "MandalaCore.h"
@@ -52,30 +51,49 @@ typedef struct {
   double        hdg;
 }_runway;
 //=============================================================================
+#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
+#define CFGDEF(atype,aname,aspan,abytes,around,adescr) idx_cfg_##aname,
+enum {
+  #include "MandalaVarsAP.h"
+  cfgCnt
+};
+#define MODEDEF(aname,adescr) fm##aname,
+enum {
+  #include "MandalaVarsAP.h"
+  fmCnt
+};
+#define REGDEF(aname,adescr) reg##aname,
+enum {
+  #include "MandalaVarsAP.h"
+  regCnt
+};
+//=============================================================================
+//-----------------------------------------------------------------------------
+// config variable typedefs
+#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) typedef _var_##atype var_typedef_cfg_##aname [asize];
+#define CFGDEF(atype,aname,aspan,abytes,around,adescr) typedef _var_##atype var_typedef_cfg_##aname;
+#include "MandalaVarsAP.h"
+//=============================================================================
 class Mandala : public MandalaCore
 {
 public:
-  const char *    var_name[maxVars];  //text name
-  const char *    var_descr[maxVars]; //text description
-  double          var_round[maxVars]; //round value for CFG vars
-  uint            var_size[maxVars];  //size of whole packed var
-  //double          var_mult[maxVars];  //multiplier to pack and fit to bytes
-  //uint            var_bytes[maxVars]; //size of packed member
-  //uint8_t*        var_sig[maxVars];
-  void *          var_ptr[maxVars];
-  _var_type       var_type[maxVars];
-  uint            var_array[maxVars];
-  double          var_span[maxVars];
+  const char *    var_name[256];  //text name
+  const char *    var_descr[256]; //text description
+  double          var_round[256]; //round value for CFG vars
+  uint            var_size[256];  //size of whole packed var
+  void *          var_ptr[256];
+  _var_type       var_type[256];
+  uint            var_array[256];
+  double          var_span[256];
 
-  uint            var_bits[maxVars];    // number of bitfield bits
-  const char      *var_bits_name[maxVars][32];  // bit descriptions
-  const char      *var_bits_descr[maxVars][32];  // bit descriptions
+  uint            var_bits[256];    // number of bitfield bits
+  const char      *var_bits_name[256][32];  // bit descriptions
+  const char      *var_bits_descr[256][32];  // bit descriptions
 
 
   //---- CFG Vars ----
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr)  var_typedef_cfg_##aname aname;
-#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
-#include "MandalaVars.h"
+#define CFGDEF(atype,aname,aspan,abytes,around,adescr)  var_typedef_cfg_##aname cfg_##aname;
+#include "MandalaVarsAP.h"
 
 
   //---- Waypoints ----
@@ -101,12 +119,6 @@ public:
   double  last_course;
   double  gps_lat_s,gps_lon_s; //change detect
 
-  //---- strings ----
-  // var names and descriptions string declarations: name_XXXX, descr_XXX
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr)        VARDEF(atype,cfg_##aname,aspan,abytes,adescr)
-#define SIGDEF(aname,adescr,...)                              VARDEF( ,aname, , , )
-#define VARDEF(atype,aname,aspan,abytes,adescr)               const char *name_##aname,*descr_##aname;
-#include "MandalaVars.h"
   const char      *mode_names[fmCnt];
   const char      *mode_descr[fmCnt];
 

@@ -25,25 +25,16 @@
 //=============================================================================
 // Mandala constants
 //=============================================================================
-#define maxVars 256
-#define idxCFG  200     //configuration variables
-#define idxSIG  160     //special variables - signatures
-#define idxCMD  200     //special variables - commands
-//-----------------------------------------------------------------------------
-#define AHRS_FREQ       100     // AHRS Update [Hz]
-#define GPS_FREQ        5       // GPS Update [Hz]
-#define CTR_FREQ        20      // RPTY (fast servo) update rate [Hz]
-#define TELEMETRY_FREQ  10      // Telemetry send rate [Hz] MAX 10Hz!
-#define SIM_FREQ        10      // Simulator servo send rate [Hz]
-#define MAX_TELEMETRY   90      // max telemetry packet size [bytes]
+#define idxPAD  64      //start index for regular vars
 //-----------------------------------------------------------------------------
 // Controls indexes
 enum {jswRoll,jswPitch,jswThr,jswYaw,   jswCnt};
 enum {ppmRoll,ppmPitch,ppmThr,ppmYaw,ppmSW,ppmFlaps,ppmBrake,   ppmCnt};
 //-----------------------------------------------------------------------------
-//variable type index
+// Var Type enum
 typedef enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig}_var_type;
 //=============================================================================
+// Physical constants
 #define EARTH_RATE   0.00007292115   // rotation rate of earth (rad/sec)
 #define EARTH_RADIUS 6378137         // earth semi-major axis radius (m)
 #define ECCENTRICITY 0.0818191908426 // major eccentricity of earth ellipsoid
@@ -73,74 +64,40 @@ typedef enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig}_var_type;
 #define VA_NUM_ARGS_IMPL(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,N,...) N
 //=============================================================================
 #endif
-
-//=============================================================================
-//    Flight modes definitions. makes enum and mode_descr[], mode_names[]
-// <mode enum name>, <description>
-//------------------------------------------------------------------------------
-#ifndef MODEDEF
-#define MODEDEF(aname,adescr)
-#endif
-MODEDEF(EMG,     "Realtime control")
-MODEDEF(RPV,     "Angles control")
-MODEDEF(UAV,     "Heading control")
-MODEDEF(WPT,     "Waypoints navigation")
-MODEDEF(HOME,    "Go back home")
-MODEDEF(TAKEOFF, "Takeoff")
-MODEDEF(LANDING, "Landing")
-MODEDEF(PLAND,   "Parachute Landing")
-MODEDEF(STBY,    "Loiter around DNED")
-//=============================================================================
-
-//=============================================================================
-//    PID Regulators definitions. makes enum and reg_descr[], reg_names[]
-// <reg enum name>, <description>
-//------------------------------------------------------------------------------
-#ifndef REGDEF
-#define REGDEF(aname,adescr)
-#endif
-REGDEF(Roll,     "Roll angle to Ailerons")
-REGDEF(Pitch,    "Pitch angle to Elevator")
-REGDEF(Thr,      "Airspeed to Throttle / RPM to Throttle")
-REGDEF(Yaw,      "Yaw angle to Rudder")
-REGDEF(RollH,    "Course to Desired Roll angle")
-REGDEF(PitchH,   "Altitude to Desired Pitch angle")
-REGDEF(Alt,      "VSpeed to Throttle/Altitude to Collective Pitch")
 //=============================================================================
 //=============================================================================
-//-----------------------------------------------------------------------------
+//=============================================================================
 // special variables - signatures
 #ifndef SIGDEF
 #define SIGDEF(aname,adescr,...)
 #endif
+//------------------------------
+// special protocols
+SIGDEF(service,   "Service packet down/up link <src-dadr>,<dadr-cmd>,<data..>")
+SIGDEF(config,    "System configuration")
+SIGDEF(downstream,"Downlink stream, all variables")
+SIGDEF(debug,     "Debug <stdout> string")
+SIGDEF(flightplan,"Flight plan data")
+//------------------------------
+// var packs
 SIGDEF(imu, "IMU sensors data pack",\
        idx_acc, idx_gyro, idx_mag)
 SIGDEF(gps, "GPS fix data pack",\
       idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED, idx_gps_accuracy)
 SIGDEF(ctr, "Fast controls",\
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_wheel)
-//telemetry filter (send with skip factor X), if changed fast but no need for update
-#define dl_slow_factor  10
-SIGDEF(dl_slow, "Downlink variables filter (slow update rate)",\
-      idx_Ve,idx_Vs,idx_Vp,idx_AT,idx_ET,idx_fuel,idx_tsens)
+//------------------------------
+// Internal use only
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
+SIGDEF(autosend,  "Automatically forwarded variables to GCU",\
+      idx_downstream, idx_debug, idx_service, idx_flightplan, idx_config )
 //telemetry filter (don't send at all), calculated by mandala.extractTelemetry()
 SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",\
       idx_NED,idx_homeHDG,idx_dHome,idx_dWPT,idx_dNED,\
       idx_vXYZ,idx_dXYZ,idx_aXYZ,idx_crsRate,\
       idx_wpHDG,idx_rwDelta,\
       idx_wpcnt,idx_rwcnt)
-// telemetry variables
-SIGDEF(downstream,"Downlink stream, all variables")
-SIGDEF(debug,     "Debug <stdout> string forward to GCU")
-SIGDEF(service,   "Service packet down/up link <src-dadr>,<dadr-cmd>,<data..>")
-SIGDEF(flightplan,"Flight plan packed data")
-SIGDEF(config,    "All configuration vars (>=idxCFG)")
-//SIGDEF(uplink)    // special command uplink
-// static signatures
-//modem special
-SIGDEF(autosend,  "Automatically forwarded variables to GCU",\
-      idx_downstream, idx_debug, idx_service, idx_flightplan, idx_config )
+//------------------------------
 //=============================================================================
 //    Mandala variables definitions
 // type:           variable type: [uint, float, vect]
@@ -156,12 +113,6 @@ SIGDEF(autosend,  "Automatically forwarded variables to GCU",\
 #endif
 #ifndef VARDEFA
 #define VARDEFA(atype,aname,asize,aspan,abytes,adescr) VARDEF(atype,aname,aspan,abytes,adescr)
-#endif
-#ifndef CFGDEF
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr)
-#endif
-#ifndef CFGDEFA
-#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
 #endif
 #ifndef BITDEF
 #define BITDEF(avarname,abitname,amask,adescr)
@@ -180,8 +131,8 @@ VARDEF(vect, gyro,  -300,2, "p,q,r angular rates [deg/s]")
 VARDEF(vect, mag,   -1.25,1,   "Hx,Hy,Hz magnetic field vector [gauss]")
 
 //--------- Filtered NAV --------------
-//VARDEF(float,altitude,  6553.5,2, "local altitude [m]")
-//VARDEF(float,vspeed,    -100,2, "Ax,Ay,Az accelerations [m/s2]")
+VARDEF(float,altitude,  6553.5,2, "local altitude [m]")
+VARDEF(float,vspeed,    -100,2, "Ax,Ay,Az accelerations [m/s2]")
 
 //--------- Measured by GPS --------------
 VARDEF(float, gps_lat,     -180,4,     "latitude [deg]")
@@ -204,6 +155,7 @@ VARDEF(float, pstatic,         6553.5,2,  "barometric pressure AGL [m]")
 VARDEF(float, Ve,     25.5,1,     "autopilot battery voltage [v]")
 VARDEF(float, Vs,     45,1,     "servo battery voltage [v]")
 VARDEF(float, Vp,     0,1,          "payload battery voltage [v]")
+VARDEF(float, Vg,     0,1,          "GCU battery voltage [v]")
 VARDEF(uint,   power,  0,1,          "power status bitfield [on/off]")
 BITDEF(power,   ap,      1,     "Avionics")
 BITDEF(power,   servo,   2,     "Servo on/off")
@@ -241,8 +193,8 @@ BITDEF(ctrb,  brake,     2, "Parking brake on/off")
 BITDEF(ctrb,  ers,       4, "Parachute launched/off")
 
 //--------- AUTOPILOT COMMAND --------------
-VARDEF(vect,   cmd_theta,    -180,2,   "desired roll,pitch,yaw [deg]")
-VARDEF(vect,   cmd_NED,      -10000,2, "desired north,east,down [m]")
+VARDEF(vect,  cmd_theta,    -180,2,   "desired roll,pitch,yaw [deg]")
+VARDEF(vect,  cmd_NED,      -10000,2, "desired north,east,down [m]")
 VARDEF(float, cmd_course,   -180,2,   "desired course [deg]")
 VARDEF(float, cmd_rpm,      25500,1,  "desired RPM [rpm]")
 VARDEF(float, cmd_airspeed, 0,1,      "desired airspeed (for regThr) [m/s]")
@@ -274,82 +226,7 @@ VARDEF(float,   RSS_gcu,1.0,1,  "Modem GCU Receiver signal strength [0..1]")
 VARDEF(float,   fuel,   1.0,1,  "Fuel [0..1]")
 
 //=============================================================================
-//--------- CONFIG --------------
-// IDX START FROM idxCFG (200)
-//-------------------------------
-// PID variables (the first 3 vars are hardcoded to GCU ConfigModel)
-CFGDEFA(vect,       pidK,regCnt,   655.35,2,0.01, "PID coeffitients Kp,Ki,Kd")
-CFGDEFA(vect,       pidL,regCnt,   100,1,1,       "PID limits Lp,Li,Ld [%]")
-CFGDEFA(float,     pidLo,regCnt,  100,1,1,       "PID out limits Lo [%]")
-
-// other variables (added to ConfigModel) automatically.
-// description format:
-// <Group>: text (vect axis names if any)
-// vect axis names used to create text names in ConfigModel
-// <Group> may be ommited if repeated
-// vect arrays not allowed (by ConfigModel)
-CFGDEF(float,  mix_elv_Kp,   2.55,1,0.01,  "Mixer: Roll angle to Elevator mix")
-CFGDEF(float,  mix_elv_Lo,   100,1,1,      "Roll angle to Elevator limit")
-CFGDEF(float,  mix_rud_Kp,   -12.7,1,0.1,  "Roll angle to Rudder mix")
-CFGDEF(float,  mix_rud_Lo,   100,1,1,      "Roll angle to Rudder limit (+/-) [%]")
-CFGDEF(float,  mix_thr_Kp,   25.5,1,0.1,   "Pitch angle to Throttle mix")
-CFGDEF(float,  mix_thr_Lo,   100,1,1,      "Pitch angle to Throttle limit (+/-) [%]")
-
-CFGDEF(vect,    imu_align,    -180,2,0.1,   "AHRS: body frame align (roll,pitch,yaw) [-180..0..+180]")
-CFGDEF(vect,    theta_bias,   -180,2,0.1,   "AHRS: theta bias (roll,pitch,yaw) [-180..0..+180]")
-
-CFGDEF(float,  wptSnap,      0,1,0,        "Waypoints: waypoint snap distance [m]")
-
-CFGDEF(float,  distHome,   255000,1,1000,  "Safety: turn home distance [m]")
-CFGDEF(float,  distKill,   255000,1,1000,  "Safety: suicide distance [m]")
-
-CFGDEF(float,  turnRate,   25.5,1,0.1,     "Sim: max turn rate [deg/s]")
-
-CFGDEF(float,  hyst_dist,  25.5,1,0.1,     "Hysterezis: distance [m]")
-CFGDEF(float,  hyst_spd,   25.5,1,0.1,     "speed hold [m/s]")
-CFGDEF(float,  hyst_yaw,   25.5,1,0.1,     "heading hold [deg]")
-
-CFGDEF(float,  eng_rpm,     25500,1,100,   "Engine: cruise rpm [1/min]")
-CFGDEF(float,  eng_rpm_idle,25500,1,100,   "idle rpm [1/min]")
-CFGDEF(float,  eng_rpm_max, 25500,1,100,   "max rpm [1/min]")
-
-
-CFGDEF(float,  flight_speed,   0,1,0,      "Flight: cruise speed [m/s]")
-CFGDEF(float,  flight_speedFlaps,0,1,0,    "airspeed limit with flaps down [m/s]")
-CFGDEF(float,  flight_safeAlt, 2550,1,10,  "safe altitude, HOME, TA mode [m]")
-CFGDEF(float,  flight_throttle, 0,1,0.01,  "cruise throttle setting [0..1]")
-
-CFGDEF(float,  takeoff_Kp,      25.5,1,0.1,"Takeoff: alt error coeffitient [deg]")
-CFGDEF(float,  takeoff_Lp,      90,1,1,    "pitch limit [deg]")
-CFGDEF(float,  takeoff_throttle,1,1,0.1,   "throttle setting [0..1]")
-
-CFGDEF(float,  pland_pitch,   90,1,1,    "Parachute Landing: stall pitch [deg]")
-CFGDEF(float,  pland_speed,   255,1,1,   "airspeed to open parachute [m/s]")
-
-CFGDEF(float,  rw_dist,     2550,1,10,   "Runway Landing: approach distance [m]")
-CFGDEF(float,  rw_turnDist, -1270,1,10,  "approach turn distance [m]")
-CFGDEF(float,  rw_finAGL,   255,1,0,     "approach final altitude AGL [m]")
-CFGDEF(float,  rw_finPitch, -12.7,1,0.1, "final pitch bias [deg]")
-CFGDEF(float,  rw_finSpeed, 0,1,0,       "final speed [m/s]")
-CFGDEF(float,  rw_tdPitch,  0,1,1,       "touchdown pitch bias [deg]")
-CFGDEF(float,  rw_tdAGL,    12.7,1,0.1,    "AGL altitude before touchdown [m]")
-CFGDEF(float,  rw_Kp,       2.55,1,0.01, "error multiplier [m]")
-CFGDEF(float,  rw_Lp,       255,1,1,     "heading limit [deg]")
-
-CFGDEF(float,  stby_R,  2550,1,10,     "Standby mode: radius [m]")
-CFGDEF(float,  stby_Kp, 2.55,1,0.01,   "error multiplier [m]")
-CFGDEF(float,  stby_Lp, 255,1,1,       "heading limit [deg]")
-
-CFGDEF(float,  flaps_speed,     2.55,1,0.01, "Flaps: flaps speed [0..1]")
-CFGDEF(float,  flaps_level,     2.55,1,0.01, "flaps level [0..1]")
-CFGDEF(float,  flaps_levelTO,   2.55,1,0.01, "flaps level for TAKEOFF mode [0..1]")
-//=============================================================================
-#undef MODEDEF
-#undef REGDEF
-#undef CMDDEF
 #undef SIGDEF
 #undef VARDEF
 #undef VARDEFA
-#undef CFGDEF
-#undef CFGDEFA
 #undef BITDEF

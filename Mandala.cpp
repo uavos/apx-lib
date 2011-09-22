@@ -29,17 +29,14 @@
 Mandala::Mandala()
   : MandalaCore()
 {
-  for (uint i=0;i<maxVars;i++) {
+  for (uint i=0;i<256;i++) {
     var_name[i]="";
     var_descr[i]="";
     var_round[i]=0;
     var_bits[i]=0;
-    //var_mult[i]=0;
-    //var_bytes[i]=0;
-    //var_size[i]=0;
     var_span[i]=0;
     var_array[i]=0;
-    var_ptr[i]=NULL;//(void*)(& var_void);
+    var_ptr[i]=NULL;
     var_type[i]=vt_void;
   }
 
@@ -63,7 +60,7 @@ Mandala::Mandala()
   var_ptr[idx_##aname]=(void*)(& aname); \
   var_type[idx_##aname]=vt_##atype; \
   var_array[idx_##aname]=asize; \
-  var_span[idx_##aname]=(aspan!=0)?aspan:((uint)var_max_##aname); \
+  /*var_span[idx_##aname]=(aspan!=0)?aspan:((uint)var_max_##aname);*/ \
   var_size[idx_##aname]=var_size_##aname; \
   var_name[idx_##aname]=#aname; \
   var_descr[idx_##aname]=adescr; \
@@ -78,14 +75,6 @@ Mandala::Mandala()
   VARDEFX(atype,aname,asize,aspan,abytes,adescr) \
   for(uint i=0;i<asize;i++) aname[i]=0;
 
-#define MODEDEF(aname,adescr) \
-  mode_names[fm##aname]=#aname; \
-  mode_descr[fm##aname]=adescr;
-
-#define REGDEF(aname,adescr) \
-  reg_names[reg##aname]=#aname; \
-  reg_descr[reg##aname]=adescr;
-
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr) \
   VARDEF(atype,cfg_##aname,aspan,abytes,adescr) \
   var_round[idx_cfg_##aname]=around;
@@ -94,6 +83,8 @@ Mandala::Mandala()
   VARDEFA(atype,cfg_##aname,asize,aspan,abytes,adescr) \
   var_round[idx_cfg_##aname]=around;
 
+
+#include "MandalaVarsAP.h"
 #include "MandalaVars.h"
 
 #define SIGDEF(aname,adescr,...) \
@@ -101,6 +92,16 @@ Mandala::Mandala()
   var_size[idx_##aname]=sig_size(aname);
 
 #include "MandalaVars.h"
+
+
+#define MODEDEF(aname,adescr) \
+  mode_names[fm##aname]=#aname; \
+  mode_descr[fm##aname]=adescr;
+
+#define REGDEF(aname,adescr) \
+  reg_names[reg##aname]=#aname; \
+  reg_descr[reg##aname]=adescr;
+
 
   //fill strings
   static const char *wt_str_s[wtCnt]={ wt_str_def };
