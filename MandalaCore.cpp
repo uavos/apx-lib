@@ -369,7 +369,7 @@ uint MandalaCore::do_extract(uint8_t *buf,uint cnt,uint var_idx)
 }
 //=============================================================================
 //=============================================================================
-double MandalaCore::get_value(uint var_idx,uint member_idx)
+_var_float MandalaCore::get_value(uint var_idx,uint member_idx)
 {
   if (!vdsc_fill(0,var_idx))return 0;
   if(vdsc.type==vt_float){
@@ -387,7 +387,7 @@ double MandalaCore::get_value(uint var_idx,uint member_idx)
   return 0;
 }
 //=============================================================================
-void MandalaCore::set_value(uint var_idx,uint member_idx,double value)
+void MandalaCore::set_value(uint var_idx,uint member_idx,_var_float value)
 {
   if (!vdsc_fill(0,var_idx))return;
   if(vdsc.type==vt_float){

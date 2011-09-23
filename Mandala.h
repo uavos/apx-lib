@@ -91,10 +91,11 @@ public:
   const char      *var_bits_descr[256][32];  // bit descriptions
 
 
-  //---- CFG Vars ----
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr)  var_typedef_cfg_##aname cfg_##aname;
+  //---- AP CFG Vars ----
+  struct {
+#define CFGDEF(atype,aname,aspan,abytes,around,adescr)  var_typedef_cfg_##aname aname;
 #include "MandalaVarsAP.h"
-
+  }cfg;
 
   //---- Waypoints ----
   _waypoint waypoints[100];

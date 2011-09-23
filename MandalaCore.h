@@ -32,7 +32,12 @@
 #define assert(...)
 #endif
 //=============================================================================
+//use double for ARM
+#ifdef FLOAT_TYPE
 typedef float   _var_float;
+#else
+typedef double  _var_float;
+#endif
 //=============================================================================
 class Vector
 {
@@ -114,8 +119,8 @@ public:
   MandalaCore();
 
   //member=mask, if var is a bitfield, or vect idx, or array idx
-  double get_value(uint var_idx,uint member_idx);
-  void set_value(uint var_idx,uint member_idx,double value);
+  _var_float get_value(uint var_idx,uint member_idx);
+  void set_value(uint var_idx,uint member_idx,_var_float value);
   //-----------------------------------------------------------------------------
   virtual uint archive(uint8_t *buf,uint var_idx){return do_archive(buf,var_idx);}
   virtual uint extract(uint8_t *buf,uint cnt,uint var_idx){return do_extract(buf,cnt,var_idx);}
@@ -126,8 +131,6 @@ public:
   #include "MandalaVars.h"
   uint do_archive(uint8_t *buf,uint var_idx);
   uint do_extract(uint8_t *buf,uint cnt,uint var_idx);
-
-private:
 
   struct {
     uint8_t *buf;         //buffer to store/extract
@@ -140,6 +143,8 @@ private:
     uint    size;         //total size of archived data
   }vdsc;
   uint vdsc_fill(uint8_t *buf,uint var_idx);
+
+private:
 
   uint32_t limit_u(const _var_float v,const uint32_t max);
   uint32_t limit_ui(const uint32_t v,const uint32_t max);

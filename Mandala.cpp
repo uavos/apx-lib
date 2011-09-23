@@ -60,12 +60,11 @@ Mandala::Mandala()
   var_ptr[idx_##aname]=(void*)(& aname); \
   var_type[idx_##aname]=vt_##atype; \
   var_array[idx_##aname]=asize; \
-  /*var_span[idx_##aname]=(aspan!=0)?aspan:((uint)var_max_##aname);*/ \
-  var_size[idx_##aname]=var_size_##aname; \
+  var_size[idx_##aname]=((asize)*(abytes)*((vt_##atype==vt_vect)?3:1)); \
   var_name[idx_##aname]=#aname; \
   var_descr[idx_##aname]=adescr; \
-  name_##aname=#aname; \
-  descr_##aname=adescr;
+  /*name_##aname=#aname; \
+  descr_##aname=adescr;*/
 
 #define VARDEF(atype,aname,aspan,abytes,adescr) \
   VARDEFX(atype,aname,1,aspan,abytes,adescr) \
@@ -75,16 +74,17 @@ Mandala::Mandala()
   VARDEFX(atype,aname,asize,aspan,abytes,adescr) \
   for(uint i=0;i<asize;i++) aname[i]=0;
 
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr) \
+/*#define CFGDEF(atype,aname,aspan,abytes,around,adescr) \
   VARDEF(atype,cfg_##aname,aspan,abytes,adescr) \
+  var_span[idx_##aname]=(aspan!=0)?aspan:((uint)var_max_##aname); \
   var_round[idx_cfg_##aname]=around;
 
 #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) \
   VARDEFA(atype,cfg_##aname,asize,aspan,abytes,adescr) \
   var_round[idx_cfg_##aname]=around;
+*/
 
-
-#include "MandalaVarsAP.h"
+//#include "MandalaVarsAP.h"
 #include "MandalaVars.h"
 
 #define SIGDEF(aname,adescr,...) \
@@ -174,7 +174,7 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   //}
   size-=vsz;
   var_idx++;
-  if(size&&(var_idx<idxSIG))return vsz+extract(buf,size,var_idx);
+  if(size&&(idxPAD<var_idx<idx_vars_top))return vsz+extract(buf,size,var_idx);
   else return vsz;
 }
 //=============================================================================
@@ -200,8 +200,8 @@ uint Mandala::sig_size(_var_signature signature)
 //=============================================================================
 uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
 {
-  const uint wptPackedSz=(-var_bytes_gps_lat)+(-var_bytes_gps_lon)+(-var_bytes_gps_hmsl)+1;
-  const uint rwPackedSz=wptPackedSz+(-var_bytes_NED)*3;
+  const uint wptPackedSz=(-var_size[idx_gps_lat])+(-var_size[idx_gps_lon])+(-var_size[idx_gps_hmsl])+1;
+  const uint rwPackedSz=wptPackedSz+(-var_size[idx_NED])*3;
   const uint sz=wptPackedSz*wpcnt+rwPackedSz*rwcnt+2;
   if(bufSize<sz){
     printf("Can't archive flight plan, wrong buffer size (%u) need (%u).\n",bufSize,sz);
@@ -243,8 +243,8 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
 //=============================================================================
 uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
 {
-  const uint wptPackedSz=(-var_bytes_gps_lat)+(-var_bytes_gps_lon)+(-var_bytes_gps_hmsl)+1;
-  const uint rwPackedSz=wptPackedSz+(-var_bytes_NED)*3;
+  const uint wptPackedSz=(-var_size[idx_gps_lat])+(-var_size[idx_gps_lon])+(-var_size[idx_gps_hmsl])+1;
+  const uint rwPackedSz=wptPackedSz+(-var_size[idx_NED])*3;
   const uint sz=wptPackedSz*buf[0]+rwPackedSz*buf[1]+2;
   if(cnt!=sz){
     printf("Can't extract flight plan, wrong data size (%u) need (%u).\n",cnt,sz);
@@ -324,7 +324,6 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
     bool filtered=memchr(dl_filter+1,i,dl_filter[0])!=NULL;
     if((*reset_mask_ptr)&mask) (*reset_mask_ptr)&=~mask;
     else{
-      filtered|=(dl_frcnt%dl_slow_factor)&&memchr(dl_slow+1,i,dl_slow[0]);
       //test changed
       filtered|=(memcmp(snapshot,buf_var,sz)==0);
     }
@@ -438,7 +437,7 @@ void Mandala::calcDGPS(const double dt)
 
   Vector theta_r=theta*D2R;
   // calculate frame velocities
-  //theta_r[2]=gps_course*D2R;
+  theta_r[2]=gps_course*D2R;
   vXYZ=rotate(gps_vNED,theta_r);
 
   Vector acc;
@@ -725,10 +724,10 @@ void Mandala::print_report(FILE *stream)
 {
   fprintf(stream,"======= Mandala Variables ===================\n");
   fprintf(stream,"#\tVariableName\tDescription\tType\tArray\tSpan\tPackedSize\n");
-  for (uint i=0;i<maxVars;i++) {
+  for (uint i=0;i<256;i++) {
     if ((!var_size[i])&&(var_type[i]!=vt_sig))continue;
-    if (i==idxSIG) fprintf(stream,"== Signature Variables (internal use only) ==\n");
-    if (i==idxCFG) fprintf(stream,"======= Configuration Variables =============\n");
+    //if (i==0) fprintf(stream,"== Signature Variables (internal use only) ==\n");
+    //if (i==idxCFG) fprintf(stream,"======= Configuration Variables =============\n");
     const char *vt="";
     switch(var_type[i]){
       case vt_void:   vt="UNKNOWN";break;
@@ -749,7 +748,7 @@ void Mandala::print_report(FILE *stream)
   }
   fprintf(stream,"=========== Bitfields =======================\n");
   fprintf(stream,"VariableName\tBitNumber\tBitName\tDescription\n");
-  for (uint i=0;i<maxVars;i++) {
+  for (uint i=0;i<256;i++) {
     if (!var_bits[i])continue;
     for(uint ib=0;ib<var_bits[i];ib++)
       fprintf(stream,"%s\t%u\t%s\t%s\n",
@@ -761,7 +760,7 @@ void Mandala::print_report(FILE *stream)
   }
   fprintf(stream,"=========== Content of Signature Variables ==\n");
   fprintf(stream,"VariableName\tContent\n");
-  for (uint i=idxSIG;i<maxVars;i++) {
+  for (uint i=0;i<idxPAD;i++) {
     if(!var_ptr[i])break;
     _var_signature sig=*(_var_signature*)var_ptr[i];
     if ((var_type[i]!=vt_sig)||(!sig[0]))continue;
