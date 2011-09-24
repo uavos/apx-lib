@@ -130,34 +130,31 @@ VARDEF(vect, acc,   -100,2, "Ax,Ay,Az accelerations [m/s2]")
 VARDEF(vect, gyro,  -300,2, "p,q,r angular rates [deg/s]")
 VARDEF(vect, mag,   -1.25,1,   "Hx,Hy,Hz magnetic field vector [gauss]")
 
-//--------- Filtered NAV --------------
-VARDEF(float,altitude,  6553.5,2, "local altitude [m]")
-VARDEF(float,vspeed,    -100,2, "Ax,Ay,Az accelerations [m/s2]")
+//--------- FLIGHT CONTROL --------------
+VARDEF(float, airspeed,        655.35,2, "Airspeed [m/s]")
+VARDEF(float, altitude,        6553.5,2, "Altitude [m]")
+VARDEF(float, vspeed,          -100,2,   "Variometer [m/s]")
 
 //--------- Measured by GPS --------------
 VARDEF(float, gps_lat,     -180,4,     "latitude [deg]")
 VARDEF(float, gps_lon,     -180,4,     "longitude [deg]")
 VARDEF(float, gps_hmsl,    -10000,2,   "altitde above sea [m]")
-VARDEF(vect,   gps_vNED,    -150,2,     "velocity north,east,down [m/s]")
+VARDEF(vect,   gps_vNED,    -150,2,    "velocity north,east,down [m/s]")
 VARDEF(float, gps_course,  -180,2,     "GPS course [deg]")
 VARDEF(float, gps_home_lat, -180,4,    "home latitude [deg]")
 VARDEF(float, gps_home_lon, -180,4,    "home longitude [deg]")
 VARDEF(float, gps_home_hmsl,-10000,2,  "home altitde above sea [m]")
-VARDEF(uint,  gps_time, 0,4,            "GPS UTC Time from 1970 1st Jan [sec]")
-VARDEF(float, gps_SV, 0,1,              "GPS Satellites visible [number]")
-VARDEF(vect,  gps_accuracy, 2.55,1,     "GPS accuracy estimation Hrz[m],Ver[m],Spd[m/s]")
-
-//--------- PRESSURE --------------
-VARDEF(float, airspeed,        100,1,    "barometric airspeed [m/s]")
-VARDEF(float, pstatic,         6553.5,2, "barometric pressure AGL [m]")
-VARDEF(float, vspeed,          -12.7,1,  "Variometer [m/s]")
+VARDEF(uint,  gps_time,      0,4,      "GPS UTC Time from 1970 1st Jan [sec]")
+VARDEF(uint,  gps_SV,        0,1,      "GPS Satellites visible [number]")
+VARDEF(uint,  gps_SU,        0,1,      "GPS Satellites used [number]")
+VARDEF(vect,  gps_accuracy, 2.55,1,    "GPS accuracy estimation Hrz[m],Ver[m],Spd[m/s]")
 
 //--------- BATTERY --------------
-VARDEF(float, Ve,     25.5,1,     "autopilot battery voltage [v]")
+VARDEF(float, Ve,     25.5,1,   "autopilot battery voltage [v]")
 VARDEF(float, Vs,     45,1,     "servo battery voltage [v]")
-VARDEF(float, Vp,     0,1,          "payload battery voltage [v]")
-VARDEF(float, Vg,     0,1,          "GCU battery voltage [v]")
-VARDEF(uint,   power,  0,1,          "power status bitfield [on/off]")
+VARDEF(float, Vp,     0,1,      "payload battery voltage [v]")
+VARDEF(float, Vg,     25.5,1,   "GCU battery voltage [v]")
+VARDEF(uint,   power,  0,1,     "power status bitfield [on/off]")
 BITDEF(power,   ap,      1,     "Avionics")
 BITDEF(power,   servo,   2,     "Servo on/off")
 BITDEF(power,   payload, 4,     "Payload activated/off")
@@ -176,22 +173,10 @@ VARDEF(float, AT,    -100,1,    "ambient temperature [deg C]")
 VARDEF(float, ET,     0,1,      "engine temperature [deg C]")
 VARDEFA(float,  tsens,8,0,1,    "temperature sensors [C]")
 
-//--------- CONTROLS --------------
-// fast controls
-VARDEFA(float, jsw,jswCnt,    -1.0,1, "joystick command [-1..0..+1]")
-VARDEFA(float, ppm,ppmCnt,    -1.0,1, "RC PPM command [-1..0..+1]")
-VARDEF(float,  ctr_ailerons,  -1.0,1, "ailerons [-1..0..+1]")
-VARDEF(float,  ctr_elevator,  -1.0,1, "elevator [-1..0..+1]")
-VARDEF(float,  ctr_throttle,   1.0,1, "throttle [0..1]")
-VARDEF(float,  ctr_rudder,    -1.0,1, "rudder [-1..0..+1]")
-VARDEF(float,  ctr_wheel,     -1.0,1, "front wheel [-1..0..+1]")
-// slow controls
-VARDEF(float,  ctr_flaps,      1.0,1, "flaps [0..1]")
-VARDEF(float,  ctr_airbrk,     1.0,1, "airbrakes [0..1]")
-VARDEF(uint,    ctrb,           0,1,   "controls bitfield [on/off]")
-BITDEF(ctrb,  gear,      1, "Landing gear retracted/extracted")
-BITDEF(ctrb,  brake,     2, "Parking brake on/off")
-BITDEF(ctrb,  ers,       4, "Parachute launched/off")
+//--------- OTHER SENSORS (information) --------------
+VARDEF(float,   RSS,   1.0,1,   "Modem Receiver signal strength [0..1]")
+VARDEF(float,   RSS_gcu,1.0,1,  "Modem GCU Receiver signal strength [0..1]")
+VARDEF(float,   fuel,   1.0,1,  "Fuel [0..1]")
 
 //--------- AUTOPILOT COMMAND --------------
 VARDEF(vect,  cmd_theta,    -180,2,   "desired roll,pitch,yaw [deg]")
@@ -207,6 +192,23 @@ VARDEF(uint,  wpType,    0,1,       "current waypoint type [wp_type]")
 VARDEF(uint,  wpidx,     0,1,       "current waypoint [0...]")
 VARDEF(uint,  rwcnt,     0,1,       "number of runways[0...]")
 
+//--------- CONTROLS --------------
+// fast controls
+VARDEFA(float, jsw,jswCnt,    -1.0,1, "joystick command [-1..0..+1]")
+VARDEFA(float, ppm,ppmCnt,    -1.0,1, "RC PPM command [-1..0..+1]")
+VARDEF(float,  ctr_ailerons,  -1.0,1, "ailerons [-1..0..+1]")
+VARDEF(float,  ctr_elevator,  -1.0,1, "elevator [-1..0..+1]")
+VARDEF(float,  ctr_throttle,   1.0,1, "throttle [0..1]")
+VARDEF(float,  ctr_rudder,    -1.0,1, "rudder [-1..0..+1]")
+VARDEF(float,  ctr_wheel,     -1.0,1, "front wheel [-1..0..+1]")
+// slow controls
+VARDEF(float,  ctr_flaps,      1.0,1, "flaps [0..1]")
+VARDEF(float,  ctr_airbrk,     1.0,1, "airbrakes [0..1]")
+VARDEF(uint,   ctrb,           0,1,   "controls bitfield [on/off]")
+BITDEF(ctrb,  gear,      1, "Landing gear retracted/extracted")
+BITDEF(ctrb,  brake,     2, "Parking brake on/off")
+BITDEF(ctrb,  ers,       4, "Parachute launched/off")
+
 //--------- calculated by Mandala::calc() --------------
 VARDEF(vect,  NED,     -10000,2, "north,east,down position [m]")
 VARDEF(float,homeHDG, -180,2,   "heading to home position [deg]")
@@ -220,11 +222,6 @@ VARDEF(float,crsRate, -50,1,    "trajectory course change rate [deg/s]")
 VARDEF(float,wpHDG,   -180,2,   "current waypoint heading [deg]")
 VARDEF(float,rwHDG,   -180,2,   "current runway heading [deg]")
 VARDEF(float,rwDelta, -127,1,   "runway horizontal displacement [m]")
-
-//--------- OTHER SENSORS (information) --------------
-VARDEF(float,   RSS,   1.0,1,   "Modem Receiver signal strength [0..1]")
-VARDEF(float,   RSS_gcu,1.0,1,  "Modem GCU Receiver signal strength [0..1]")
-VARDEF(float,   fuel,   1.0,1,  "Fuel [0..1]")
 
 //=============================================================================
 #undef SIGDEF

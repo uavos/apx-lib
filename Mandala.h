@@ -93,6 +93,15 @@ public:
 
   //---- AP CFG Vars ----
   struct {
+    const char *    var_name[cfgCnt];  //text name
+    const char *    var_descr[cfgCnt]; //text description
+    double          var_round[cfgCnt]; //round value for CFG vars
+    uint            var_size[cfgCnt];  //size of whole packed var
+    void *          var_ptr[cfgCnt];
+    _var_type       var_type[cfgCnt];
+    uint            var_array[cfgCnt];
+    uint            var_bytes[cfgCnt];
+    double          var_span[cfgCnt];
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr)  var_typedef_cfg_##aname aname;
 #include "MandalaVarsAP.h"
   }cfg;
@@ -139,7 +148,6 @@ public:
   uint extract(uint8_t *buf,uint size); //overloaded - first byte=var_idx
   //-----------------------------------------------------------------------------
 
-  //uint size(void);          // size (bytes) of all archived mandala vars
   uint sig_size(_var_signature signature);
 
   //-----------------------------------------------------------------------------
@@ -182,6 +190,9 @@ public:
   double sqr(double x);
 private:
   // some special protocols
+  void fill_config_vdsc(uint8_t *buf,uint i);
+  uint archive_config(uint8_t *buf,uint bufSize);  //pack config to buf, return size
+  uint extract_config(uint8_t *buf,uint cnt);//read packed config from buf
   uint archive_flightplan(uint8_t *buf,uint bufSize);  //pack wypoints to buf, return size
   uint extract_flightplan(uint8_t *buf,uint cnt);//read packed waypoints from buf
   uint archive_downstream(uint8_t *buf,uint maxSize);    //pack telemetry DownlinkStream (128 vars)

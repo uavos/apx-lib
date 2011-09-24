@@ -212,6 +212,10 @@ void MandalaCore::archive_sig()
 uint MandalaCore::do_archive(uint8_t *buf,uint var_idx)
 {
   if (!vdsc_fill(buf,var_idx))return 0;
+  return do_archive_vdsc();
+}
+uint MandalaCore::do_archive_vdsc(void)
+{
   switch (vdsc.type) {
     case vt_float:
       archive_float();
@@ -350,6 +354,10 @@ void MandalaCore::extract_sig(uint buf_cnt)
 uint MandalaCore::do_extract(uint8_t *buf,uint cnt,uint var_idx)
 {
   if (!vdsc_fill(buf,var_idx))return 0;
+  return do_extract_vdsc(cnt);
+}
+uint MandalaCore::do_extract_vdsc(uint cnt)
+{
   if (cnt<vdsc.size)return 0;
   switch (vdsc.type) {
     case vt_float:
@@ -366,6 +374,33 @@ uint MandalaCore::do_extract(uint8_t *buf,uint cnt,uint var_idx)
       break;
   }
   return vdsc.size;
+}
+//=============================================================================
+uint MandalaCore::extract_stream(uint8_t *buf,uint cnt)
+{
+  uint mask=1;
+  uint8_t *mask_ptr=buf;
+  uint8_t *ptr=mask_ptr+1;
+  int tcnt=cnt;
+  uint idx=idxPAD;
+  do{
+    for(uint i=0;i<8;i++){
+      if((*mask_ptr)&mask){
+        if(tcnt<=0)return 0;
+        uint sz=do_extract(ptr,tcnt,idx);
+        if(!sz)return 0;
+        ptr+=sz;
+        tcnt-=sz;
+      }
+      idx++;
+      mask<<=1;
+    }
+    mask_ptr=ptr;
+    mask=1;
+    ptr++;
+    tcnt--;
+  }while(tcnt>0);
+  return cnt;
 }
 //=============================================================================
 //=============================================================================
@@ -403,6 +438,22 @@ void MandalaCore::set_value(uint var_idx,uint member_idx,_var_float value)
   }
 }
 //=============================================================================
+void MandalaCore::filter(const _var_float &v,_var_float *var_p,const _var_float &S,const _var_float &L)
+{
+  const _var_float D=v-*var_p;
+  _var_float G=S+S*(D/L)*(D/L);
+  if (*var_p==0.0)*var_p=v;
+  else {
+    if (G>1)G=1;
+    else if (G<S)G=S;
+    *var_p=*var_p+D*G;
+  }
+}
+void MandalaCore::filter(const _var_vect &v,_var_vect *var_p,const _var_float &S,const _var_float &L)
+{
+  for(uint i=0;i<3;i++)filter(v[i],&((*var_p)[i]),S,L);
+}
+//===========================================================================
 //=============================================================================
 //=============================================================================
 //=============================================================================

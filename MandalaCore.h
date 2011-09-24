@@ -33,7 +33,7 @@
 #endif
 //=============================================================================
 //use double for ARM
-#ifdef FLOAT_TYPE
+#ifdef USE_FLOAT_TYPE
 typedef float   _var_float;
 #else
 typedef double  _var_float;
@@ -85,23 +85,6 @@ enum {
   varsCnt=(idx_vars_top-idx_vars_start+1)
 };
 //-----------------------------------------------------------------------------
-//variable parameters
-/*#define SIGDEF(aname, adescr, ... ) VARDEFA(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,1,adescr)
-#define VARDEF(atype,aname,aspan,abytes,adescr) VARDEFA(atype,aname,1,aspan,abytes,adescr)
-#define VARDEFA(atype,aname,asize,aspan,abytes,adescr) \
-  enum{\
-      var_type_##aname=vt_##atype, \
-      var_bytes_##aname=(aspan<0)?(-abytes):(abytes), \
-      var_array_##aname=asize, \
-      var_size_##aname=((asize)*(abytes)*((vt_##atype==vt_vect)?3:1)), \
-      var_max_##aname=(aspan>0)?(((abytes==1)?0xFF:((abytes==2)?0xFFFF:((abytes==4)?0xFFFFFFFF:0)))): \
-                      ( (aspan<0)?((abytes==1)?0x7F:((abytes==2)?0x7FFF:((abytes==4)?0x7FFFFFFF:0))):0 ), \
-      var_span100_##aname=(int)(((aspan<0)?(-aspan):(aspan))*100.0),\
-      };
-
-#include "MandalaVars.h"
-*/
-//-----------------------------------------------------------------------------
 // variable typedefs
 #define VARDEFA(atype,aname,asize,aspan,abytes,adescr) typedef _var_##atype var_typedef_##aname [asize];
 #define VARDEF(atype,aname,aspan,abytes,adescr) typedef _var_##atype var_typedef_##aname;
@@ -118,6 +101,10 @@ class MandalaCore
 public:
   MandalaCore();
 
+
+  void filter(const _var_float &v,_var_float *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
+  void filter(const _var_vect &v,_var_vect *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
+
   //member=mask, if var is a bitfield, or vect idx, or array idx
   _var_float get_value(uint var_idx,uint member_idx);
   void set_value(uint var_idx,uint member_idx,_var_float value);
@@ -132,6 +119,7 @@ public:
   uint do_archive(uint8_t *buf,uint var_idx);
   uint do_extract(uint8_t *buf,uint cnt,uint var_idx);
 
+  uint extract_stream(uint8_t *buf,uint cnt);
   struct {
     uint8_t *buf;         //buffer to store/extract
     void    *ptr;         //pointer to local var.VARNAME
@@ -143,6 +131,8 @@ public:
     uint    size;         //total size of archived data
   }vdsc;
   uint vdsc_fill(uint8_t *buf,uint var_idx);
+  uint do_archive_vdsc(void);
+  uint do_extract_vdsc(uint cnt);
 
 private:
 
