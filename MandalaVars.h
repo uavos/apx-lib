@@ -194,7 +194,8 @@ VARDEF(vect,  gps_accuracy, 2.55,1,     "GPS accuracy estimation Hrz[m],Ver[m],S
 
 //--------- PRESSURE --------------
 VARDEF(float, airspeed,        100,1,    "barometric airspeed [m/s]")
-VARDEF(float, pstatic,         6553.5,2,  "barometric pressure AGL [m]")
+VARDEF(float, pstatic,         6553.5,2, "barometric pressure AGL [m]")
+VARDEF(float, vspeed,          -12.7,1,  "Variometer [m/s]")
 
 //--------- BATTERY --------------
 VARDEF(float, Ve,     25.5,2,     "autopilot battery voltage [v]")
