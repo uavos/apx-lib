@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include "preprocessor.h"
 #include "MandalaCore.h"
+#include "math.h"
 //===========================================================================
 // static signatures
 #define SIGDEF(aname, adescr, ... )   \
@@ -57,6 +58,7 @@ uint MandalaCore::vdsc_fill(uint8_t *buf,uint var_idx)
     vdsc.size=((asize)*(abytes)*((vt_##atype==vt_vect)?3:1));\
     break;
     vdsc.buf=buf;
+    vdsc.prec1000=0;
     switch (var_idx) {
       #include "MandalaVars.h"
       default:
@@ -281,7 +283,12 @@ void MandalaCore::extract_float(void)
   }
   vdsc.buf=buf;
   if (vdsc.span!=0.0)
-    *v=(*v)/vdsc.max*vdsc.span;
+    *v=(*v)/(_var_float)vdsc.max*vdsc.span;
+  if(vdsc.prec1000){
+    _var_float prec=(_var_float)vdsc.prec1000/1000.0;
+    //uint64_t vp=*v/prec;
+    *v=round(*v/prec)*prec;
+  }
 }
 void MandalaCore::extract_uint(void)
 {

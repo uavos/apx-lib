@@ -129,6 +129,7 @@ public:
     uint    type;         //type of variable
     uint32_t max;         //max archived integer value (unsigned)
     uint    size;         //total size of archived data
+    uint    prec1000;     //cfg vars only round*1000
   }vdsc;
   uint vdsc_fill(uint8_t *buf,uint var_idx);
   uint do_archive_vdsc(void);
