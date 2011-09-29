@@ -83,6 +83,7 @@ CFGDEFA(vect,       pidK,regCnt,   655.35,2,0.01, "PID coeffitients Kp,Ki,Kd")
 CFGDEFA(vect,       pidL,regCnt,   100,1,1,       "PID limits Lp,Li,Ld [%]")
 CFGDEFA(float,     pidLo,regCnt,  100,1,1,       "PID out limits Lo [%]")
 
+
 // other variables (added to ConfigModel) automatically.
 // description format:
 // <Group>: text (vect axis names if any)
@@ -96,13 +97,17 @@ CFGDEF(float,  mix_rud_Lo,   100,1,1,      "Roll angle to Rudder limit (+/-) [%]
 CFGDEF(float,  mix_thr_Kp,   25.5,1,0.1,   "Pitch angle to Throttle mix")
 CFGDEF(float,  mix_thr_Lo,   100,1,1,      "Pitch angle to Throttle limit (+/-) [%]")
 
+CFGDEF(float,   rollSpeed, 255,1,1,  "Dynamics: roll angle change speed [deg/s]")
+CFGDEF(float,   pitchSpeed, 255,1,1,  "pitch angle change speed [deg/s]")
+
 CFGDEF(vect,    imu_align,    -180,2,0.1,   "AHRS: body frame align (roll,pitch,yaw) [-180..0..+180]")
 CFGDEF(vect,    theta_bias,   -180,2,0.1,   "AHRS: theta bias (roll,pitch,yaw) [-180..0..+180]")
 
 CFGDEF(float,  wptSnap,      0,1,0,        "Waypoints: waypoint snap distance [m]")
 
-CFGDEF(float,  distHome,   255000,1,1000,  "Safety: turn home distance [m]")
-CFGDEF(float,  distKill,   255000,1,1000,  "Safety: suicide distance [m]")
+CFGDEF(float,  safety_dHome,   255000,1,1000,  "Safety: turn home distance [m]")
+CFGDEF(float,  safety_dHomeERS,   255000,1,1000,  "suicide (ERS) distance [m]")
+CFGDEF(float,  safety_vspeedERS,   50,1,1,  "max descending speed to launch ERS [m/s]")
 
 CFGDEF(float,  turnRate,   25.5,1,0.1,     "Sim: max turn rate [deg/s]")
 
@@ -118,11 +123,14 @@ CFGDEF(float,  eng_rpm_max, 25500,1,100,   "max rpm [1/min]")
 CFGDEF(float,  flight_speed,   0,1,0,      "Flight: cruise speed [m/s]")
 CFGDEF(float,  flight_speedFlaps,0,1,0,    "airspeed limit with flaps down [m/s]")
 CFGDEF(float,  flight_safeAlt, 2550,1,10,  "safe altitude, HOME, TA mode [m]")
-CFGDEF(float,  flight_throttle, 0,1,0.01,  "cruise throttle setting [0..1]")
+CFGDEF(float,  flight_throttle, 1.0,1,0.01,  "cruise throttle setting [0..1]")
 
-CFGDEF(float,  takeoff_Kp,      25.5,1,0.1,"Takeoff: alt error coeffitient [deg]")
-CFGDEF(float,  takeoff_Lp,      90,1,1,    "pitch limit [deg]")
-CFGDEF(float,  takeoff_throttle,1,1,0.1,   "throttle setting [0..1]")
+CFGDEF(float,  takeoff_Kp,      25.5,1,0.1,"Takeoff: climbing alt error coeffitient [deg]")
+CFGDEF(float,  takeoff_Lp,      90,1,1,    "climbing pitch limit [deg]")
+CFGDEF(float,  takeoff_thrSpeed, 1,1,0.1,  "throttle start speed [1/s]")
+CFGDEF(float,  takeoff_liftSpeed,   100,1,1,   "airspeed to start liftoff [m/s]")
+CFGDEF(float,  takeoff_liftPitch,   100,1,1,   "liftoff pitch angle [deg]")
+CFGDEF(float,  takeoff_liftAlt,     100,1,1,   "altitude to start climbing [m]")
 
 CFGDEF(float,  pland_pitch,   90,1,1,    "Parachute Landing: stall pitch [deg]")
 CFGDEF(float,  pland_speed,   255,1,1,   "airspeed to open parachute [m/s]")

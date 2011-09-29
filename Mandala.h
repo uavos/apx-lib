@@ -134,6 +134,7 @@ public:
 
   const char      *reg_names[regCnt];
   const char      *reg_descr[regCnt];
+    int stage;
 
 //=============================================================================
   Mandala();

@@ -476,7 +476,7 @@ void Mandala::calcDGPS(const double dt)
 
   Vector theta_r=theta*D2R;
   // calculate frame velocities
-  theta_r[2]=gps_course*D2R;
+  //theta_r[2]=gps_course*D2R;
   vXYZ=rotate(gps_vNED,theta_r);
 
   Vector acc;
