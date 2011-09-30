@@ -93,7 +93,7 @@ SIGDEF(autosend,  "Automatically forwarded variables to GCU",\
       idx_downstream, idx_debug, idx_service, idx_flightplan, idx_config )
 //telemetry filter (don't send at all), calculated by mandala.extractTelemetry()
 SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",\
-      idx_NED,idx_homeHDG,idx_dHome,idx_dWPT,idx_dNED,\
+      idx_NED,idx_homeHDG,idx_dHome,idx_dWPT,idx_dN,idx_dE,idx_dAlt,\
       idx_vXYZ,idx_dXYZ,idx_aXYZ,idx_crsRate,\
       idx_wpHDG,idx_rwDelta,\
       idx_wpcnt,idx_rwcnt)
@@ -180,9 +180,11 @@ VARDEF(float,   fuel,   1.0,1,  "Fuel [0..1]")
 
 //--------- AUTOPILOT COMMAND --------------
 VARDEF(vect,  cmd_theta,    -180,2,   "desired roll,pitch,yaw [deg]")
-VARDEF(vect,  cmd_NED,      -10000,2, "desired north,east,down [m]")
+VARDEF(float, cmd_N,        -10000,2, "desired north [m]")
+VARDEF(float, cmd_E,        -10000,2, "desired east [m]")
 VARDEF(float, cmd_course,   -180,2,   "desired course [deg]")
 VARDEF(float, cmd_rpm,      25500,1,  "desired RPM [rpm]")
+VARDEF(float, cmd_altitude, -10000,2, "desired altitude [m]")
 VARDEF(float, cmd_airspeed, 0,1,      "desired airspeed (for regThr) [m/s]")
 VARDEF(float, cmd_vspeed,   -12.7,1,  "desired vertical speed (for regPitchH) [m/s]")
 
@@ -214,7 +216,9 @@ VARDEF(vect,  NED,     -10000,2, "north,east,down position [m]")
 VARDEF(float,homeHDG, -180,2,   "heading to home position [deg]")
 VARDEF(float,dHome,   0,2,      "distance to GCU [m]")
 VARDEF(float,dWPT,    0,2,      "distance to waypoint [m]")
-VARDEF(vect,  dNED,    -10000,2, "delta north,east,down [m]")
+VARDEF(float,dN,      -10000,2, "delta north [m]")
+VARDEF(float,dE,      -10000,2, "delta east [m]")
+VARDEF(float,dAlt,    -10000,2, "delta altitude [m]")
 VARDEF(vect,  vXYZ,    -50,1,    "velocity bodyframe x,y,z [m/s]")
 VARDEF(vect,  dXYZ,    -10000,2, "delta bodyframe x,y,z [m]")
 VARDEF(vect,  aXYZ,    -100,1,   "accelerations by trajectory ax,ay,az [m/c2]")

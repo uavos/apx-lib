@@ -288,8 +288,8 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     buf+=archive(buf,bufSize,idx_gps_lat);
     buf+=archive(buf,bufSize,idx_gps_lon);
     buf+=archive(buf,bufSize,idx_gps_hmsl);
-    *buf++=runways[i].type;
     buf+=archive(buf,bufSize,idx_NED);
+    *buf++=runways[i].type;
   }
   gps_lat=gps_lat_save;
   gps_lon=gps_lon_save;
@@ -339,7 +339,7 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     runways[i].LLA[2]=gps_hmsl;
     runways[i].type=(_rw_type)*data++;
     runways[i].dNED=NED;
-    printf("Runway%u (%s)\n",i+1,rwt_str[runways[i].type]);
+    printf("Runway%u (%s), NED(%.0f,%.0f,%.0f)\n",i+1,rwt_str[runways[i].type],runways[i].dNED[0],runways[i].dNED[1],runways[i].dNED[2]);
   }
   gps_lat=gps_lat_save;
   gps_lon=gps_lon_save;
@@ -455,20 +455,6 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
 }
 //=============================================================================
 //=============================================================================
-uint Mandala::status_set(uint mask,bool value)
-{
-  if(value)status|=mask; else status&=~mask;
-  return status;
-}
-uint Mandala::status_clear(uint mask)
-{
-  return status_set(mask,false);
-}
-bool Mandala::status_get(uint mask)
-{
-  return status&mask;
-}
-//=============================================================================
 void Mandala::calcDGPS(const double dt)
 {
   // calculate NED
@@ -502,7 +488,10 @@ void Mandala::calcDGPS(const double dt)
 void Mandala::calc(void)
 {
   // vars should be filtered by dl_filter
-  dNED=cmd_NED-NED;
+  dN=cmd_N-NED[0];
+  dE=cmd_E-NED[1];
+  dAlt=cmd_altitude-altitude;
+  Vector dNED(dN,dE,-dAlt);
   dXYZ=rotate(dNED,theta[2]*D2R);
   dWPT=ned2dist(dNED);
   dHome=ned2dist(NED);

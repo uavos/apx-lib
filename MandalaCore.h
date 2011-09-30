@@ -121,15 +121,15 @@ public:
 
   uint extract_stream(uint8_t *buf,uint cnt);
   struct {
-    uint8_t *buf;         //buffer to store/extract
-    void    *ptr;         //pointer to local var.VARNAME
-    int     sbytes;       //archived bytes cnt (if < 0 => signed)
-    _var_float   span;         //variable span (absolute, always >0)
-    uint    array;        //count of bytes in array
-    uint    type;         //type of variable
-    uint32_t max;         //max archived integer value (unsigned)
-    uint    size;         //total size of archived data
-    uint    prec1000;     //cfg vars only round*1000
+    uint8_t *buf;       //buffer to store/extract
+    void    *ptr;       //pointer to local var.VARNAME
+    int     sbytes;     //archived bytes cnt (if < 0 => signed)
+    _var_float   span;  //variable span (absolute, always >0)
+    uint    array;      //count of bytes in array
+    uint    type;       //type of variable
+    uint32_t max;       //max archived integer value (unsigned)
+    uint    size;       //total size of archived data
+    uint    prec1000;   //cfg vars only round*1000
   }vdsc;
   uint vdsc_fill(uint8_t *buf,uint var_idx);
   uint do_archive_vdsc(void);

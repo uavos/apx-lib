@@ -47,16 +47,16 @@ uint MandalaCore::vdsc_fill(uint8_t *buf,uint var_idx)
   #define SIGDEF(aname,adescr,...)                        VARDEFA(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,1,adescr)
 
   #define VARDEFA(atype,aname,asize,aspan,abytes,adescr) \
-  case idx_##aname:\
-    vdsc.ptr=&(aname);\
-    vdsc.sbytes=(aspan<0)?(-abytes):(abytes);\
-    vdsc.span=(aspan<0)?(-aspan):(aspan);\
-    vdsc.array=asize;\
-    vdsc.type=vt_##atype;\
-    vdsc.max=(aspan>0)?(((abytes==1)?0xFF:((abytes==2)?0xFFFF:((abytes==4)?0xFFFFFFFF:0)))): \
-                      ( (aspan<0)?((abytes==1)?0x7F:((abytes==2)?0x7FFF:((abytes==4)?0x7FFFFFFF:0))):0 );\
-    vdsc.size=((asize)*(abytes)*((vt_##atype==vt_vect)?3:1));\
-    break;
+  case idx_##aname: { \
+      vdsc.ptr=(void*)&(aname);\
+      vdsc.sbytes=(aspan<0)?(-abytes):(abytes);\
+      vdsc.span=(aspan<0)?(-aspan):(aspan);\
+      vdsc.array=asize;\
+      vdsc.type=vt_##atype;\
+      vdsc.max=(aspan>0)?(((abytes==1)?0xFF:((abytes==2)?0xFFFF:((abytes==4)?0xFFFFFFFF:0)))): \
+                        ( (aspan<0)?((abytes==1)?0x7F:((abytes==2)?0x7FFF:((abytes==4)?0x7FFFFFFF:0))):0 );\
+      vdsc.size=((asize)*(abytes)*((vt_##atype==vt_vect)?3:1));\
+    } break;
     vdsc.buf=buf;
     vdsc.prec1000=0;
     switch (var_idx) {
@@ -155,7 +155,7 @@ void MandalaCore::archive_uint(void)
   }
   uint8_t *buf=vdsc.buf;
   uint32_t max=vdsc.max;
-  uint v=*((_var_uint*)vdsc.ptr);
+  _var_uint v=*((_var_uint*)vdsc.ptr);
   switch (vdsc.sbytes) {
     case 1:     //uint8
         *(buf++)=limit_ui(v,max);
@@ -303,7 +303,7 @@ void MandalaCore::extract_uint(void)
     return;
   }
   uint8_t *buf=vdsc.buf;
-  uint *v=(_var_uint*)vdsc.ptr;
+  _var_uint *v=(_var_uint*)vdsc.ptr;
   switch (vdsc.sbytes) {
     case 1:     //uint8
       *v=*(buf++);

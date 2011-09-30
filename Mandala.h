@@ -134,7 +134,6 @@ public:
 
   const char      *reg_names[regCnt];
   const char      *reg_descr[regCnt];
-    int stage;
 
 //=============================================================================
   Mandala();
@@ -157,11 +156,6 @@ public:
   void dump(const Vector &v,const char *str="");
   void dump(const uint var_idx);
   void print_report(FILE *stream);
-
-  // flags
-  uint status_set(uint mask,bool value=true);
-  uint status_clear(uint mask);
-  bool status_get(uint mask);
 
   // math operations
   double boundAngle(double v,double span=180.0);
