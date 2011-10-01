@@ -538,18 +538,6 @@ uint Mandala::snap(uint v, uint snapv)
   return v;
 }
 //===========================================================================
-void Mandala::filterValue(double v,double *vLast,double S,double L)
-{
-  double D=v-*vLast;
-  double G=S+S*(D/L)*(D/L);
-  if (*vLast==0.0)*vLast=v;
-  else {
-    if (G>1)G=1;
-    else if (G<S)G=S;
-    *vLast=*vLast+D*G;
-  }
-}
-//===========================================================================
 double Mandala::hyst(double err,double hyst)
 {
   if (fabs(err)<=hyst)return 0.0;

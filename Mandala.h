@@ -161,7 +161,6 @@ public:
   double boundAngle(double v,double span=180.0);
   Vector boundAngle(const Vector &v,double span=180.0);
   uint snap(uint v, uint snapv=10);
-  void filterValue(double v,double *vLast,double S,double L);
   double hyst(double err,double hyst);
   double limit(const double v,const double vL=1.0);
   double limit(const double v,const double vMin,const double vMax);
