@@ -53,7 +53,7 @@ uint MandalaCore::vdsc_fill(uint8_t *buf,uint var_idx)
       vdsc.span=(aspan<0)?(-aspan):(aspan);\
       vdsc.array=asize;\
       vdsc.type=vt_##atype;\
-      vdsc.max=(aspan>0)?(((abytes==1)?0xFF:((abytes==2)?0xFFFF:((abytes==4)?0xFFFFFFFF:0)))): \
+      vdsc.max=(aspan>=0)?(((abytes==1)?0xFF:((abytes==2)?0xFFFF:((abytes==4)?0xFFFFFFFF:0)))): \
                         ( (aspan<0)?((abytes==1)?0x7F:((abytes==2)?0x7FFF:((abytes==4)?0x7FFFFFFF:0))):0 );\
       vdsc.size=((asize)*(abytes)*((vt_##atype==vt_vect)?3:1));\
     } break;

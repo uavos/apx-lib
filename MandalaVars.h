@@ -83,7 +83,7 @@ SIGDEF(flightplan,"Flight plan data")
 SIGDEF(imu, "IMU sensors data pack",\
        idx_acc, idx_gyro, idx_mag)
 SIGDEF(gps, "GPS fix data pack",\
-      idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED, idx_gps_accuracy)
+      idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED)
 SIGDEF(ctr, "Fast controls",\
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_wheel)
 //------------------------------
@@ -93,10 +93,11 @@ SIGDEF(autosend,  "Automatically forwarded variables to GCU",\
       idx_downstream, idx_debug, idx_service, idx_flightplan, idx_config )
 //telemetry filter (don't send at all), calculated by mandala.extractTelemetry()
 SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",\
-      idx_NED,idx_homeHDG,idx_dHome,idx_dWPT,idx_dN,idx_dE,idx_dAlt,\
-      idx_vXYZ,idx_dXYZ,idx_aXYZ,idx_crsRate,\
+      idx_homeHDG,idx_dHome,idx_dWPT,idx_dN,idx_dE,idx_dAlt,\
+      idx_dXYZ,\
       idx_wpHDG,idx_rwDelta,\
       idx_wpcnt,idx_rwcnt)
+      //idx_NED,idx_vXYZ,idx_aXYZ,idx_crsRate)
 //------------------------------
 //=============================================================================
 //    Mandala variables definitions
@@ -139,7 +140,7 @@ VARDEF(float, vspeed,          -100,2,   "Variometer [m/s]")
 VARDEF(float, gps_lat,     -180,4,     "latitude [deg]")
 VARDEF(float, gps_lon,     -180,4,     "longitude [deg]")
 VARDEF(float, gps_hmsl,    -10000,2,   "altitde above sea [m]")
-VARDEF(vect,   gps_vNED,    -150,2,    "velocity north,east,down [m/s]")
+VARDEF(vect,  gps_vNED,    -150,2,     "velocity north,east,down [m/s]")
 VARDEF(float, gps_course,  -180,2,     "GPS course [deg]")
 VARDEF(float, gps_home_lat, -180,4,    "home latitude [deg]")
 VARDEF(float, gps_home_lon, -180,4,    "home longitude [deg]")
@@ -209,7 +210,7 @@ VARDEF(float,  ctr_airbrk,     1.0,1, "airbrakes [0..1]")
 VARDEF(uint,   ctrb,           0,1,   "controls bitfield [on/off]")
 BITDEF(ctrb,  gear,      1, "Landing gear retracted/extracted")
 BITDEF(ctrb,  brake,     2, "Parking brake on/off")
-BITDEF(ctrb,  ers,       4, "Parachute launched/off")
+BITDEF(ctrb,  ers,       4, "ERS on/off")
 
 //--------- calculated by Mandala::calc() --------------
 VARDEF(vect,  NED,     -10000,2, "north,east,down position [m]")
@@ -221,7 +222,7 @@ VARDEF(float,dE,      -10000,2, "delta east [m]")
 VARDEF(float,dAlt,    -10000,2, "delta altitude [m]")
 VARDEF(vect,  vXYZ,    -50,1,    "velocity bodyframe x,y,z [m/s]")
 VARDEF(vect,  dXYZ,    -10000,2, "delta bodyframe x,y,z [m]")
-VARDEF(vect,  aXYZ,    -100,1,   "accelerations by trajectory ax,ay,az [m/c2]")
+VARDEF(vect,  aXYZ,    -100,2,   "accelerations by trajectory ax,ay,az [m/c2]")
 VARDEF(float,crsRate, -50,1,    "trajectory course change rate [deg/s]")
 VARDEF(float,wpHDG,   -180,2,   "current waypoint heading [deg]")
 VARDEF(float,rwHDG,   -180,2,   "current runway heading [deg]")

@@ -447,7 +447,7 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
   if((gps_lat_s!=gps_lat)||(gps_lon_s!=gps_lon)){
     gps_lat_s=gps_lat;
     gps_lon_s=gps_lon;
-    calcDGPS();
+    //calcDGPS();
   }
   // gps_deltaNED,gps_deltaXYZ,gps_distWPT,gps_distHome,
   calc();
@@ -464,18 +464,31 @@ void Mandala::calcDGPS(const double dt)
   // calculate frame velocities
   //theta_r[2]=gps_course*D2R;
   vXYZ=rotate(gps_vNED,theta_r);
+  //filter(rotate(gps_vNED,theta_r),&vXYZ,0.2,1.0);
 
   Vector acc;
   if(derivatives_init)
     acc=rotate((gps_vNED-last_vNED)/dt,theta_r);
-  else last_aXYZ=acc;
+  //else last_aXYZ=acc;
   last_vNED=gps_vNED;
-  Vector tacc(last_aXYZ-acc);
+  /*Vector tacc(last_aXYZ-acc);
   const double accF=5;
   if((fabs(tacc[0])<accF)&&(fabs(tacc[1])<accF)&&(fabs(tacc[2])<accF)){
-    aXYZ=acc;
+    //aXYZ=acc;
   }
-  last_aXYZ=acc;
+  last_aXYZ=acc;*/
+  /*if(derivatives_init)
+    acc=(vXYZ-last_aXYZ)/dt;
+  last_aXYZ=vXYZ;*/
+
+  //gps_aNED=rotate(gps_vNED,theta_r);
+
+
+  //aXYZ=rotate(gps_aNED,theta_r);
+  //aXYZ=acc;
+  //filter(acc,&aXYZ,0.5,5.5);
+  aXYZ=acc;//*0.5+aXYZ*0.5;
+
 
   //calc course rate (derivative)
   if(derivatives_init)
