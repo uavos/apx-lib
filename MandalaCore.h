@@ -77,7 +77,7 @@ enum {
   #include "MandalaVars.h"
   sigCnt
 };
-#define VARDEF(atype,aname,aspan,abytes,adescr) idx_##aname,
+#define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) idx_##aname,
 enum {
   idx_vars_start=idxPAD-1,
   #include "MandalaVars.h"
@@ -86,8 +86,8 @@ enum {
 };
 //-----------------------------------------------------------------------------
 // variable typedefs
-#define VARDEFA(atype,aname,asize,aspan,abytes,adescr) typedef _var_##atype var_typedef_##aname [asize];
-#define VARDEF(atype,aname,aspan,abytes,adescr) typedef _var_##atype var_typedef_##aname;
+#define VARDEFA(atype,aname,asize,aspan,abytes,atbytes,adescr) typedef _var_##atype var_typedef_##aname [asize];
+#define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) typedef _var_##atype var_typedef_##aname;
 #define SIGDEF(aname, adescr, ... ) typedef _var_signature var_typedef_##aname;
 #include "MandalaVars.h"
 
@@ -112,8 +112,7 @@ public:
   virtual uint archive(uint8_t *buf,uint var_idx){return do_archive(buf,var_idx);}
   virtual uint extract(uint8_t *buf,uint cnt,uint var_idx){return do_extract(buf,cnt,var_idx);}
 
-  #define VARDEF(atype,aname,aspan,abytes,adescr)         var_typedef_##aname aname;
-  #define VARDEFA(atype,aname,asize,aspan,abytes,adescr)  VARDEF( atype,aname,aspan,abytes,adescr )
+  #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr)         var_typedef_##aname aname;
   #define SIGDEF(aname,adescr,...)                        static var_typedef_##aname aname;
   #include "MandalaVars.h"
   uint do_archive(uint8_t *buf,uint var_idx);
@@ -130,10 +129,16 @@ public:
     uint32_t max;       //max archived integer value (unsigned)
     uint    size;       //total size of archived data
     uint    prec1000;   //cfg vars only round*1000
+
+    int     sbytes_t;   //for do_archive_telemetry
+    uint32_t max_t;     //for do_archive_telemetry
+    uint    size_t;     //for do_archive_telemetry
   }vdsc;
   uint vdsc_fill(uint8_t *buf,uint var_idx);
   uint do_archive_vdsc(void);
   uint do_extract_vdsc(uint cnt);
+
+  bool do_archive_telemetry;
 
 private:
 

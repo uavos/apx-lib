@@ -57,7 +57,7 @@ Mandala::Mandala()
 
   //------------------------
 
-#define VARDEFX(atype,aname,asize,aspan,abytes,adescr) \
+#define VARDEFX(atype,aname,asize,aspan,abytes,atbytes,adescr) \
   var_ptr[idx_##aname]=(void*)(& aname); \
   var_type[idx_##aname]=vt_##atype; \
   var_array[idx_##aname]=asize; \
@@ -66,18 +66,18 @@ Mandala::Mandala()
   var_name[idx_##aname]=#aname; \
   var_descr[idx_##aname]=adescr;
 
-#define VARDEF(atype,aname,aspan,abytes,adescr) \
-  VARDEFX(atype,aname,1,aspan,abytes,adescr) \
+#define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
+  VARDEFX(atype,aname,1,aspan,abytes,atbytes,adescr) \
   aname=0;
 
-#define VARDEFA(atype,aname,asize,aspan,abytes,adescr) \
-  VARDEFX(atype,aname,asize,aspan,abytes,adescr) \
+#define VARDEFA(atype,aname,asize,aspan,abytes,atbytes,adescr) \
+  VARDEFX(atype,aname,asize,aspan,abytes,atbytes,adescr) \
   for(uint i=0;i<asize;i++) aname[i]=0;
 
 #include "MandalaVars.h"
 
 #define SIGDEF(aname,adescr,...) \
-  VARDEFX(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,0,adescr) \
+  VARDEFX(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,0,0,adescr) \
   var_size[idx_##aname]=sig_size(aname);
 
 #include "MandalaVars.h"
@@ -147,8 +147,9 @@ uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
     return 0;
   }
   //archive var
-  if(!do_archive(buf,var_idx))return 0;
-  return var_size[var_idx];
+  uint cnt=do_archive(buf,var_idx);
+  if(!cnt)return 0;
+  return cnt;//var_size[var_idx];
 }
 //=============================================================================
 uint Mandala::extract(uint8_t *buf,uint size)
@@ -171,17 +172,22 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   }
   //printf("extracting: %s\n",var_name[var_idx]);
   uint vsz=var_size[var_idx];
-  if((!vsz)||(vsz>size)){
+  if((!do_archive_telemetry)&&((!vsz)||(vsz>size))){
     fprintf(stderr,"Error: extract %s #%u (sz: %u, buf: %u)\n",var_name[var_idx],var_idx,vsz,size);
     return 0;
   }
-  //uint cnt=do_extract(buf,size,var_idx);
-  if(!do_extract(buf,size,var_idx))return 0; //error
+  uint cnt=do_extract(buf,size,var_idx);
+  if(!cnt)return 0; //error
   //if(var_idx==20){
     //printf("cnt:%u var:%u %.2f ",cnt,var_idx,Ve);
     //dump(idx_theta);
     //dump(buf,size);
   //}
+  vsz=cnt;
+  if(size<vsz){
+    fprintf(stderr,"Error: telemetry tail extra.\n");
+    return cnt;
+  }
   size-=vsz;
   var_idx++;
   if(size&&(var_idx>idxPAD)&&(var_idx<idx_vars_top))return vsz+extract(buf+vsz,size,var_idx);
@@ -373,6 +379,7 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
   uint8_t *mask_ptr=buf+2;      //start of data
   uint8_t *ptr=mask_ptr+1;
   *mask_ptr=0;
+  do_archive_telemetry=true;    //for var pack size
   for(uint i=idxPAD;i<(idxPAD+128);i++){
     uint sz=var_size[i];
     if(!sz)break; //valid vars end
@@ -408,9 +415,11 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
       ptr++;
     }
   }
+  do_archive_telemetry=false;
 
   if(!(dl_timestamp%dl_reset_interval)) // periodically send everything
     dl_reset=true;
+
 
   /*if(!cnt){
     dl_timestamp+=dl_dt;
@@ -435,19 +444,20 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
   if(!dl_dt)dl_dt=100; //default
   //extract data
   uint tcnt=0;
+  do_archive_telemetry=true;    //for var pack size
   if(cnt>2){
     tcnt=extract_stream(buf+2,cnt-2);
     if(!tcnt){
       fprintf(stderr,"Error extract_downstream");
-      return 0;
     }
   }
+  do_archive_telemetry=false;
   // calculate vars filtered by sig dl_filter
   //check if to calc derivatives (gps fix)
   if((gps_lat_s!=gps_lat)||(gps_lon_s!=gps_lon)){
     gps_lat_s=gps_lat;
     gps_lon_s=gps_lon;
-    //calcDGPS();
+    calcDGPS();
   }
   // gps_deltaNED,gps_deltaXYZ,gps_distWPT,gps_distHome,
   calc();

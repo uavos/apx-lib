@@ -37,25 +37,30 @@ typedef _var_uint _var_uint_array [];
 typedef _var_vect _var_vect_array [];
 //===========================================================================
 MandalaCore::MandalaCore()
+  : do_archive_telemetry(false)
 {
 }
 //===========================================================================
 uint MandalaCore::vdsc_fill(uint8_t *buf,uint var_idx)
 {
   //_variable_descriptor
-  #define VARDEF(atype,aname,aspan,abytes,adescr)         VARDEFA(atype,aname,1,aspan,abytes,adescr)
-  #define SIGDEF(aname,adescr,...)                        VARDEFA(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,1,adescr)
+  #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr)         VARDEFA(atype,aname,1,aspan,abytes,atbytes,adescr)
+  #define SIGDEF(aname,adescr,...)                        VARDEFA(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,1,1,adescr)
 
-  #define VARDEFA(atype,aname,asize,aspan,abytes,adescr) \
+  #define VARDEFA(atype,aname,asize,aspan,abytes,atbytes,adescr) \
   case idx_##aname: { \
       vdsc.ptr=(void*)&(aname);\
       vdsc.sbytes=(aspan<0)?(-abytes):(abytes);\
+      vdsc.sbytes_t=(aspan<0)?(-atbytes):(atbytes);\
       vdsc.span=(aspan<0)?(-aspan):(aspan);\
       vdsc.array=asize;\
       vdsc.type=vt_##atype;\
       vdsc.max=(aspan>=0)?(((abytes==1)?0xFF:((abytes==2)?0xFFFF:((abytes==4)?0xFFFFFFFF:0)))): \
                         ( (aspan<0)?((abytes==1)?0x7F:((abytes==2)?0x7FFF:((abytes==4)?0x7FFFFFFF:0))):0 );\
+      vdsc.max_t=(aspan>=0)?(((atbytes==1)?0xFF:((atbytes==2)?0xFFFF:((atbytes==4)?0xFFFFFFFF:0)))): \
+                        ( (aspan<0)?((atbytes==1)?0x7F:((atbytes==2)?0x7FFF:((atbytes==4)?0x7FFFFFFF:0))):0 );\
       vdsc.size=((asize)*(abytes)*((vt_##atype==vt_vect)?3:1));\
+      vdsc.size_t=((asize)*(atbytes)*((vt_##atype==vt_vect)?3:1));\
     } break;
     vdsc.buf=buf;
     vdsc.prec1000=0;
@@ -63,6 +68,11 @@ uint MandalaCore::vdsc_fill(uint8_t *buf,uint var_idx)
       #include "MandalaVars.h"
       default:
         return 0;
+    }
+    if(do_archive_telemetry&&(vdsc.sbytes_t!=0)){
+      vdsc.sbytes=vdsc.sbytes_t;
+      vdsc.max=vdsc.max_t;
+      vdsc.size=vdsc.size_t;
     }
     return vdsc.size;
 }
