@@ -81,7 +81,7 @@ SIGDEF(flightplan,"Flight plan data")
 //------------------------------
 // var packs
 SIGDEF(imu, "IMU sensors data pack",\
-       idx_acc, idx_gyro, idx_mag)
+       idx_acc, idx_gyro)
 SIGDEF(gps, "GPS fix data pack",\
       idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED)
 SIGDEF(ctr, "Fast controls",\
