@@ -127,10 +127,10 @@ BITDEF(status,    rc,      1,   "RC on/off")
 BITDEF(status,    gps,     2,   "GPS available/lost")
 
 //--------- IMU --------------
-VARDEF(vect, theta, -180,2,0,  "roll,pitch,yaw [deg]")
-VARDEF(vect, acc,   -100,2,1, "Ax,Ay,Az accelerations [m/s2]")
-VARDEF(vect, gyro,  -127,2,1, "p,q,r angular rates [deg/s]")
-VARDEF(vect, mag,   -1.25,2,1,   "Hx,Hy,Hz magnetic field vector [gauss]")
+VARDEF(vect, theta, -180,2,0,   "roll,pitch,yaw [deg]")
+VARDEF(vect, acc,   -60,2,1,    "Ax,Ay,Az accelerations [m/s2]")
+VARDEF(vect, gyro,  -700,2,1,   "p,q,r angular rates [deg/s]")
+VARDEF(vect, mag,   -1.27,2,1,  "Hx,Hy,Hz magnetic field vector [gauss]")
 
 //--------- FLIGHT CONTROL --------------
 VARDEF(float, airspeed,        655.35,2,0, "Airspeed [m/s]")
