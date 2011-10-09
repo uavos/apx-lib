@@ -23,6 +23,11 @@ enum{
   apc_WriteConfig,
   apc_ResetConfig,
 
+  //standard commands
+  apc_Status,   //return status structure
+  apc_Debug,    //stdout stream (not used yet)
+  apc_Data,     //send/receive some data [portNo]
+
   //user commands
   apc_user=100,
   apc_loader=0xFF
