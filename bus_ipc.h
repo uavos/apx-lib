@@ -4,11 +4,11 @@
 #include <sys/msg.h>
 //==============================================================================
 // messages from bus
+#define _bus_msg_size     1024
 typedef struct{
   long    type;   //must be long (used by filter)
-  uint8_t data[1024];
+  uint8_t data[_bus_msg_size];
 }_bus_msg;
-#define _bus_msg_size     (sizeof(_bus_msg)-offsetof(_bus_msg,data))
 enum{
   mtypeBusAll=0,  //reserved for receive all filter
   mtypeBusTx,     //transmit to uart bus
