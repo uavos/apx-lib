@@ -25,7 +25,6 @@ public:
   uint readEscaped(uint8_t *buf,uint max_len);
 
   uint8_t getCRC(const uint8_t *buf,uint cnt);
-
   unsigned int getRxCnt(void);
   unsigned int getTxCnt(void);
   uint isBusy(void);
