@@ -97,7 +97,8 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",\
       idx_dXYZ,\
       idx_wpHDG,idx_rwDelta,\
       idx_wpcnt,idx_rwcnt,\
-      idx_NED,idx_vXYZ,idx_aXYZ,idx_crsRate)
+      idx_NED,idx_vXYZ,idx_aXYZ,idx_crsRate,\
+      idx_RSS_gcu)
 //------------------------------
 //=============================================================================
 //    Mandala variables definitions

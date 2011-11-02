@@ -164,6 +164,8 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   if(var_idx==idx_config)return extract_config(buf,size);
   if(var_idx==idx_downstream)return extract_downstream(buf,size);
   if(var_idx==idx_flightplan)return extract_flightplan(buf,size);
+  if(var_idx==idx_debug)return 1; //nothing to do
+  if(var_idx==idx_service)return 1; //nothing to do
 
   void *ptr=var_ptr[var_idx];
   if(!ptr){
@@ -443,7 +445,7 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
   dl_timestamp+=dl_dt;
   if(!dl_dt)dl_dt=100; //default
   //extract data
-  uint tcnt=0;
+  uint tcnt=2;
   do_archive_telemetry=true;    //for var pack size
   if(cnt>2){
     tcnt=extract_stream(buf+2,cnt-2);
