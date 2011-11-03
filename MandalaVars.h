@@ -172,7 +172,7 @@ VARDEF(float,   rpm,    0,2,0,     "engine RPM [1/min]")
 VARDEF(float,   agl,    25.5,1,0,  "Above Ground Level altitude [m]")
 
 //--------- TEMPERATURES --------------
-VARDEF(float, AT,    -100,1,0,    "ambient temperature [deg C]")
+VARDEF(float, AT,    -127,1,0,    "ambient temperature [deg C]")
 VARDEF(float, ET,     0,1,0,      "engine temperature [deg C]")
 VARDEFA(float,  tsens,8,0,1,0,    "temperature sensors [C]")
 
