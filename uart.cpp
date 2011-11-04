@@ -112,9 +112,9 @@ unsigned int Uart::getRxCnt(void)
   fd_set   fds;
   FD_ZERO(&fds);
   FD_SET(fd, &fds);
-  struct timeval  tv;
+  /*struct timeval  tv;
   tv.tv_usec = 5;
-  tv.tv_sec = 0;
+  tv.tv_sec = 0;*/
   int rc = select(fd+1,&fds,0,0,NULL);
   if (rc<=0)return 0;
   return rc;

@@ -73,11 +73,12 @@ typedef enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig}_var_type;
 #endif
 //------------------------------
 // special protocols
-SIGDEF(service,   "Service packet down/up link <src-dadr>,<dadr-cmd>,<data..>")
 SIGDEF(config,    "System configuration")
 SIGDEF(downstream,"Downlink stream, all variables")
 SIGDEF(debug,     "Debug <stdout> string")
 SIGDEF(flightplan,"Flight plan data")
+SIGDEF(health,    "Health status <nodes cnt>,<node_adr><node_health>...")
+SIGDEF(service,   "Service packet down/up link <src-dadr>,<dadr-cmd>,<data..>")
 //------------------------------
 // var packs
 SIGDEF(imu, "IMU sensors data pack",\
@@ -90,7 +91,7 @@ SIGDEF(ctr, "Fast controls",\
 // Internal use only
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
 SIGDEF(autosend,  "Automatically forwarded variables to GCU",\
-      idx_downstream, idx_debug, idx_service, idx_flightplan, idx_config )
+      idx_downstream, idx_debug, idx_flightplan, idx_config, idx_service, idx_health )
 //telemetry filter (don't send at all), calculated by mandala.extractTelemetry()
 SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",\
       idx_homeHDG,idx_dHome,idx_dWPT,idx_dN,idx_dE,idx_dAlt,\
@@ -98,7 +99,7 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",\
       idx_wpHDG,idx_rwDelta,\
       idx_wpcnt,idx_rwcnt,\
       idx_NED,idx_vXYZ,idx_aXYZ,idx_crsRate,\
-      idx_RSS_gcu)
+      idx_gcu_RSS, idx_gcu_Ve, idx_gcu_MT)
 //------------------------------
 //=============================================================================
 //    Mandala variables definitions
@@ -154,32 +155,28 @@ VARDEF(vect,  gps_accuracy, 2.55,1,0,    "GPS accuracy estimation Hrz[m],Ver[m],
 
 //--------- BATTERY --------------
 VARDEF(float, Ve,     25.5,1,0,   "autopilot battery voltage [v]")
-VARDEF(float, Vs,     45,1,0,     "servo battery voltage [v]")
-VARDEF(float, Vp,     0,1,0,      "payload battery voltage [v]")
-VARDEF(float, Vg,     25.5,1,0,   "GCU battery voltage [v]")
-VARDEF(uint,   power,  0,1,0,     "power status bitfield [on/off]")
-BITDEF(power,   ap,      1,     "Avionics")
-BITDEF(power,   servo,   2,     "Servo on/off")
-BITDEF(power,   payload, 4,     "Payload activated/off")
-BITDEF(power,   agl,     8,     "AGL sensor")
-BITDEF(power,   ignition,16,    "Engine on/off")
-BITDEF(power,   lights,  32,    "Lights on/off")
-BITDEF(power,   taxi,    64,    "Taxi lights on/off")
-BITDEF(power,   ice,    128,    "Anti-ice on/off")
+VARDEF(float, Vs,     25.5,1,0,   "servo battery voltage [v]")
+VARDEF(float, Vp,     25.5,1,0,   "payload battery voltage [v]")
+VARDEF(float, Vm,     45,1,0,     "engine battery voltage [v]")
+VARDEF(float, Ie,     2.55,1,0,   "autopilot current [A]")
+VARDEF(float, Is,     25.5,1,0,   "servo current [A]")
+VARDEF(float, Ip,     25.5,1,0,   "payload current [A]")
+VARDEF(float, Im,     255,1,0,    "engine current [A]")
 
 //--------- OTHER AP SENSORS --------------
 VARDEF(float,   rpm,    0,2,0,     "engine RPM [1/min]")
 VARDEF(float,   agl,    25.5,1,0,  "Above Ground Level altitude [m]")
 
 //--------- TEMPERATURES --------------
-VARDEF(float, AT,    -127,1,0,    "ambient temperature [deg C]")
-VARDEF(float, ET,     0,1,0,      "engine temperature [deg C]")
-VARDEFA(float,  tsens,8,0,1,0,    "temperature sensors [C]")
+VARDEF(float, AT,    -127,1,0,    "ambient temperature [C]")
+VARDEF(float, RT,    -127,1,0,    "room temperature [C]")
+VARDEF(float, MT,    -127,1,0,    "modem temperature [C]")
+VARDEF(float, ET,     0,1,0,      "engine temperature [C]")
+VARDEF(float, EGT,    900,1,0,    "exhaust gas temperature [C]")
 
 //--------- OTHER SENSORS (information) --------------
-VARDEF(float,   RSS,   1.0,1,0,   "Modem Receiver signal strength [0..1]")
-VARDEF(float,   RSS_gcu,1.0,1,0,  "Modem GCU Receiver signal strength [0..1]")
-VARDEF(float,   fuel,   1.0,1,0,  "Fuel [0..1]")
+VARDEF(float,   RSS,   1.0,1,0,   "modem signal strength [0..1]")
+VARDEF(float,   fuel,   1.0,1,0,  "fuel capacity [0..1]")
 
 //--------- AUTOPILOT COMMAND --------------
 VARDEF(vect,  cmd_theta,    -180,2,0,   "desired roll,pitch,yaw [deg]")
@@ -214,6 +211,17 @@ BITDEF(ctrb,  gear,      1, "Landing gear retracted/extracted")
 BITDEF(ctrb,  brake,     2, "Parking brake on/off")
 BITDEF(ctrb,  ers,       4, "ERS on/off")
 
+//--------- POWER CONTROL --------------
+VARDEF(uint,   power,  0,1,0,     "power status bitfield [on/off]")
+BITDEF(power,   ap,      1,     "Avionics")
+BITDEF(power,   servo,   2,     "Servo on/off")
+BITDEF(power,   payload, 4,     "Payload activated/off")
+BITDEF(power,   agl,     8,     "AGL sensor")
+BITDEF(power,   ignition,16,    "Engine on/off")
+BITDEF(power,   lights,  32,    "Lights on/off")
+BITDEF(power,   taxi,    64,    "Taxi lights on/off")
+BITDEF(power,   ice,    128,    "Anti-ice on/off")
+
 //--------- calculated by Mandala::calc() --------------
 VARDEF(vect,  NED,     -10000,2,0, "north,east,down position [m]")
 VARDEF(float,homeHDG, -180,2,0,   "heading to home position [deg]")
@@ -230,6 +238,11 @@ VARDEF(float,wpHDG,   -180,2,0,   "current waypoint heading [deg]")
 VARDEF(float,rwHDG,   -180,2,0,   "current runway heading [deg]")
 VARDEF(float,rwDelta, -127,1,0,   "runway horizontal displacement [m]")
 
+
+//--------- GCU use only --------------
+VARDEF(float, gcu_RSS,  1.0,1,0,  "GCU modem signal strength [0..1]")
+VARDEF(float, gcu_Ve,   25.5,1,0, "GCU battery voltage [v]")
+VARDEF(float, gcu_MT,   -127,1,0, "GCU modem temperature [C]")
 //=============================================================================
 #undef SIGDEF
 #undef VARDEF

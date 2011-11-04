@@ -17,6 +17,7 @@ enum{
   apc_ID,       //return _node_id
   apc_Info,     //return _node_info
   apc_SetAdr,   //set new address[dadr] _node_sn used to filter
+  apc_Debug,    //stdout message
 
   //node configuration
   apc_ReadConfig,
@@ -24,8 +25,6 @@ enum{
   apc_ResetConfig,
 
   //standard commands
-  apc_Status,   //return status structure
-  apc_Debug,    //stdout stream (not used yet)
   apc_Data,     //send/receive some data [portNo]
 
   //user commands
