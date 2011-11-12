@@ -27,12 +27,8 @@
 //=============================================================================
 #define idxPAD  64      //start index for regular vars
 //-----------------------------------------------------------------------------
-// Controls indexes
-enum {jswRoll,jswPitch,jswThr,jswYaw,   jswCnt};
-enum {ppmRoll,ppmPitch,ppmThr,ppmYaw,ppmSW,ppmFlaps,ppmBrake,   ppmCnt};
-//-----------------------------------------------------------------------------
 // Var Type enum
-typedef enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig}_var_type;
+enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig,vt_core_top};
 //=============================================================================
 // Physical constants
 #define EARTH_RATE   0.00007292115   // rotation rate of earth (rad/sec)
@@ -60,8 +56,8 @@ typedef enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig}_var_type;
 #define C_WIE_F     7.2321151467e-05f
 //=============================================================================
 #define VA_NUM_ARGS(...) ( sizeof(#__VA_ARGS__)==sizeof("")?0:\
-  VA_NUM_ARGS_IMPL(__VA_ARGS__, 16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1) )
-#define VA_NUM_ARGS_IMPL(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,N,...) N
+  VA_NUM_ARGS_IMPL(__VA_ARGS__, 32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1) )
+#define VA_NUM_ARGS_IMPL(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20,_21,_22,_23,_24,_25,_26,_27,_28,_29,_30,_31,_32,N,...) N
 //=============================================================================
 #endif
 //=============================================================================
@@ -81,26 +77,36 @@ SIGDEF(health,    "Health status <nodes cnt>,<node_adr><node_health>...")
 SIGDEF(service,   "Service packet down/up link <src-dadr>,<dadr-cmd>,<data..>")
 //------------------------------
 // var packs
-SIGDEF(imu, "IMU sensors data pack",\
-       idx_acc, idx_gyro)
-SIGDEF(gps, "GPS fix data pack",\
+SIGDEF(imu, "IMU sensors data pack",
+       idx_acc, idx_gyro )
+SIGDEF(gps, "GPS fix data pack",
       idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED)
-SIGDEF(ctr, "Fast controls",\
-      idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_wheel)
+SIGDEF(ctr, "Fast controls",
+      idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_wheel )
+SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_wheel)
+SIGDEF(ctr_gcu, "GCU Pilot fast controls", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_wheel)
 //------------------------------
 // Internal use only
+SIGDEF(update,  "Auto send to bus when changed",
+      idx_mode,idx_status,idx_power,
+      idx_ctrb,idx_ctr_airbrk,idx_ctr_flaps,
+      idx_cam,idx_cam_heading,idx_cam_pitch )
+
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
-SIGDEF(autosend,  "Automatically forwarded variables to GCU",\
+SIGDEF(autosend,  "Automatically forwarded variables to GCU",
       idx_downstream, idx_debug, idx_flightplan, idx_config, idx_service, idx_health )
+
 //telemetry filter (don't send at all), calculated by mandala.extractTelemetry()
-SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",\
-      idx_homeHDG,idx_dHome,idx_dWPT,idx_dN,idx_dE,idx_dAlt,\
-      idx_dXYZ,\
-      idx_wpHDG,idx_rwDelta,\
-      idx_wpcnt,idx_rwcnt,\
-      idx_NED,idx_vXYZ,idx_aXYZ,idx_crsRate,\
-      idx_gcu_RSS, idx_gcu_Ve, idx_gcu_MT)
+SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
+      idx_homeHDG,idx_dHome,idx_dWPT,idx_dN,idx_dE,idx_dAlt,
+      idx_dXYZ,
+      idx_wpHDG,idx_rwDelta,
+      idx_wpcnt,idx_rwcnt,
+      idx_NED,idx_vXYZ,idx_aXYZ,idx_crsRate,
+      idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_wheel,
+      idx_gcu_RSS, idx_gcu_Ve, idx_gcu_MT )
 //------------------------------
+#undef SIGDEF
 //=============================================================================
 //    Mandala variables definitions
 // type:           variable type: [uint, float, vect]
@@ -115,24 +121,30 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",\
 #ifndef VARDEF
 #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr)
 #endif
-#ifndef VARDEFA
-#define VARDEFA(atype,aname,asize,aspan,abytes,atbytes,adescr) VARDEF(atype,aname,aspan,abytes,atbytes,adescr)
-#endif
 #ifndef BITDEF
 #define BITDEF(avarname,abitname,amask,adescr)
 #endif
 //--------- SPECIAL --------------
-VARDEF(uint,    mode,      0,1,0,       "mode of operation: EMG,RPV,UAV...")
-VARDEF(uint,    stage,     0,1,0,       "auto set to zero by mode change (maneuver stage)")
-VARDEF(uint,    status,    0,1,0,       "status flags bitfield [status_xxx]")
-BITDEF(status,    rc,      1,   "RC on/off")
-BITDEF(status,    gps,     2,   "GPS available/lost")
+VARDEF(uint,  mode,     0,1,0,  "flight mode")
+BITDEF(mode,   EMG,     0,       "Realtime control")
+BITDEF(mode,   RPV,     1,       "Angles control")
+BITDEF(mode,   UAV,     2,       "Heading control")
+BITDEF(mode,   WPT,     3,       "Waypoints navigation")
+BITDEF(mode,   HOME,    4,       "Go back home")
+BITDEF(mode,   TAKEOFF, 5,       "Takeoff")
+BITDEF(mode,   LANDING, 6,       "Landing")
+BITDEF(mode,   STBY,    7,       "Loiter around DNED")
+BITDEF(mode,   DEMO,    8,       "Aerobatic demonstration")
+VARDEF(uint,  stage,    0,1,0,  "auto set to zero by mode change (maneuver stage)")
+VARDEF(uint,  status,   0,1,0,  "status flags bitfield [status_xxx]")
+BITDEF(status, rc,      1,       "RC on/off")
+BITDEF(status, gps,     2,       "GPS available/lost")
 
 //--------- IMU --------------
-VARDEF(vect, theta, -180,2,0,   "roll,pitch,yaw [deg]")
-VARDEF(vect, acc,   -60,2,1,    "Ax,Ay,Az accelerations [m/s2]")
-VARDEF(vect, gyro,  -700,2,1,   "p,q,r angular rates [deg/s]")
-VARDEF(vect, mag,   -1.27,2,1,  "Hx,Hy,Hz magnetic field vector [gauss]")
+VARDEF(vect,  theta, -180,2,0,   "roll,pitch,yaw [deg]")
+VARDEF(vect,  acc,   -60,2,1,    "Ax,Ay,Az accelerations [m/s2]")
+VARDEF(vect,  gyro,  -700,2,1,   "p,q,r angular rates [deg/s]")
+VARDEF(vect,  mag,   -1.27,2,1,  "Hx,Hy,Hz magnetic field vector [gauss]")
 
 //--------- FLIGHT CONTROL --------------
 VARDEF(float, airspeed,        655.35,2,0, "Airspeed [m/s]")
@@ -142,7 +154,7 @@ VARDEF(float, vspeed,          -100,2,0,   "Variometer [m/s]")
 //--------- Measured by GPS --------------
 VARDEF(float, gps_lat,     -180,4,0,     "latitude [deg]")
 VARDEF(float, gps_lon,     -180,4,0,     "longitude [deg]")
-VARDEF(float, gps_hmsl,    -10000,2,0,   "altitde above sea [m]")
+VARDEF(float, gps_hmsl,    -10000,2,0,   "altitude above sea [m]")
 VARDEF(vect,  gps_vNED,    -150,2,1,     "velocity north,east,down [m/s]")
 VARDEF(float, gps_course,  -180,2,1,     "GPS course [deg]")
 VARDEF(float, gps_home_lat, -180,4,0,    "home latitude [deg]")
@@ -164,8 +176,8 @@ VARDEF(float, Ip,     25.5,1,0,   "payload current [A]")
 VARDEF(float, Im,     255,1,0,    "engine current [A]")
 
 //--------- OTHER AP SENSORS --------------
-VARDEF(float,   rpm,    0,2,0,     "engine RPM [1/min]")
-VARDEF(float,   agl,    25.5,1,0,  "Above Ground Level altitude [m]")
+VARDEF(float, rpm,    0,2,0,     "engine RPM [1/min]")
+VARDEF(float, agl,    25.5,1,0,  "Above Ground Level altitude [m]")
 
 //--------- TEMPERATURES --------------
 VARDEF(float, AT,    -127,1,0,    "ambient temperature [C]")
@@ -175,8 +187,8 @@ VARDEF(float, ET,     0,1,0,      "engine temperature [C]")
 VARDEF(float, EGT,    900,1,0,    "exhaust gas temperature [C]")
 
 //--------- OTHER SENSORS (information) --------------
-VARDEF(float,   RSS,   1.0,1,0,   "modem signal strength [0..1]")
-VARDEF(float,   fuel,   1.0,1,0,  "fuel capacity [0..1]")
+VARDEF(float, RSS,   1.0,1,0,   "modem signal strength [0..1]")
+VARDEF(float, fuel,   1.0,1,0,  "fuel capacity [0..1]")
 
 //--------- AUTOPILOT COMMAND --------------
 VARDEF(vect,  cmd_theta,    -180,2,0,   "desired roll,pitch,yaw [deg]")
@@ -196,55 +208,68 @@ VARDEF(uint,  rwcnt,     0,1,0,       "number of runways[0...]")
 
 //--------- CONTROLS --------------
 // fast controls
-VARDEFA(float, jsw,jswCnt,    -1.0,1,0, "joystick command [-1..0..+1]")
-VARDEFA(float, ppm,ppmCnt,    -1.0,1,0, "RC PPM command [-1..0..+1]")
-VARDEF(float,  ctr_ailerons,  -1.0,1,0, "ailerons [-1..0..+1]")
-VARDEF(float,  ctr_elevator,  -1.0,1,0, "elevator [-1..0..+1]")
-VARDEF(float,  ctr_throttle,   1.0,1,0, "throttle [0..1]")
-VARDEF(float,  ctr_rudder,    -1.0,1,0, "rudder [-1..0..+1]")
-VARDEF(float,  ctr_wheel,     -1.0,1,0, "front wheel [-1..0..+1]")
+VARDEF(float, ctr_ailerons,  -1.0,1,0, "ailerons [-1..0..+1]")
+VARDEF(float, ctr_elevator,  -1.0,1,0, "elevator [-1..0..+1]")
+VARDEF(float, ctr_throttle,   1.0,1,0, "throttle [0..1]")
+VARDEF(float, ctr_rudder,    -1.0,1,0, "rudder [-1..0..+1]")
+VARDEF(float, ctr_wheel,     -1.0,1,0, "front wheel [-1..0..+1]")
 // slow controls
-VARDEF(float,  ctr_flaps,      1.0,1,0, "flaps [0..1]")
-VARDEF(float,  ctr_airbrk,     1.0,1,0, "airbrakes [0..1]")
-VARDEF(uint,   ctrb,           0,1,0,   "controls bitfield [on/off]")
-BITDEF(ctrb,  gear,      1, "Landing gear retracted/extracted")
-BITDEF(ctrb,  brake,     2, "Parking brake on/off")
-BITDEF(ctrb,  ers,       4, "ERS on/off")
+VARDEF(float, ctr_flaps,      1.0,1,0, "flaps [0..1]")
+VARDEF(float, ctr_airbrk,     1.0,1,0, "airbrakes [0..1]")
+VARDEF(uint,  ctrb,           0,1,0,   "controls bitfield [on/off]")
+BITDEF(ctrb,   gear,      1, "Landing gear retracted/extracted")
+BITDEF(ctrb,   brake,     2, "Parking brake on/off")
+BITDEF(ctrb,   ers,       4, "ERS on/off")
+
+//--------- CAM CONTROL --------------
+VARDEF(float, cam_heading, -180.0,2,0, "camera heading [deg]")
+VARDEF(float, cam_pitch,   -180.0,2,0, "camera pitch [deg]")
+VARDEF(float, cam_lat,     -180,4,0,   "cam track latitude [deg]")
+VARDEF(float, cam_lon,     -180,4,0,   "cam track longitude [deg]")
+VARDEF(float, cam_alt,    -10000,2,0,  "cam track altitude [m]")
+VARDEF(uint,  cam,            0,1,0,   "camera control type")
+BITDEF(cam,    atrack,  1,  "Camera attitude hold")
+BITDEF(cam,    ptrack,  2,  "Camera position tracking")
+BITDEF(cam,    front,   3,  "Front facing camera")
 
 //--------- POWER CONTROL --------------
-VARDEF(uint,   power,  0,1,0,     "power status bitfield [on/off]")
-BITDEF(power,   ap,      1,     "Avionics")
-BITDEF(power,   servo,   2,     "Servo on/off")
-BITDEF(power,   payload, 4,     "Payload activated/off")
-BITDEF(power,   agl,     8,     "AGL sensor")
-BITDEF(power,   ignition,16,    "Engine on/off")
-BITDEF(power,   lights,  32,    "Lights on/off")
-BITDEF(power,   taxi,    64,    "Taxi lights on/off")
-BITDEF(power,   ice,    128,    "Anti-ice on/off")
+VARDEF(uint,  power,  0,1,0,     "power status bitfield [on/off]")
+BITDEF(power,  ap,      1,     "Avionics")
+BITDEF(power,  servo,   2,     "Servo on/off")
+BITDEF(power,  payload, 4,     "Payload activated/off")
+BITDEF(power,  agl,     8,     "AGL sensor")
+BITDEF(power,  ignition,16,    "Engine on/off")
+BITDEF(power,  lights,  32,    "Lights on/off")
+BITDEF(power,  taxi,    64,    "Taxi lights on/off")
+BITDEF(power,  ice,    128,    "Anti-ice on/off")
+
+//--------- PILOT CONTROLS --------------
+VARDEF(float, rc_roll,    -1.0,1,0, "RC Roll [-1..0..+1]")
+VARDEF(float, rc_pitch,   -1.0,1,0, "RC Pitch [-1..0..+1]")
+VARDEF(float, rc_throttle, 1.0,1,0, "RC Throttle [0..1]")
+VARDEF(float, rc_yaw,     -1.0,1,0, "RC Yaw [-1..0..+1]")
+VARDEF(float, rc_wheel,   -1.0,1,0, "RC Front Wheel [-1..0..+1]")
 
 //--------- calculated by Mandala::calc() --------------
 VARDEF(vect,  NED,     -10000,2,0, "north,east,down position [m]")
-VARDEF(float,homeHDG, -180,2,0,   "heading to home position [deg]")
-VARDEF(float,dHome,   0,2,0,      "distance to GCU [m]")
-VARDEF(float,dWPT,    0,2,0,      "distance to waypoint [m]")
-VARDEF(float,dN,      -10000,2,0, "delta north [m]")
-VARDEF(float,dE,      -10000,2,0, "delta east [m]")
-VARDEF(float,dAlt,    -10000,2,0, "delta altitude [m]")
+VARDEF(float, homeHDG, -180,2,0,   "heading to home position [deg]")
+VARDEF(float, dHome,   0,2,0,      "distance to GCU [m]")
+VARDEF(float, dWPT,    0,2,0,      "distance to waypoint [m]")
+VARDEF(float, dN,      -10000,2,0, "delta north [m]")
+VARDEF(float, dE,      -10000,2,0, "delta east [m]")
+VARDEF(float, dAlt,    -10000,2,0, "delta altitude [m]")
 VARDEF(vect,  vXYZ,    -50,1,0,    "velocity bodyframe x,y,z [m/s]")
 VARDEF(vect,  dXYZ,    -10000,2,0, "delta bodyframe x,y,z [m]")
 VARDEF(vect,  aXYZ,    -100,2,0,   "accelerations by trajectory ax,ay,az [m/c2]")
-VARDEF(float,crsRate, -50,1,0,    "trajectory course change rate [deg/s]")
-VARDEF(float,wpHDG,   -180,2,0,   "current waypoint heading [deg]")
-VARDEF(float,rwHDG,   -180,2,0,   "current runway heading [deg]")
-VARDEF(float,rwDelta, -127,1,0,   "runway horizontal displacement [m]")
-
+VARDEF(float, crsRate, -50,1,0,    "trajectory course change rate [deg/s]")
+VARDEF(float, wpHDG,   -180,2,0,   "current waypoint heading [deg]")
+VARDEF(float, rwHDG,   -180,2,0,   "current runway heading [deg]")
+VARDEF(float, rwDelta, -127,1,0,   "runway horizontal displacement [m]")
 
 //--------- GCU use only --------------
 VARDEF(float, gcu_RSS,  1.0,1,0,  "GCU modem signal strength [0..1]")
 VARDEF(float, gcu_Ve,   25.5,1,0, "GCU battery voltage [v]")
 VARDEF(float, gcu_MT,   -127,1,0, "GCU modem temperature [C]")
 //=============================================================================
-#undef SIGDEF
 #undef VARDEF
-#undef VARDEFA
 #undef BITDEF

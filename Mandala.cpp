@@ -35,7 +35,6 @@ Mandala::Mandala()
     var_round[i]=0;
     var_bits[i]=0;
     var_span[i]=0;
-    var_array[i]=0;
     var_ptr[i]=NULL;
     var_type[i]=vt_void;
   }
@@ -57,35 +56,25 @@ Mandala::Mandala()
 
   //------------------------
 
-#define VARDEFX(atype,aname,asize,aspan,abytes,atbytes,adescr) \
+#define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
   var_ptr[idx_##aname]=(void*)(& aname); \
   var_type[idx_##aname]=vt_##atype; \
-  var_array[idx_##aname]=asize; \
-  var_size[idx_##aname]=((asize)*(abytes)*((vt_##atype==vt_vect)?3:1)); \
+  var_size[idx_##aname]=((abytes)*((vt_##atype==vt_vect)?3:1)); \
   var_span[idx_##aname]=aspan; \
   var_name[idx_##aname]=#aname; \
-  var_descr[idx_##aname]=adescr;
-
-#define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
-  VARDEFX(atype,aname,1,aspan,abytes,atbytes,adescr) \
+  var_descr[idx_##aname]=adescr; \
   aname=0;
-
-#define VARDEFA(atype,aname,asize,aspan,abytes,atbytes,adescr) \
-  VARDEFX(atype,aname,asize,aspan,abytes,atbytes,adescr) \
-  for(uint i=0;i<asize;i++) aname[i]=0;
-
 #include "MandalaVars.h"
 
 #define SIGDEF(aname,adescr,...) \
-  VARDEFX(sig,aname,VA_NUM_ARGS(__VA_ARGS__),0,0,0,adescr) \
-  var_size[idx_##aname]=sig_size(aname);
-
+  var_ptr[idx_##aname]=(void*)(& aname); \
+  var_type[idx_##aname]=vt_sig; \
+  var_size[idx_##aname]=sig_size(aname); \
+  var_name[idx_##aname]=#aname; \
+  var_descr[idx_##aname]=adescr;
 #include "MandalaVars.h"
 
 
-#define MODEDEF(aname,adescr) \
-  mode_names[fm##aname]=#aname; \
-  mode_descr[fm##aname]=adescr;
 
 #define REGDEF(aname,adescr) \
   reg_names[reg##aname]=#aname; \
@@ -102,7 +91,7 @@ Mandala::Mandala()
   cfg.var_span[idx_cfg_##aname]=aspan;
 
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr) \
-  CFGDEFA(atype,aname,1,aspan,abytes,around,adescr) \
+  CFGDEFA(atype,aname,1,aspan,abytes,around,adescr)
 
 #include "MandalaVarsAP.h"
 
@@ -119,13 +108,20 @@ Mandala::Mandala()
 
 
   //bitfield strings
-  uint bidx;
+  uint bit_var=256,bit_idx=0;
+  memset(var_bits_mask,0,sizeof(var_bits_mask));
+  memset(var_bits_name,0,sizeof(var_bits_name));
+  memset(var_bits_descr,0,sizeof(var_bits_descr));
+//  bidx=(int)(log(amask)/log(2));
 #define BITDEF(avarname,abitname,amask,adescr) var_bits[idx_##avarname]++;
 #include "MandalaVars.h"
+
 #define BITDEF(avarname,abitname,amask,adescr) \
-  bidx=(int)(log(amask)/log(2));\
-  var_bits_name[idx_##avarname][bidx]= #abitname ;\
-  var_bits_descr[idx_##avarname][bidx]= adescr ;
+  if(bit_var!=idx_##avarname){bit_var=idx_##avarname;bit_idx=0;}\
+  var_bits_mask[idx_##avarname][bit_idx]= avarname##_##abitname ;\
+  var_bits_name[idx_##avarname][bit_idx]= #abitname ;\
+  var_bits_descr[idx_##avarname][bit_idx]= adescr ;\
+  bit_idx++;
 #include "MandalaVars.h"
 }
 //===========================================================================
@@ -208,6 +204,9 @@ uint Mandala::sig_size(_var_signature signature)
 //=============================================================================
 //=============================================================================
 //=============================================================================
+typedef _var_float _var_float_array [];
+typedef _var_uint _var_uint_array [];
+typedef _var_vect _var_vect_array [];
 uint Mandala::archive_config(uint8_t *buf,uint bufSize)
 {
   uint sz=var_size[idx_config];
@@ -217,7 +216,33 @@ uint Mandala::archive_config(uint8_t *buf,uint bufSize)
   }
   for(uint i=0;i<cfgCnt;i++){
     fill_config_vdsc(buf,i);
-    buf+=do_archive_vdsc();
+    uint asz=cfg.var_array[i];
+    if(asz>1){
+      switch(cfg.var_type[i]){
+        case vt_float:{
+          _var_float_array *v=((_var_float_array*)vdsc.ptr);
+          for(uint ai=0;ai<asz;ai++){
+            vdsc.ptr=&((*v)[ai]);
+            do_archive_vdsc();
+          }
+        }break;
+        case vt_vect:{
+          _var_vect_array *v=((_var_vect_array*)vdsc.ptr);
+          for(uint ai=0;ai<asz;ai++){
+            vdsc.ptr=&((*v)[ai][0]);
+            do_archive_vdsc();
+          }
+        }break;
+        case vt_uint:{
+          _var_uint_array *v=((_var_uint_array*)vdsc.ptr);
+          for(uint ai=0;ai<asz;ai++){
+            vdsc.ptr=&((*v)[ai]);
+            do_archive_vdsc();
+          }
+        }break;
+      }
+    }else do_archive_vdsc();
+    buf+=vdsc.size;
   }
   return sz;
 }
@@ -231,9 +256,43 @@ uint Mandala::extract_config(uint8_t *buf,uint cnt)
   }
   for(uint i=0;i<cfgCnt;i++){
     fill_config_vdsc(buf,i);
-    uint vsz=do_extract_vdsc(cnt);
-    buf+=vsz;
-    cnt-=vsz;
+    uint asz=cfg.var_array[i];
+    if(asz>1){
+      vdsc.size/=asz;
+      switch(cfg.var_type[i]){
+        case vt_float:{
+          _var_float_array *v=((_var_float_array*)vdsc.ptr);
+          for(uint ai=0;ai<asz;ai++){
+            vdsc.ptr=&((*v)[ai]);
+            uint vsz=do_extract_vdsc(cnt);
+            buf+=vsz;
+            cnt-=vsz;
+          }
+        }break;
+        case vt_vect:{
+          _var_vect_array *v=((_var_vect_array*)vdsc.ptr);
+          for(uint ai=0;ai<asz;ai++){
+            vdsc.ptr=&((*v)[ai][0]);
+            uint vsz=do_extract_vdsc(cnt);
+            buf+=vsz;
+            cnt-=vsz;
+          }
+        }break;
+        case vt_uint:{
+          _var_uint_array *v=((_var_uint_array*)vdsc.ptr);
+          for(uint ai=0;ai<asz;ai++){
+            vdsc.ptr=&((*v)[ai]);
+            uint vsz=do_extract_vdsc(cnt);
+            buf+=vsz;
+            cnt-=vsz;
+          }
+        }break;
+      }
+    }else{
+      uint vsz=do_extract_vdsc(cnt);
+      buf+=vsz;
+      cnt-=vsz;
+    }
   }
   return sz;
 }
@@ -247,7 +306,6 @@ void Mandala::fill_config_vdsc(uint8_t *buf,uint i)
     vdsc.ptr=&(cfg. aname );\
     vdsc.sbytes=(aspan<0)?(-abytes):(abytes);\
     vdsc.span=(aspan<0)?(-aspan):(aspan);\
-    vdsc.array=asize;\
     vdsc.type=vt_##atype;\
     vdsc.max=(aspan>0)?(((abytes==1)?0xFF:((abytes==2)?0xFFFF:((abytes==4)?0xFFFFFFFF:0)))): \
                       ( (aspan<0)?((abytes==1)?0x7F:((abytes==2)?0x7FFF:((abytes==4)?0x7FFFFFFF:0))):0 );\
@@ -376,7 +434,6 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
   uint8_t *reset_mask_ptr=dl_reset_mask;
   uint cnt=0,mask_cnt=0,mask_cnt_zero=1;
   uint8_t *snapshot=dl_snapshot;
-  uint8_t *buf_var=dl_var;
   uint mask=1;
   uint8_t *mask_ptr=buf+2;      //start of data
   uint8_t *ptr=mask_ptr+1;
@@ -385,21 +442,21 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
   for(uint i=idxPAD;i<(idxPAD+128);i++){
     uint sz=var_size[i];
     if(!sz)break; //valid vars end
-    sz=archive(buf_var,sz,i);
+    sz=archive(dl_var,sizeof(dl_var),i);
     //check if filtered var
     bool filtered=memchr(dl_filter+1,i,dl_filter[0])!=NULL;
     if((*reset_mask_ptr)&mask) (*reset_mask_ptr)&=~mask;
     else{
       //test changed
-      filtered|=(memcmp(snapshot,buf_var,sz)==0);
+      filtered|=(memcmp(snapshot,dl_var,sz)==0);
     }
     //pack if not filtered
     if(!filtered){
       //check buf overflow
       if((cnt+mask_cnt+mask_cnt_zero+sz+2)>=maxSize)break;
       //post variable
-      memcpy(snapshot,buf_var,sz);
-      memcpy(ptr,buf_var,sz);
+      memcpy(snapshot,dl_var,sz);
+      memcpy(ptr,dl_var,sz);
       ptr+=sz;
       cnt+=sz;
       mask_cnt+=mask_cnt_zero;
@@ -764,9 +821,10 @@ void Mandala::dump(const uint var_idx)
 void Mandala::print_report(FILE *stream)
 {
   fprintf(stream,"======= Mandala Variables ===================\n");
-  fprintf(stream,"#\tVariableName\tDescription\tType\tArray\tSpan\tPackedSize\n");
+  fprintf(stream,"#\tVariableName\tDescription\tType\tSpan\tPackedSize\n");
   for (uint i=0;i<256;i++) {
     if ((!var_size[i])&&(var_type[i]!=vt_sig))continue;
+    if (var_type[i]==vt_void)continue;
     //if (i==0) fprintf(stream,"== Signature Variables (internal use only) ==\n");
     //if (i==idxCFG) fprintf(stream,"======= Configuration Variables =============\n");
     const char *vt="";
@@ -777,12 +835,11 @@ void Mandala::print_report(FILE *stream)
       case vt_vect:   vt="vector";break;
       case vt_sig:    vt="signature";break;
     }
-    fprintf(stream,"%u\t%s\t%s\t%s\t%u\t%g\t%u\n",
+    fprintf(stream,"%u\t%s\t%s\t%s\t%g\t%u\n",
            i,
            var_name[i],
            var_descr[i],
            vt,
-           var_array[i],
            var_span[i],
            var_size[i]
     );

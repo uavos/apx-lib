@@ -51,16 +51,12 @@ typedef struct {
   double        hdg;
 }_runway;
 //=============================================================================
+//=============================================================================
 #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr) idx_cfg_##aname,
 enum {
   #include "MandalaVarsAP.h"
   cfgCnt
-};
-#define MODEDEF(aname,adescr) fm##aname,
-enum {
-  #include "MandalaVarsAP.h"
-  fmCnt
 };
 #define REGDEF(aname,adescr) reg##aname,
 enum {
@@ -82,13 +78,13 @@ public:
   double          var_round[256]; //round value for CFG vars
   uint            var_size[256];  //size of whole packed var
   void *          var_ptr[256];
-  _var_type       var_type[256];
-  uint            var_array[256];
+  uint            var_type[256];
   double          var_span[256];
 
-  uint            var_bits[256];    // number of bitfield bits
-  const char      *var_bits_name[256][32];  // bit descriptions
-  const char      *var_bits_descr[256][32];  // bit descriptions
+  uint            var_bits[256];            // number of bitfield bits
+  uint8_t         var_bits_mask[256][8];    // bitmask of bitfield
+  const char      *var_bits_name[256][8];   // bit names
+  const char      *var_bits_descr[256][8];  // bit descriptions
 
 
   //---- AP CFG Vars ----
@@ -98,7 +94,7 @@ public:
     double          var_round[cfgCnt]; //round value for CFG vars
     uint            var_size[cfgCnt];  //size of whole packed var
     void *          var_ptr[cfgCnt];
-    _var_type       var_type[cfgCnt];
+    uint            var_type[cfgCnt];
     uint            var_array[cfgCnt];
     uint            var_bytes[cfgCnt];
     double          var_span[cfgCnt];
@@ -114,7 +110,7 @@ public:
 
   //---- Internal use -----
   // telemetry framework
-  uint8_t dl_snapshot[2048];    // all archived variables (first 128) snapshot
+  uint8_t dl_snapshot[2048];    // all archived variables snapshot
   bool    dl_reset;             // set true to send everything next time
   uint8_t dl_reset_mask[128/8]; // bitmask 1=var send anyway, auto clear after sent
   uint8_t dl_var[32];           // one var max size (tmp buf)
@@ -128,9 +124,6 @@ public:
   Vector  last_vNED,last_aXYZ;
   double  last_course;
   double  gps_lat_s,gps_lon_s; //change detect
-
-  const char      *mode_names[fmCnt];
-  const char      *mode_descr[fmCnt];
 
   const char      *reg_names[regCnt];
   const char      *reg_descr[regCnt];
@@ -191,7 +184,6 @@ private:
   uint extract_flightplan(uint8_t *buf,uint cnt);//read packed waypoints from buf
   uint archive_downstream(uint8_t *buf,uint maxSize);    //pack telemetry DownlinkStream (128 vars)
   uint extract_downstream(uint8_t *buf,uint cnt);  //read telemetry DownlinkStream
-
 };
 //=============================================================================
 #endif // MANDALA_H

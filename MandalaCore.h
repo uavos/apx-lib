@@ -86,7 +86,6 @@ enum {
 };
 //-----------------------------------------------------------------------------
 // variable typedefs
-#define VARDEFA(atype,aname,asize,aspan,abytes,atbytes,adescr) typedef _var_##atype var_typedef_##aname [asize];
 #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) typedef _var_##atype var_typedef_##aname;
 #define SIGDEF(aname, adescr, ... ) typedef _var_signature var_typedef_##aname;
 #include "MandalaVars.h"
@@ -124,7 +123,6 @@ public:
     void    *ptr;       //pointer to local var.VARNAME
     int     sbytes;     //archived bytes cnt (if < 0 => signed)
     _var_float   span;  //variable span (absolute, always >0)
-    uint    array;      //count of bytes in array
     uint    type;       //type of variable
     uint32_t max;       //max archived integer value (unsigned)
     uint    size;       //total size of archived data

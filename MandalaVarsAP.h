@@ -25,32 +25,14 @@
 //=============================================================================
 // AP constants
 //=============================================================================
-#define AHRS_FREQ       100     // AHRS Update [Hz]
-#define GPS_FREQ        5       // GPS Update [Hz]
-#define CTR_FREQ        20      // RPTY (fast servo) update rate [Hz]
+#define AHRS_FREQ       100     // AHRS Update (main loop freq) [Hz]
+#define GPS_FREQ        5       // GPS Update rate (for derivatives) [Hz]
+#define CTR_FREQ        20      // ctr (fast servo) update rate [Hz]
 #define TELEMETRY_FREQ  10      // Telemetry send rate [Hz] MAX 10Hz!
 #define SIM_FREQ        10      // Simulator servo send rate [Hz]
 #define MAX_TELEMETRY   90      // max telemetry packet size [bytes]
 //=============================================================================
 #endif
-
-//=============================================================================
-//    Flight modes definitions. makes enum and mode_descr[], mode_names[]
-// <mode enum name>, <description>
-//------------------------------------------------------------------------------
-#ifndef MODEDEF
-#define MODEDEF(aname,adescr)
-#endif
-MODEDEF(EMG,    "Realtime control")
-MODEDEF(RPV,    "Angles control")
-MODEDEF(UAV,    "Heading control")
-MODEDEF(WPT,    "Waypoints navigation")
-MODEDEF(HOME,   "Go back home")
-MODEDEF(TAKEOFF,"Takeoff")
-MODEDEF(LANDING,"Landing")
-MODEDEF(STBY,   "Loiter around DNED")
-MODEDEF(DEMO,   "Aerobatic demonstration")
-//=============================================================================
 
 //=============================================================================
 //    PID Regulators definitions. makes enum and reg_descr[], reg_names[]
@@ -61,13 +43,15 @@ MODEDEF(DEMO,   "Aerobatic demonstration")
 #endif
 REGDEF(Roll,    "[PID] Roll angle to Ailerons")
 REGDEF(Pitch,   "[PID] Pitch angle to Elevator")
-REGDEF(Thr,     "[PI] Airspeed to Throttle / RPM to Throttle")
+REGDEF(Thr,     "[PI]  Airspeed to Throttle/RPM")
+REGDEF(Rpm,     "[PI]  RPM to Throttle")
 REGDEF(Yaw,     "[PID] Yaw angle to Rudder")
 REGDEF(Course,  "[PID] Course to Roll angle")
-REGDEF(Vspeed,  "[PI] Vertical Speed to Pitch angle")
-REGDEF(Altitude,"[P] Altitude to Vertical Speed")
+REGDEF(Vspeed,  "[PI]  Vertical Speed to Pitch angle")
+REGDEF(Altitude,"[P]   Altitude to Vertical Speed")
 REGDEF(HoverR,  "[PID] Hover X displacement to Roll angle")
 REGDEF(HoverP,  "[PID] Hover Y displacement to Pitch angle")
+#undef REGDEF
 //=============================================================================
 
 
@@ -83,8 +67,7 @@ REGDEF(HoverP,  "[PID] Hover Y displacement to Pitch angle")
 // PID variables (the first 3 vars are hardcoded to GCU ConfigModel)
 CFGDEFA(vect,       pidK,regCnt,   655.35,2,0.01, "PID coeffitients Kp,Ki,Kd")
 CFGDEFA(vect,       pidL,regCnt,   100,1,1,       "PID limits Lp,Li,Ld [%]")
-CFGDEFA(float,     pidLo,regCnt,  100,1,1,       "PID out limits Lo [%]")
-
+CFGDEFA(float,      pidLo,regCnt,  100,1,1,       "PID out limits Lo [%]")
 
 // other variables (added to ConfigModel) automatically.
 // description format:
@@ -101,8 +84,6 @@ CFGDEF(float,  mix_thr_Lo,   100,1,1,      "Pitch angle to Throttle limit (+/-) 
 
 CFGDEF(float,   dyn_roll,       255,1,1,  "Dynamics: roll angle change speed [deg/s]")
 CFGDEF(float,   dyn_pitch,      255,1,1,  "pitch angle change speed [deg/s]")
-CFGDEF(float,   dyn_throttle,   1,1,0.1,  "throttle change speed [1/s]")
-CFGDEF(float,   dyn_flaps,      1,1,0.1,  "flaps change speed [1/s]")
 
 CFGDEF(vect,    imu_align,    -180,2,0.1,   "AHRS: body frame align (roll,pitch,yaw) [-180..0..+180]")
 
@@ -161,7 +142,5 @@ CFGDEF(float,  ld_finVSpeed, 25.5,1,0.1, "final descending speed [m/s]")
 CFGDEF(float,  ld_tdPitch,  0,1,1,       "touchdown pitch bias [deg]")
 CFGDEF(float,  ld_tdAGL,    12.7,1,0.1,  "AGL altitude before touchdown [m]")
 //=============================================================================
-#undef MODEDEF
-#undef REGDEF
 #undef CFGDEF
 #undef CFGDEFA

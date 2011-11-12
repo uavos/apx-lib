@@ -13,6 +13,7 @@ typedef struct{
     signed char   mult;       //multiplier (x0.1) -127[-12.7]..+127[+12.7]
     signed char   diff;       //differential multiplier (x0.01+1) for pos/neg var value
     unsigned char weight;     //weight to set port value 0..255
+    unsigned char speed;      //speed of change (x0.1) 0..25.5
     unsigned char port;       //output port number 0...x
     unsigned char type;       //type of port
 }__attribute__((packed)) _ports_ctr;
