@@ -30,7 +30,7 @@
 #define CTR_FREQ        20      // ctr (fast servo) update rate [Hz]
 #define TELEMETRY_FREQ  10      // Telemetry send rate [Hz] MAX 10Hz!
 #define SIM_FREQ        10      // Simulator servo send rate [Hz]
-#define MAX_TELEMETRY   90      // max telemetry packet size [bytes]
+#define MAX_TELEMETRY   64      // max telemetry packet size [bytes]
 //=============================================================================
 #endif
 
