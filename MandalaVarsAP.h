@@ -123,13 +123,14 @@ CFGDEF(float,  rwLp,   255,1,1,            "runway heading limit [deg]")
 CFGDEF(float,  spdKp,  25.5,1,0.1,         "speed to stabilization (multiplier) [K-1]")
 
 
-CFGDEF(float,  takeoff_Kp,        25.5,1,0.1,"Takeoff: climbing alt error coeffitient [deg]")
-CFGDEF(float,  takeoff_Lp,        90,1,1,    "climbing pitch limit [deg]")
+CFGDEF(float,  takeoff_flaps,     1,1,0.1,   "Takeoff: flaps level [0..1]")
 CFGDEF(float,  takeoff_thrRise,   1,1,0.01,  "initial throttle rise speed [1/s]")
 CFGDEF(float,  takeoff_liftSpeed, 100,1,1,   "airspeed to start liftoff [m/s]")
 CFGDEF(float,  takeoff_liftPitch, 100,1,1,   "liftoff pitch angle [deg]")
 CFGDEF(float,  takeoff_liftAlt,   100,1,1,   "altitude to start climbing [m]")
-CFGDEF(float,  takeoff_flaps,     1,1,0.1,   "flaps level [0..1]")
+CFGDEF(float,  takeoff_climbRate, 25.5,1,0.1,"max climbing rate [m/s]")
+CFGDEF(float,  takeoff_climbKp,   25.5,1,0.1,"climbing rate [Kp]")
+CFGDEF(float,  takeoff_climbSpeed,100,1,1,   "airspeed during climbing [m/s]")
 
 CFGDEF(float,  ld_dist,     2550,1,10,   "Landing: approach distance [m]")
 CFGDEF(float,  ld_distTA, -1270,1,10,    "approach turn distance [m]")
