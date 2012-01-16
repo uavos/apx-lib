@@ -93,19 +93,19 @@ enum {
 //bitfield constants
 #define BITDEF(avarname,abitname,amask,adescr) enum{ avarname##_##abitname=amask };
 #include "MandalaVars.h"
-//-----------------------------------------------------------------------------
 //=============================================================================
 class MandalaCore
 {
 public:
   MandalaCore();
 
-
   void filter(const _var_float &v,_var_float *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
   void filter(const _var_vect &v,_var_vect *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
 
   //member=mask, if var is a bitfield, or vect idx, or array idx
+  _var_float get_value(uint var_m);
   _var_float get_value(uint var_idx,uint member_idx);
+  void set_value(uint var_m,_var_float value);
   void set_value(uint var_idx,uint member_idx,_var_float value);
   //-----------------------------------------------------------------------------
   virtual uint archive(uint8_t *buf,uint var_idx){return do_archive(buf,var_idx);}
@@ -119,18 +119,18 @@ public:
 
   uint extract_stream(uint8_t *buf,uint cnt);
   struct {
-    uint8_t *buf;       //buffer to store/extract
-    void    *ptr;       //pointer to local var.VARNAME
-    int     sbytes;     //archived bytes cnt (if < 0 => signed)
-    _var_float   span;  //variable span (absolute, always >0)
-    uint    type;       //type of variable
-    uint32_t max;       //max archived integer value (unsigned)
-    uint    size;       //total size of archived data
-    uint    prec1000;   //cfg vars only round*1000
+    uint8_t     *buf;           // buffer to store/extract
+    void        *ptr;           // pointer to local var.VARNAME
+    int         sbytes;         // archived bytes cnt (if < 0 => signed)
+    _var_float  span;           // variable span (absolute, always >0)
+    uint        type;           // type of variable
+    uint32_t    max;            // max archived integer value (unsigned)
+    uint        size;           // total size of archived data
+    uint        prec1000;       // cfg vars only: round*1000
 
-    int     sbytes_t;   //for do_archive_telemetry
-    uint32_t max_t;     //for do_archive_telemetry
-    uint    size_t;     //for do_archive_telemetry
+    int         sbytes_t;       // for do_archive_telemetry
+    uint32_t    max_t;          // for do_archive_telemetry
+    uint        size_t;         // for do_archive_telemetry
   }vdsc;
   uint vdsc_fill(uint8_t *buf,uint var_idx);
   uint do_archive_vdsc(void);
