@@ -1,5 +1,5 @@
-#ifndef _BUS_DEFAULTS_H_
-#define _BUS_DEFAULTS_H_
+#ifndef _NODE_H_
+#define _NODE_H_
 #include <inttypes.h>
 #include <sys/types.h>
 //=============================================================================
@@ -13,20 +13,36 @@ typedef struct{
 //=============================================================================
 //default bus commands (service packets)
 enum{
-  apc_ACK=0,
+  apc_ACK=0,    //acknowledge - sent back in response to commands
+  //------------------
+  //system commands
   apc_ID,       //return _node_id
-  apc_Info,     //return _node_info
   apc_SetAdr,   //set new address[dadr] _node_sn used to filter
   apc_Debug,    //stdout message
+  apc_Reboot,   //reset/reboot node
+  apc_Stop,     //stop sending data (sensors)
 
-  //node configuration
+  //------------------
+  //conf
+  apc_ReadConfDsc,      //return _node_conf_dsc descriptor
+  apc_ReadConfStr,      //return conf fields strings
+  apc_ReadConfCmd,      //return available node commands
+  apc_ReadConf,         //return _node_conf structure
+  apc_WriteConf,        //save _node_conf
+  apc_ResetConf,        //reset conf to defaults
+
+  //------------------
+  //standard commands
+  apc_Data,     //send/receive some data [portNo]
+
+  //------------------
+  //deprecated node configuration
+  apc_Info,
   apc_ReadConfig,
   apc_WriteConfig,
   apc_ResetConfig,
 
-  //standard commands
-  apc_Data,     //send/receive some data [portNo]
-
+  //------------------
   //user commands
   apc_user=100,
   apc_loader=0xFF
@@ -90,6 +106,55 @@ typedef struct{
   }__attribute__((packed)) hdr;
   uint8_t       data[256];
 }__attribute__((packed)) _ldc_write;
+//=============================================================================
+// NODE CONF typedefs
+//=============================================================================
+typedef struct{
+    uint8_t var_idx;    //i.e. ctr_ailerons or any other
+    uint8_t bitmask;    //mask if var bitfield or vect idx or array idx
+    int8_t  mult;       //multiplier (x0.1) -127[-12.7]..+127[+12.7]
+    int8_t  diff;       //differential multiplier (x0.01+1) for pos/neg var value
+    uint8_t weight;     //weight to set port value 0..255
+    uint8_t speed;      //speed of change (x0.1) 0..25.5
+    uint8_t port;       //output port number 0...x
+    uint8_t type;       //type of port
+}__attribute__((packed)) _ctr;
+typedef struct {
+  int8_t zero;         //pwm zero shift -127[-1]..+127[+1]
+  int8_t max;          //pwm maximum -127[-1]..+127[+1]
+  int8_t min;          //pwm minimum -127[-1]..+127[+1]
+}__attribute__((packed)) _pwm;
+//-----------------------------------------------------------------------------
+typedef struct {
+  int8_t  protocol;     //protocol
+  int16_t speed;        //baud rate
+}__attribute__((packed)) _serial;
+//-----------------------------------------------------------------------------
+typedef float     _ft_float;
+typedef uint32_t  _ft_uint;
+typedef uint8_t   _ft_bool;
+typedef uint8_t   _ft_option;
+typedef _ctr      _ft_ctr;
+typedef _pwm      _ft_pwm;
+typedef _serial   _ft_serial;
+//-----------------------------------------------------------------------------
+typedef enum{
+  ft_uint=0,
+  ft_bool,
+  ft_option,
+  ft_float,
+  ft_ctr,
+  ft_pwm,
+  ft_serial,
+  //---------
+  ft_cnt
+}_node_ft;
+//=============================================================================
+typedef struct {
+  uint8_t       cnt;
+  uint8_t       types[256];
+}__attribute__((packed)) _node_conf_dsc; //send with shrinked size by {cnt}
+//=============================================================================
 //=============================================================================
 #endif
 
