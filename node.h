@@ -13,34 +13,33 @@ typedef struct{
 //=============================================================================
 //default bus commands (service packets)
 enum{
-  apc_ACK=0,    //acknowledge - sent back in response to commands
+  apc_ack=0,    //acknowledge - sent back in response to commands
   //------------------
   //system commands
-  apc_ID,       //return _node_id
-  apc_SetAdr,   //set new address[dadr] _node_sn used to filter
-  apc_Debug,    //stdout message
-  apc_Reboot,   //reset/reboot node
-  apc_Stop,     //stop sending data (sensors)
+  apc_id,       //return _node_id
+  apc_adr,      //set new address[dadr] _node_sn used to filter
+  apc_debug,    //stdout message
+  apc_reboot,   //reset/reboot node
+  apc_stop,     //stop sending data (sensors)
 
   //------------------
   //conf
-  apc_ReadConfDsc,      //return _node_conf_dsc descriptor
-  apc_ReadConfStr,      //return conf fields strings
-  apc_ReadConfCmd,      //return available node commands
-  apc_ReadConf,         //return _node_conf structure
-  apc_WriteConf,        //save _node_conf
-  apc_ResetConf,        //reset conf to defaults
+  apc_fields,           //return conf descriptor
+  apc_commands,         //return node commands descrptor
+  apc_rconf,            //return _node_conf structure
+  apc_wconf,            //save _node_conf
+  apc_econf,            //reset conf to defaults
 
   //------------------
   //standard commands
-  apc_Data,     //send/receive some data [portNo]
+  apc_data,     //send/receive some data [portNo]
 
   //------------------
   //deprecated node configuration
-  apc_Info,
-  apc_ReadConfig,
-  apc_WriteConfig,
-  apc_ResetConfig,
+  apc_info,
+  apc_readConfig,
+  apc_writeConfig,
+  apc_resetConfig,
 
   //------------------
   //user commands
@@ -149,12 +148,6 @@ typedef enum{
   //---------
   ft_cnt
 }_node_ft;
-//=============================================================================
-typedef struct {
-  uint8_t       cnt;
-  uint8_t       types[256];
-}__attribute__((packed)) _node_conf_dsc; //send with shrinked size by {cnt}
-//=============================================================================
 //=============================================================================
 #endif
 
