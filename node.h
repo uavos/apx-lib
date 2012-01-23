@@ -125,8 +125,8 @@ typedef struct {
 }__attribute__((packed)) _pwm;
 //-----------------------------------------------------------------------------
 typedef struct {
-  int8_t  protocol;     //protocol
-  int16_t speed;        //baud rate
+  uint8_t  protocol;     //protocol
+  uint32_t baudrate;     //baud rate for some protocols
 }__attribute__((packed)) _serial;
 //-----------------------------------------------------------------------------
 typedef float     _ft_float;
