@@ -131,16 +131,14 @@ typedef struct {
 //-----------------------------------------------------------------------------
 typedef float     _ft_float;
 typedef uint32_t  _ft_uint;
-typedef uint8_t   _ft_bool;
 typedef uint8_t   _ft_option;
 typedef _ctr      _ft_ctr;
 typedef _pwm      _ft_pwm;
 typedef _serial   _ft_serial;
 //-----------------------------------------------------------------------------
 typedef enum{
-  ft_uint=0,
-  ft_bool,
-  ft_option,
+  ft_option=0,
+  ft_uint,
   ft_float,
   ft_ctr,
   ft_pwm,
