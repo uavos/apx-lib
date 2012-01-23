@@ -129,9 +129,9 @@ typedef struct {
   uint32_t baudrate;     //baud rate for some protocols
 }__attribute__((packed)) _serial;
 //-----------------------------------------------------------------------------
-typedef float     _ft_float;
-typedef uint32_t  _ft_uint;
 typedef uint8_t   _ft_option;
+typedef uint32_t  _ft_uint;
+typedef float     _ft_float;
 typedef _ctr      _ft_ctr;
 typedef _pwm      _ft_pwm;
 typedef _serial   _ft_serial;
