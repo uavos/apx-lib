@@ -108,6 +108,7 @@ typedef struct{
 //=============================================================================
 // NODE CONF typedefs
 //=============================================================================
+enum{pt_pwm,pt_out,pt_inp,pt_adc}; //type of port
 typedef struct{
     uint8_t var_idx;    //i.e. ctr_ailerons or any other
     uint8_t bitmask;    //mask if var bitfield or vect idx or array idx
@@ -123,6 +124,9 @@ typedef struct {
   int8_t max;          //pwm maximum -127[-1]..+127[+1]
   int8_t min;          //pwm minimum -127[-1]..+127[+1]
 }__attribute__((packed)) _pwm;
+typedef struct {
+  int8_t zero;         //out zero shift -127[-1]..+127[+1]
+}__attribute__((packed)) _out;
 //-----------------------------------------------------------------------------
 typedef struct {
   uint8_t  protocol;     //protocol
@@ -132,17 +136,19 @@ typedef struct {
 typedef uint8_t   _ft_option;
 typedef uint32_t  _ft_uint;
 typedef float     _ft_float;
+typedef _serial   _ft_serial;
 typedef _ctr      _ft_ctr;
 typedef _pwm      _ft_pwm;
-typedef _serial   _ft_serial;
+typedef _out      _ft_out;
 //-----------------------------------------------------------------------------
 typedef enum{
   ft_option=0,
   ft_uint,
   ft_float,
+  ft_serial,
   ft_ctr,
   ft_pwm,
-  ft_serial,
+  ft_out,
   //---------
   ft_cnt
 }_node_ft;

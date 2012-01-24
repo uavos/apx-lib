@@ -5,7 +5,7 @@
 // _ports_ctr[] must be first in _cfg, _ports_pwm[] always second
 
 //type of port
-enum{pt_pwm,pt_out,pt_inp,pt_adc};
+//enum{pt_pwm,pt_out,pt_inp,pt_adc};
 //=============================================================================
 typedef struct{
     unsigned char var_idx;    //i.e. ctr_ailerons or any other
