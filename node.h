@@ -35,13 +35,6 @@ enum{
   apc_data,     //send/receive some data [portNo]
 
   //------------------
-  //deprecated node configuration
-  apc_info,
-  apc_readConfig,
-  apc_writeConfig,
-  apc_resetConfig,
-
-  //------------------
   //user commands
   apc_user=100,
   apc_loader=0xFF
@@ -64,18 +57,6 @@ typedef struct{
   uint8_t       dadr;           //device address (opt byte)
   _fw_info      fw;
 }__attribute__((packed)) _node_id; //filled by hwInit;
-//-------------------------------------------------
-typedef struct {
-  _node_id  id;
-  struct{             //general ports availability (dynamically set by drivers)
-    uint8_t ctr;      //configurable controls
-    uint8_t pwm;      //pwm servo outputs
-    uint8_t out;      //logical outputs
-    uint8_t inp;      //logical inputs
-    uint8_t adc;      //analog inputs
-  }ports;
-  uint8_t vars[32];   //bitmask of known variables
-}__attribute__((packed)) _node_info;
 //=============================================================================
 //=============================================================================
 // Loader packet: [ALL PACKETS ARE BROADCAST SRV - src=0x80]
