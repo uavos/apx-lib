@@ -20,7 +20,7 @@ enum{
   apc_adr,      //set new address[dadr] _node_sn used to filter
   apc_debug,    //stdout message
   apc_reboot,   //reset/reboot node
-  apc_stop,     //stop sending data (sensors)
+  apc_mute,     //stop sending data (sensors)
 
   //------------------
   //conf

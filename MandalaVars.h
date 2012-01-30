@@ -81,6 +81,8 @@ SIGDEF(imu, "IMU sensors data pack",
        idx_acc, idx_gyro )
 SIGDEF(gps, "GPS fix data pack",
       idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED)
+SIGDEF(cas, "CAS fix data pack",
+      idx_airspeed, idx_altitude, idx_vspeed)
 SIGDEF(ctr, "Fast controls",
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_wheel )
 SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_wheel)
