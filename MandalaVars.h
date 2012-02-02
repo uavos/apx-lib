@@ -81,8 +81,6 @@ SIGDEF(imu, "IMU sensors data pack",
        idx_acc, idx_gyro )
 SIGDEF(gps, "GPS fix data pack",
       idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED)
-SIGDEF(cas, "CAS fix data pack",
-      idx_airspeed, idx_altitude, idx_vspeed)
 SIGDEF(ctr, "Fast controls",
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_wheel )
 SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_wheel)
@@ -92,7 +90,7 @@ SIGDEF(ctr_gcu, "GCU Pilot fast controls", idx_rc_roll,idx_rc_pitch,idx_rc_throt
 SIGDEF(update,  "Auto send to bus when changed",
       idx_mode,idx_status,idx_power,
       idx_ctrb,idx_ctr_airbrk,idx_ctr_flaps,
-      idx_cam,idx_cam_heading,idx_cam_pitch )
+      idx_cam_ctr,idx_cam_heading,idx_cam_pitch )
 
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
 SIGDEF(autosend,  "Automatically forwarded variables to GCU",
@@ -106,7 +104,8 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
       idx_wpcnt,idx_rwcnt,
       idx_NED,idx_vXYZ,idx_aXYZ,idx_crsRate,
       idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_wheel,
-      idx_gcu_RSS, idx_gcu_Ve, idx_gcu_MT )
+      idx_gcu_RSS, idx_gcu_Ve, idx_gcu_MT,
+      idx_pstatic )
 //------------------------------
 #undef SIGDEF
 //=============================================================================
@@ -150,8 +149,10 @@ VARDEF(vect,  mag,   -1.27,2,1,  "magnetic field: Hx,Hy,Hz [gauss]")
 
 //--------- FLIGHT CONTROL --------------
 VARDEF(float, airspeed,        655.35,2,0, "Airspeed [m/s]")
-VARDEF(float, altitude,        6553.5,2,0, "Altitude [m]")
+VARDEF(float, altitude,        15000.0,4,2, "Altitude [m]")
 VARDEF(float, vspeed,          -100,2,0,   "Variometer [m/s]")
+VARDEF(float, pstatic,        35.0,4,2,    "Static pressure [inHg]")
+VARDEF(float, pstatic_gnd,    35.0,4,0,    "Static pressure on ground level [inHg]")
 
 //--------- Measured by GPS --------------
 VARDEF(float, gps_lat,     -180,4,0,     "latitude [deg]")
@@ -228,12 +229,12 @@ VARDEF(float, cam_heading, -180.0,2,0, "camera heading [deg]")
 VARDEF(float, cam_pitch,   -180.0,2,0, "camera pitch [deg]")
 VARDEF(float, cam_lat,     -180,4,0,   "cam track latitude [deg]")
 VARDEF(float, cam_lon,     -180,4,0,   "cam track longitude [deg]")
-VARDEF(float, cam_alt,    -10000,2,0,  "cam track altitude [m]")
-VARDEF(uint,  cam,            0,1,0,   "camera control type")
-BITDEF(cam,    camoff,  0,  "Camera off")
-BITDEF(cam,    atrack,  1,  "Camera attitude hold")
-BITDEF(cam,    ptrack,  2,  "Camera position tracking")
-BITDEF(cam,    front,   3,  "Front facing camera")
+VARDEF(float, cam_alt,     -10000,2,0, "cam track altitude [m]")
+VARDEF(uint, cam_ctr,  0,1,0, "camera control type")
+BITDEF(cam_ctr, camoff,  0,  "Camera off")
+BITDEF(cam_ctr, atrack,  1,  "Camera attitude hold")
+BITDEF(cam_ctr, ptrack,  2,  "Camera position tracking")
+BITDEF(cam_ctr, front,   3,  "Front facing camera")
 
 //--------- POWER CONTROL --------------
 VARDEF(uint,  power,  0,1,0,   "power status bitfield [on/off]")

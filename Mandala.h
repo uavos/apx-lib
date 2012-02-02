@@ -175,6 +175,7 @@ public:
   const Vector ECEF2llh(const Vector &ECEF);
   const Vector llh2ECEF(const Vector &llh);
   double sqr(double x);
+  double inHgToAltitude(double inHg);
 private:
   // some special protocols
   void fill_config_vdsc(uint8_t *buf,uint i);
