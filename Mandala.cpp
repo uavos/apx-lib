@@ -162,6 +162,8 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   if(var_idx==idx_flightplan)return extract_flightplan(buf,size);
   if(var_idx==idx_debug)return 1; //nothing to do
   if(var_idx==idx_service)return 1; //nothing to do
+  if(var_idx==idx_setb)return extract_setb(buf,size);
+  if(var_idx==idx_clrb)return extract_clrb(buf,size);
 
   void *ptr=var_ptr[var_idx];
   if(!ptr){
@@ -522,6 +524,51 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
   calc();
   return tcnt;
 }
+//=============================================================================
+uint Mandala::extract_setb(uint8_t *buf,uint cnt)
+{
+  uint var_idx=buf[0];
+  bool bChk=true;
+  bChk=bChk&&(var_type[var_idx]==vt_uint);
+  bChk=bChk&&(var_bits[var_idx]);
+  bChk=bChk&&(var_bits_mask[var_idx][0]);
+  bChk=bChk&&(cnt==(1+var_size[var_idx]));
+  _var_uint *ptr;
+  _var_uint old_v;
+  if(bChk){
+    ptr=(_var_uint*)var_ptr[var_idx];
+    old_v=*ptr;
+    bChk=bChk&&extract(buf+1,cnt-1,var_idx);
+  }
+  if(!bChk){
+    printf("Can't extract 'set_bit'. Integrity check error.");
+    return 0;
+  }
+  *ptr|=old_v;
+}
+//-----------------------------------------------------------------------------
+uint Mandala::extract_clrb(uint8_t *buf,uint cnt)
+{
+  uint var_idx=buf[0];
+  bool bChk=true;
+  bChk=bChk&&(var_type[var_idx]==vt_uint);
+  bChk=bChk&&(var_bits[var_idx]);
+  bChk=bChk&&(var_bits_mask[var_idx][0]);
+  bChk=bChk&&(cnt==(1+var_size[var_idx]));
+  _var_uint *ptr;
+  _var_uint old_v;
+  if(bChk){
+    ptr=(_var_uint*)var_ptr[var_idx];
+    old_v=*ptr;
+    bChk=bChk&&extract(buf+1,cnt-1,var_idx);
+  }
+  if(!bChk){
+    printf("Can't extract 'clr_bit'. Integrity check error.");
+    return 0;
+  }
+  *ptr=old_v&~(*ptr);
+}
+//=============================================================================
 //=============================================================================
 //=============================================================================
 void Mandala::calcDGPS(const double dt)

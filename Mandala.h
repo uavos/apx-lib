@@ -185,6 +185,8 @@ private:
   uint extract_flightplan(uint8_t *buf,uint cnt);//read packed waypoints from buf
   uint archive_downstream(uint8_t *buf,uint maxSize);    //pack telemetry DownlinkStream (128 vars)
   uint extract_downstream(uint8_t *buf,uint cnt);  //read telemetry DownlinkStream
+  uint extract_setb(uint8_t *buf,uint cnt);  //read
+  uint extract_clrb(uint8_t *buf,uint cnt);  //read
 };
 //=============================================================================
 #endif // MANDALA_H

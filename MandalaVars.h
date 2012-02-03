@@ -75,6 +75,8 @@ SIGDEF(debug,     "Debug <stdout> string")
 SIGDEF(flightplan,"Flight plan data")
 SIGDEF(health,    "Health status <nodes cnt>,<node_adr><node_health>...")
 SIGDEF(service,   "Service packet down/up link <src-dadr>,<dadr-cmd>,<data..>")
+SIGDEF(setb,      "Set bit <var_idx>,<data>")
+SIGDEF(clrb,       "Clear bit <var_idx>,<data>")
 //------------------------------
 // var packs
 SIGDEF(imu, "IMU sensors data pack",
