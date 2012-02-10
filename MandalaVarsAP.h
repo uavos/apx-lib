@@ -143,7 +143,8 @@ CFGDEF(float,  ld_finAlt,   255,1,0,     "approach final altitude AGL [m]")
 CFGDEF(float,  ld_finSpeed, 25.5,1,0.1,  "final speed [m/s]")
 CFGDEF(float,  ld_finVSpeed, 25.5,1,0.1, "final descending speed [m/s]")
 CFGDEF(float,  ld_tdPitch,  0,1,1,       "touchdown pitch bias [deg]")
-CFGDEF(float,  ld_tdAGL,    12.7,1,0.1,  "AGL altitude before touchdown [m]")
+CFGDEF(float,  ld_tdAGL,    25.5,1,0.1,  "AGL altitude before touchdown [m]")
+CFGDEF(float,  ld_zeroAGL,  25.5,1,0.1,  "AGL altitude on the ground [m]")
 //=============================================================================
 #undef CFGDEF
 #undef CFGDEFA

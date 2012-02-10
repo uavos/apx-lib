@@ -545,6 +545,7 @@ uint Mandala::extract_setb(uint8_t *buf,uint cnt)
     return 0;
   }
   *ptr|=old_v;
+  return cnt;
 }
 //-----------------------------------------------------------------------------
 uint Mandala::extract_clrb(uint8_t *buf,uint cnt)
@@ -567,6 +568,7 @@ uint Mandala::extract_clrb(uint8_t *buf,uint cnt)
     return 0;
   }
   *ptr=old_v&~(*ptr);
+  return cnt;
 }
 //=============================================================================
 //=============================================================================
@@ -626,7 +628,7 @@ void Mandala::calc(void)
   dHome=ned2dist(NED);
   wpHDG=ned2hdg(dNED);
   homeHDG=ned2hdg(NED,true);
-  rwDelta=dWPT*sin((wpHDG+180.0-rwHDG)*D2R);
+  rwDelta=dWPT*sin((wpHDG+180.0-rwHDG)*D2R)+rwAdj;
 }
 //=============================================================================
 double Mandala::ned2hdg(const Vector &ned,bool back)
