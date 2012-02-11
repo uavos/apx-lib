@@ -102,7 +102,7 @@ SIGDEF(autosend,  "Automatically forwarded variables to GCU",
 SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
       idx_homeHDG,idx_dHome,idx_dWPT,idx_dN,idx_dE,idx_dAlt,
       idx_dXYZ,
-      idx_wpHDG,idx_rwDelta, idx_rwAdj,
+      idx_wpHDG,idx_rwDelta,idx_rwAdj,idx_rwDs,
       idx_wpcnt,idx_rwcnt,
       idx_NED,idx_vXYZ,idx_aXYZ,idx_crsRate,
       idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_wheel,
@@ -272,6 +272,7 @@ VARDEF(float, crsRate, -50,1,0,    "trajectory course change rate [deg/s]")
 VARDEF(float, wpHDG,   -180,2,0,   "current waypoint heading [deg]")
 VARDEF(float, rwHDG,   -180,2,0,   "current runway heading [deg]")
 VARDEF(float, rwDelta, -127,1,0,   "runway horizontal displacement [m]")
+VARDEF(float, rwDs,    -12.7,1,0,  "runway horizontal displacement derivative [m/s]")
 
 //--------- uplink only/internal use --------------
 VARDEF(float, rwAdj,   -127,1,0,   "runway displacement adjust during landing [m]")
