@@ -76,7 +76,7 @@ CFGDEFA(float,      pidLo,regCnt,  100,1,1,       "PID out limits Lo [%]")
 // vect axis names used to create text names in ConfigModel
 // <Group> may be ommited if repeated
 // vect arrays not allowed (by ConfigModel)
-CFGDEF(float,  mix_elv_Kp,   2.55,1,0.01,  "Mixer: Roll angle to Elevator mix")
+CFGDEF(float,  mix_elv_Kp,   -1.27,1,0.01,  "Mixer: Roll angle to Elevator mix")
 CFGDEF(float,  mix_elv_Lo,   100,1,1,      "Roll angle to Elevator limit")
 CFGDEF(float,  mix_rud_Kp,   -12.7,1,0.1,  "Roll angle to Rudder mix")
 CFGDEF(float,  mix_rud_Lo,   100,1,1,      "Roll angle to Rudder limit (+/-) [%]")

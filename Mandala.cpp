@@ -628,7 +628,7 @@ void Mandala::calc(void)
   dHome=ned2dist(NED);
   wpHDG=ned2hdg(dNED);
   homeHDG=ned2hdg(NED,true);
-  rwDelta=dWPT*sin((boundAngle(wpHDG+180.0-rwHDG))*D2R);//-rwAdj;
+  rwDelta=dWPT*sin((wpHDG+180.0-rwHDG)*D2R)-rwAdj;
   rwDV=rotate(gps_vNED,rwHDG*D2R)[1];
 }
 //=============================================================================

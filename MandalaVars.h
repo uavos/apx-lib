@@ -102,7 +102,7 @@ SIGDEF(autosend,  "Automatically forwarded variables to GCU",
 SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
       idx_homeHDG,idx_dHome,idx_dWPT,idx_dN,idx_dE,idx_dAlt,
       idx_dXYZ,
-      idx_wpHDG,idx_rwDelta,idx_rwAdj,idx_rwDV,
+      idx_wpHDG,idx_rwDelta,idx_rwDV,
       idx_wpcnt,idx_rwcnt,
       idx_NED,idx_vXYZ,idx_aXYZ,idx_crsRate,
       idx_rc_roll,idx_rc_pitch,idx_rc_throttle,
@@ -144,6 +144,8 @@ VARDEF(uint,  status,   0,1,0,  "status flags bitfield")
 BITDEF(status, rc,      1,       "RC on/off")
 BITDEF(status, gps,     2,       "GPS available/lost")
 BITDEF(status, agl,     4,       "AGL valid")
+BITDEF(status, cas,     8,       "CAS valid")
+BITDEF(status, modem,   16,      "Data link available/lost")
 
 //--------- IMU --------------
 VARDEF(vect,  theta, -180,2,0,   "attitude: roll,pitch,yaw [deg]")
@@ -276,7 +278,7 @@ VARDEF(float, rwDelta, -127,1,0,   "runway alignment [m]")
 VARDEF(float, rwDV,    -12.7,1,0,  "runway alignment velocity [m/s]")
 
 //--------- uplink only/internal use --------------
-VARDEF(float, rwAdj,   -127,1,0,   "runway displacement adjust during landing [m]")
+VARDEF(float, rwAdj,   -127,1,0,   "runway displacement adjust during takeoff or landing [m]")
 
 //--------- GCU use only --------------
 VARDEF(float, gcu_RSS,  1.0,1,0,  "GCU modem signal strength [0..1]")

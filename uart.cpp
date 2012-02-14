@@ -70,11 +70,12 @@ bool Uart::open(const char *portname,int baudrate,const char *name,int timeout,u
 void Uart::close()
 {
   ::close(fd);
+  fd=-1;
 }
 //==============================================================================
 bool Uart::isOpen(void)
 {
-  return fd>=0;
+  return (fd>=0)&&(fcntl(fd, F_GETFL) != -1 || errno != EBADF);
 }
 //==============================================================================
 int Uart::handle(void)
