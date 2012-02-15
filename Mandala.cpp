@@ -393,8 +393,8 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     waypoints[i].LLA=Vector(lat,lon,alt);
     waypoints[i].cmd[0]=0;
     //print wpt stats
-    const Vector ned=llh2ned(Vector(lat*D2R,lon*D2R,gps_home_hmsl+alt));
-    printf("WPT%u NED(%.0f, %.0f, %.0f) %s\n",i+1,ned[0],ned[1],ned[2],wt_str[waypoints[i].type]);
+    //const Vector ned=llh2ned(Vector(lat*D2R,lon*D2R,gps_home_hmsl+alt));
+    //printf("WPT%u NED(%.0f, %.0f, %.0f) %s\n",i+1,ned[0],ned[1],ned[2],wt_str[waypoints[i].type]);
   }
   //unpack runways
   for (uint i=0;i<rwcnt;i++) {
@@ -407,7 +407,7 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     runways[i].LLA[2]=gps_hmsl;
     runways[i].type=(_rw_type)*data++;
     runways[i].dNED=NED;
-    printf("Runway%u (%s), NED(%.0f,%.0f,%.0f)\n",i+1,rwt_str[runways[i].type],runways[i].dNED[0],runways[i].dNED[1],runways[i].dNED[2]);
+    //printf("Runway%u (%s), NED(%.0f,%.0f,%.0f)\n",i+1,rwt_str[runways[i].type],runways[i].dNED[0],runways[i].dNED[1],runways[i].dNED[2]);
   }
   gps_lat=gps_lat_save;
   gps_lon=gps_lon_save;
