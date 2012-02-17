@@ -86,13 +86,11 @@ SIGDEF(gps, "GPS fix data pack",
 SIGDEF(ctr, "Fast controls",
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_steering )
 SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_steering)
-//SIGDEF(ctr_gcu, "GCU Pilot fast controls", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_wheel)
-//SIGDEF(ctr_cam, "GCU Camera controls", idx_cam_heading,idx_cam_pitch)
 //------------------------------
 // Auto update/send vars
 SIGDEF(update,  "Auto send to bus when changed",
       idx_mode,idx_status,idx_power,
-      idx_ctrb,idx_ctr_airbrk,idx_ctr_flaps,
+      idx_ctrb,idx_ctr_airbrk,idx_ctr_flaps,idx_ctr_brake,
       idx_cam_ctr,idx_cam_opt )
 
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
@@ -224,11 +222,11 @@ VARDEF(float, ctr_rudder,    -1.0,1,0, "rudder [-1..0..+1]")
 VARDEF(float, ctr_steering,  -1.0,1,0, "steering [-1..0..+1]")
 // slow controls
 VARDEF(float, ctr_flaps,      1.0,1,0, "flaps [0..1]")
+VARDEF(float, ctr_brake,      1.0,1,0, "brake [0..1]")
 VARDEF(float, ctr_airbrk,     1.0,1,0, "airbrakes [0..1]")
 VARDEF(uint,  ctrb,           0,1,0,   "controls bitfield [on/off]")
 BITDEF(ctrb,   gear,      1, "Landing gear retracted/extracted")
-BITDEF(ctrb,   brake,     2, "Parking brake on/off")
-BITDEF(ctrb,   ers,       4, "ERS on/off")
+BITDEF(ctrb,   ers,       2, "ERS on/off")
 
 //--------- POWER CONTROL --------------
 VARDEF(uint,  power,  0,1,0,   "power status bitfield [on/off]")
@@ -249,24 +247,26 @@ VARDEF(float, rc_yaw,     -1.0,1,0, "RC yaw [-1..0..+1]")
 VARDEF(float, rc_steering,-1.0,1,0, "RC steering [-1..0..+1]")
 
 //--------- CAM CONTROL --------------
-VARDEF(float, cam_heading, -180.0,2,1, "camera heading [deg]")
-VARDEF(float, cam_pitch,   -180.0,2,1, "camera pitch [deg]")
-VARDEF(float, cam_roll,    -180.0,2,1, "camera roll [deg]")
-VARDEF(float, cam_lat,     -180,4,0,   "camera track latitude [deg]")
-VARDEF(float, cam_lon,     -180,4,0,   "camera track longitude [deg]")
-VARDEF(float, cam_alt,     -10000,2,0, "camera track altitude [m]")
-VARDEF(float, cam_zoom,     1.0,1,0,   "camera zoom level [0..1]")
-VARDEF(float, cam_focus,    1.0,1,0,   "camera focus [0..1]")
 VARDEF(uint, cam_ctr,  0,1,0, "camera control type")
 BITDEF(cam_ctr, camoff,  0,  "Camera off")
-BITDEF(cam_ctr, atrack,  1,  "Camera attitude hold")
-BITDEF(cam_ctr, ptrack,  2,  "Camera position tracking")
-BITDEF(cam_ctr, front,   3,  "Front facing camera")
+BITDEF(cam_ctr, stab,    1,  "gyro stabilization")
+BITDEF(cam_ctr, hold,    2,  "attitude hold")
+BITDEF(cam_ctr, pos,     3,  "position tracking")
+BITDEF(cam_ctr, fixed,   4,  "fixed position")
+VARDEF(float, cam_heading, -180.0,2,1, "camera heading [deg]")
+VARDEF(float, cam_pitch,   -180.0,2,1, "camera pitch [deg]")
+VARDEF(float, cam_zoom,     1.0,1,0,   "camera zoom level [0..1]")
+VARDEF(float, cam_focus,    1.0,1,0,   "camera focus [0..1]")
+VARDEF(float, cam_bias_h,  -327.67,2,0,"camera heading stability bias [deg/s]")
+VARDEF(float, cam_bias_p,  -327.67,2,0,"camera pitch stability bias [deg/s]")
 VARDEF(uint, cam_opt,  0,1,0, "camera options [on/off]")
 BITDEF(cam_opt, PF,      1,  "Picture flip on/off")
 BITDEF(cam_opt, NIR,     2,  "NIR filter on/off")
 BITDEF(cam_opt, DSP,     4,  "Display information on/off")
 BITDEF(cam_opt, FM,      8,  "Focus mode auto/infinity")
+VARDEF(float, cam_lat,     -180,4,0,   "camera track latitude [deg]")
+VARDEF(float, cam_lon,     -180,4,0,   "camera track longitude [deg]")
+VARDEF(float, cam_alt,     -10000,2,0, "camera track altitude [m]")
 
 //--------- calculated by Mandala::calc() --------------
 VARDEF(vect,  NED,     -10000,2,0, "local position: north,east,down [m]")
