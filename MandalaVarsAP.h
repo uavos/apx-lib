@@ -49,7 +49,7 @@ REGDEF(Yaw,     "[PID] Yaw angle to Rudder")
 REGDEF(Course,  "[PID] Course to Roll angle")
 REGDEF(Vspeed,  "[PI]  Vertical Speed to Pitch angle")
 REGDEF(Altitude,"[P]   Altitude to Vertical Speed")
-REGDEF(Taxi,    "[PPI] Runway alignment to rudder and wheel")
+REGDEF(Taxi,    "[PIP] Runway alignment to rudder and wheel")
 REGDEF(HoverR,  "[PPI] Hover X displacement to Roll angle")
 REGDEF(HoverP,  "[PPI] Hover Y displacement to Pitch angle")
 #undef REGDEF
