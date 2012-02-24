@@ -144,6 +144,7 @@ BITDEF(status, gps,     2,       "GPS available/lost")
 BITDEF(status, agl,     4,       "AGL valid")
 BITDEF(status, cas,     8,       "CAS valid")
 BITDEF(status, modem,   16,      "Data link available/lost")
+BITDEF(status, ahrsm,   128,     "AHRS mode inertial/gps")
 
 //--------- IMU --------------
 VARDEF(vect,  theta, -180,2,0,   "attitude: roll,pitch,yaw [deg]")
