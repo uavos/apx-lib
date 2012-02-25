@@ -43,7 +43,7 @@ enum{
 // node information, dynamically assigned values
 typedef uint8_t _node_sn[12]; //chip serial number
 typedef uint8_t _node_name[16]; //device name string
-typedef uint8_t _node_version[8]; //fw version string
+typedef uint8_t _node_version[16]; //fw version string
 //-------------------------------------------------
 // firmware information, saved in FLASH section [CONFIG]
 typedef struct {
