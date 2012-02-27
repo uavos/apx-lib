@@ -35,7 +35,7 @@
 typedef enum { wtHdg=0,wtLine,  wtCnt } _wpt_type;
 #define wt_str_def "Hdg","Line"
 typedef struct {
-  Vector        LLA;  //lat,lon,agl
+  _var_vect     LLA;  //lat,lon,agl
   _wpt_type     type;
   uint8_t       cmd[9]; //TODO: implement wpt commands
   uint          cmdSize;
@@ -44,8 +44,8 @@ typedef struct {
 typedef enum { rwtApproach=0,rwtParachute,  rwtCnt } _rw_type;
 #define rwt_str_def "Approach","Parachute"
 typedef struct {
-  Vector        LLA;  //start pos [lat lon agl]
-  Vector        dNED;
+  _var_vect     LLA;  //start pos [lat lon agl]
+  _var_vect     dNED;
   _rw_type      type;
   //calculated
   double        hdg;
@@ -121,7 +121,7 @@ public:
   uint    dl_size;              // last telemetry size statistics
   //---- derivatives calc by calcDGPS ----
   bool    derivatives_init;
-  Vector  last_vNED,last_aXYZ;
+  _var_vect  last_vNED,last_aXYZ;
   double  last_course;
   double  gps_lat_s,gps_lon_s; //change detect
 
@@ -146,34 +146,34 @@ public:
   //-----------------------------------------------------------------------------
   // additional methods (debug, math, NAV helper functions)
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
-  void dump(const Vector &v,const char *str="");
+  void dump(const _var_vect &v,const char *str="");
   void dump(const uint var_idx);
   void print_report(FILE *stream);
 
   // math operations
   double boundAngle(double v,double span=180.0);
-  Vector boundAngle(const Vector &v,double span=180.0);
+  _var_vect boundAngle(const _var_vect &v,double span=180.0);
   uint snap(uint v, uint snapv=10);
   double hyst(double err,double hyst);
   double limit(const double v,const double vL=1.0);
   double limit(const double v,const double vMin,const double vMax);
-  double ned2hdg(const Vector &ned,bool back=false); //return heading to NED frm (0,0,0)
-  double ned2dist(const Vector &ned); //return distance to to NED frm (0,0,0)
-  const Vector lla2ned(const Vector &lla);  // return NED from Lat Lon AGL
+  double ned2hdg(const _var_vect &ned,bool back=false); //return heading to NED frm (0,0,0)
+  double ned2dist(const _var_vect &ned); //return distance to to NED frm (0,0,0)
+  const _var_vect lla2ned(const _var_vect &lla);  // return NED from Lat Lon AGL
 
   void calcDGPS(const double dt=(1.0/(double)GPS_FREQ)); //calculate GPS derivatives
   void calc(void); // calculate vars dependent on current and desired UAV position
 
-  const Vector llh2ned(const Vector llh);
-  const Vector llh2ned(const Vector llh,const Vector home_llh);
-  const Vector rotate(const Vector &v_in,const double theta);
-  const Vector rotate(const Vector &v_in,const Vector &theta);
-  const Vector LLH_dist(const Vector &llh1,const Vector &llh2,const double lat,const double lon);
-  const Vector ECEF_dist(const Vector &ecef1,const Vector &ecef2,const double lat,const double lon);
-  const Vector ECEF2Tangent(const Vector &ECEF,const double latitude,const double longitude);
-  const Vector Tangent2ECEF(const Vector &Local,const double latitude,const double longitude);
-  const Vector ECEF2llh(const Vector &ECEF);
-  const Vector llh2ECEF(const Vector &llh);
+  const _var_vect llh2ned(const _var_vect llh);
+  const _var_vect llh2ned(const _var_vect llh,const _var_vect home_llh);
+  const _var_vect rotate(const _var_vect &v_in,const double theta);
+  const _var_vect rotate(const _var_vect &v_in,const _var_vect &theta);
+  const _var_vect LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const double lat,const double lon);
+  const _var_vect ECEF_dist(const _var_vect &ecef1,const _var_vect &ecef2,const double lat,const double lon);
+  const _var_vect ECEF2Tangent(const _var_vect &ECEF,const double latitude,const double longitude);
+  const _var_vect Tangent2ECEF(const _var_vect &Local,const double latitude,const double longitude);
+  const _var_vect ECEF2llh(const _var_vect &ECEF);
+  const _var_vect llh2ECEF(const _var_vect &llh);
   double sqr(double x);
   double inHgToAltitude(double inHg);
 private:

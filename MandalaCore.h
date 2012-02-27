@@ -34,39 +34,42 @@
 //=============================================================================
 //use double for ARM
 #ifdef USE_FLOAT_TYPE
+// Simplified Vector math
 typedef float   _var_float;
-#else
-typedef double  _var_float;
-#endif
-//=============================================================================
-class Vector
+class Vect
 {
 public:
-  Vector();
-  Vector(const _var_float &s);
-  Vector(const _var_float &s0,const _var_float &s1,const _var_float &s2);
+  Vect();
+  Vect(const _var_float &s);
+  Vect(const _var_float &s0,const _var_float &s1,const _var_float &s2);
   void fill(const _var_float &value=0);
   _var_float *array();
   const _var_float*array()const;
   _var_float &operator[](unsigned int index);
   const _var_float &operator[](unsigned int index)const;
-  Vector & operator=(const _var_float value);
-  bool operator==(const Vector &value)const;
-  bool operator!=(const Vector &value)const;
-  const Vector operator+(const Vector &that)const;
-  Vector &operator+=(const Vector &that);
-  const Vector operator-(const Vector &that)const;
-  Vector &operator-=(const Vector &that);
-  const Vector operator*(const _var_float &scale)const;
-  Vector &operator*=(const _var_float &scale);
-  const Vector operator/(const _var_float &scale)const;
-  Vector &operator/=(const _var_float &scale);
+  Vect & operator=(const _var_float value);
+  bool operator==(const Vect &value)const;
+  bool operator!=(const Vect &value)const;
+  const Vect operator+(const Vect &that)const;
+  Vect &operator+=(const Vect &that);
+  const Vect operator-(const Vect &that)const;
+  Vect &operator-=(const Vect &that);
+  const Vect operator*(const _var_float &scale)const;
+  Vect &operator*=(const _var_float &scale);
+  const Vect operator/(const _var_float &scale)const;
+  Vect &operator/=(const _var_float &scale);
 protected:
   _var_float v[3];
 };
+#else
+typedef double  _var_float;
+#include "MatrixMath.h"
+using namespace matrixmath;
+#endif
 //=============================================================================
-typedef Vector _var_vect;
-typedef uint    _var_uint;
+//=============================================================================
+typedef Vect _var_vect;
+typedef uint _var_uint;
 typedef const uint8_t*  _var_signature;
 //=============================================================================
 #include "MandalaVars.h" //get constants

@@ -413,44 +413,47 @@ void MandalaCore::filter(const _var_vect &v,_var_vect *var_p,const _var_float &S
 //=============================================================================
 //=============================================================================
 //=============================================================================
-Vector::Vector()
+#ifdef USE_FLOAT_TYPE
+// Simplified Vector math
+Vect::Vect()
 {this->fill();}
-Vector::Vector(const _var_float &s)
+Vect::Vect(const _var_float &s)
 {this->fill(s);}
-Vector::Vector(const _var_float &s0,const _var_float &s1,const _var_float &s2)
+Vect::Vect(const _var_float &s0,const _var_float &s1,const _var_float &s2)
 {(*this)[0]=s0;(*this)[1]=s1;(*this)[2]=s2;}
-void Vector::fill(const _var_float &value)
+void Vect::fill(const _var_float &value)
 {for(uint i=0;i<3;i++)this->v[i]=value;}
-_var_float *Vector::array()
+_var_float *Vect::array()
 {return this->v;}
-const _var_float*Vector::array()const
+const _var_float*Vect::array()const
 {return this->v;}
-_var_float &Vector::operator[](unsigned int index)
+_var_float &Vect::operator[](unsigned int index)
 {return this->v[index];}
-const _var_float &Vector::operator[](unsigned int index)const
+const _var_float &Vect::operator[](unsigned int index)const
 {return this->v[index];}
-Vector & Vector::operator=(const _var_float value)
+Vect & Vect::operator=(const _var_float value)
 {for(uint i=0;i<3;i++)(*this)[i]=value;return(*this);}
-bool Vector::operator==(const Vector &value)const
+bool Vect::operator==(const Vect &value)const
 {for(uint i=0;i<3;i++)if((*this)[i]!=value[i])return false;return true;}
-bool Vector::operator!=(const Vector &value)const
+bool Vect::operator!=(const Vect &value)const
 {for(uint i=0;i<3;i++)if((*this)[i]==value[i])return false;return true;}
-const Vector Vector::operator+(const Vector &that)const
-{return Vector(*this)+=that;}
-Vector &Vector::operator+=(const Vector &that)
+const Vect Vect::operator+(const Vect &that)const
+{return Vect(*this)+=that;}
+Vect &Vect::operator+=(const Vect &that)
 {for(uint i=0;i<3;i++)(*this)[i]+=that[i];return(*this);}
-const Vector Vector::operator-(const Vector &that)const
-{return Vector(*this)-=that;}
-Vector &Vector::operator-=(const Vector &that)
+const Vect Vect::operator-(const Vect &that)const
+{return Vect(*this)-=that;}
+Vect &Vect::operator-=(const Vect &that)
 {for(uint i=0;i<3;i++)(*this)[i]-=that[i];return(*this);}
-const Vector Vector::operator*(const _var_float &scale)const
-{return Vector(*this)*=scale;}
-Vector &Vector::operator*=(const _var_float &scale)
+const Vect Vect::operator*(const _var_float &scale)const
+{return Vect(*this)*=scale;}
+Vect &Vect::operator*=(const _var_float &scale)
 {for(uint i=0;i<3;i++)(*this)[i]*=scale;return (*this);}
-const Vector Vector::operator/(const _var_float &scale)const
-{return Vector(*this)/=scale;}
-Vector &Vector::operator/=(const _var_float &scale)
+const Vect Vect::operator/(const _var_float &scale)const
+{return Vect(*this)/=scale;}
+Vect &Vect::operator/=(const _var_float &scale)
 {for(uint i=0;i<3;i++)(*this)[i]/=scale;return (*this);}
+#endif
 //=============================================================================
 //=============================================================================
 //=============================================================================
