@@ -36,11 +36,6 @@
 #ifdef USE_FLOAT_TYPE
 // Simplified Vector math
 typedef float   _var_float;
-#else
-typedef double  _var_float;
-//#include "MatrixMath.h"
-//using namespace matrixmath;
-#endif
 class Vect
 {
 public:
@@ -66,6 +61,11 @@ public:
 protected:
   _var_float v[3];
 };
+#else
+typedef double  _var_float;
+#include "MatrixMath.h"
+using namespace matrixmath;
+#endif
 //=============================================================================
 //=============================================================================
 typedef Vect _var_vect;

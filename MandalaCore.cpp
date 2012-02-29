@@ -413,7 +413,7 @@ void MandalaCore::filter(const _var_vect &v,_var_vect *var_p,const _var_float &S
 //=============================================================================
 //=============================================================================
 //=============================================================================
-//#ifdef USE_FLOAT_TYPE
+#ifdef USE_FLOAT_TYPE
 // Simplified Vector math
 Vect::Vect()
 {this->fill();}
@@ -453,7 +453,7 @@ const Vect Vect::operator/(const _var_float &scale)const
 {return Vect(*this)/=scale;}
 Vect &Vect::operator/=(const _var_float &scale)
 {for(uint i=0;i<3;i++)(*this)[i]/=scale;return (*this);}
-//#endif
+#endif
 //=============================================================================
 //=============================================================================
 //=============================================================================
