@@ -144,6 +144,8 @@ BITDEF(status, gps,     2,       "GPS available/lost")
 BITDEF(status, agl,     4,       "AGL valid")
 BITDEF(status, cas,     8,       "CAS valid")
 BITDEF(status, modem,   16,      "Data link available/lost")
+BITDEF(status, bit6,    32,      "Reserved")
+BITDEF(status, glide,   64,      "Glide status")
 BITDEF(status, ahrsm,   128,     "AHRS mode inertial/gps")
 
 //--------- IMU --------------
