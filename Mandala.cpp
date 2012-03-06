@@ -731,7 +731,6 @@ const _var_vect Mandala::ECEF2Tangent(const _var_vect &ECEF,const double latitud
   double slat=sin(latitude);
   double slon=sin(longitude);
   double Re2t[3][3];
-  //libmat::Matrix<3,3>   Re2t;
 
   Re2t[0][0]=-slat*clon;
   Re2t[0][1]=-slat*slon;
@@ -750,7 +749,6 @@ const _var_vect Mandala::ECEF2Tangent(const _var_vect &ECEF,const double latitud
     c[i]=s;
   }
   return c;
-  //return Re2t*ECEF;
 }
 //=============================================================================
 const _var_vect Mandala::Tangent2ECEF(const _var_vect &Local,const double latitude,const double longitude)
