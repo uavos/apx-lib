@@ -138,12 +138,12 @@ const Vector<4> dpsi_dq(const Vector<4> & quat, const Matrix<3,3> & DCM) {
 //=============================================================================
 // MATH
 //=============================================================================
-const Quat qmethod(const _mat_float &a1,const _mat_float &a2,const Vect &r1,const Vect &r2,const Vect &b1,const Vect &b2)
+/*const Quat qmethod(const _mat_float &a1,const _mat_float &a2,const Vect &r1,const Vect &r2,const Vect &b1,const Vect &b2)
 {
   Vect Z=a1*cross(r1,b1)+a2*cross(r2,b2);
   Vect B=(a1*r1);//*b1;//+a2*r2*b2;
   //Vect B1=B*b1;
-}
+}*/
 //=============================================================================
 const Matrix<4,3> Tquat(const Quat &q)
 {
@@ -157,6 +157,48 @@ const Matrix<4,3> Tquat(const Quat &q)
     Vect( eps3, eta, -eps1),
     Vect(-eps2, eps1, eta)
   );
+}
+//=============================================================================
+const Quat qbuild(const Vect &eps)
+{
+  const _mat_float eta=sqrt(1-eps*eps);
+  return Quat(eta,eps[0],eps[1],eps[2]);
+}
+//=============================================================================
+const Matrix<3,3> Wmtrx(const Vect &eps,const Vect &v)
+{
+  const _mat_float eta=sqrt(1-eps*eps);
+  Matrix<3,3> W,Smtrx_v=eulerWx(v);
+  W=Smtrx_v*(2.0*eta);
+  W+=Smtrx_v*(-2.0/eta)*mult_T(eps,eps);
+  W+=eye<3,double>()*(2.0*(v*eps));
+  W+=mult_T(eps,v)*2;
+  W+=mult_T(v,eps)*(-4);
+  return W;
+}
+//=============================================================================
+const Quat qmult(const Quat &q1,const Quat &q2)
+{
+  const _mat_float eta1=q1[0];
+  const Vect eps1=Vect(q1[1],q1[2],q1[3]);
+  const _mat_float eta2=q2[0];
+  const Vect eps2=Vect(q2[1],q2[2],q2[3]);
+  const _mat_float eta=eta1*eta2 - eps1*eps2;
+  const Vect eps=eta1*eps2+eta2*eps1+cross(eps1,eps2);
+  return Quat(eta,eps[0],eps[1],eps[2]);
+}
+//=============================================================================
+const Matrix<4,4> Omega(const Vect &w)
+{
+  const _mat_float x=w[0];
+  const _mat_float y=w[1];
+  const _mat_float z=w[2];
+  Matrix<4,4> A;
+  A[0]=Quat(0,-x,-y,-z);
+  A[1]=Quat(x,0,z,-y);
+  A[2]=Quat(y,-z,0,x);
+  A[3]=Quat(z,y,-x,0);
+  return A;
 }
 //=============================================================================
 //=============================================================================

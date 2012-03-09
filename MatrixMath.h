@@ -117,7 +117,8 @@ public:
     return (*this);
   }
   Vector & operator/=(const T &scale) {
-    for (index_t i=0 ; i < n ; i++)
+    if(scale==0)(*this).fill(0);
+    else for (index_t i=0 ; i < n ; i++)
       (*this)[i] /= scale;
     return (*this);
   }
@@ -262,6 +263,7 @@ public:
   }
   Matrix & operator *= (const Matrix & B) { return (*this) = (*this) * B; }
 
+
   //Scale
   const Matrix operator * (const T & s) const { return Matrix(*this) *= s; }
   Matrix & operator *= (const T & s) {
@@ -319,6 +321,17 @@ const Vector<m,T> operator*(const Vector<n,T> & a,const Matrix<n,m,T> & B) {
   return c;
 }
 
+//Matrix<n,n> = Vector<n> * transpose(Vector<n>)
+template<const int n,class T>
+const Matrix<n,n,T> mult_T(const Vector<n,T> & a,const Vector<n,T> & b) {
+  typedef typename Vector<n,T>::index_t index_t;
+  Matrix<n,n,T> m;
+  for (index_t i=0 ; i<n ; i++)
+    for (index_t j=0 ; j<n ; j++)
+      m[i][j]=a[i]*b[j];
+  return m;
+}
+
 //three way multiplication
 template<const int n,const int m,const int p,const int q,class T>
 const Matrix<n,q,T> mult3(const Matrix<n,m,T> & a,const Matrix<m,p,T> & b,const Matrix<p,q,T> & c) {
@@ -347,9 +360,89 @@ const Matrix<N,N,T> diag(const Vector<N,T> & v) {
     m[i][i]=v[i];
   return m;
 }
-template<const int N,class T>
-const Matrix<N,N,T> eye() {
-  return diag<N,T>(Vector<N,T>(1.0));
+
+// Make a square identity matrix
+template< const int n, class T >
+const Matrix<n,n,T> eye() {
+    Matrix<n,n,T> A;
+    for ( int i=0 ; i<n ; i++ ) A[i][i] = T(1);
+    return A;
+}
+// Compute the LU factorization of a square matrix * A is modified, so we pass by value.
+template<const int n, class T >
+void LU( Matrix<n,n,T> A, Matrix<n,n,T> & L, Matrix<n,n,T> & U ) {
+    for ( int k=0 ; k<n-1 ; k++ ) {
+        for ( int i=k+1 ; i<n ; i++ ) {
+            A[i][k] = A[i][k] / A[k][k];
+            for ( int j=k+1 ; j<n ; j++ ) {
+                A[i][j] -= A[i][k] * A[k][j];
+            }
+        }
+    }
+    L = eye<n,T>(); /* Separate the L matrix */
+    for ( int j=0 ; j<n-1 ; j++ )
+      for ( int i=j+1 ; i<n ; i++ )
+        L[i][j] = A[i][j]; /* Separate the M matrix */
+    U.fill();
+    for ( int i=0 ; i<n ; i++ )
+      for ( int j=i ; j<n ; j++ )
+        U[i][j] = A[i][j];
+}
+// Invert a matrix using LU. * Special case for a 1x1 and 2x2 matrix first
+template< class T >
+const Matrix<1,1,T> invert( const Matrix<1,1,T> & A ) {
+    Matrix<1,1,T> B;
+    B[0][0] = T(1) / A[0][0];
+    return B;
+}
+template< class T >
+const Matrix<2,2,T> invert( const Matrix<2,2,T> & A ) {
+    Matrix<2,2,T> B;
+    const T det( A[0][0] * A[1][1] - A[0][1] * A[1][0] );
+    B[0][0] = A[1][1] / det;
+    B[0][1] = -A[0][1] / det;
+    B[1][0] = -A[1][0] / det;
+    B[1][1] = A[0][0] / det;
+    return B;
+}
+template< const int n, class T >
+const Vector<n,T> solve_upper( const Matrix<n,n,T> & A, const Vector<n,T> & b ) {
+    Vector<n,T> x;
+    for ( int i=n-1 ; i>=0 ; i-- ) {
+        T s( b[i] );
+        const Vector<n,T> & A_i( A[i] );
+        for ( int j=i+1 ; j<n ; ++j ) {
+            s -= A_i[j]*x[j];
+        } x[i] = s / A_i[i];
+    } return x;
+}
+template< const int n, class T >
+const Vector<n,T> solve_lower( const Matrix<n,n,T> & A, const Vector<n,T> & b ) {
+    Vector<n,T> x;
+    for ( int i=0; i<n; ++i) {
+        T s( b[i] );
+        const Vector<n,T> & A_i( A[i] );
+        for ( int j=0; j<i; ++j) {
+            s -= A_i[j] * x[j];
+        } x[i] = s / A_i[i];
+    } return x;
+}
+template< const int n, class T >
+const Matrix<n,n,T> invert( const Matrix<n,n,T> & M ) {
+    typedef Matrix<n,n,T> Matrix;
+    typedef Vector<n,T> Vector;
+    Matrix L;
+    Matrix U;
+    Matrix invU;
+    Matrix invL;
+    Vector identCol;
+    LU( M, L, U );
+    for ( int i=0 ; i<n ; i++ ) {
+        identCol[i] = T(1);
+        invU.col( i, solve_upper( U, identCol ) );
+        invL.col( i, solve_lower( L, identCol ) );
+        identCol[i] = T(0);
+    } return invU * invL;
 }
 //=============================================================================
 // DEBUG OUTPUT
@@ -449,16 +542,26 @@ extern const Quat dpsi_dq(const Quat & q, const Matrix<3,3> & DCM);
 // r - reference vector   (NED)
 // b - observation vector (BODY)
 // 100,1,[0 0 1]',[cos(decl) sin(decl) 0]',-acc/norm(acc),mag/norm(mag)
-extern const Quat qmethod(const _mat_float &a1,const _mat_float &a2,const Vect &r1,const Vect &r2,const Vect &b1,const Vect &b2);
+//extern const Quat qmethod(const _mat_float &a1,const _mat_float &a2,const Vect &r1,const Vect &r2,const Vect &b1,const Vect &b2);
 
 // For the quaternion differential equation:
 // q_dot = Tquat(q)*w
 extern const Matrix<4,3> Tquat(const Quat &q);
 
+// Construct the quaternion from the unit constraint
+extern const Quat qbuild(const Vect &eps);
 
+// Jacobian of Transposed rotation matrix:
+// Returns the partial derivative of  R(q)'*v  with
+// respect to eps, when q = [sqrt(1-eps'*eps); eps].
+extern const Matrix<3,3> Wmtrx(const Vect &eps,const Vect &v);
 
+// Quaternion multiplication
+extern const Quat qmult(const Quat &q1,const Quat &q2);
 
-
+// For the quaternion differential equation:
+// q_dot = Omega(w)*q;
+extern const Matrix<4,4> Omega(const Vect &w);
 
 
 
