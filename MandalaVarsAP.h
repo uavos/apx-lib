@@ -88,6 +88,7 @@ CFGDEF(float, mix_thr_Lo, 100,1,1,      "Pitch angle to Throttle limit (+/-) [%]
 
 CFGDEF(float, dyn_roll,  255,1,1, "Dynamics: roll angle change speed [deg/s]")
 CFGDEF(float, dyn_pitch, 255,1,1, "pitch angle change speed [deg/s]")
+CFGDEF(float, dyn_hystP, 25.5,1,0.1, "pitch error Kp hysterezis [deg]")
 
 CFGDEF(vect,  imu_align, -180,2,0.1,   "AHRS: body frame align (roll,pitch,yaw) [-180..0..+180]")
 
