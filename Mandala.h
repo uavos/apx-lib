@@ -42,11 +42,18 @@ typedef struct {
 }_waypoint;
 //----------------------
 typedef enum { rwtApproach=0,rwtParachute,  rwtCnt } _rw_type;
+typedef enum { rwaLeft=0,rwaRight, rwaCnt } _rw_app;
 #define rwt_str_def "Approach","Parachute"
+#define rwa_str_def "Left","Right"
 typedef struct {
   _var_vect     LLA;  //start pos [lat lon agl]
   _var_vect     dNED;
-  _rw_type      type;
+  _rw_type      rwType;
+  _rw_app       appType;
+  double        distApp;
+  double        altApp;
+  double        distTA;
+  double        altTA;
   //calculated
   double        hdg;
 }_runway;
@@ -107,6 +114,7 @@ public:
   _runway   runways[10];
   const char *wt_str[wtCnt];  //wt_type string descr
   const char *rwt_str[rwtCnt];  //wt_type string descr
+  const char *rwa_str[rwaCnt];  //wt_type string descr
 
   //---- Internal use -----
   // telemetry framework

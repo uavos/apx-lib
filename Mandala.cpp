@@ -105,6 +105,8 @@ Mandala::Mandala()
   for(uint i=0;i<wtCnt;i++) wt_str[i]=wt_str_s[i];
   static const char *rwt_str_s[rwtCnt]={ rwt_str_def };
   for(uint i=0;i<rwtCnt;i++) rwt_str[i]=rwt_str_s[i];
+  static const char *rwa_str_s[rwaCnt]={ rwa_str_def };
+  for(uint i=0;i<rwaCnt;i++) rwa_str[i]=rwa_str_s[i];
 
 
   //bitfield strings
@@ -326,7 +328,7 @@ void Mandala::fill_config_vdsc(uint8_t *buf,uint i)
 uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
 {
   const uint wptPackedSz=(var_size[idx_gps_lat])+(var_size[idx_gps_lon])+(var_size[idx_gps_hmsl])+1;
-  const uint rwPackedSz=wptPackedSz+(var_size[idx_NED]);
+  const uint rwPackedSz=wptPackedSz+(var_size[idx_NED])+5;
   const uint sz=wptPackedSz*wpcnt+rwPackedSz*rwcnt+2;
   if(bufSize<sz){
     printf("Can't archive flight plan, wrong buffer size (%u) need (%u).\n",bufSize,sz);
@@ -357,7 +359,12 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     buf+=archive(buf,bufSize,idx_gps_lon);
     buf+=archive(buf,bufSize,idx_gps_hmsl);
     buf+=archive(buf,bufSize,idx_NED);
-    *buf++=runways[i].type;
+    *buf++=runways[i].rwType;
+    *buf++=runways[i].appType;
+    *buf++=limit(runways[i].distApp/10,0,2550);
+    *buf++=limit(runways[i].altApp/10,0,2550);
+    *buf++=limit(runways[i].distTA/10,0,2550);
+    *buf++=limit(runways[i].altTA/10,0,2550);
   }
   gps_lat=gps_lat_save;
   gps_lon=gps_lon_save;
@@ -369,7 +376,7 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
 uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
 {
   const uint wptPackedSz=(var_size[idx_gps_lat])+(var_size[idx_gps_lon])+(var_size[idx_gps_hmsl])+1;
-  const uint rwPackedSz=wptPackedSz+(var_size[idx_NED]);
+  const uint rwPackedSz=wptPackedSz+(var_size[idx_NED])+5;
   const uint sz=wptPackedSz*buf[0]+rwPackedSz*buf[1]+2;
   if(cnt!=sz){
     printf("Can't extract flight plan, wrong data size (%u) need (%u).\n",cnt,sz);
@@ -405,7 +412,12 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     runways[i].LLA[0]=gps_lat;
     runways[i].LLA[1]=gps_lon;
     runways[i].LLA[2]=gps_hmsl;
-    runways[i].type=(_rw_type)*data++;
+    runways[i].rwType=(_rw_type)*data++;
+    runways[i].appType=(_rw_app)*data++;
+    runways[i].distApp=*data++*10;
+    runways[i].altApp=*data++*10;
+    runways[i].distTA=*data++*10;
+    runways[i].altTA=*data++*10;
     runways[i].dNED=NED;
     //printf("Runway%u (%s), NED(%.0f,%.0f,%.0f)\n",i+1,rwt_str[runways[i].type],runways[i].dNED[0],runways[i].dNED[1],runways[i].dNED[2]);
   }
