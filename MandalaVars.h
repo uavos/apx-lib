@@ -141,7 +141,7 @@ VARDEF(uint,  stage,    0,1,0,  "auto set to zero by mode change [maneuver stage
 VARDEF(uint,  status,   0,1,0,  "status flags bitfield")
 BITDEF(status, rc,      1,       "RC on/off")
 BITDEF(status, gps,     2,       "GPS available/lost")
-BITDEF(status, agl,     4,       "AGL valid")
+BITDEF(status, agl,     4,       "AGL available/off")
 BITDEF(status, cas,     8,       "CAS valid")
 BITDEF(status, modem,   16,      "Data link available/lost")
 BITDEF(status, bit6,    32,      "Reserved")
