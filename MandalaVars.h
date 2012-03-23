@@ -214,7 +214,8 @@ VARDEF(float, cmd_vspeed,   -12.7,1,0,  "desired vertical speed (for regPitchH) 
 VARDEF(uint,  wpcnt,     0,1,0,       "number of waypoints [0...]")
 VARDEF(uint,  wpType,    0,1,0,       "current waypoint type [wp_type]")
 VARDEF(uint,  wpidx,     0,1,0,       "current waypoint [0...]")
-VARDEF(uint,  rwcnt,     0,1,0,       "number of runways[0...]")
+VARDEF(uint,  rwcnt,     0,1,0,       "number of runways [0...]")
+VARDEF(uint,  rwidx,     0,1,0,       "current runway [0...]")
 
 //--------- CONTROLS --------------
 // fast controls
