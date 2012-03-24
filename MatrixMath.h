@@ -68,6 +68,12 @@ public:
 
   size_t size() const {return n;}
 
+  bool isNull(void){
+    for (index_t i=0 ; i < n ; i++)
+      if((*this)[i]!=0.0)return false;
+    return true;
+  }
+
 //Magnitude
   const T mag2() const {return (*this)*(*this);}
   const T mag() const {return sqrt(this->mag2());}
