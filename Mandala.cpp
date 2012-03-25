@@ -623,6 +623,7 @@ void Mandala::calc(void)
   homeHDG=ned2hdg(NED,true);
   rwDelta=dWPT*sin((wpHDG+180.0-rwHDG)*D2R)-rwAdj;
   rwDV=rotate(gps_vNED,rwHDG*D2R)[1];
+  gSpeed=ned2dist(gps_vNED);
 }
 //=============================================================================
 double Mandala::ned2hdg(const _var_vect &ned,bool back)

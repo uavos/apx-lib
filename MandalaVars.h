@@ -103,7 +103,7 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
       idx_dXYZ,
       idx_wpHDG,idx_rwDelta,idx_rwDV,
       idx_wpcnt,idx_rwcnt,
-      idx_NED,idx_vXYZ,idx_aXYZ,idx_crsRate,
+      idx_NED,idx_vXYZ,idx_aXYZ,idx_crsRate,idx_gSpeed,
       idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_steering,
       idx_gcu_RSS, idx_gcu_Ve, idx_gcu_MT,
       idx_pstatic )
@@ -283,6 +283,7 @@ VARDEF(float, dAlt,    -10000,2,0, "delta altitude [m]")
 VARDEF(vect,  vXYZ,    -50,1,0,    "bodyframe velocity: Vx,Vy,Vz [m/s]")
 VARDEF(vect,  dXYZ,    -10000,2,0, "bodyframe delta: dx,dy,dz [m]")
 VARDEF(vect,  aXYZ,    -100,2,0,   "acceleration by trajectory: atx,aty,atz [m/s2]")
+VARDEF(float, gSpeed,  655.35,2,0, "ground speed [m]")
 VARDEF(float, crsRate, -50,1,0,    "trajectory course change rate [deg/s]")
 VARDEF(float, wpHDG,   -180,2,0,   "current waypoint heading [deg]")
 VARDEF(float, rwHDG,   -180,2,0,   "current runway heading [deg]")
