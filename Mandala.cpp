@@ -590,9 +590,12 @@ void Mandala::calcDGPS(const double dt)
   // calculate NED
   NED=llh2ned(_var_vect(gps_lat*D2R,gps_lon*D2R,gps_hmsl));
 
+  //calculate GPS velocity vector
+  double crs=ned2hdg(gps_vNED);
+
   _var_vect theta_r=theta*D2R;
   // calculate frame velocities
-  theta_r[2]=gps_course*D2R;
+  theta_r[2]=crs*D2R;//gps_course*D2R;
   vXYZ=rotate(gps_vNED,theta_r);
 
   _var_vect acc;
