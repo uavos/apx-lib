@@ -103,6 +103,7 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
       idx_dXYZ,
       idx_wpHDG,idx_rwDelta,idx_rwDV,
       idx_wpcnt,idx_rwcnt,
+      idx_windSpd,idx_windHdg,
       idx_NED,idx_vXYZ,idx_aXYZ,idx_crsRate,idx_gSpeed,
       idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_steering,
       idx_gcu_RSS, idx_gcu_Ve, idx_gcu_MT,
@@ -291,7 +292,9 @@ VARDEF(float, rwDelta, -127,1,0,   "runway alignment [m]")
 VARDEF(float, rwDV,    -12.7,1,0,  "runway alignment velocity [m/s]")
 
 //--------- uplink only/internal use --------------
-VARDEF(float, rwAdj,   -127,1,0,   "runway displacement adjust during takeoff or landing [m]")
+VARDEF(float, windSpd,  25.5,1,0,   "wind speed [m/s]")
+VARDEF(float, windHdg,  -180,1,0,   "wind direction to [deg]")
+VARDEF(float, rwAdj,    -127,1,0,   "runway displacement adjust during takeoff or landing [m]")
 
 //--------- GCU use only --------------
 VARDEF(float, gcu_RSS,  1.0,1,0,  "GCU modem signal strength [0..1]")
