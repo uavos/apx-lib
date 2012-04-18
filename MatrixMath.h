@@ -116,7 +116,7 @@ public:
 
 //multiply to scalar
   const Vector operator*(const T &scale) const {return Vector(*this)*=scale;}
-  const Vector operator/(const T &scale) const {return Vector(*this)/=scale;}
+  const Vector operator/(const T &scale) const {if(scale==0)return Vector(*this)*=scale;return Vector(*this)/=scale;}
   Vector & operator*=(const T &scale) {
     for (index_t i=0 ; i < n ; i++)
       (*this)[i] *= scale;
@@ -130,8 +130,8 @@ public:
   }
 
 //Normalize a vector
-  const Vector norm() const {return (*this)/this->mag();}
-  Vector & norm_self() {return (*this)/=this->mag();}
+  const Vector norm() const {T m=this->mag();if(m==0)return (*this)*m;return (*this)/m;}
+  Vector & norm_self() {T m=this->mag();if(m==0)return (*this)*=m;return (*this)/=m;}
 }; //Vector class
 //------------------------------------------------------------------------------
 //Multiplication is commutative.
@@ -234,8 +234,8 @@ public:
   }
 
 //Add two matrixes, returning the sum of the two
-  const Matrix & operator+ (const Matrix & that) const { return Matrix(*this) += that; }
-  const Matrix & operator- (const Matrix & that) const { return Matrix(*this) -= that; }
+  const Matrix operator+ (const Matrix & that) const { Matrix sr(*this); sr+= that; return  sr; }
+  const Matrix operator- (const Matrix & that) const { Matrix sr(*this); sr-= that; return  sr; }
 
 //Update the matrix in place
   Matrix & operator+= (const Matrix & that) {
@@ -271,7 +271,7 @@ public:
 
 
   //Scale
-  const Matrix operator * (const T & s) const { return Matrix(*this) *= s; }
+  const Matrix operator * (const T & s) const { Matrix sr(*this); sr*= s; return  sr; }
   Matrix & operator *= (const T & s) {
     for (index_t i=0 ; i<n ; i++)
       (*this)[i] *= s;
@@ -548,7 +548,7 @@ extern const Quat dpsi_dq(const Quat & q, const Matrix<3,3> & DCM);
 // r - reference vector   (NED)
 // b - observation vector (BODY)
 // 100,1,[0 0 1]',[cos(decl) sin(decl) 0]',-acc/norm(acc),mag/norm(mag)
-//extern const Quat qmethod(const _mat_float &a1,const _mat_float &a2,const Vect &r1,const Vect &r2,const Vect &b1,const Vect &b2);
+extern const Quat qmethod(const _mat_float &a1,const _mat_float &a2,const Vect &r1,const Vect &r2,const Vect &b1,const Vect &b2);
 
 // For the quaternion differential equation:
 // q_dot = Tquat(q)*w

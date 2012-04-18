@@ -91,6 +91,7 @@ CFGDEF(float, dyn_pitch, 255,1,1, "pitch angle change speed [deg/s]")
 CFGDEF(float, dyn_hystP, 25.5,1,0.1, "pitch error Kp hysterezis [deg]")
 
 CFGDEF(vect,  imu_align, -180,2,0.1,   "AHRS: body frame align (roll,pitch,yaw) [-180..0..+180]")
+CFGDEF(vect,  imu_gps_arm, -12.7,1,0.1,   "gps lever arm (x,y,z) [m]")
 
 CFGDEF(float, wptSnap,   0,1,0,        "Waypoints: waypoint snap distance [m]")
 

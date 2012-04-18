@@ -22,7 +22,10 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <iostream>
 #include "MatrixMath.h"
+#define debug(a) std::cout<< #a << a <<std::endl
 //=============================================================================
 namespace matrixmath {
 //=============================================================================
@@ -80,8 +83,8 @@ const Vector<3> quat2euler(const Quat & q) {
   const _mat_float & q2 = q[2];
   const _mat_float & q3 = q[3];
   _mat_float theta = -asin(2*(q1*q3 - q0*q2));
-  _mat_float phi = atan2(2*(q2*q3 + q0*q1), 1-2*(q1*q1 + q2*q2));
-  _mat_float psi = atan2(2*(q1*q2 + q0*q3), 1-2*(q2*q2 + q3*q3));
+  _mat_float phi = atan2(2.0*(q2*q3 + q0*q1), 1.0-2.0*(q1*q1 + q2*q2));
+  _mat_float psi = atan2(2.0*(q1*q2 + q0*q3), 1.0-2.0*(q2*q2 + q3*q3));
   return Vector<3>(phi, theta, psi);
 }
 const Quat euler2quat(const Vector<3> & euler) {
@@ -138,12 +141,25 @@ const Vector<4> dpsi_dq(const Vector<4> & quat, const Matrix<3,3> & DCM) {
 //=============================================================================
 // MATH
 //=============================================================================
-/*const Quat qmethod(const _mat_float &a1,const _mat_float &a2,const Vect &r1,const Vect &r2,const Vect &b1,const Vect &b2)
+const Quat qmethod(const _mat_float &a1,const _mat_float &a2,const Vect &r1,const Vect &r2,const Vect &b1,const Vect &b2)
 {
   Vect Z=a1*cross(r1,b1)+a2*cross(r2,b2);
-  Vect B=(a1*r1);//*b1;//+a2*r2*b2;
-  //Vect B1=B*b1;
-}*/
+  Matrix<3,3> B=mult_T(a1*r1,b1)+mult_T(a2*r2,b2);
+  debug(B);
+  Matrix<3,3> S=B+B.transpose();
+  debug(S);
+  _mat_float sigma=trace(B);
+  //Compute the K matrixmath
+  Matrix<4,4> K(
+    Vector<4>(-sigma,Z[0],Z[1],Z[2]),
+    Vector<4>(Z[0],-S[0][0]+sigma,-S[0][1],-S[0][2]),
+    Vector<4>(Z[1],-S[1][0],-S[1][1]+sigma,-S[1][2]),
+    Vector<4>(Z[2],-S[2][0],-S[2][1],-S[2][2]+sigma)
+  );
+  debug(Z);
+  debug(K);
+  //Find the eigenvector for the smallest eigenvalue of K
+}
 //=============================================================================
 const Matrix<4,3> Tquat(const Quat &q)
 {
@@ -161,16 +177,18 @@ const Matrix<4,3> Tquat(const Quat &q)
 //=============================================================================
 const Quat qbuild(const Vect &eps)
 {
-  const _mat_float eta=sqrt(1-eps*eps);
+  const double eps2=eps*eps;
+  const _mat_float eta=eps2>=1?0:sqrt(1-eps2);
   return Quat(eta,eps[0],eps[1],eps[2]);
 }
 //=============================================================================
 const Matrix<3,3> Wmtrx(const Vect &eps,const Vect &v)
 {
-  const _mat_float eta=sqrt(1-eps*eps);
+  const double eps2=eps*eps;
+  const _mat_float eta=eps2>=1?0:sqrt(1-eps2);
   Matrix<3,3> W,Smtrx_v=eulerWx(v);
   W=Smtrx_v*(2.0*eta);
-  W+=Smtrx_v*(-2.0/eta)*mult_T(eps,eps);
+  W+=Smtrx_v*(eta==0?0:(-2.0/eta))*mult_T(eps,eps);
   W+=eye<3,double>()*(2.0*(v*eps));
   W+=mult_T(eps,v)*2;
   W+=mult_T(v,eps)*(-4);
