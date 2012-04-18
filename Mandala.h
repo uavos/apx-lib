@@ -182,6 +182,9 @@ public:
   const _var_vect Tangent2ECEF(const _var_vect &Local,const double latitude,const double longitude);
   const _var_vect ECEF2llh(const _var_vect &ECEF);
   const _var_vect llh2ECEF(const _var_vect &llh);
+  const _var_vect ned2llh(const _var_vect &ned);
+  const _var_vect ned2llh(const _var_vect &ned,const _var_vect &home_llh);
+  const _var_vect ned2ecef(const _var_vect &ned,const _var_vect &home_llh);
   double sqr(double x);
   double inHgToAltitude(double inHg);
 private:

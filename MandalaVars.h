@@ -48,12 +48,11 @@ enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig,vt_core_top};
 #define MAG_DEC     -0.270944862           //magnetic declination of Stanford (rad): -15.15
 #define MM2M         0.001                 //mm to m
 
-#define C_WGS84_a   6378137.0         // WGS-84 semimajor axis (m)
-#define C_WGS84_a_F 6378137.0f
-#define C_WGS84_b   6356752.3142      // WGS-84 semiminor axis (m)
-#define C_WGS84_b_F 6356752.3142f
+//WGS-84
+#define C_WGS84_a   6378137.0           // earth equitorial radius
+#define C_WGS84_b   6356752.3142        // earth polor radius
+#define C_WGS84_f   ((C_WGS84_a-C_WGS84_b)/C_WGS84_a)
 #define C_WIE       7.2321151467e-05  // WGS-84 earth rotation rate (rad/s)
-#define C_WIE_F     7.2321151467e-05f
 //=============================================================================
 #define VA_NUM_ARGS(...) ( sizeof(#__VA_ARGS__)==sizeof("")?0:\
   VA_NUM_ARGS_IMPL(__VA_ARGS__, 32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1) )
@@ -166,7 +165,7 @@ VARDEF(float, pstatic_gnd,    35.0,4,0,    "Static pressure on ground level [inH
 VARDEF(float, gps_lat,     -90,4,0,     "latitude [deg]")
 VARDEF(float, gps_lon,     -180,4,0,     "longitude [deg]")
 VARDEF(float, gps_hmsl,    -10000,2,0,   "altitude above sea [m]")
-VARDEF(vect,  gps_vNED,    -150,2,1,     "velocity: Vnorth, Veast, Vdown [m/s]")
+VARDEF(vect,  gps_vNED,    -150,2,2,     "velocity: Vnorth, Veast, Vdown [m/s]")
 VARDEF(float, gps_course,  -180,2,1,     "GPS course [deg]")
 VARDEF(float, gps_home_lat, -90,4,0,    "home latitude [deg]")
 VARDEF(float, gps_home_lon, -180,4,0,    "home longitude [deg]")

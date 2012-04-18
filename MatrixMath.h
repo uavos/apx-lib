@@ -132,6 +132,18 @@ public:
 //Normalize a vector
   const Vector norm() const {T m=this->mag();if(m==0)return (*this)*m;return (*this)/m;}
   Vector & norm_self() {T m=this->mag();if(m==0)return (*this)*=m;return (*this)/=m;}
+
+//quaternion
+  const Vector & qbuild(const Vector<3> &eps) {
+    const _mat_float eps2=1.0-eps*eps;
+    const _mat_float eta=eps2<=0?0:sqrt(eps2);
+    (*this)[0]=eta;
+    (*this)[1]=eps[0];
+    (*this)[2]=eps[1];
+    (*this)[3]=eps[2];
+    return (*this);
+  }
+
 }; //Vector class
 //------------------------------------------------------------------------------
 //Multiplication is commutative.
@@ -227,9 +239,8 @@ public:
   const Matrix operator-() const {
     Matrix Mn;
     for (index_t i=0 ; i<n ; i++)
-      for (index_t j=0 ; j<m ; j++) {
+      for (index_t j=0 ; j<m ; j++)
         Mn[i][j] = -(*this)[i][j];
-      }
     return Mn;
   }
 
@@ -300,6 +311,64 @@ public:
     }
     return sqrt(v);
   }
+  // Make a square identity matrix
+  const Matrix & eye(const T &value=T(1)) {
+    Matrix<n,m,T> & A(*this);
+    for (index_t i=0 ; i<n ; i++)
+      for (index_t j=0 ; j<m ; j++)
+        A[i][j] = i==j?value:T();
+    return A;
+  }
+  // Add a square identity matrix
+  const Matrix & eye_add(const T &value=T(1)) {
+    Matrix<n,m,T> & A(*this);
+    for (index_t i=0 ; i<n ; i++)
+      A[i][i]+=value;
+    return A;
+  }
+// construct a direction cosine matrix from quaternions in the standard
+// rotation sequence [phi][theta][psi] from NED to body frame
+// body = tBL(3,3)*NED q(4,1)
+  const Matrix & quatDC(const Vector<4> & q){
+    const _mat_float & q0 = q[0];
+    const _mat_float & q1 = q[1];
+    const _mat_float & q2 = q[2];
+    const _mat_float & q3 = q[3];
+    Matrix<n,m,T> & A(*this);
+    Vector<3> &A0=A[0];
+    Vector<3> &A1=A[1];
+    Vector<3> &A2=A[2];
+    A0[0]=1.0-2*(q2*q2 + q3*q3);
+    A0[1]=2*(q1*q2 + q0*q3);
+    A0[2]=2*(q1*q3 - q0*q2);
+    A1[0]=2*(q1*q2 - q0*q3);
+    A1[1]=1.0-2*(q1*q1 + q3*q3);
+    A1[2]=2*(q2*q3 + q0*q1);
+    A2[0]=2*(q1*q3 + q0*q2);
+    A2[1]=2*(q2*q3 - q0*q1);
+    A2[2]=1.0-2*(q1*q1 + q2*q2);
+    return A;
+  }
+  const Matrix & quatDC_T(const Vector<4> & q){ //transposed
+    const _mat_float & q0 = q[0];
+    const _mat_float & q1 = q[1];
+    const _mat_float & q2 = q[2];
+    const _mat_float & q3 = q[3];
+    Matrix<n,m,T> & A(*this);
+    Vector<3> &A0=A[0];
+    Vector<3> &A1=A[1];
+    Vector<3> &A2=A[2];
+    A0[0]=1.0-2*(q2*q2 + q3*q3);
+    A0[1]=2*(q1*q2 - q0*q3);
+    A0[2]=2*(q1*q3 + q0*q2);
+    A1[0]=2*(q1*q2 + q0*q3);
+    A1[1]=1.0-2*(q1*q1 + q3*q3);
+    A1[2]=2*(q2*q3 - q0*q1);
+    A2[0]=2*(q1*q3 - q0*q2);
+    A2[1]=2*(q2*q3 + q0*q1);
+    A2[2]=1.0-2*(q1*q1 + q2*q2);
+    return A;
+  }
 
 }; //Matrix
 //------------------------------------------------------------------------------
@@ -368,12 +437,12 @@ const Matrix<N,N,T> diag(const Vector<N,T> & v) {
 }
 
 // Make a square identity matrix
-template< const int n, class T >
+/*template< const int n, class T >
 const Matrix<n,n,T> eye() {
     Matrix<n,n,T> A;
     for ( int i=0 ; i<n ; i++ ) A[i][i] = T(1);
     return A;
-}
+}*/
 // Compute the LU factorization of a square matrix * A is modified, so we pass by value.
 template<const int n, class T >
 void LU( Matrix<n,n,T> A, Matrix<n,n,T> & L, Matrix<n,n,T> & U ) {
@@ -385,7 +454,7 @@ void LU( Matrix<n,n,T> A, Matrix<n,n,T> & L, Matrix<n,n,T> & U ) {
             }
         }
     }
-    L = eye<n,T>(); /* Separate the L matrix */
+    L.eye(); /* Separate the L matrix */
     for ( int j=0 ; j<n-1 ; j++ )
       for ( int i=j+1 ; i<n ; i++ )
         L[i][j] = A[i][j]; /* Separate the M matrix */
@@ -488,7 +557,7 @@ extern const Matrix<3,3> eulerDC(const Vector<3> & euler);
 // construct a direction cosine matrix from quaternions in the standard
 // rotation sequence [phi][theta][psi] from NED to body frame
 // body = tBL(3,3)*NED q(4,1)
-extern const Matrix<3,3> quatDC(const Quat & q);
+//extern const Matrix<3,3> quatDC(const Quat & q);
 
 //construct the euler omega-cross matrix wx(3,3)
 // p, q, r (rad/sec)
@@ -553,9 +622,6 @@ extern const Quat qmethod(const _mat_float &a1,const _mat_float &a2,const Vect &
 // For the quaternion differential equation:
 // q_dot = Tquat(q)*w
 extern const Matrix<4,3> Tquat(const Quat &q);
-
-// Construct the quaternion from the unit constraint
-extern const Quat qbuild(const Vect &eps);
 
 // Jacobian of Transposed rotation matrix:
 // Returns the partial derivative of  R(q)'*v  with

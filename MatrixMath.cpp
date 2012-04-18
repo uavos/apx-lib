@@ -45,7 +45,7 @@ const Matrix<3,3> eulerDC(const Vector<3> & euler) {
            Vector<3>(spsi*sphi + cpsi*stheta*cphi, -cpsi*sphi + spsi*stheta*cphi, ctheta*cphi)
          );
 }
-const Matrix<3,3> quatDC(const Quat & q) {
+/*const Matrix<3,3> quatDC(const Quat & q) {
   const _mat_float & q0 = q[0];
   const _mat_float & q1 = q[1];
   const _mat_float & q2 = q[2];
@@ -55,7 +55,7 @@ const Matrix<3,3> quatDC(const Quat & q) {
            Vector<3>(2*(q1*q2 - q0*q3),1.0-2*(q1*q1 + q3*q3),2*(q2*q3 + q0*q1)),
            Vector<3>(2*(q1*q3 + q0*q2),2*(q2*q3 - q0*q1),1.0-2*(q1*q1 + q2*q2))
          );
-}
+}*/
 const Matrix<3,3> eulerWx(const Vector<3> & euler) {
   const _mat_float & p = euler[0];
   const _mat_float & q = euler[1];
@@ -175,13 +175,6 @@ const Matrix<4,3> Tquat(const Quat &q)
   );
 }
 //=============================================================================
-const Quat qbuild(const Vect &eps)
-{
-  const double eps2=eps*eps;
-  const _mat_float eta=eps2>=1?0:sqrt(1-eps2);
-  return Quat(eta,eps[0],eps[1],eps[2]);
-}
-//=============================================================================
 const Matrix<3,3> Wmtrx(const Vect &eps,const Vect &v)
 {
   const double eps2=eps*eps;
@@ -189,7 +182,7 @@ const Matrix<3,3> Wmtrx(const Vect &eps,const Vect &v)
   Matrix<3,3> W,Smtrx_v=eulerWx(v);
   W=Smtrx_v*(2.0*eta);
   W+=Smtrx_v*(eta==0?0:(-2.0/eta))*mult_T(eps,eps);
-  W+=eye<3,double>()*(2.0*(v*eps));
+  W.eye_add(2.0*(v*eps));
   W+=mult_T(eps,v)*2;
   W+=mult_T(v,eps)*(-4);
   return W;

@@ -727,6 +727,58 @@ const _var_vect Mandala::llh2ned(const _var_vect llh,const _var_vect home_llh)
   return LLH_dist(home_llh,llh,home_llh[0],home_llh[1]);
 }
 //===========================================================================
+const _var_vect Mandala::ned2llh(const _var_vect &ned)
+{
+  return ned2llh(ned,_var_vect(gps_home_lat*D2R,gps_home_lon*D2R,gps_home_hmsl));
+}
+//===========================================================================
+const _var_vect Mandala::ned2llh(const _var_vect &ned,const _var_vect &home_llh)
+{
+  //return ECEF2llh(Tangent2ECEF(Vect(ned[0],ned[1],ned[2]-C_WGS84_a*2),home_llh[0],home_llh[1]));
+  //NED to ECEF
+  Vect siteECEF=llh2ECEF(home_llh);
+  double lat=home_llh[0];
+  double lon=home_llh[1];
+  double cosLat = cos(lat);
+  double sinLat = sin(lat);
+  double cosLon = cos(lon);
+  double sinLon = sin(lon);
+  double conversionMatrix [3][3] =
+  {{-sinLat * cosLon, -sinLat * sinLon, cosLat},
+    {-sinLon,          cosLon,           0.0},
+    {-cosLat * cosLon, -cosLat * sinLon, -sinLat}};
+  _var_vect ecef;
+  double down=ned[2];//-C_WGS84_a;
+  ecef[0] = siteECEF[0]+conversionMatrix[0][0] * ned[0] + conversionMatrix[1][0] * ned[1] + conversionMatrix[2][0] * down;
+  ecef[1] = siteECEF[1]+conversionMatrix[0][1] * ned[0] + conversionMatrix[1][1] * ned[1] + conversionMatrix[2][1] * down;
+  ecef[2] = siteECEF[2]+conversionMatrix[0][2] * ned[0] + conversionMatrix[1][2] * ned[1] + conversionMatrix[2][2] * down;
+
+  //ECEF to LLH
+  double e = sqrt(2.0 * C_WGS84_f - C_WGS84_f * C_WGS84_f);
+  double h = 0;
+  double N = C_WGS84_a;
+  _var_vect llh;
+  llh[1] = atan2(ecef[1], ecef[0]); // longitude
+  for(int n = 0; n < 50; ++n) {
+    double sin_lat = ecef[2] / (N * (1.0 - e * e) + h);
+    llh[0] = atan((ecef[2] + e * e * N * sin_lat) / sqrt(ecef[0] * ecef[0] + ecef[1] * ecef[1]));
+    N = C_WGS84_a / sqrt(1.0 - e * e * sin(llh[0]) * sin(llh[0]));
+    h = sqrt(ecef[0] * ecef[0] + ecef[1] * ecef[1]) / cos(llh[0]) - N;
+  }
+
+  llh[2] = h;
+  //geocentric latitude to geodetic latitude
+
+
+  return llh;//ECEF2llh(Tangent2ECEF(ned,home_llh[0],home_llh[1]));
+}
+//===========================================================================
+const _var_vect Mandala::ned2ecef(const _var_vect &ned,const _var_vect &home_llh)
+{
+
+
+}
+//===========================================================================
 const _var_vect Mandala::LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const double lat,const double lon)
 {
   const _var_vect &ecef1(llh2ECEF(llh1));
