@@ -104,7 +104,7 @@ public:
 
   void filter(const _var_float &v,_var_float *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
   void filter(const _var_vect &v,_var_vect *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
-
+  void filter_m(const _var_float &v,_var_float *var_p,const _var_float &f);
   //member=mask, if var is a bitfield, or vect idx, or array idx
   _var_float get_value(uint var_m);
   _var_float get_value(uint var_idx,uint member_idx);
@@ -139,7 +139,9 @@ public:
   uint do_archive_vdsc(void);
   uint do_extract_vdsc(uint cnt);
 
-  bool do_archive_telemetry;
+  // flag to use alternate bytes field for packing vars
+  // used for telemetry (smaller size, less precision)
+  bool alt_bytecnt;
 
 private:
 

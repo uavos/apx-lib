@@ -118,6 +118,7 @@ public:
 
   //---- Internal use -----
   // telemetry framework
+  bool    dl_hd;                // don't decrease byte cnt for downstream
   uint8_t dl_snapshot[2048];    // all archived variables snapshot
   bool    dl_reset;             // set true to send everything next time
   uint8_t dl_reset_mask[128/8]; // bitmask 1=var send anyway, auto clear after sent
@@ -125,7 +126,7 @@ public:
   uint    dl_frcnt;             // downlink frame cnt for eeror check (inc by archiveTelemety)
   uint    dl_errcnt;            // errors counter (by extractTelemetry)
   uint    dl_timestamp;         // time[ms]
-  uint    dl_dt;                // dt[ms] by extractTelemetry
+  uint    dl_dt;                // dt[ms] of telemetry stream
   uint    dl_size;              // last telemetry size statistics
   //---- derivatives calc by calcDGPS ----
   bool    derivatives_init;
@@ -184,7 +185,6 @@ public:
   const _var_vect llh2ECEF(const _var_vect &llh);
   const _var_vect ned2llh(const _var_vect &ned);
   const _var_vect ned2llh(const _var_vect &ned,const _var_vect &home_llh);
-  const _var_vect ned2ecef(const _var_vect &ned,const _var_vect &home_llh);
   double sqr(double x);
   double inHgToAltitude(double inHg);
 private:

@@ -102,7 +102,7 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
       idx_dXYZ,
       idx_wpHDG,idx_rwDelta,idx_rwDV,
       idx_wpcnt,idx_rwcnt,
-      idx_windSpd,idx_windHdg,
+//      idx_windSpd,idx_windHdg,
       idx_NED,idx_vXYZ,idx_aXYZ,idx_crsRate,idx_gSpeed,
       idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_steering,
       idx_gcu_RSS, idx_gcu_Ve, idx_gcu_MT,
@@ -165,7 +165,7 @@ VARDEF(float, pstatic_gnd,    35.0,4,0,    "Static pressure on ground level [inH
 VARDEF(float, gps_lat,     -90,4,0,     "latitude [deg]")
 VARDEF(float, gps_lon,     -180,4,0,     "longitude [deg]")
 VARDEF(float, gps_hmsl,    -10000,2,0,   "altitude above sea [m]")
-VARDEF(vect,  gps_vNED,    -150,2,2,     "velocity: Vnorth, Veast, Vdown [m/s]")
+VARDEF(vect,  gps_vNED,    -150,2,1,     "velocity: Vnorth, Veast, Vdown [m/s]")
 VARDEF(float, gps_course,  -180,2,1,     "GPS course [deg]")
 VARDEF(float, gps_home_lat, -90,4,0,    "home latitude [deg]")
 VARDEF(float, gps_home_lon, -180,4,0,    "home longitude [deg]")
@@ -272,6 +272,11 @@ VARDEF(float, cam_lat,     -180,4,0,   "camera track latitude [deg]")
 VARDEF(float, cam_lon,     -180,4,0,   "camera track longitude [deg]")
 VARDEF(float, cam_alt,     -10000,2,0, "camera track altitude [m]")
 
+//--------- dynamic tuning --------------
+VARDEF(float, windSpd,  6553.5,2,0, "wind speed [m/s]")
+VARDEF(float, windHdg,  360,2,0,    "wind direction to 0..360 [deg]")
+VARDEF(float, rwAdj,    -32767,2,0, "runway displacement adjust during takeoff or landing [m]")
+
 //--------- calculated by Mandala::calc() --------------
 VARDEF(vect,  NED,     -10000,2,0, "local position: north,east,down [m]")
 VARDEF(float, homeHDG, -180,2,0,   "heading to home position [deg]")
@@ -289,11 +294,6 @@ VARDEF(float, wpHDG,   -180,2,0,   "current waypoint heading [deg]")
 VARDEF(float, rwHDG,   -180,2,0,   "current runway heading [deg]")
 VARDEF(float, rwDelta, -127,1,0,   "runway alignment [m]")
 VARDEF(float, rwDV,    -12.7,1,0,  "runway alignment velocity [m/s]")
-
-//--------- uplink only/internal use --------------
-VARDEF(float, windSpd,  25.5,1,0,   "wind speed [m/s]")
-VARDEF(float, windHdg,  -180,1,0,   "wind direction to [deg]")
-VARDEF(float, rwAdj,    -127,1,0,   "runway displacement adjust during takeoff or landing [m]")
 
 //--------- GCU use only --------------
 VARDEF(float, gcu_RSS,  1.0,1,0,  "GCU modem signal strength [0..1]")

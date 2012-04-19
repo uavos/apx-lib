@@ -49,6 +49,7 @@ Mandala::Mandala()
   dl_dt=1000/TELEMETRY_FREQ;
   dl_size=0;
   dl_reset=true;
+  dl_hd=false;
 
   derivatives_init=false;
   gps_lat_s=0;
@@ -174,7 +175,7 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   }
   //printf("extracting: %s\n",var_name[var_idx]);
   uint vsz=var_size[var_idx];
-  if((!do_archive_telemetry)&&((!vsz)||(vsz>size))){
+  if((!alt_bytecnt)&&((!vsz)||(vsz>size))){
     fprintf(stderr,"Error: extract %s #%u (sz: %u, buf: %u)\n",var_name[var_idx],var_idx,vsz,size);
     return 0;
   }
@@ -445,6 +446,11 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
     memset(dl_reset_mask,0xFF,sizeof(dl_reset_mask));
     dl_reset=false;
   }
+  //timestamp and special cases
+  buf[0]=(dl_frcnt++)&0x7F;
+  if(dl_hd) buf[0]|=0x80;
+  buf[1]=dl_timestamp/(1000/AHRS_FREQ);
+  //pack stream
   uint8_t *reset_mask_ptr=dl_reset_mask;
   uint cnt=0,mask_cnt=0,mask_cnt_zero=1;
   uint8_t *snapshot=dl_snapshot;
@@ -452,7 +458,7 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
   uint8_t *mask_ptr=buf+2;      //start of data
   uint8_t *ptr=mask_ptr+1;
   *mask_ptr=0;
-  do_archive_telemetry=true;    //for var pack size
+  alt_bytecnt=!dl_hd;    //for var pack size
   for(uint i=idxPAD;i<(idxPAD+128);i++){
     uint sz=var_size[i];
     if(!sz)break; //valid vars end
@@ -488,19 +494,12 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
       ptr++;
     }
   }
-  do_archive_telemetry=false;
+  alt_bytecnt=false;
 
   if(!(dl_timestamp%dl_reset_interval)) // periodically send everything
     dl_reset=true;
 
-
-  /*if(!cnt){
-    dl_timestamp+=dl_dt;
-    return 0;
-  }*/
-  buf[0]=dl_frcnt++;
-  buf[1]=dl_timestamp/100;
-  dl_timestamp+=1000/TELEMETRY_FREQ;
+  dl_timestamp+=dl_dt;//1000/TELEMETRY_FREQ;
   dl_size=cnt+mask_cnt+2;
   return dl_size;
 }
@@ -509,22 +508,25 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
 {
   //get timestamps and stats
   dl_size=cnt;
-  uint fr_d=((buf[0]-dl_frcnt)&0xFF);
+  uint frcnt=buf[0]&0x7F;
+  dl_hd=buf[0]&0x80;
+  uint fr_d=((frcnt-dl_frcnt)&0x7F);
   if(fr_d>1)dl_errcnt+=fr_d-1;
   dl_frcnt+=fr_d;
-  dl_dt=((buf[1]-dl_timestamp/100)&0xFF)*100;
+  uint dtu=(1000/AHRS_FREQ);
+  dl_dt=((buf[1]-dl_timestamp/dtu)&0xFF)*dtu;
+  if(!dl_dt)dl_dt=dtu; //default
   dl_timestamp+=dl_dt;
-  if(!dl_dt)dl_dt=100; //default
   //extract data
   uint tcnt=2;
-  do_archive_telemetry=true;    //for var pack size
+  alt_bytecnt=!dl_hd;    //for var pack size
   if(cnt>2){
     tcnt=extract_stream(buf+2,cnt-2);
     if(!tcnt){
       fprintf(stderr,"Error extract_downstream");
     }
   }
-  do_archive_telemetry=false;
+  alt_bytecnt=false;
   // calculate vars filtered by sig dl_filter
   //check if to calc derivatives (gps fix)
   if((gps_lat_s!=gps_lat)||(gps_lon_s!=gps_lon)){
@@ -588,7 +590,7 @@ uint Mandala::extract_clrb(uint8_t *buf,uint cnt)
 void Mandala::calcDGPS(const double dt)
 {
   // calculate NED
-  NED=llh2ned(_var_vect(gps_lat*D2R,gps_lon*D2R,gps_hmsl));
+  //NED=llh2ned(_var_vect(gps_lat*D2R,gps_lon*D2R,gps_hmsl));
 
   //calculate GPS velocity vector
   double crs=ned2hdg(gps_vNED);
@@ -734,49 +736,7 @@ const _var_vect Mandala::ned2llh(const _var_vect &ned)
 //===========================================================================
 const _var_vect Mandala::ned2llh(const _var_vect &ned,const _var_vect &home_llh)
 {
-  //return ECEF2llh(Tangent2ECEF(Vect(ned[0],ned[1],ned[2]-C_WGS84_a*2),home_llh[0],home_llh[1]));
-  //NED to ECEF
-  Vect siteECEF=llh2ECEF(home_llh);
-  double lat=home_llh[0];
-  double lon=home_llh[1];
-  double cosLat = cos(lat);
-  double sinLat = sin(lat);
-  double cosLon = cos(lon);
-  double sinLon = sin(lon);
-  double conversionMatrix [3][3] =
-  {{-sinLat * cosLon, -sinLat * sinLon, cosLat},
-    {-sinLon,          cosLon,           0.0},
-    {-cosLat * cosLon, -cosLat * sinLon, -sinLat}};
-  _var_vect ecef;
-  double down=ned[2];//-C_WGS84_a;
-  ecef[0] = siteECEF[0]+conversionMatrix[0][0] * ned[0] + conversionMatrix[1][0] * ned[1] + conversionMatrix[2][0] * down;
-  ecef[1] = siteECEF[1]+conversionMatrix[0][1] * ned[0] + conversionMatrix[1][1] * ned[1] + conversionMatrix[2][1] * down;
-  ecef[2] = siteECEF[2]+conversionMatrix[0][2] * ned[0] + conversionMatrix[1][2] * ned[1] + conversionMatrix[2][2] * down;
-
-  //ECEF to LLH
-  double e = sqrt(2.0 * C_WGS84_f - C_WGS84_f * C_WGS84_f);
-  double h = 0;
-  double N = C_WGS84_a;
-  _var_vect llh;
-  llh[1] = atan2(ecef[1], ecef[0]); // longitude
-  for(int n = 0; n < 50; ++n) {
-    double sin_lat = ecef[2] / (N * (1.0 - e * e) + h);
-    llh[0] = atan((ecef[2] + e * e * N * sin_lat) / sqrt(ecef[0] * ecef[0] + ecef[1] * ecef[1]));
-    N = C_WGS84_a / sqrt(1.0 - e * e * sin(llh[0]) * sin(llh[0]));
-    h = sqrt(ecef[0] * ecef[0] + ecef[1] * ecef[1]) / cos(llh[0]) - N;
-  }
-
-  llh[2] = h;
-  //geocentric latitude to geodetic latitude
-
-
-  return llh;//ECEF2llh(Tangent2ECEF(ned,home_llh[0],home_llh[1]));
-}
-//===========================================================================
-const _var_vect Mandala::ned2ecef(const _var_vect &ned,const _var_vect &home_llh)
-{
-
-
+  return ECEF2llh(llh2ECEF(home_llh)+Tangent2ECEF(ned,home_llh[0],home_llh[1]));
 }
 //===========================================================================
 const _var_vect Mandala::LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const double lat,const double lon)

@@ -33,7 +33,7 @@
 #include "MandalaVars.h"
 //=============================================================================
 MandalaCore::MandalaCore()
-  : do_archive_telemetry(false)
+  : alt_bytecnt(false)
 {
 }
 //===========================================================================
@@ -63,7 +63,7 @@ uint MandalaCore::vdsc_fill(uint8_t *buf,uint var_idx)
       default:
         return 0;
     }
-    if(do_archive_telemetry&&(vdsc.sbytes_t!=0)){
+    if(alt_bytecnt&&(vdsc.sbytes_t!=0)){
       vdsc.sbytes=vdsc.sbytes_t;
       vdsc.max=vdsc.max_t;
       vdsc.size=vdsc.size_t;
@@ -407,6 +407,10 @@ void MandalaCore::filter(const _var_float &v,_var_float *var_p,const _var_float 
 void MandalaCore::filter(const _var_vect &v,_var_vect *var_p,const _var_float &S,const _var_float &L)
 {
   for(uint i=0;i<3;i++)filter(v[i],&((*var_p)[i]),S,L);
+}
+void MandalaCore::filter_m(const _var_float &v,_var_float *var_p,const _var_float &f)
+{
+  *var_p=(*var_p)*(1.0-f)+v*f;
 }
 //===========================================================================
 //=============================================================================
