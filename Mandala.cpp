@@ -465,7 +465,7 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
     sz=archive(dl_var,sizeof(dl_var),i);
     //check if filtered var
     bool filtered=memchr(dl_filter+1,i,dl_filter[0])!=NULL;
-    if((*reset_mask_ptr)&mask) (*reset_mask_ptr)&=~mask;
+    if((*reset_mask_ptr)&mask) (*reset_mask_ptr)&=~mask; //remove reset flag
     else{
       //test changed
       filtered|=(memcmp(snapshot,dl_var,sz)==0);
@@ -473,7 +473,10 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
     //pack if not filtered
     if(!filtered){
       //check buf overflow
-      if((cnt+mask_cnt+mask_cnt_zero+sz+2)>=maxSize)break;
+      if((cnt+mask_cnt+mask_cnt_zero+sz+2)>=maxSize){
+        (*reset_mask_ptr)|=mask; //recover reset flag (send later)
+        break;
+      }
       //post variable
       memcpy(snapshot,dl_var,sz);
       memcpy(ptr,dl_var,sz);
@@ -532,6 +535,7 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
   if((gps_lat_s!=gps_lat)||(gps_lon_s!=gps_lon)){
     gps_lat_s=gps_lat;
     gps_lon_s=gps_lon;
+    NED=llh2ned(_var_vect(gps_lat*D2R,gps_lon*D2R,gps_hmsl));
     calcDGPS();
   }
   // gps_deltaNED,gps_deltaXYZ,gps_distWPT,gps_distHome,

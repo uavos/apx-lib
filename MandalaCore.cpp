@@ -332,12 +332,12 @@ uint MandalaCore::extract_stream(uint8_t *buf,uint cnt)
   uint mask=1;
   uint8_t *mask_ptr=buf;
   uint8_t *ptr=mask_ptr+1;
-  int tcnt=cnt;
+  int tcnt=cnt-1;
   uint idx=idxPAD;
   do{
     for(uint i=0;i<8;i++){
       if((*mask_ptr)&mask){
-        if(tcnt<=0)return 0;
+        if(tcnt<=0)break;
         uint sz=do_extract(ptr,tcnt,idx);
         if(!sz)return 0;
         ptr+=sz;
