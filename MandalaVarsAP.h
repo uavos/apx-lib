@@ -69,10 +69,10 @@ REGDEF(HoverP,  "[PPI] Hovering Y Displacement to Pitch")
 #endif
 //-------------------------------
 // PID variables
-CFGDEFA(vect, pidK,regCnt,  655.35,2,0.01, "PID coeffitients Kp,Ki,Kd [K]")
-CFGDEFA(vect, pidL,regCnt,  100,1,1,       "PID limits Lp,Li,Ld [%]")
-CFGDEFA(float,pidKs,regCnt, 25.5,1,1,      "PID speed coeff [K-1]")
-CFGDEFA(float,pidLo,regCnt, 100,1,1,       "PID out limits Lo [%]")
+CFGDEFA(vect, pidK,regCnt,  655.35,2,0.01, "proportional,integral,derivative [K]")
+CFGDEFA(vect, pidL,regCnt,  100,1,1,       "limit [%]")
+CFGDEFA(float,pidKs,regCnt, 25.5,1,1,      "speed coeff [K-1]")
+CFGDEFA(float,pidLo,regCnt, 100,1,1,       "output limit [%]")
 
 // description format:
 // <Group>: text (vect axis names if any)
