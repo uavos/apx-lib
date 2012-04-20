@@ -67,18 +67,29 @@ REGDEF(HoverP,  "[PPI] Hovering Y Displacement to Pitch")
 #ifndef CFGDEFA
 #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
 #endif
-//-------------------------------
-// PID variables
-CFGDEFA(vect, pidK,regCnt,  655.35,2,0.01, "proportional,integral,derivative [K]")
-CFGDEFA(vect, pidL,regCnt,  100,1,1,       "limit [%]")
-CFGDEFA(float,pidKs,regCnt, 25.5,1,1,      "speed coeff [K-1]")
-CFGDEFA(float,pidLo,regCnt, 100,1,1,       "output limit [%]")
-
 // description format:
 // <Group>: text (vect axis names if any)
 // vect axis names used to create text names in ConfigModel
 // <Group> may be ommited if repeated
 // vect arrays not allowed (by ConfigModel)
+//-------------------------------
+// PID variables
+CFGDEFA(vect, pidK,regCnt,  655.35,2,0.01, "proportional,integral,derivative [K]")
+CFGDEFA(vect, pidL,regCnt,  100,1,1,       "limit [%]")
+CFGDEFA(float,pidLo,regCnt, 100,1,1,       "output limit [%]")
+
+CFGDEF(float, Ks_speed_low,     255,1,1,     "Speed: low speed value for multiplier [m/s]")
+CFGDEF(float, Ks_speed_high,    255,1,1,     "high speed value for multiplier [m/s]")
+CFGDEF(float, Ks_ailerons_low,  25.5,1,0.1,  "low speed ailerons multiplier [K]")
+CFGDEF(float, Ks_ailerons_high, 2.55,1,0.01, "high speed ailerons multiplier [K]")
+CFGDEF(float, Ks_elevator_low,  25.5,1,0.1,  "low speed elevator multiplier [K]")
+CFGDEF(float, Ks_elevator_high, 2.55,1,0.01, "high speed elevator multiplier [K]")
+CFGDEF(float, Ks_rudder_low,    25.5,1,0.1,  "low speed rudder multiplier [K]")
+CFGDEF(float, Ks_rudder_high,   2.55,1,0.01, "high speed rudder multiplier [K]")
+CFGDEF(float, Ks_steering_low,  25.5,1,0.1,  "low speed steering multiplier [K]")
+CFGDEF(float, Ks_roll_high,     2.55,1,0.01, "high speed bank angle multiplier [K]")
+CFGDEF(float, Ks_pitch_high,    2.55,1,0.01, "high speed pitch angle multiplier [K]")
+
 CFGDEF(float, mix_elv_Kp, -1.27,1,0.01, "Mixer: Roll angle to Elevator mix")
 CFGDEF(float, mix_elv_Lo, 100,1,1,      "Roll angle to Elevator limit")
 CFGDEF(float, mix_rud_Kp, -12.7,1,0.1,  "Roll angle to Rudder mix")

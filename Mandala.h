@@ -128,10 +128,7 @@ public:
   uint    dl_timestamp;         // time[ms]
   uint    dl_dt;                // dt[ms] of telemetry stream
   uint    dl_size;              // last telemetry size statistics
-  //---- derivatives calc by calcDGPS ----
-  bool    derivatives_init;
-  _var_vect  last_vNED,last_aXYZ;
-  double  last_course;
+  //---- calc ----
   double  gps_lat_s,gps_lon_s; //change detect
 
   const char      *reg_names[regCnt];
@@ -170,7 +167,6 @@ public:
   double ned2dist(const _var_vect &ned); //return distance to to NED frm (0,0,0)
   const _var_vect lla2ned(const _var_vect &lla);  // return NED from Lat Lon AGL
 
-  void calcDGPS(const double dt=(1.0/(double)GPS_FREQ)); //calculate GPS derivatives
   void calc(void); // calculate vars dependent on current and desired UAV position
 
   const _var_vect llh2ned(const _var_vect llh);

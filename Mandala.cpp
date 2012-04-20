@@ -51,7 +51,6 @@ Mandala::Mandala()
   dl_reset=true;
   dl_hd=false;
 
-  derivatives_init=false;
   gps_lat_s=0;
   gps_lon_s=0;
 
@@ -536,7 +535,6 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
     gps_lat_s=gps_lat;
     gps_lon_s=gps_lon;
     NED=llh2ned(_var_vect(gps_lat*D2R,gps_lon*D2R,gps_hmsl));
-    calcDGPS();
   }
   // gps_deltaNED,gps_deltaXYZ,gps_distWPT,gps_distHome,
   calc();
@@ -590,33 +588,6 @@ uint Mandala::extract_clrb(uint8_t *buf,uint cnt)
 }
 //=============================================================================
 //=============================================================================
-//=============================================================================
-void Mandala::calcDGPS(const double dt)
-{
-  // calculate NED
-  //NED=llh2ned(_var_vect(gps_lat*D2R,gps_lon*D2R,gps_hmsl));
-
-  //calculate GPS velocity vector
-  double crs=ned2hdg(gps_vNED);
-
-  _var_vect theta_r=theta*D2R;
-  // calculate frame velocities
-  theta_r[2]=crs*D2R;//gps_course*D2R;
-  vXYZ=rotate(gps_vNED,theta_r);
-
-  _var_vect acc;
-  if(derivatives_init)
-    acc=rotate((gps_vNED-last_vNED)/dt,theta_r);
-  last_vNED=gps_vNED;
-  aXYZ=acc;
-
-  //calc course rate (derivative)
-  if(derivatives_init)
-    crsRate=boundAngle(gps_course-last_course)/dt;
-  last_course=gps_course;
-
-  derivatives_init=true;
-}
 //=============================================================================
 void Mandala::calc(void)
 {
