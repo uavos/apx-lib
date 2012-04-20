@@ -68,12 +68,12 @@ REGDEF(HoverP,  "[PPI] Hovering Y Displacement to Pitch")
 #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
 #endif
 //-------------------------------
-// PID variables (the first 3 vars are hardcoded to GCU ConfigModel)
-CFGDEFA(vect, pidK,regCnt,  655.35,2,0.01, "PID coeffitients Kp,Ki,Kd")
+// PID variables
+CFGDEFA(vect, pidK,regCnt,  655.35,2,0.01, "PID coeffitients Kp,Ki,Kd [K]")
 CFGDEFA(vect, pidL,regCnt,  100,1,1,       "PID limits Lp,Li,Ld [%]")
+CFGDEFA(float,pidKs,regCnt, 25.5,1,1,      "PID speed coeff [K-1]")
 CFGDEFA(float,pidLo,regCnt, 100,1,1,       "PID out limits Lo [%]")
 
-// other variables (added to ConfigModel) automatically.
 // description format:
 // <Group>: text (vect axis names if any)
 // vect axis names used to create text names in ConfigModel
@@ -114,7 +114,6 @@ CFGDEF(float, speedMinFlaps,   0,1,1,     "min airspeed (stall) with flaps down 
 CFGDEF(float, speedMaxFlaps,   0,1,1,     "max airspeed (VNE) with flaps down [m/s]")
 CFGDEF(float, altitude,        2550,1,10,"safe altitude, HOME, TA mode [m]")
 CFGDEF(float, stbyR,  -1270,1,10,         "standby radius, positive CW, negative CCW [m]")
-CFGDEF(float, spdKp,  25.5,1,0.1,         "speed to stabilization (multiplier) [K-1]")
 
 CFGDEF(float, takeoff_flaps,     1,1,0.1,   "Takeoff: flaps level [0..1]")
 CFGDEF(float, takeoff_thrRise,   1,1,0.01,  "initial throttle rise speed [1/s]")
