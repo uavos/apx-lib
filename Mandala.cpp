@@ -215,7 +215,7 @@ uint Mandala::archive_config(uint8_t *buf,uint bufSize)
 {
   uint sz=var_size[idx_config];
   if(bufSize<sz){
-    printf("Can't archive config, wrong buffer size (%u) need (%u).\n",bufSize,sz);
+    fprintf(stderr,"Can't archive config, wrong buffer size (%u) need (%u).\n",bufSize,sz);
     return 0;
   }
   for(uint i=0;i<cfgCnt;i++){
@@ -255,7 +255,7 @@ uint Mandala::extract_config(uint8_t *buf,uint cnt)
 {
   uint sz=var_size[idx_config];
   if(cnt!=sz){
-    printf("Can't extract config, wrong data size (%u) need (%u).\n",cnt,sz);
+    fprintf(stderr,"Can't extract config, wrong data size (%u) need (%u).\n",cnt,sz);
     return 0;
   }
   for(uint i=0;i<cfgCnt;i++){
@@ -331,7 +331,7 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
   const uint rwPackedSz=wptPackedSz+(var_size[idx_NED])+5;
   const uint sz=wptPackedSz*wpcnt+rwPackedSz*rwcnt+2;
   if(bufSize<sz){
-    printf("Can't archive flight plan, wrong buffer size (%u) need (%u).\n",bufSize,sz);
+    fprintf(stderr,"Can't archive flight plan, wrong buffer size (%u) need (%u).\n",bufSize,sz);
     return 0;
   }
   uint8_t *sbuf=buf;
@@ -379,7 +379,7 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
   const uint rwPackedSz=wptPackedSz+(var_size[idx_NED])+5;
   const uint sz=wptPackedSz*buf[0]+rwPackedSz*buf[1]+2;
   if(cnt!=sz){
-    printf("Can't extract flight plan, wrong data size (%u) need (%u).\n",cnt,sz);
+    fprintf(stderr,"Can't extract flight plan, wrong data size (%u) need (%u).\n",cnt,sz);
     return 0;
   }
   wpcnt=buf[0];
@@ -557,7 +557,7 @@ uint Mandala::extract_setb(uint8_t *buf,uint cnt)
     bChk=bChk&&extract(buf+1,cnt-1,var_idx);
   }
   if(!bChk){
-    printf("Can't extract 'set_bit'. Integrity check error.");
+    fprintf(stderr,"Can't extract 'set_bit'. Integrity check error.");
     return 0;
   }
   *ptr|=old_v;
@@ -580,7 +580,7 @@ uint Mandala::extract_clrb(uint8_t *buf,uint cnt)
     bChk=bChk&&extract(buf+1,cnt-1,var_idx);
   }
   if(!bChk){
-    printf("Can't extract 'clr_bit'. Integrity check error.");
+    fprintf(stderr,"Can't extract 'clr_bit'. Integrity check error.");
     return 0;
   }
   *ptr=old_v&~(*ptr);
