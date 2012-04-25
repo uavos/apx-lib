@@ -82,7 +82,6 @@ class Mandala : public MandalaCore
 public:
   const char *    var_name[256];  //text name
   const char *    var_descr[256]; //text description
-  double          var_round[256]; //round value for CFG vars
   uint            var_size[256];  //size of whole packed var
   void *          var_ptr[256];
   uint            var_type[256];

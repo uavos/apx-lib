@@ -32,7 +32,6 @@ Mandala::Mandala()
   for (uint i=0;i<256;i++) {
     var_name[i]="";
     var_descr[i]="";
-    var_round[i]=0;
     var_bits[i]=0;
     var_span[i]=0;
     var_ptr[i]=NULL;
