@@ -412,6 +412,10 @@ void MandalaCore::filter_m(const _var_float &v,_var_float *var_p,const _var_floa
 {
   *var_p=(*var_p)*(1.0-f)+v*f;
 }
+void MandalaCore::filter_m(const _var_vect &v,_var_vect *var_p,const _var_float &f)
+{
+  for(uint i=0;i<3;i++)filter_m(v[i],&((*var_p)[i]),f);
+}
 //===========================================================================
 //=============================================================================
 //=============================================================================

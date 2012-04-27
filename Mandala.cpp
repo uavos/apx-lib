@@ -52,7 +52,6 @@ Mandala::Mandala()
 
   gps_lat_s=0;
   gps_lon_s=0;
-
   //------------------------
 
 #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
@@ -819,7 +818,6 @@ double Mandala::inHgToAltitude(double inHg)
 {
   return (1.0-powf(inHg/pstatic_gnd,0.190284))*(145366.45*0.3048);
 }
-//=============================================================================
 //=============================================================================
 //=============================================================================
 void Mandala::dump(const uint8_t *ptr,uint cnt,bool hex)
