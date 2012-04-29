@@ -104,6 +104,8 @@ CFGDEF(float, dyn_hystP, 25.5,1,0.1, "pitch error Kp hysterezis [deg]")
 CFGDEF(vect,  imu_align, -180,2,0.1,      "AHRS: body frame align (roll,pitch,yaw) [-180..0..+180]")
 CFGDEF(vect,  imu_gps_arm, -12.7,1,0.1,   "gps lever arm (x,y,z) [m]")
 CFGDEF(float, imu_decl,   -90,2,0.01,     "Magnetic declination [deg]")
+CFGDEF(float, imu_facc,   2.55,1,0.01,    "acc filter")
+CFGDEF(float, imu_fgyr,   2.55,1,0.01,    "gyro filter")
 
 CFGDEF(float, wptSnap,   0,1,0,        "Waypoints: waypoint snap distance [m]")
 
@@ -144,7 +146,7 @@ CFGDEF(float, ld_finPitchSpdKp,25.5,1,0.1, "final descending pitch speed Kp [K]"
 CFGDEF(float, ld_tdPitch,  0,1,1,       "touchdown pitch bias [deg]")
 CFGDEF(float, ld_tdAGL,    25.5,1,0.1,  "AGL altitude before touchdown [m]")
 CFGDEF(float, ld_zeroAGL,  25.5,1,0.1,  "AGL altitude on the ground [m]")
-
+/*
 CFGDEF(float, mekf_q_gyr, 25.5,1,0.1,   "MEKF: f(Gyro variance)")
 CFGDEF(float, mekf_q_bgyr,25.5,1,0.1,   "f(Gyro bias variance)")
 CFGDEF(float, mekf_q_pos, 25.5,1,0.1,   "f(pos variance)")
@@ -154,9 +156,7 @@ CFGDEF(float, mekf_r_mag, 25.5,1,0.1,   "Magnetometer variance")
 CFGDEF(float, mekf_r_acc, 25.5,1,0.1,   "Accelerometer variance")
 CFGDEF(float, mekf_r_pos, 25.5,1,0.1,   "GPS position variance")
 CFGDEF(float, mekf_r_vel, 25.5,1,0.1,   "GPS velocity variance")
-CFGDEF(float, mekf_f_acc, 2.55,1,0.01,  "acc filter")
-CFGDEF(float, mekf_f_gyr, 2.55,1,0.01,  "gyro filter")
-
+*/
 //=============================================================================
 #undef CFGDEF
 #undef CFGDEFA
