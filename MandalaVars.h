@@ -188,6 +188,7 @@ VARDEF(float, Im,     255,1,0,    "engine current [A]")
 //--------- OTHER AP SENSORS --------------
 VARDEF(float, rpm,    0,2,0,     "engine RPM [1/min]")
 VARDEF(float, agl,    25.5,1,0,  "Above Ground Level altitude [m]")
+VARDEF(float, slip,   -127,1,0,  "slip [deg]")
 
 //--------- TEMPERATURES --------------
 VARDEF(float, AT,    -127,1,0,    "ambient temperature [C]")
@@ -209,6 +210,7 @@ VARDEF(float, cmd_rpm,      25500,1,0,  "desired RPM [rpm]")
 VARDEF(float, cmd_altitude, -10000,2,0, "desired altitude [m]")
 VARDEF(float, cmd_airspeed, 0,1,0,      "desired airspeed (for regThr) [m/s]")
 VARDEF(float, cmd_vspeed,   -12.7,1,0,  "desired vertical speed (for regPitchH) [m/s]")
+VARDEF(float, cmd_slip,     -127,1,0,   "desired slip [deg]")
 
 //--------- WAYPOINTS --------------
 VARDEF(uint,  wpcnt,     0,1,0,       "number of waypoints [0...]")

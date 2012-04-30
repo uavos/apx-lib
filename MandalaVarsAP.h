@@ -53,6 +53,7 @@ REGDEF(Steering,"[PID] Yaw angle to Steering")
 REGDEF(Runway,  "[PID] Runway Displacement to Course")
 REGDEF(Path,    "[PID] Trajectory Path to Course")
 REGDEF(Glider,  "[PI]  Airspeed to Pitch angle")
+REGDEF(Slip,    "[PI]  Slip rate to Rudder")
 REGDEF(HoverR,  "[PPI] Hovering X Displacement to Roll")
 REGDEF(HoverP,  "[PPI] Hovering Y Displacement to Pitch")
 #undef REGDEF
@@ -104,8 +105,8 @@ CFGDEF(float, dyn_hystP, 25.5,1,0.1, "pitch error Kp hysterezis [deg]")
 CFGDEF(vect,  imu_align, -180,2,0.1,      "AHRS: body frame align (roll,pitch,yaw) [-180..0..+180]")
 CFGDEF(vect,  imu_gps_arm, -12.7,1,0.1,   "gps lever arm (x,y,z) [m]")
 CFGDEF(float, imu_decl,   -90,2,0.01,     "Magnetic declination [deg]")
-CFGDEF(float, imu_facc,   2.55,1,0.01,    "acc filter")
-CFGDEF(float, imu_fgyr,   2.55,1,0.01,    "gyro filter")
+CFGDEF(float, imu_facc,   2.55,1,0.01,    "Accelerometers filter [0..1]")
+CFGDEF(float, imu_fgyr,   2.55,1,0.01,    "Gyro filter [0..1]")
 
 CFGDEF(float, wptSnap,   0,1,0,        "Waypoints: waypoint snap distance [m]")
 
