@@ -147,7 +147,7 @@ CFGDEF(float, ld_finPitchSpdKp,25.5,1,0.1, "final descending pitch speed Kp [K]"
 CFGDEF(float, ld_tdPitch,  0,1,1,       "touchdown pitch bias [deg]")
 CFGDEF(float, ld_tdAGL,    25.5,1,0.1,  "AGL altitude before touchdown [m]")
 CFGDEF(float, ld_zeroAGL,  25.5,1,0.1,  "AGL altitude on the ground [m]")
-/*
+
 CFGDEF(float, mekf_q_gyr, 25.5,1,0.1,   "MEKF: f(Gyro variance)")
 CFGDEF(float, mekf_q_bgyr,25.5,1,0.1,   "f(Gyro bias variance)")
 CFGDEF(float, mekf_q_pos, 25.5,1,0.1,   "f(pos variance)")
@@ -157,7 +157,7 @@ CFGDEF(float, mekf_r_mag, 25.5,1,0.1,   "Magnetometer variance")
 CFGDEF(float, mekf_r_acc, 25.5,1,0.1,   "Accelerometer variance")
 CFGDEF(float, mekf_r_pos, 25.5,1,0.1,   "GPS position variance")
 CFGDEF(float, mekf_r_vel, 25.5,1,0.1,   "GPS velocity variance")
-*/
+
 //=============================================================================
 #undef CFGDEF
 #undef CFGDEFA
