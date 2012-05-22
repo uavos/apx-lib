@@ -88,7 +88,7 @@ CFGDEF(float, Ks_elevator_high, 2.55,1,0.01, "high speed elevator multiplier [K]
 CFGDEF(float, Ks_rudder_low,    25.5,1,0.1,  "low speed rudder multiplier [K]")
 CFGDEF(float, Ks_rudder_high,   2.55,1,0.01, "high speed rudder multiplier [K]")
 CFGDEF(float, Ks_steering_low,  25.5,1,0.1,  "low speed steering multiplier [K]")
-CFGDEF(float, Ks_roll_high,     2.55,1,0.01, "high speed bank angle multiplier [K]")
+CFGDEF(float, Ks_roll_gs_low,   2.55,1,0.01, "low gspeed bank angle multiplier [K]")
 CFGDEF(float, Ks_pitch_high,    2.55,1,0.01, "high speed pitch angle multiplier [K]")
 
 CFGDEF(float, mix_elv_Kp, -1.27,1,0.01, "Mixer: Roll angle to Elevator mix")
