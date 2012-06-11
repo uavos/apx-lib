@@ -102,10 +102,10 @@ class MandalaCore
 public:
   MandalaCore();
 
-  void filter(const _var_float &v,_var_float *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
-  void filter(const _var_vect &v,_var_vect *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
-  void filter_m(const _var_float &v,_var_float *var_p,const _var_float &f);
-  void filter_m(const _var_vect &v,_var_vect *var_p,const _var_float &f);
+  static void filter(const _var_float &v,_var_float *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
+  static void filter(const _var_vect &v,_var_vect *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
+  static void filter_m(const _var_float &v,_var_float *var_p,const _var_float &f);
+  static void filter_m(const _var_vect &v,_var_vect *var_p,const _var_float &f);
   //member=mask, if var is a bitfield, or vect idx, or array idx
   _var_float get_value(uint var_m);
   _var_float get_value(uint var_idx,uint member_idx);
