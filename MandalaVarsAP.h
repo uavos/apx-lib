@@ -54,6 +54,7 @@ REGDEF(Runway,  "[PP/PD] Runway Displacement to Course")
 REGDEF(Path,    "[PP/PD] Trajectory Path to Course")
 REGDEF(Glider,  "[PI]  Airspeed to Pitch angle")
 REGDEF(Slip,    "[PI]  Slip rate to Rudder")
+REGDEF(ThrVar,  "[PI]  Variometer to Throttle/RPM")
 REGDEF(HoverR,  "[PPI] Hovering X Displacement to Roll")
 REGDEF(HoverP,  "[PPI] Hovering Y Displacement to Pitch")
 #undef REGDEF
@@ -100,7 +101,7 @@ CFGDEF(float, mix_thr_Lo, 100,1,1,      "Pitch angle to Throttle limit (+/-) [%]
 
 CFGDEF(float, dyn_roll,  255,1,1, "Dynamics: roll angle change speed [deg/s]")
 CFGDEF(float, dyn_pitch, 255,1,1, "pitch angle change speed [deg/s]")
-CFGDEF(float, dyn_hystP, 25.5,1,0.1, "pitch error Kp hysterezis [deg]")
+CFGDEF(float, dyn_pitchDiff, 2.55,1,0.1, "pitch differential multiplier down [K]")
 
 CFGDEF(vect,  imu_align, -180,2,0.1,      "AHRS: body frame align (roll,pitch,yaw) [-180..0..+180]")
 CFGDEF(vect,  imu_gps_arm, -12.7,1,0.1,   "gps lever arm (x,y,z) [m]")
@@ -109,6 +110,7 @@ CFGDEF(float, imu_facc,   2.55,1,0.01,    "Accelerometers filter [0..1]")
 CFGDEF(float, imu_fgyr,   2.55,1,0.01,    "Gyro filter [0..1]")
 
 CFGDEF(float, wptSnap,   0,1,0,        "Waypoints: waypoint snap distance [m]")
+CFGDEF(float, wptDrv,   0,1,0,        "waypoint course derivative level [deg/s]")
 
 CFGDEF(float, safety_dHome,    255000,1,1000,"Safety: max distance to go home [m]")
 CFGDEF(float, safety_dHomeERS, 255000,1,1000,"suicide (ERS) distance [m]")
@@ -128,7 +130,7 @@ CFGDEF(float, speedMax,        0,1,1,     "max airspeed (VNE) to pitch up [m/s]"
 CFGDEF(float, speedMinFlaps,   0,1,1,     "min airspeed (stall) with flaps down [m/s]")
 CFGDEF(float, speedMaxFlaps,   0,1,1,     "max airspeed (VNE) with flaps down [m/s]")
 CFGDEF(float, altitude,        2550,1,10,"safe altitude, HOME, TA mode [m]")
-CFGDEF(float, stbyR,  -1270,1,10,         "standby radius, positive CW, negative CCW [m]")
+CFGDEF(float, turnR,  -1270,1,10,         "turn radius, positive STBY CW, negative STBY CCW [m]")
 
 CFGDEF(float, takeoff_flaps,     1,1,0.1,   "Takeoff: flaps level [0..1]")
 CFGDEF(float, takeoff_thrRise,   1,1,0.01,  "initial throttle rise speed [1/s]")
@@ -143,11 +145,12 @@ CFGDEF(float, ld_flaps,    1,1,0.1,     "approach flaps level [0..1]")
 CFGDEF(float, ld_finAlt,   255,1,0,     "approach final altitude AGL [m]")
 CFGDEF(float, ld_finVSpeed,25.5,1,0.1,  "final descending speed [m/s]")
 CFGDEF(float, ld_finPitchLo,25.5,1,0.1, "final descending pitch limit [deg/s]")
-CFGDEF(float, ld_finPitchSpdKp,25.5,1,0.1, "final descending pitch speed Kp [K]")
+CFGDEF(float, ld_tdPitchSpdKp,25.5,1,0.1, "touchdown pitch divider by speed [K]")
 CFGDEF(float, ld_tdPitch,  0,1,1,       "touchdown pitch bias [deg]")
 CFGDEF(float, ld_tdAGL,    25.5,1,0.1,  "AGL altitude before touchdown [m]")
 CFGDEF(float, ld_zeroAGL,  25.5,1,0.1,  "AGL altitude on the ground [m]")
 
+#ifdef MEKF_CONFIG
 CFGDEF(float, mekf_q_gyr, 25.5,1,0.1,   "MEKF: f(Gyro variance)")
 CFGDEF(float, mekf_q_bgyr,25.5,1,0.1,   "f(Gyro bias variance)")
 CFGDEF(float, mekf_q_pos, 25.5,1,0.1,   "f(pos variance)")
@@ -157,7 +160,7 @@ CFGDEF(float, mekf_r_mag, 25.5,1,0.1,   "Magnetometer variance")
 CFGDEF(float, mekf_r_acc, 25.5,1,0.1,   "Accelerometer variance")
 CFGDEF(float, mekf_r_pos, 25.5,1,0.1,   "GPS position variance")
 CFGDEF(float, mekf_r_vel, 25.5,1,0.1,   "GPS velocity variance")
-
+#endif
 //=============================================================================
 #undef CFGDEF
 #undef CFGDEFA
