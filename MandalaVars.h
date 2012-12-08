@@ -83,14 +83,14 @@ SIGDEF(imu, "IMU sensors data pack",
 SIGDEF(gps, "GPS fix data pack",
       idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED)
 SIGDEF(ctr, "Fast controls",
-      idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder )
-SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_steering)
+      idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_steering,idx_ctr_collective )
+SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw)
 //------------------------------
 // Auto update/send vars
 SIGDEF(update,  "Auto send to bus when changed",
       idx_mode,idx_status,idx_error,idx_cmode,
       idx_power,idx_sw,
-      idx_ctr_flaps,idx_ctr_steering,idx_ctr_collective,idx_ctr_airbrk,idx_ctr_brake,idx_ctr_mixture,idx_ctr_engine,idx_ctr_sweep,
+      idx_ctr_flaps,idx_ctr_airbrk,idx_ctr_brake,idx_ctr_mixture,idx_ctr_engine,idx_ctr_sweep,
       idx_ctrb,
       idx_cam_ch,idx_cam_ctr,idx_cam_opt,idx_cam_ctrb )
 
@@ -105,7 +105,7 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
       idx_gSpeed,
       idx_wpHDG,idx_rwDelta,idx_rwDV,
       idx_wpcnt,idx_rwcnt,
-      idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_steering,
+      idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,
       idx_gcu_RSS,idx_gcu_Ve,idx_gcu_MT,idx_gcu_VSWR,
       idx_pstatic )
 //------------------------------
@@ -317,7 +317,6 @@ VARDEF(float, rc_roll,    -1.0,1,0, "RC roll [-1..0..+1]")
 VARDEF(float, rc_pitch,   -1.0,1,0, "RC pitch [-1..0..+1]")
 VARDEF(float, rc_throttle, 1.0,1,0, "RC throttle [0..1]")
 VARDEF(float, rc_yaw,     -1.0,1,0, "RC yaw [-1..0..+1]")
-VARDEF(float, rc_steering,-1.0,1,0, "RC steering [-1..0..+1]")
 
 //--------- calculated by Mandala::calc() --------------
 VARDEF(vect,  NED,     -10000,2,0, "local position: north,east,down [m]")
