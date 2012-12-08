@@ -83,29 +83,30 @@ SIGDEF(imu, "IMU sensors data pack",
 SIGDEF(gps, "GPS fix data pack",
       idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED)
 SIGDEF(ctr, "Fast controls",
-      idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_steering )
+      idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder )
 SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_steering)
 //------------------------------
 // Auto update/send vars
 SIGDEF(update,  "Auto send to bus when changed",
-      idx_mode,idx_status,idx_power,
-      idx_ctrb,idx_ctr_airbrk,idx_ctr_flaps,idx_ctr_brake,
-      idx_cam_ctr,idx_cam_opt )
+      idx_mode,idx_status,idx_error,idx_cmode,
+      idx_power,idx_sw,
+      idx_ctr_flaps,idx_ctr_steering,idx_ctr_collective,idx_ctr_airbrk,idx_ctr_brake,idx_ctr_mixture,idx_ctr_engine,idx_ctr_sweep,
+      idx_ctrb,
+      idx_cam_ch,idx_cam_ctr,idx_cam_opt,idx_cam_ctrb )
 
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
 SIGDEF(autosend,  "Automatically forwarded variables to GCU",
       idx_downstream, idx_debug, idx_flightplan, idx_config, idx_service, idx_health )
 
-//telemetry filter (don't send at all), calculated by mandala.extractTelemetry()
+//telemetry filter (never send), also calculated by mandala.extractTelemetry()
 SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
-      idx_homeHDG,idx_dHome,idx_dWPT,idx_dN,idx_dE,idx_dAlt,
-      idx_dXYZ,
+      idx_NED,idx_homeHDG,idx_dHome,idx_dWPT,idx_dN,idx_dE,idx_dAlt,
+      idx_vXYZ,idx_dXYZ,
+      idx_gSpeed,
       idx_wpHDG,idx_rwDelta,idx_rwDV,
       idx_wpcnt,idx_rwcnt,
-//      idx_windSpd,idx_windHdg,
-      idx_NED,idx_vXYZ,idx_gSpeed,
       idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,idx_rc_steering,
-      idx_gcu_RSS, idx_gcu_Ve, idx_gcu_MT,
+      idx_gcu_RSS,idx_gcu_Ve,idx_gcu_MT,idx_gcu_VSWR,
       idx_pstatic )
 //------------------------------
 #undef SIGDEF
@@ -138,7 +139,7 @@ VARDEF(float, altitude,        15000.0,4,2, "Altitude [m]")
 VARDEF(float, vspeed,          -100,2,0,    "Variometer [m/s]")
 
 //--------- OTHER AP SENSORS --------------
-VARDEF(float, rpm,    0,2,0,     "engine RPM [1/min]")
+VARDEF(float, rpm,    25500,1,0, "engine RPM [1/min]")
 VARDEF(float, agl,    25.5,1,0,  "Above Ground Level altitude [m]")
 VARDEF(float, slip,   -127,1,0,  "slip [deg]")
 
@@ -269,6 +270,7 @@ VARDEF(uint,  wpType,    0,1,0,       "current waypoint type [wp_type]")
 VARDEF(uint,  wpidx,     0,1,0,       "current waypoint [0...]")
 VARDEF(uint,  rwcnt,     0,1,0,       "number of runways [0...]")
 VARDEF(uint,  rwidx,     0,1,0,       "current runway [0...]")
+VARDEF(float, rwHDG,   -180,2,0,      "current runway heading [deg]")
 
 //--------- dynamic tuning --------------
 VARDEF(float, performance,  655.35,2,0, "Aircraft performance [K]")
@@ -276,7 +278,7 @@ VARDEF(float, corr,         655.35,2,0, "Correlator output [K]")
 VARDEF(float, windSpd,  25.5,1,0,   "wind speed [m/s]")
 VARDEF(float, windHdg,  360,1,0,    "wind direction to 0..360 [deg]")
 VARDEF(float, corrTAS,  25.5,1,0,   "CAS to TAS multiplier [K]")
-VARDEF(float, rwAdj,    -127,1,0,   "runway displacement adjust during takeoff or landing [m]")
+VARDEF(float, rwAdj,    -127,1,0,  "runway displacement adjust during takeoff or landing [m]")
 VARDEF(float, gps_home_lat, -90,4,0,     "home latitude [deg]")
 VARDEF(float, gps_home_lon, -180,4,0,    "home longitude [deg]")
 VARDEF(float, gps_home_hmsl,-10000,2,0,  "home altitde above sea [m]")
@@ -329,7 +331,6 @@ VARDEF(vect,  vXYZ,    -50,1,0,    "bodyframe velocity: Vx,Vy,Vz [m/s]")
 VARDEF(vect,  dXYZ,    -10000,2,0, "bodyframe delta: dx,dy,dz [m]")
 VARDEF(float, gSpeed,  655.35,2,0, "ground speed [m]")
 VARDEF(float, wpHDG,   -180,2,0,   "current waypoint heading [deg]")
-VARDEF(float, rwHDG,   -180,2,0,   "current runway heading [deg]")
 VARDEF(float, rwDelta, -127,1,0,   "runway alignment [m]")
 VARDEF(float, rwDV,    -12.7,1,0,  "runway alignment velocity [m/s]")
 
