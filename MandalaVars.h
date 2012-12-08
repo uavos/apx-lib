@@ -75,7 +75,7 @@ SIGDEF(flightplan,"Flight plan data")
 SIGDEF(health,    "Health status <nodes cnt>,<node_adr><node_health>...")
 SIGDEF(service,   "Service packet down/up link <src-dadr>,<dadr-cmd>,<data..>")
 SIGDEF(setb,      "Set bit <var_idx>,<data>")
-SIGDEF(clrb,       "Clear bit <var_idx>,<data>")
+SIGDEF(clrb,      "Clear bit <var_idx>,<data>")
 //------------------------------
 // var packs
 SIGDEF(imu, "IMU sensors data pack",
@@ -126,80 +126,53 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
 #ifndef BITDEF
 #define BITDEF(avarname,abitname,amask,adescr)
 #endif
-//--------- SPECIAL --------------
-VARDEF(uint,  mode,     0,1,0,  "flight mode")
-BITDEF(mode,   EMG,     0,       "Realtime control")
-BITDEF(mode,   RPV,     1,       "Angles control")
-BITDEF(mode,   UAV,     2,       "Heading control")
-BITDEF(mode,   WPT,     3,       "Waypoints navigation")
-BITDEF(mode,   HOME,    4,       "Go back home")
-BITDEF(mode,   TAKEOFF, 5,       "Takeoff")
-BITDEF(mode,   LANDING, 6,       "Landing")
-BITDEF(mode,   STBY,    7,       "Loiter around DNED")
-BITDEF(mode,   DEMO,    8,       "Aerobatic demonstration")
-VARDEF(uint,  stage,    0,1,0,  "auto set to zero by mode change [maneuver stage]")
-VARDEF(uint,  status,   0,1,0,  "status flags bitfield")
-BITDEF(status, rc,      1,       "RC on/off")
-BITDEF(status, gps,     2,       "GPS available/lost")
-BITDEF(status, agl,     4,       "AGL available/off")
-BITDEF(status, cas,     8,       "CAS valid")
-BITDEF(status, modem,   16,      "Data link available/lost")
-BITDEF(status, gerr,    32,      "IMU gyros bias error")
-BITDEF(status, glide,   64,      "Glide status")
-BITDEF(status, ahrsm,   128,     "AHRS mode inertial/gps")
-
 //--------- IMU --------------
 VARDEF(vect,  theta, -180,2,0,   "attitude: roll,pitch,yaw [deg]")
 VARDEF(vect,  acc,   -60,2,1,    "acceleration: Ax,Ay,Az [m/s2]")
 VARDEF(vect,  gyro,  -700,2,1,   "angular rate: p,q,r [deg/s]")
 VARDEF(vect,  mag,   -1.27,2,1,  "magnetic field: Hx,Hy,Hz [gauss]")
 
-//--------- FLIGHT CONTROL --------------
-VARDEF(float, airspeed,        655.35,2,0, "Airspeed [m/s]")
+//--------- FLIGHT CONTROL SENSORS --------------
+VARDEF(float, airspeed,        655.35,2,0,  "Airspeed [m/s]")
 VARDEF(float, altitude,        15000.0,4,2, "Altitude [m]")
-VARDEF(float, vspeed,          -100,2,0,   "Variometer [m/s]")
-VARDEF(float, pstatic,        35.0,4,2,    "Static pressure [inHg]")
-VARDEF(float, pstatic_gnd,    35.0,4,0,    "Static pressure on ground level [inHg]")
-
-//--------- Measured by GPS --------------
-VARDEF(float, gps_lat,     -90,4,0,     "latitude [deg]")
-VARDEF(float, gps_lon,     -180,4,0,     "longitude [deg]")
-VARDEF(float, gps_hmsl,    -10000,2,0,   "altitude above sea [m]")
-VARDEF(vect,  gps_vNED,    -150,2,1,     "velocity: Vnorth, Veast, Vdown [m/s]")
-VARDEF(float, gps_course,  -180,2,1,     "GPS course [deg]")
-VARDEF(float, gps_home_lat, -90,4,0,    "home latitude [deg]")
-VARDEF(float, gps_home_lon, -180,4,0,    "home longitude [deg]")
-VARDEF(float, gps_home_hmsl,-10000,2,0,  "home altitde above sea [m]")
-VARDEF(uint,  gps_time,      0,4,0,      "GPS UTC Time from 1970 1st Jan [sec]")
-VARDEF(uint,  gps_SV,        0,1,0,      "GPS Satellites visible [number]")
-VARDEF(uint,  gps_SU,        0,1,0,      "GPS Satellites used [number]")
-VARDEF(vect,  gps_accuracy, 2.55,1,0,    "GPS accuracy: hrz, ver, spd [m, m/s]")
-
-//--------- BATTERY --------------
-VARDEF(float, Ve,     25.5,1,0,   "autopilot battery voltage [v]")
-VARDEF(float, Vs,     25.5,1,0,   "servo battery voltage [v]")
-VARDEF(float, Vp,     25.5,1,0,   "payload battery voltage [v]")
-VARDEF(float, Vm,     45,1,0,     "engine battery voltage [v]")
-VARDEF(float, Ie,     2.55,1,0,   "autopilot current [A]")
-VARDEF(float, Is,     25.5,1,0,   "servo current [A]")
-VARDEF(float, Ip,     25.5,1,0,   "payload current [A]")
-VARDEF(float, Im,     255,1,0,    "engine current [A]")
+VARDEF(float, vspeed,          -100,2,0,    "Variometer [m/s]")
 
 //--------- OTHER AP SENSORS --------------
 VARDEF(float, rpm,    0,2,0,     "engine RPM [1/min]")
 VARDEF(float, agl,    25.5,1,0,  "Above Ground Level altitude [m]")
 VARDEF(float, slip,   -127,1,0,  "slip [deg]")
 
-//--------- TEMPERATURES --------------
-VARDEF(float, AT,    -127,1,0,    "ambient temperature [C]")
-VARDEF(float, RT,    -127,1,0,    "room temperature [C]")
-VARDEF(float, MT,    -127,1,0,    "modem temperature [C]")
-VARDEF(float, ET,     0,1,0,      "engine temperature [C]")
-VARDEF(float, EGT,    900,1,0,    "exhaust gas temperature [C]")
+//--------- Measured by GPS --------------
+VARDEF(float, gps_lat,     -90,4,0,      "latitude [deg]")
+VARDEF(float, gps_lon,     -180,4,0,     "longitude [deg]")
+VARDEF(float, gps_hmsl,    -10000,2,0,   "altitude above sea [m]")
+VARDEF(vect,  gps_vNED,    -150,2,1,     "velocity: Vnorth, Veast, Vdown [m/s]")
+VARDEF(float, gps_course,  -180,2,1,     "GPS course [deg]")
+VARDEF(uint,  gps_time,      0,4,0,      "GPS UTC Time from 1970 1st Jan [sec]")
 
-//--------- OTHER SENSORS (information) --------------
-VARDEF(float, RSS,   1.0,1,0,   "modem signal strength [0..1]")
-VARDEF(float, fuel,   1.0,1,0,  "fuel capacity [0..1]")
+//--------- FAST CONTROLS --------------
+VARDEF(float, ctr_ailerons,  -1.0,1,0, "ailerons [-1..0..+1]")
+VARDEF(float, ctr_elevator,  -1.0,1,0, "elevator [-1..0..+1]")
+VARDEF(float, ctr_throttle,   1.0,1,0, "throttle [0..1]")
+VARDEF(float, ctr_rudder,    -1.0,1,0, "rudder [-1..0..+1]")
+
+//--------- SLOW CONTROLS --------------
+VARDEF(float, ctr_flaps,      1.0,1,0, "flaps [0..1]")
+VARDEF(float, ctr_steering,  -1.0,1,0, "steering [-1..0..+1]")
+VARDEF(float, ctr_collective,-1.0,1,0, "collective pitch [-1..0..+1]")
+VARDEF(float, ctr_airbrk,     1.0,1,0, "airbrakes [0..1]")
+VARDEF(float, ctr_brake,      1.0,1,0, "brake [0..1]")
+VARDEF(float, ctr_mixture,    1.0,1,0, "mixture [0..1]")
+VARDEF(float, ctr_engine,     1.0,1,0, "engine tuning [0..1]")
+VARDEF(float, ctr_sweep,     -1.0,1,0, "sweep [-1..0..1]")
+
+VARDEF(uint,  ctrb,           0,1,0,   "controls bitfield [on/off]")
+BITDEF(ctrb,   gear,      1, "Landing gear retracted/extracted")
+BITDEF(ctrb,   ers,       2, "ERS on/off")
+BITDEF(ctrb,   rel,       4, "Parachute released/locked")
+BITDEF(ctrb,   drp,       8, "Drop-off open/locked")
+BITDEF(ctrb,   pump,      16,"Fuel pump on/off")
+BITDEF(ctrb,   xfeed,     32,"Crossfeed on/off")
 
 //--------- AUTOPILOT COMMAND --------------
 VARDEF(vect,  cmd_theta,    -180,2,0,   "desired attitude: roll,pitch,yaw [deg]")
@@ -212,6 +185,84 @@ VARDEF(float, cmd_airspeed, 0,1,0,      "desired airspeed (for regThr) [m/s]")
 VARDEF(float, cmd_vspeed,   -12.7,1,0,  "desired vertical speed (for regPitchH) [m/s]")
 VARDEF(float, cmd_slip,     -127,1,0,   "desired slip [deg]")
 
+//--------- Movement sensors --------------
+VARDEF(vect,  radar_vXYZ,  -150,2,1,     "radar velocity: rVx, rVy, rVz [m/s]")
+VARDEF(vect,  radar_dXYZ,  -3276.7,2,1,  "radar delta: rDx, rDy, rDz [m]")
+
+//--------- OTHER SENSORS (information) --------------
+VARDEF(float, fuel,  1.0,1,0,  "fuel capacity [0..1]")
+VARDEF(float, RSS,   1.0,1,0,  "modem signal strength [0..1]")
+
+//--------- BATTERY --------------
+VARDEF(float, Ve,     25.5,1,0,   "autopilot battery voltage [v]")
+VARDEF(float, Vs,     25.5,1,0,   "servo battery voltage [v]")
+VARDEF(float, Vp,     25.5,1,0,   "payload battery voltage [v]")
+VARDEF(float, Vm,     45,1,0,     "engine battery voltage [v]")
+VARDEF(float, Ie,     2.55,1,0,   "autopilot current [A]")
+VARDEF(float, Is,     25.5,1,0,   "servo current [A]")
+VARDEF(float, Ip,     25.5,1,0,   "payload current [A]")
+VARDEF(float, Im,     255,1,0,    "engine current [A]")
+
+//--------- TEMPERATURES --------------
+VARDEF(float, AT,    -127,1,0,    "ambient temperature [C]")
+VARDEF(float, RT,    -127,1,0,    "room temperature [C]")
+VARDEF(float, MT,    -127,1,0,    "modem temperature [C]")
+VARDEF(float, ET,     0,1,0,      "engine temperature [C]")
+VARDEF(float, EGT,    900,1,0,    "exhaust gas temperature [C]")
+VARDEF(float, OT,     0,1,0,      "oil temperature [C]")
+
+//--------- STATUS FLAGS --------------
+VARDEF(uint,  stage,    0,1,0, "auto set to zero by mode change [maneuver stage]")
+VARDEF(uint,  mode,     0,1,0, "flight mode")
+BITDEF(mode,   EMG,     0,       "Realtime control")
+BITDEF(mode,   RPV,     1,       "Angles control")
+BITDEF(mode,   UAV,     2,       "Heading control")
+BITDEF(mode,   WPT,     3,       "Waypoints navigation")
+BITDEF(mode,   HOME,    4,       "Go back home")
+BITDEF(mode,   TAKEOFF, 5,       "Takeoff")
+BITDEF(mode,   LANDING, 6,       "Landing")
+BITDEF(mode,   STBY,    7,       "Loiter around DNED")
+BITDEF(mode,   DEMO,    8,       "Aerobatic demonstration")
+BITDEF(mode,   RECOVER, 9,       "Recovery")
+
+VARDEF(uint,  status,   0,1,0, "status flags bitfield")
+BITDEF(status, rc,      1,       "RC on/off")
+BITDEF(status, gps,     2,       "GPS available/lost")
+BITDEF(status, agl,     4,       "AGL available/off")
+BITDEF(status, modem,   8,       "Data link available/lost")
+BITDEF(status, glide,   16,      "Glide status")
+
+VARDEF(uint,  error,    0,1,0, "error flags bitfield")
+BITDEF(error,  cas,     1,       "CAS error")
+BITDEF(error,  gyro,    2,       "IMU gyros bias error")
+BITDEF(error,  engine,  4,       "Engine error")
+
+VARDEF(uint,  cmode,    0,1,0, "operation mode")
+BITDEF(cmode,  ahrs,    1,       "AHRS mode inertial/gps")
+BITDEF(cmode,  thrcut,  2,       "Throttle cut on/off")
+BITDEF(cmode,  hover,   4,       "Stabilization mode hover/run")
+
+//--------- POWER CONTROL --------------
+VARDEF(uint,  power,  0,1,0, "power controls bitfield [on/off]")
+BITDEF(power,  ap,      1,     "Avionics")
+BITDEF(power,  servo,   2,     "Servo on/off")
+BITDEF(power,  ignition,4,     "Engine on/off")
+BITDEF(power,  payload, 8,     "Payload activated/off")
+BITDEF(power,  agl,     16,    "AGL sensor")
+BITDEF(power,  satcom,  32,    "Satcom on/off")
+BITDEF(power,  rfamp,   64,    "RF amplifier on/off")
+BITDEF(power,  pcam,   128,    "Pilot camera on/off")
+
+VARDEF(uint,  sw,     0,1,0, "operator controlled switches [on/off]")
+BITDEF(sw,     lights,   1,    "Lights on/off")
+BITDEF(sw,     taxi,     2,    "Taxi lights on/off")
+BITDEF(sw,     ice,      4,    "Anti-ice on/off")
+BITDEF(sw,     pheat,    8,    "Pitot tube heater on/off")
+BITDEF(sw,     sw1,     16,    "switch 1 on/off")
+BITDEF(sw,     sw2,     32,    "switch 2 on/off")
+BITDEF(sw,     sw3,     64,    "switch 3 on/off")
+BITDEF(sw,     sw4,    128,    "switch 4 on/off")
+
 //--------- WAYPOINTS --------------
 VARDEF(uint,  wpcnt,     0,1,0,       "number of waypoints [0...]")
 VARDEF(uint,  wpType,    0,1,0,       "current waypoint type [wp_type]")
@@ -219,46 +270,29 @@ VARDEF(uint,  wpidx,     0,1,0,       "current waypoint [0...]")
 VARDEF(uint,  rwcnt,     0,1,0,       "number of runways [0...]")
 VARDEF(uint,  rwidx,     0,1,0,       "current runway [0...]")
 
-//--------- CONTROLS --------------
-// fast controls
-VARDEF(float, ctr_ailerons,  -1.0,1,0, "ailerons [-1..0..+1]")
-VARDEF(float, ctr_elevator,  -1.0,1,0, "elevator [-1..0..+1]")
-VARDEF(float, ctr_throttle,   1.0,1,0, "throttle [0..1]")
-VARDEF(float, ctr_rudder,    -1.0,1,0, "rudder [-1..0..+1]")
-VARDEF(float, ctr_steering,  -1.0,1,0, "steering [-1..0..+1]")
-// slow controls
-VARDEF(float, ctr_flaps,      1.0,1,0, "flaps [0..1]")
-VARDEF(float, ctr_brake,      1.0,1,0, "brake [0..1]")
-VARDEF(float, ctr_airbrk,     1.0,1,0, "airbrakes [0..1]")
-VARDEF(uint,  ctrb,           0,1,0,   "controls bitfield [on/off]")
-BITDEF(ctrb,   gear,      1, "Landing gear retracted/extracted")
-BITDEF(ctrb,   ers,       2, "ERS on/off")
-
-//--------- POWER CONTROL --------------
-VARDEF(uint,  power,  0,1,0,   "power status bitfield [on/off]")
-BITDEF(power,  ap,      1,     "Avionics")
-BITDEF(power,  servo,   2,     "Servo on/off")
-BITDEF(power,  payload, 4,     "Payload activated/off")
-BITDEF(power,  agl,     8,     "AGL sensor")
-BITDEF(power,  ignition,16,    "Engine on/off")
-BITDEF(power,  lights,  32,    "Lights on/off")
-BITDEF(power,  taxi,    64,    "Taxi lights on/off")
-BITDEF(power,  ice,    128,    "Anti-ice on/off")
-
-//--------- PILOT CONTROLS --------------
-VARDEF(float, rc_roll,    -1.0,1,0, "RC roll [-1..0..+1]")
-VARDEF(float, rc_pitch,   -1.0,1,0, "RC pitch [-1..0..+1]")
-VARDEF(float, rc_throttle, 1.0,1,0, "RC throttle [0..1]")
-VARDEF(float, rc_yaw,     -1.0,1,0, "RC yaw [-1..0..+1]")
-VARDEF(float, rc_steering,-1.0,1,0, "RC steering [-1..0..+1]")
+//--------- dynamic tuning --------------
+VARDEF(float, performance,  655.35,2,0, "Aircraft performance [K]")
+VARDEF(float, corr,         655.35,2,0, "Correlator output [K]")
+VARDEF(float, windSpd,  25.5,1,0,   "wind speed [m/s]")
+VARDEF(float, windHdg,  360,1,0,    "wind direction to 0..360 [deg]")
+VARDEF(float, corrTAS,  25.5,1,0,   "CAS to TAS multiplier [K]")
+VARDEF(float, rwAdj,    -127,1,0,   "runway displacement adjust during takeoff or landing [m]")
+VARDEF(float, gps_home_lat, -90,4,0,     "home latitude [deg]")
+VARDEF(float, gps_home_lon, -180,4,0,    "home longitude [deg]")
+VARDEF(float, gps_home_hmsl,-10000,2,0,  "home altitde above sea [m]")
+VARDEF(uint,  gps_SV,        0,1,0,      "GPS Satellites visible [number]")
+VARDEF(uint,  gps_SU,        0,1,0,      "GPS Satellites used [number]")
+VARDEF(float, pstatic,        35.0,4,2,    "Static pressure [inHg]")
+VARDEF(float, pstatic_gnd,    35.0,4,0,    "Static pressure on ground level [inHg]")
 
 //--------- CAM CONTROL --------------
+VARDEF(uint, cam_ch,   0,1,0, "video channel")
 VARDEF(uint, cam_ctr,  0,1,0, "camera control type")
-BITDEF(cam_ctr, camoff,  0,  "Camera off")
-BITDEF(cam_ctr, stab,    1,  "gyro stabilization")
-BITDEF(cam_ctr, hold,    2,  "attitude hold")
-BITDEF(cam_ctr, pos,     3,  "position tracking")
-BITDEF(cam_ctr, fixed,   4,  "fixed position")
+BITDEF(cam_ctr, camoff,  0,     "Camera off")
+BITDEF(cam_ctr, stab,    1,     "gyro stabilization")
+BITDEF(cam_ctr, hold,    2,     "attitude hold")
+BITDEF(cam_ctr, pos,     3,     "position tracking")
+BITDEF(cam_ctr, fixed,   4,     "fixed position")
 VARDEF(float, cam_heading, -180.0,2,1, "camera heading [deg]")
 VARDEF(float, cam_pitch,   -180.0,2,1, "camera pitch [deg]")
 VARDEF(float, cam_zoom,     1.0,1,0,   "camera zoom level [0..1]")
@@ -273,12 +307,15 @@ BITDEF(cam_opt, FM,      8,  "Focus mode infinity/auto")
 VARDEF(float, cam_lat,     -180,4,0,   "camera track latitude [deg]")
 VARDEF(float, cam_lon,     -180,4,0,   "camera track longitude [deg]")
 VARDEF(float, cam_alt,     -10000,2,0, "camera track altitude [m]")
+VARDEF(uint, cam_ctrb, 0,1,0, "camera controls bitfield [on/off]")
+BITDEF(cam_ctrb, shot,      1,  "Snapshot")
 
-//--------- dynamic tuning --------------
-VARDEF(float, windSpd,  6553.5,2,0, "wind speed [m/s]")
-VARDEF(float, windHdg,  360,2,0,    "wind direction to 0..360 [deg]")
-VARDEF(float, corrTAS,  25.5,1,0,   "CAS to TAS multiplier [K]")
-VARDEF(float, rwAdj,    -32767,2,0, "runway displacement adjust during takeoff or landing [m]")
+//--------- PILOT CONTROLS --------------
+VARDEF(float, rc_roll,    -1.0,1,0, "RC roll [-1..0..+1]")
+VARDEF(float, rc_pitch,   -1.0,1,0, "RC pitch [-1..0..+1]")
+VARDEF(float, rc_throttle, 1.0,1,0, "RC throttle [0..1]")
+VARDEF(float, rc_yaw,     -1.0,1,0, "RC yaw [-1..0..+1]")
+VARDEF(float, rc_steering,-1.0,1,0, "RC steering [-1..0..+1]")
 
 //--------- calculated by Mandala::calc() --------------
 VARDEF(vect,  NED,     -10000,2,0, "local position: north,east,down [m]")
