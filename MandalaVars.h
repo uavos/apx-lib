@@ -187,8 +187,8 @@ VARDEF(float, cmd_vspeed,   -12.7,1,0,  "desired vertical speed (for regPitchH) 
 VARDEF(float, cmd_slip,     -127,1,0,   "desired slip [deg]")
 
 //--------- Movement sensors --------------
-VARDEF(vect,  radar_vXYZ,  -150,2,1,     "radar velocity: rVx, rVy, rVz [m/s]")
-VARDEF(vect,  radar_dXYZ,  -3276.7,2,1,  "radar delta: rDx, rDy, rDz [m]")
+VARDEF(vect,  radar_vXYZ,  -150,2,1,     "radar velocity: Vx, Vy, Vz [m/s]")
+VARDEF(vect,  radar_dXYZ,  -3276.7,2,1,  "radar delta: dx, dy, dz [m]")
 
 //--------- OTHER SENSORS (information) --------------
 VARDEF(float, fuel,  1.0,1,0,  "fuel capacity [0..1]")
@@ -286,6 +286,7 @@ VARDEF(uint,  gps_SV,        0,1,0,      "GPS Satellites visible [number]")
 VARDEF(uint,  gps_SU,        0,1,0,      "GPS Satellites used [number]")
 VARDEF(float, pstatic,        35.0,4,2,    "Static pressure [inHg]")
 VARDEF(float, pstatic_gnd,    35.0,4,0,    "Static pressure on ground level [inHg]")
+VARDEF(uint,  errcode,  0,1,0, "error code")
 
 //--------- CAM CONTROL --------------
 VARDEF(uint, cam_ch,   0,1,0, "video channel")
