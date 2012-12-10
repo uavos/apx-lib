@@ -58,6 +58,14 @@ typedef struct {
   double        hdg;
 }_runway;
 //=============================================================================
+// UAV identification
+typedef struct {
+  uint8_t       id;             //dynamically assigned ID
+  uint8_t       sn[12];         //serial number
+  uint8_t       name[16];       //text name
+  uint8_t       nodes_cnt;      //number of nodes in the system
+}_uav_id;
+//=============================================================================
 //=============================================================================
 #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr) idx_cfg_##aname,
@@ -80,6 +88,8 @@ enum {
 class Mandala : public MandalaCore
 {
 public:
+  _uav_id         id;
+
   const char *    var_name[256];  //text name
   const char *    var_descr[256]; //text description
   uint            var_size[256];  //size of whole packed var
@@ -117,16 +127,20 @@ public:
 
   //---- Internal use -----
   // telemetry framework
-  bool    dl_hd;                // don't decrease byte cnt for downstream
+  uint8_t dl_id;                // received uav_id
   uint8_t dl_snapshot[2048];    // all archived variables snapshot
   bool    dl_reset;             // set true to send everything next time
   uint8_t dl_reset_mask[128/8]; // bitmask 1=var send anyway, auto clear after sent
   uint8_t dl_var[32];           // one var max size (tmp buf)
-  uint    dl_frcnt;             // downlink frame cnt for eeror check (inc by archiveTelemety)
-  uint    dl_errcnt;            // errors counter (by extractTelemetry)
-  uint    dl_timestamp;         // time[ms]
-  uint    dl_dt;                // dt[ms] of telemetry stream
-  uint    dl_size;              // last telemetry size statistics
+  //filled by extract_downstream
+  uint          dl_frcnt;       // downlink frame cnt (inc by extract_downlink)
+  uint          dl_errcnt;      // errors counter (by extract_downlink)
+  uint          dl_timestamp;   // time[ms]
+  uint16_t      dl_ts;          // previous timestamp (to count dl_dt)
+  uint16_t      dl_Pdt;         // previous delta (to count errors)
+  bool          dl_e;           // if delta was different (errors counter)
+  uint          dl_size;        // last telemetry size statistics
+  bool          dl_hd_save;     // to watch change in alt_bytecnt
   //---- calc ----
   double  gps_lat_s,gps_lon_s; //change detect
 
@@ -189,8 +203,10 @@ private:
   uint extract_config(uint8_t *buf,uint cnt);//read packed config from buf
   uint archive_flightplan(uint8_t *buf,uint bufSize);  //pack wypoints to buf, return size
   uint extract_flightplan(uint8_t *buf,uint cnt);//read packed waypoints from buf
-  uint archive_downstream(uint8_t *buf,uint maxSize);    //pack telemetry DownlinkStream (128 vars)
-  uint extract_downstream(uint8_t *buf,uint cnt);  //read telemetry DownlinkStream
+  uint archive_downstream(uint8_t *buf,uint maxSize);    //pack telemetry
+  uint extract_downstream(uint8_t *buf,uint cnt);  //read telemetry
+  uint archive_downstream_hd(uint8_t *buf,uint maxSize);    //pack telemetry high-precision
+  uint extract_downstream_hd(uint8_t *buf,uint cnt);  //read telemetry high-precision
   uint extract_setb(uint8_t *buf,uint cnt);  //read
   uint extract_clrb(uint8_t *buf,uint cnt);  //read
 };

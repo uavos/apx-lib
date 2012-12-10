@@ -68,14 +68,17 @@ enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig,vt_core_top};
 #endif
 //------------------------------
 // special protocols
-SIGDEF(config,    "System configuration")
-SIGDEF(downstream,"Downlink stream, all variables")
-SIGDEF(debug,     "Debug <stdout> string")
-SIGDEF(flightplan,"Flight plan data")
-SIGDEF(health,    "Health status <nodes cnt>,<node_adr><node_health>...")
-SIGDEF(service,   "Service packet down/up link <src-dadr>,<dadr-cmd>,<data..>")
-SIGDEF(setb,      "Set bit <var_idx>,<data>")
-SIGDEF(clrb,      "Clear bit <var_idx>,<data>")
+SIGDEF(service,   "Service packet <node_sn>,<cmd>,<data..>")
+SIGDEF(downstream,"Downlink stream <stream>")
+SIGDEF(uav_id,    "UAV identification data <packed ID>")
+SIGDEF(msg,       "Message string <text string>")
+SIGDEF(ping,      "Ping packet")
+SIGDEF(tag,       "Tagged var <tag>,<var_idx>,<data..>")
+SIGDEF(setb,      "Set bit (uplink only) <var_idx>,<mask>")
+SIGDEF(clrb,      "Clear bit (uplink only) <var_idx>,<mask>")
+SIGDEF(downstream_hd,"Downlink stream (highest precision) <stream>")
+SIGDEF(config,    "System configuration <packed config>")
+SIGDEF(flightplan,"Flight plan data <packed fligthplan>")
 //------------------------------
 // var packs
 SIGDEF(imu, "IMU sensors data pack",
@@ -96,7 +99,7 @@ SIGDEF(update,  "Auto send to bus when changed",
 
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
 SIGDEF(autosend,  "Automatically forwarded variables to GCU",
-      idx_downstream, idx_debug, idx_flightplan, idx_config, idx_service, idx_health )
+       idx_service, idx_downstream, idx_uav_id, idx_msg, idx_downstream_hd, idx_config, idx_flightplan )
 
 //telemetry filter (never send), also calculated by mandala.extractTelemetry()
 SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
@@ -107,7 +110,7 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
       idx_wpcnt,idx_rwcnt,
       idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,
       idx_gcu_RSS,idx_gcu_Ve,idx_gcu_MT,idx_gcu_VSWR,
-      idx_pstatic )
+      idx_pstatic, idx_dl_period )
 //------------------------------
 #undef SIGDEF
 //=============================================================================
@@ -239,9 +242,10 @@ BITDEF(error,  gyro,    2,       "IMU gyros bias error")
 BITDEF(error,  engine,  4,       "Engine error")
 
 VARDEF(uint,  cmode,    0,1,0, "operation mode")
-BITDEF(cmode,  ahrs,    1,       "AHRS mode inertial/gps")
-BITDEF(cmode,  thrcut,  2,       "Throttle cut on/off")
-BITDEF(cmode,  hover,   4,       "Stabilization mode hover/run")
+BITDEF(cmode,  dlhd,    1,       "High precision downstream on/off")
+BITDEF(cmode,  ahrs,    2,       "AHRS mode inertial/gps")
+BITDEF(cmode,  thrcut,  4,       "Throttle cut on/off")
+BITDEF(cmode,  hover,   8,       "Stabilization mode hover/run")
 
 //--------- POWER CONTROL --------------
 VARDEF(uint,  power,  0,1,0, "power controls bitfield [on/off]")
@@ -265,14 +269,13 @@ BITDEF(sw,     sw3,     64,    "switch 3 on/off")
 BITDEF(sw,     sw4,    128,    "switch 4 on/off")
 
 //--------- WAYPOINTS --------------
-VARDEF(uint,  wpcnt,     0,1,0,       "number of waypoints [0...]")
-VARDEF(uint,  wpType,    0,1,0,       "current waypoint type [wp_type]")
 VARDEF(uint,  wpidx,     0,1,0,       "current waypoint [0...]")
-VARDEF(uint,  rwcnt,     0,1,0,       "number of runways [0...]")
+VARDEF(uint,  wpType,    0,1,0,       "current waypoint type [wp_type]")
 VARDEF(uint,  rwidx,     0,1,0,       "current runway [0...]")
 VARDEF(float, rwHDG,   -180,2,0,      "current runway heading [deg]")
 
 //--------- dynamic tuning --------------
+VARDEF(uint,  errcode,  0,1,0, "error code")
 VARDEF(float, performance,  655.35,2,0, "Aircraft performance [K]")
 VARDEF(float, corr,         655.35,2,0, "Correlator output [K]")
 VARDEF(float, windSpd,  25.5,1,0,   "wind speed [m/s]")
@@ -284,9 +287,7 @@ VARDEF(float, gps_home_lon, -180,4,0,    "home longitude [deg]")
 VARDEF(float, gps_home_hmsl,-10000,2,0,  "home altitde above sea [m]")
 VARDEF(uint,  gps_SV,        0,1,0,      "GPS Satellites visible [number]")
 VARDEF(uint,  gps_SU,        0,1,0,      "GPS Satellites used [number]")
-VARDEF(float, pstatic,        35.0,4,2,    "Static pressure [inHg]")
 VARDEF(float, pstatic_gnd,    35.0,4,0,    "Static pressure on ground level [inHg]")
-VARDEF(uint,  errcode,  0,1,0, "error code")
 
 //--------- CAM CONTROL --------------
 VARDEF(uint, cam_ch,   0,1,0, "video channel")
@@ -313,12 +314,6 @@ VARDEF(float, cam_alt,     -10000,2,0, "camera track altitude [m]")
 VARDEF(uint, cam_ctrb, 0,1,0, "camera controls bitfield [on/off]")
 BITDEF(cam_ctrb, shot,      1,  "Snapshot")
 
-//--------- PILOT CONTROLS --------------
-VARDEF(float, rc_roll,    -1.0,1,0, "RC roll [-1..0..+1]")
-VARDEF(float, rc_pitch,   -1.0,1,0, "RC pitch [-1..0..+1]")
-VARDEF(float, rc_throttle, 1.0,1,0, "RC throttle [0..1]")
-VARDEF(float, rc_yaw,     -1.0,1,0, "RC yaw [-1..0..+1]")
-
 //--------- calculated by Mandala::calc() --------------
 VARDEF(vect,  NED,     -10000,2,0, "local position: north,east,down [m]")
 VARDEF(float, homeHDG, -180,2,0,   "heading to home position [deg]")
@@ -333,6 +328,18 @@ VARDEF(float, gSpeed,  655.35,2,0, "ground speed [m]")
 VARDEF(float, wpHDG,   -180,2,0,   "current waypoint heading [deg]")
 VARDEF(float, rwDelta, -127,1,0,   "runway alignment [m]")
 VARDEF(float, rwDV,    -12.7,1,0,  "runway alignment velocity [m/s]")
+
+//--------- filtered dynamic tuning --------------
+VARDEF(uint,  dl_period, 0,2,0,     "downlink period [ms]")
+VARDEF(uint,  wpcnt,     0,1,0,     "number of waypoints [0...]")
+VARDEF(uint,  rwcnt,     0,1,0,     "number of runways [0...]")
+VARDEF(float, pstatic,   35.0,4,2,  "Static pressure [inHg]")
+
+//--------- PILOT CONTROLS --------------
+VARDEF(float, rc_roll,    -1.0,1,0, "RC roll [-1..0..+1]")
+VARDEF(float, rc_pitch,   -1.0,1,0, "RC pitch [-1..0..+1]")
+VARDEF(float, rc_throttle, 1.0,1,0, "RC throttle [0..1]")
+VARDEF(float, rc_yaw,     -1.0,1,0, "RC yaw [-1..0..+1]")
 
 //--------- GCU use only --------------
 VARDEF(float, gcu_RSS,  1.0,1,0,  "GCU modem signal strength [0..1]")

@@ -45,10 +45,10 @@ Mandala::Mandala()
   dl_frcnt=0;
   dl_errcnt=0;
   dl_timestamp=0;
-  dl_dt=1000/TELEMETRY_FREQ;
+  dl_ts=0;
+  dl_Pdt=0;
   dl_size=0;
   dl_reset=true;
-  dl_hd=false;
 
   gps_lat_s=0;
   gps_lon_s=0;
@@ -131,6 +131,7 @@ uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
   //check for special protocol archiveSize
   if(var_idx==idx_config)return archive_config(buf,size);
   if(var_idx==idx_downstream)return archive_downstream(buf,size);
+  if(var_idx==idx_downstream_hd)return archive_downstream_hd(buf,size);
   if(var_idx==idx_flightplan)return archive_flightplan(buf,size);
 
   void *ptr=var_ptr[var_idx];
@@ -159,8 +160,9 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   //check for special protocol archiveSize
   if(var_idx==idx_config)return extract_config(buf,size);
   if(var_idx==idx_downstream)return extract_downstream(buf,size);
+  if(var_idx==idx_downstream_hd)return extract_downstream_hd(buf,size);
   if(var_idx==idx_flightplan)return extract_flightplan(buf,size);
-  if(var_idx==idx_debug)return 1; //nothing to do
+  if(var_idx==idx_msg)return 1; //nothing to do
   if(var_idx==idx_service)return 1; //nothing to do
   if(var_idx==idx_setb)return extract_setb(buf,size);
   if(var_idx==idx_clrb)return extract_clrb(buf,size);
@@ -426,36 +428,43 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
   return data-buf;
 }
 //=============================================================================
-uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
+uint Mandala::archive_downstream_hd(uint8_t *buf,uint maxSize)
 {
   // telemetry stream format:
-  // <frcnt>,<timestamp>,<bitsig>,<archived data>,[<bitsig>,<data>...]
+  // <uav>,<timestampL>,<timestampH>,<bitsig>,<archived data>,[<bitsig>,<data>...]
   // only modified vars are sent
-  // frcnt - inc if packet size>0 and is sent (errors checking)
-  // timestamp - every call increments by 10/TELEMETRY_FREQ (time in 100ms units)
-  // bitsig - LSBF bitfield, on/off next 8 variables starting from 0
+  // uav - dynamically assigned UAV ID
+  // timestamp - time in 10ms units
+  // bitsig - LSBF bitfield, on/off next 8 variables starting from idxPAD
   // skip vars in sig 'dl_filter' as they are calculated by 'extractTelemety'
 
   //limit maxSize
   if(maxSize>MAX_TELEMETRY)maxSize=MAX_TELEMETRY;
 
+  //watch alt_bytecnt changes
+  if(dl_hd_save!=alt_bytecnt){
+    dl_hd_save=alt_bytecnt;
+    dl_reset=true;
+  }
+  
+  //pack header
+  *buf++=id.id;
+  uint ts=dl_timestamp/10;
+  *buf++=ts;
+  *buf++=ts>>8;
+  
+  //pack stream
   if(dl_reset){
     memset(dl_reset_mask,0xFF,sizeof(dl_reset_mask));
     dl_reset=false;
   }
-  //timestamp and special cases
-  buf[0]=(dl_frcnt++)&0x7F;
-  if(dl_hd) buf[0]|=0x80;
-  buf[1]=dl_timestamp/(1000/AHRS_FREQ);
-  //pack stream
   uint8_t *reset_mask_ptr=dl_reset_mask;
   uint cnt=0,mask_cnt=0,mask_cnt_zero=1;
   uint8_t *snapshot=dl_snapshot;
   uint mask=1;
-  uint8_t *mask_ptr=buf+2;      //start of data
+  uint8_t *mask_ptr=buf;      //start of data
   uint8_t *ptr=mask_ptr+1;
   *mask_ptr=0;
-  alt_bytecnt=!dl_hd;    //for var pack size
   for(uint i=idxPAD;i<(idxPAD+128);i++){
     uint sz=var_size[i];
     if(!sz)break; //valid vars end
@@ -499,29 +508,36 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
   if(!(dl_timestamp%dl_reset_interval)) // periodically send everything
     dl_reset=true;
 
-  dl_timestamp+=dl_dt;//1000/TELEMETRY_FREQ;
-  dl_size=cnt+mask_cnt+2;
+  dl_timestamp+=dl_period?dl_period:(1000/TELEMETRY_FREQ);
+  dl_size=cnt+mask_cnt+3;
   return dl_size;
 }
-//=============================================================================
-uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
+uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
 {
-  //get timestamps and stats
+  alt_bytecnt=true;    //for var pack size
+  return archive_downstream_hd(buf,maxSize);
+}
+//=============================================================================
+uint Mandala::extract_downstream_hd(uint8_t *buf,uint cnt)
+{
+  //header
   dl_size=cnt;
-  uint frcnt=buf[0]&0x7F;
-  dl_hd=buf[0]&0x80;
-  uint fr_d=((frcnt-dl_frcnt)&0x7F);
-  if(fr_d>1)dl_errcnt+=fr_d-1;
-  dl_frcnt+=fr_d;
-  uint dtu=(1000/AHRS_FREQ);
-  dl_dt=((buf[1]-dl_timestamp/dtu)&0xFF)*dtu;
-  if(!dl_dt)dl_dt=dtu; //default
-  dl_timestamp+=dl_dt;
+  dl_id=*buf++;
+  dl_frcnt++;
+  uint16_t ts=*buf++;
+  ts|=(*buf++)<<8;
+  uint16_t Pdt=ts-dl_ts;
+  dl_ts=ts;
+  dl_timestamp+=Pdt*10;
+  bool bErr=dl_Pdt!=Pdt; //delta different
+  dl_Pdt=Pdt;
+  if(bErr&&(bErr==dl_e)) dl_errcnt++;
+  dl_e=bErr;
+  
   //extract data
   uint tcnt=2;
-  alt_bytecnt=!dl_hd;    //for var pack size
   if(cnt>2){
-    tcnt=extract_stream(buf+2,cnt-2);
+    tcnt=extract_stream(buf,cnt-2);
     if(!tcnt){
       fprintf(stderr,"Error extract_downstream");
     }
@@ -537,6 +553,11 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
   // gps_deltaNED,gps_deltaXYZ,gps_distWPT,gps_distHome,
   calc();
   return tcnt;
+}
+uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
+{
+  alt_bytecnt=true;    //for var pack size
+  return extract_downstream_hd(buf,cnt);
 }
 //=============================================================================
 uint Mandala::extract_setb(uint8_t *buf,uint cnt)
