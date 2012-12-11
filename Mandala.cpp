@@ -72,7 +72,7 @@ Mandala::Mandala()
   var_descr[idx_##aname]=adescr;
 #include "MandalaVars.h"
 
-
+  //------------------------
 
 #define REGDEF(aname,adescr) \
   reg_names[reg##aname]=#aname; \
