@@ -5,19 +5,56 @@
 //=============================================================================
 #define BUS_MAX_PACKET          1024
 //=============================================================================
+// node information, dynamically assigned values
+typedef uint8_t _node_sn[12]; //chip serial number
+typedef uint8_t _node_name[16]; //device name string
+typedef uint8_t _node_version[16]; //fw version string
+//-------------------------------------------------
+// firmware information, saved in FLASH section [CONFIG]
+typedef struct {
+  _node_name    name;
+  _node_version version;
+}__attribute__((packed)) _fw_info;
+// node information data to identify the node
 typedef struct{
-  uint8_t       src;    //source node <dadr> or service <dest>|0x80
-  uint8_t       adr;    //destination <var_idx> or service <cmd>
-  uint8_t       data[BUS_MAX_PACKET-2];   //payload
-}__attribute__((packed)) _bus_packet;
+  _node_sn      sn;     //serial number
+  _fw_info      fw;     //firmware info
+}__attribute__((packed)) _node_info; //filled by hwInit, saved in RAM
 //=============================================================================
-//default bus commands (service packets)
+// bus packet structure:
+// <tag> is an optional byte (stored in conf)
+// <tag> can be any value 7bits (<0x7F)
+// <tag>=0x7F is reserved for 'shiva'
+// MSB in <tag> flags service packet
+// all service packets start with _node_sn in <data>
+// service packets filtered by _node_sn, or 0x00000 for broadcast
+typedef struct{
+  uint8_t       id;   //<var_idx>
+  union{
+    uint8_t     data[BUS_MAX_PACKET-1];   //payload
+    struct{
+      _node_sn  sn;     //filter for service
+      uint8_t   cmd;    //service command
+      uint8_t   data[BUS_MAX_PACKET-1-sizeof(_node_sn)-1];   //service data
+    }srv;
+    struct{
+      uint8_t   tag;    //user tag
+      uint8_t   id;     //wrapped <var_idx>
+      uint8_t   data[BUS_MAX_PACKET-1-2];   //tagged data
+    }tagged;
+  };
+}__attribute__((packed)) _bus_packet;
+#define bus_packet_size_hdr             (1)
+#define bus_packet_size_hdr_srv         (bus_packet_size_hdr+sizeof(_node_sn)+1)
+#define bus_packet_size_hdr_tagged      (bus_packet_size_hdr+2)
+//=============================================================================
+// default bus commands (service packets)
+// all service packets addressed by _node_sn
 enum{
   apc_ack=0,    //acknowledge - sent back in response to commands
   //------------------
   //system commands
-  apc_id,       //return _node_id
-  apc_adr,      //set new address[dadr] _node_sn used to filter
+  apc_fw,       //return _fw_info
   apc_debug,    //stdout message
   apc_reboot,   //reset/reboot node
   apc_mute,     //stop sending data (sensors)
@@ -40,27 +77,8 @@ enum{
   apc_loader=0xFF
 };
 //=============================================================================
-// node information, dynamically assigned values
-typedef uint8_t _node_sn[12]; //chip serial number
-typedef uint8_t _node_name[16]; //device name string
-typedef uint8_t _node_version[16]; //fw version string
-//-------------------------------------------------
-// firmware information, saved in FLASH section [CONFIG]
-typedef struct {
-  _node_name    name;
-  _node_version version;
-}__attribute__((packed)) _fw_info;
-//-------------------------------------------------
-typedef struct{
-  _node_sn      sn;             //MCU SN (hardware reg)
-  uint32_t      mcu_id;         //MCU DEV_ID code (hardware reg)
-  uint8_t       dadr;           //device address (opt byte)
-  _fw_info      fw;
-}__attribute__((packed)) _node_id; //filled by hwInit;
-//=============================================================================
-//=============================================================================
 // Loader packet: [ALL PACKETS ARE BROADCAST SRV - src=0x80]
-// hdr: src=0x80 (srv broadcast), cmd=apc_loader
+// hdr: cmd=apc_loader
 // <0x80>,<apc_loader=0xFF>,<ldc_XXX>,<_node_sn>,<data...>
 // to enter loader:
 // <0x80>,<apc_loader=0xFF>,<ldc_init>,<_node_sn>
@@ -128,6 +146,7 @@ typedef _pwm      _ft_pwm;
 typedef _out      _ft_out;
 typedef _serial   _ft_serial;
 typedef _capture  _ft_capture;
+typedef uint8_t   _ft_string[16];
 //-----------------------------------------------------------------------------
 typedef enum{
   ft_option=0,
@@ -138,6 +157,7 @@ typedef enum{
   ft_out,
   ft_serial,
   ft_capture,
+  ft_string,
   //---------
   ft_cnt
 }_node_ft;

@@ -70,10 +70,12 @@ enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig,vt_core_top};
 // special protocols
 SIGDEF(service,   "Service packet <node_sn>,<cmd>,<data..>")
 SIGDEF(downstream,"Downlink stream <stream>")
+SIGDEF(uplink,    "Uplink wrapped packet <var_idx>,<data..>")
+SIGDEF(sim,       "Simulator wrapped packet <var_idx>,<data..>")
+SIGDEF(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
 SIGDEF(uav_id,    "UAV identification data <packed ID>")
 SIGDEF(msg,       "Message string <text string>")
 SIGDEF(ping,      "Ping packet")
-SIGDEF(tag,       "Tagged var <tag>,<var_idx>,<data..>")
 SIGDEF(setb,      "Set bit (uplink only) <var_idx>,<mask>")
 SIGDEF(clrb,      "Clear bit (uplink only) <var_idx>,<mask>")
 SIGDEF(downstream_hd,"Downlink stream (highest precision) <stream>")
