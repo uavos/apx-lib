@@ -3,7 +3,7 @@
 #include <inttypes.h>
 #include <sys/types.h>
 //=============================================================================
-#define BUS_MAX_PACKET          1024
+#define BUS_MAX_PACKET          2048    //2048 MAX
 //=============================================================================
 // node information, dynamically assigned values
 typedef uint8_t _node_sn[12]; //chip serial number
@@ -30,7 +30,7 @@ typedef struct{
 // service packets filtered by _node_sn, or 0x00000 for broadcast
 typedef struct{
   uint8_t       id;   //<var_idx>
-  union{
+  union {
     uint8_t     data[BUS_MAX_PACKET-1];   //payload
     struct{
       _node_sn  sn;     //filter for service
