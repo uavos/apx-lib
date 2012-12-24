@@ -54,7 +54,7 @@ enum{
   apc_ack=0,    //acknowledge - sent back in response to commands
   //------------------
   //system commands
-  apc_fw,       //return _fw_info
+  apc_info,     //return _fw_info
   apc_debug,    //stdout message
   apc_reboot,   //reset/reboot node
   apc_mute,     //stop sending data (sensors)

@@ -68,7 +68,9 @@ enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig,vt_core_top};
 #endif
 //------------------------------
 // special protocols
+//service packet, must be the first
 SIGDEF(service,   "Service packet <node_sn>,<cmd>,<data..>")
+//other protocols
 SIGDEF(downstream,"Downlink stream <stream>")
 SIGDEF(uplink,    "Uplink wrapped packet <var_idx>,<data..>")
 SIGDEF(sim,       "Simulator wrapped packet <var_idx>,<data..>")
