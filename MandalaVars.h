@@ -104,7 +104,7 @@ SIGDEF(update,  "Auto send to bus when changed",
 
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
 SIGDEF(autosend,  "Automatically forwarded variables to GCU",
-       idx_service, idx_downstream, idx_uav_id, idx_msg, idx_downstream_hd, idx_config, idx_flightplan )
+       idx_service, idx_downstream, idx_uav_id, idx_msg, idx_downstream_hd, idx_config, idx_flightplan, idx_rawbus )
 
 //telemetry filter (never send), also calculated by mandala.extractTelemetry()
 SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
@@ -234,23 +234,27 @@ BITDEF(mode,   STBY,    7,       "Loiter around DNED")
 BITDEF(mode,   DEMO,    8,       "Aerobatic demonstration")
 BITDEF(mode,   RECOVER, 9,       "Recovery")
 
-VARDEF(uint,  status,   0,1,0, "status flags bitfield")
+VARDEF(uint,  status,   0,1,0, "status flags bitfield [on/off]")
 BITDEF(status, rc,      1,       "RC on/off")
 BITDEF(status, gps,     2,       "GPS available/lost")
 BITDEF(status, agl,     4,       "AGL available/off")
 BITDEF(status, modem,   8,       "Data link available/lost")
 BITDEF(status, glide,   16,      "Glide status")
 
-VARDEF(uint,  error,    0,1,0, "error flags bitfield")
-BITDEF(error,  cas,     1,       "CAS error")
-BITDEF(error,  gyro,    2,       "IMU gyros bias error")
-BITDEF(error,  engine,  4,       "Engine error")
+VARDEF(uint,  error,    0,1,0, "error flags bitfield [set/clear]")
+BITDEF(error,  fatal,   1,       "Fatal error")
+BITDEF(error,  cas,     2,       "CAS error")
+BITDEF(error,  gyro,    4,       "IMU gyros bias error")
+BITDEF(error,  engine,  8,       "Engine error")
+BITDEF(error,  power,   16,      "Power supply error")
 
-VARDEF(uint,  cmode,    0,1,0, "operation mode")
+VARDEF(uint,  cmode,    0,1,0, "operation mode bitfield [on/off]")
 BITDEF(cmode,  dlhd,    1,       "High precision downstream on/off")
 BITDEF(cmode,  ahrs,    2,       "AHRS mode inertial/gps")
 BITDEF(cmode,  thrcut,  4,       "Throttle cut on/off")
-BITDEF(cmode,  hover,   8,       "Stabilization mode hover/run")
+BITDEF(cmode,  throvr,  8,       "Throttle override on/off")
+BITDEF(cmode,  hover,   16,      "Stabilization mode hover/run")
+BITDEF(cmode,  hdglook, 32,      "Heading control mode look/normal")
 
 //--------- POWER CONTROL --------------
 VARDEF(uint,  power,  0,1,0, "power controls bitfield [on/off]")
@@ -350,7 +354,7 @@ VARDEF(float, rc_yaw,     -1.0,1,0, "RC yaw [-1..0..+1]")
 VARDEF(float, gcu_RSS,  1.0,1,0,  "GCU modem signal strength [0..1]")
 VARDEF(float, gcu_Ve,   25.5,1,0, "GCU battery voltage [v]")
 VARDEF(float, gcu_MT,   -127,1,0, "GCU modem temperature [C]")
-VARDEF(float, gcu_VSWR, 25.5,1,0, "GCU modem voltage standing wave ratio [VSWR]")
+VARDEF(float, gcu_VSWR, 25.5,1,0, "GCU modem standing wave ratio [VSWR]")
 //=============================================================================
 #undef VARDEF
 #undef BITDEF
