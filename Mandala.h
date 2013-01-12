@@ -37,8 +37,8 @@ typedef enum { wtHdg=0,wtLine,  wtCnt } _wpt_type;
 typedef struct {
   _var_vect     LLA;  //lat,lon,agl
   _wpt_type     type;
-  uint8_t       cmd[256]; //TODO: implement wpt commands
   uint          cmdSize;
+  uint8_t       cmd[128]; //TODO: implement wpt commands
 }_waypoint;
 //----------------------
 typedef enum { rwtApproach=0,rwtParachute,  rwtCnt } _rw_type;
@@ -50,13 +50,22 @@ typedef struct {
   _var_vect     dNED;
   _rw_type      rwType;
   _rw_app       appType;
-  double        distApp;
-  double        altApp;
-  double        distTA;
-  double        altTA;
+  _var_float    distApp;
+  _var_float    altApp;
+  _var_float    distTA;
+  _var_float    altTA;
   //calculated
-  double        hdg;
+  _var_float    hdg;
 }_runway;
+typedef struct {
+  _waypoint waypoints[100];
+  _runway   runways[10];
+  struct{ //config override
+    _var_float altitude;
+    _var_float dHome;
+    _var_float dHomeERS;
+  }safety;
+}_flightplan;
 //=============================================================================
 // UAV identification
 typedef struct {
@@ -118,9 +127,8 @@ public:
 #include "MandalaVarsAP.h"
   }cfg;
 
-  //---- Waypoints ----
-  _waypoint waypoints[100];
-  _runway   runways[10];
+  //---- flightplan ----
+  _flightplan fp;
   const char *wt_str[wtCnt];    //wt_type string descr
   const char *rwt_str[rwtCnt];  //wt_type string descr
   const char *rwa_str[rwaCnt];  //wt_type string descr

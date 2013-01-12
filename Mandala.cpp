@@ -38,8 +38,7 @@ Mandala::Mandala()
     var_type[i]=vt_void;
   }
 
-  memset(waypoints,0,sizeof(waypoints));
-  memset(runways,0,sizeof(runways));
+  memset(&fp,0,sizeof(fp));
   memset(&cfg,0,sizeof(cfg));
 
   dl_frcnt=0;
@@ -327,105 +326,141 @@ void Mandala::fill_config_vdsc(uint8_t *buf,uint i)
 //=============================================================================
 uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
 {
-  const uint wptPackedSz=(var_size[idx_gps_lat])+(var_size[idx_gps_lon])+(var_size[idx_gps_hmsl])+1;
-  const uint rwPackedSz=wptPackedSz+(var_size[idx_NED])+5;
-  const uint sz=wptPackedSz*wpcnt+rwPackedSz*rwcnt+2;
-  if(bufSize<sz){
-    fprintf(stderr,"Can't archive flight plan, wrong buffer size (%u) need (%u).\n",bufSize,sz);
-    return 0;
-  }
-  uint8_t *sbuf=buf;
-  *buf++=wpcnt;
-  *buf++=rwcnt;
+  //save mandala tmp vars
   _var_float gps_lat_save=gps_lat,gps_lon_save=gps_lon,gps_hmsl_save=gps_hmsl;
   _var_vect NED_save=NED;
-  for(uint i=0;i<wpcnt;i++){
-    gps_lat=waypoints[i].LLA[0];
-    gps_lon=waypoints[i].LLA[1];
-    gps_hmsl=waypoints[i].LLA[2];
-    buf+=archive(buf,bufSize,idx_gps_lat);
-    buf+=archive(buf,bufSize,idx_gps_lon);
-    buf+=archive(buf,bufSize,idx_gps_hmsl);
-    *buf++=waypoints[i].type;
-  }
-  for(uint i=0;i<rwcnt;i++){
-    gps_lat=runways[i].LLA[0];
-    gps_lon=runways[i].LLA[1];
-    gps_hmsl=runways[i].LLA[2];
-    NED[0]=runways[i].dNED[0];
-    NED[1]=runways[i].dNED[1];
-    NED[2]=runways[i].dNED[2];
-    buf+=archive(buf,bufSize,idx_gps_lat);
-    buf+=archive(buf,bufSize,idx_gps_lon);
-    buf+=archive(buf,bufSize,idx_gps_hmsl);
-    buf+=archive(buf,bufSize,idx_NED);
-    *buf++=runways[i].rwType;
-    *buf++=runways[i].appType;
-    *buf++=limit(runways[i].distApp/10,0,2550);
-    *buf++=limit(runways[i].altApp/10,0,2550);
-    *buf++=limit(runways[i].distTA/10,0,2550);
-    *buf++=limit(runways[i].altTA/10,0,2550);
+  uint8_t *sbuf=buf,*buf_top=buf+(bufSize-1);
+  uint cnt=0;
+  const uint szLLH=var_size[idx_gps_lat]+var_size[idx_gps_lon]+var_size[idx_gps_hmsl];
+  while(1){
+    //write waypoints
+    *buf++=wpcnt;
+    uint i;
+    for(i=0;i<wpcnt;i++){
+      if((buf+(szLLH+2+fp.waypoints[i].cmdSize))>buf_top) break;
+      gps_lat=fp.waypoints[i].LLA[0];
+      gps_lon=fp.waypoints[i].LLA[1];
+      gps_hmsl=fp.waypoints[i].LLA[2];
+      buf+=archive(buf,bufSize,idx_gps_lat);
+      buf+=archive(buf,bufSize,idx_gps_lon);
+      buf+=archive(buf,bufSize,idx_gps_hmsl);
+      *buf++=fp.waypoints[i].type;
+      *buf++=fp.waypoints[i].cmdSize;
+      memcpy(buf,fp.waypoints[i].cmd,fp.waypoints[i].cmdSize);
+      buf+=fp.waypoints[i].cmdSize;
+    }
+    if(i<wpcnt)break; //overflow
+    //write runways
+    *buf++=rwcnt;
+    for(i=0;i<rwcnt;i++){
+      if((buf+(szLLH+var_size[idx_NED]+6))>buf_top) break;
+      gps_lat=fp.runways[i].LLA[0];
+      gps_lon=fp.runways[i].LLA[1];
+      gps_hmsl=fp.runways[i].LLA[2];
+      NED[0]=fp.runways[i].dNED[0];
+      NED[1]=fp.runways[i].dNED[1];
+      NED[2]=fp.runways[i].dNED[2];
+      buf+=archive(buf,bufSize,idx_gps_lat);
+      buf+=archive(buf,bufSize,idx_gps_lon);
+      buf+=archive(buf,bufSize,idx_gps_hmsl);
+      buf+=archive(buf,bufSize,idx_NED);
+      *buf++=fp.runways[i].rwType;
+      *buf++=fp.runways[i].appType;
+      *buf++=limit(fp.runways[i].distApp/10,0,2550);
+      *buf++=limit(fp.runways[i].altApp/10,0,2550);
+      *buf++=limit(fp.runways[i].distTA/10,0,2550);
+      *buf++=limit(fp.runways[i].altTA/10,0,2550);
+    }
+    if(i<rwcnt)break; //overflow
+    //write flight place parameters
+    if((buf+2)>buf_top) break;
+    *buf++=limit(fp.safety.dHome/100,0,25500);
+    *buf++=limit(fp.safety.dHomeERS/100,0,25500);
+    //success: calc number of bytes written
+    cnt=buf-sbuf;
+    break;
   }
   gps_lat=gps_lat_save;
   gps_lon=gps_lon_save;
   gps_hmsl=gps_hmsl_save;
   NED=NED_save;
-  return buf-sbuf;
+  if(!cnt) fprintf(stderr,"Can't archive flight plan, buffer overflow.\n");
+  return cnt;
 }
 //=============================================================================
 uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
 {
-  const uint wptPackedSz=(var_size[idx_gps_lat])+(var_size[idx_gps_lon])+(var_size[idx_gps_hmsl])+1;
-  const uint rwPackedSz=wptPackedSz+(var_size[idx_NED])+5;
-  const uint sz=wptPackedSz*buf[0]+rwPackedSz*buf[1]+2;
-  if(cnt!=sz){
-    fprintf(stderr,"Can't extract flight plan, wrong data size (%u) need (%u).\n",cnt,sz);
-    return 0;
-  }
-  wpcnt=buf[0];
-  rwcnt=buf[1];
-  uint8_t *data=buf+2;
+  //save mandala tmp vars
   _var_float gps_lat_save=gps_lat,gps_lon_save=gps_lon,gps_hmsl_save=gps_hmsl;
   _var_vect NED_save=NED;
   double lat,lon,alt;
-  // unpack [cnt] waypoints from [*data]
-  for (uint i=0;i<wpcnt;i++) {
-    data+=extract(data,var_size[idx_gps_lat],idx_gps_lat);
-    data+=extract(data,var_size[idx_gps_lon],idx_gps_lon);
-    data+=extract(data,var_size[idx_gps_hmsl],idx_gps_hmsl);
-    lat=gps_lat;
-    lon=gps_lon;
-    alt=gps_hmsl;
-    waypoints[i].type=(_wpt_type)*data++;
-    waypoints[i].LLA=_var_vect(lat,lon,alt);
-    waypoints[i].cmd[0]=0;
-    //print wpt stats
-    //const _var_vect ned=llh2ned(_var_vect(lat*D2R,lon*D2R,gps_home_hmsl+alt));
-    //printf("WPT%u NED(%.0f, %.0f, %.0f) %s\n",i+1,ned[0],ned[1],ned[2],wt_str[waypoints[i].type]);
-  }
-  //unpack runways
-  for (uint i=0;i<rwcnt;i++) {
-    data+=extract(data,var_size[idx_gps_lat],idx_gps_lat);
-    data+=extract(data,var_size[idx_gps_lon],idx_gps_lon);
-    data+=extract(data,var_size[idx_gps_hmsl],idx_gps_hmsl);
-    data+=extract(data,var_size[idx_NED],idx_NED);
-    runways[i].LLA[0]=gps_lat;
-    runways[i].LLA[1]=gps_lon;
-    runways[i].LLA[2]=gps_hmsl;
-    runways[i].rwType=(_rw_type)*data++;
-    runways[i].appType=(_rw_app)*data++;
-    runways[i].distApp=*data++*10;
-    runways[i].altApp=*data++*10;
-    runways[i].distTA=*data++*10;
-    runways[i].altTA=*data++*10;
-    runways[i].dNED=NED;
-    //printf("Runway%u (%s), NED(%.0f,%.0f,%.0f)\n",i+1,rwt_str[runways[i].type],runways[i].dNED[0],runways[i].dNED[1],runways[i].dNED[2]);
+  uint8_t *sbuf=buf,*buf_top=buf+cnt;
+  uint rcnt=0;
+  const uint szLLH=var_size[idx_gps_lat]+var_size[idx_gps_lon]+var_size[idx_gps_hmsl];
+  while(1){
+    //unpack waypoints
+    if((buf+1)>buf_top) break;
+    wpcnt=*buf++;
+    uint i;
+    for (i=0;i<wpcnt;i++) {
+      if((buf+(szLLH+2))>buf_top) break;
+      buf+=extract(buf,var_size[idx_gps_lat],idx_gps_lat);
+      buf+=extract(buf,var_size[idx_gps_lon],idx_gps_lon);
+      buf+=extract(buf,var_size[idx_gps_hmsl],idx_gps_hmsl);
+      lat=gps_lat;
+      lon=gps_lon;
+      alt=gps_hmsl;
+      fp.waypoints[i].LLA=_var_vect(lat,lon,alt);
+      fp.waypoints[i].type=(_wpt_type)*buf++;
+      uint csz=(_wpt_type)*buf++;
+      uint sz=csz;
+      if(sz>sizeof(_waypoint::cmdSize)) sz=0;
+      fp.waypoints[i].cmdSize=sz;
+      if((buf+sz)>buf_top) break;
+      memcpy(fp.waypoints[i].cmd,buf,sz);
+      buf+=csz;
+    }
+    if(i<wpcnt)break; //overflow
+    //unpack runways
+    if((buf+1)>buf_top) break;
+    rwcnt=*buf++;
+    for (i=0;i<rwcnt;i++) {
+      if((buf+(szLLH+var_size[idx_NED]+6))>buf_top) break;
+      buf+=extract(buf,var_size[idx_gps_lat],idx_gps_lat);
+      buf+=extract(buf,var_size[idx_gps_lon],idx_gps_lon);
+      buf+=extract(buf,var_size[idx_gps_hmsl],idx_gps_hmsl);
+      buf+=extract(buf,var_size[idx_NED],idx_NED);
+      fp.runways[i].LLA[0]=gps_lat;
+      fp.runways[i].LLA[1]=gps_lon;
+      fp.runways[i].LLA[2]=gps_hmsl;
+      fp.runways[i].dNED=NED;
+      fp.runways[i].rwType=(_rw_type)*buf++;
+      fp.runways[i].appType=(_rw_app)*buf++;
+      fp.runways[i].distApp=*buf++*10;
+      fp.runways[i].altApp=*buf++*10;
+      fp.runways[i].distTA=*buf++*10;
+      fp.runways[i].altTA=*buf++*10;
+    }
+    if(i<rwcnt)break; //overflow
+    //unpack flight place parameters
+    if((buf+2)>buf_top) break;
+    fp.safety.dHome=*buf++*100;
+    fp.safety.dHomeERS=*buf++*100;
+    //success: calc number of bytes unpacked
+    rcnt=buf-sbuf;
+    break;
   }
   gps_lat=gps_lat_save;
   gps_lon=gps_lon_save;
   gps_hmsl=gps_hmsl_save;
   NED=NED_save;
-  return data-buf;
+  if(rcnt<cnt)rcnt=0;
+  if(!rcnt){
+    fprintf(stderr,"Can't extract flight plan.\n");
+    wpcnt=rwcnt=0;
+    memset(&fp,0,sizeof(fp));
+  }
+  return rcnt;
 }
 //=============================================================================
 uint Mandala::archive_downstream_hd(uint8_t *buf,uint maxSize)
