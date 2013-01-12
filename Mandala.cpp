@@ -171,7 +171,6 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
     fprintf(stderr,"Error: extract unknown var  #%u\n",var_idx);
     return 0;
   }
-  //printf("extracting: %s\n",var_name[var_idx]);
   uint vsz=var_size[var_idx];
   if((!alt_bytecnt)&&((!vsz)||(vsz>size))){
     fprintf(stderr,"Error: extract %s #%u (sz: %u, buf: %u)\n",var_name[var_idx],var_idx,vsz,size);
@@ -179,11 +178,6 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   }
   uint cnt=do_extract(buf,size,var_idx);
   if(!cnt)return 0; //error
-  //if(var_idx==20){
-    //printf("cnt:%u var:%u %.2f ",cnt,var_idx,Ve);
-    //dump(idx_theta);
-    //dump(buf,size);
-  //}
   vsz=cnt;
   if(size<vsz){
     fprintf(stderr,"Error: telemetry tail extra.\n");
@@ -373,7 +367,8 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     }
     if(i<rwcnt)break; //overflow
     //write flight place parameters
-    if((buf+2)>buf_top) break;
+    if((buf+3)>buf_top) break;
+    *buf++=limit(fp.safety.altitude/10,0,2550);
     *buf++=limit(fp.safety.dHome/100,0,25500);
     *buf++=limit(fp.safety.dHomeERS/100,0,25500);
     //success: calc number of bytes written
@@ -443,7 +438,8 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     }
     if(i<rwcnt)break; //overflow
     //unpack flight place parameters
-    if((buf+2)>buf_top) break;
+    if((buf+3)>buf_top) break;
+    fp.safety.altitude=*buf++*10;
     fp.safety.dHome=*buf++*100;
     fp.safety.dHomeERS=*buf++*100;
     //success: calc number of bytes unpacked

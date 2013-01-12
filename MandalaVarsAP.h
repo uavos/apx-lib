@@ -113,7 +113,7 @@ CFGDEF(float, wptSnap,   0,1,0,        "Waypoints: waypoint snap distance [m]")
 CFGDEF(float, wptDrv,   0,1,0,        "waypoint course derivative level [deg/s]")
 
 CFGDEF(float, safety_dHome,    255000,1,1000,"Safety: max distance to go home [m]")
-CFGDEF(float, safety_dHomeERS, 255000,1,1000,"suicide (ERS) distance [m]")
+CFGDEF(float, safety_dHomeERS, 255000,1,1000,"max distance to activate ERS [m]")
 CFGDEF(float, safety_vspeedERS,50,1,1,       "max descending speed to launch ERS [m/s]")
 CFGDEF(float, safety_Ve,       25.5,1,0.1,   "min autopilot battery voltage to go home [v]")
 CFGDEF(float, safety_Vs,       45,1,0.1,     "min servo battery voltage to go home [v]")
