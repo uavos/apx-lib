@@ -37,7 +37,7 @@ typedef enum { wtHdg=0,wtLine,  wtCnt } _wpt_type;
 typedef struct {
   _var_vect     LLA;  //lat,lon,agl
   _wpt_type     type;
-  uint8_t       cmd[9]; //TODO: implement wpt commands
+  uint8_t       cmd[256]; //TODO: implement wpt commands
   uint          cmdSize;
 }_waypoint;
 //----------------------
@@ -121,7 +121,7 @@ public:
   //---- Waypoints ----
   _waypoint waypoints[100];
   _runway   runways[10];
-  const char *wt_str[wtCnt];  //wt_type string descr
+  const char *wt_str[wtCnt];    //wt_type string descr
   const char *rwt_str[rwtCnt];  //wt_type string descr
   const char *rwa_str[rwaCnt];  //wt_type string descr
 

@@ -14,6 +14,8 @@ typedef uint8_t _node_version[16]; //fw version string
 typedef struct {
   _node_name    name;
   _node_version version;
+  uint8_t       crc;
+  uint32_t      size;
 }__attribute__((packed)) _fw_info;
 // node information data to identify the node
 typedef struct{
@@ -77,12 +79,8 @@ enum{
   apc_loader=0xFF
 };
 //=============================================================================
-// Loader packet: [ALL PACKETS ARE BROADCAST SRV - src=0x80]
-// hdr: cmd=apc_loader
-// <0x80>,<apc_loader=0xFF>,<ldc_XXX>,<_node_sn>,<data...>
-// to enter loader:
-// <0x80>,<apc_loader=0xFF>,<ldc_init>,<_node_sn>
-// loader filter packets by _node_sn
+// Loader packet data (packet.srv.cmd=apc_loader):
+// <ldc_COMMAND>,<data...>
 // loader must reply to standard command 'apc_ID'
 //------------------------------------------------------------------------------
 typedef enum {
@@ -146,6 +144,7 @@ typedef _pwm      _ft_pwm;
 typedef _out      _ft_out;
 typedef _serial   _ft_serial;
 typedef _capture  _ft_capture;
+typedef uint8_t   _ft_byte;
 typedef uint8_t   _ft_string[16];
 //-----------------------------------------------------------------------------
 typedef enum{
@@ -157,6 +156,7 @@ typedef enum{
   ft_out,
   ft_serial,
   ft_capture,
+  ft_byte,
   ft_string,
   //---------
   ft_cnt

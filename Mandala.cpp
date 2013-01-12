@@ -431,7 +431,7 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
 uint Mandala::archive_downstream_hd(uint8_t *buf,uint maxSize)
 {
   // telemetry stream format:
-  // <uav>,<timestampL>,<timestampH>,<bitsig>,<archived data>,[<bitsig>,<data>...]
+  // <timestampL>,<timestampH>,<bitsig>,<archived data>,[<bitsig>,<data>...]
   // only modified vars are sent
   // uav - dynamically assigned UAV ID
   // timestamp - time in 10ms units
@@ -439,7 +439,9 @@ uint Mandala::archive_downstream_hd(uint8_t *buf,uint maxSize)
   // skip vars in sig 'dl_filter' as they are calculated by 'extractTelemety'
 
   //limit maxSize
-  if(maxSize>MAX_TELEMETRY)maxSize=MAX_TELEMETRY;
+  if(maxSize){
+    if(maxSize>MAX_TELEMETRY)maxSize=MAX_TELEMETRY;
+  }else maxSize=sizeof(dl_snapshot);
 
   //watch alt_bytecnt changes
   if(dl_hd_save!=alt_bytecnt){
@@ -448,7 +450,6 @@ uint Mandala::archive_downstream_hd(uint8_t *buf,uint maxSize)
   }
   
   //pack header
-  *buf++=id.id;
   uint ts=dl_timestamp/10;
   *buf++=ts;
   *buf++=ts>>8;
@@ -465,17 +466,12 @@ uint Mandala::archive_downstream_hd(uint8_t *buf,uint maxSize)
   uint8_t *mask_ptr=buf;      //start of data
   uint8_t *ptr=mask_ptr+1;
   *mask_ptr=0;
-  for(uint i=idxPAD;i<(idxPAD+128);i++){
-    uint sz=var_size[i];
-    if(!sz)break; //valid vars end
-    sz=archive(dl_var,sizeof(dl_var),i);
+  for(uint i=idxPAD;i<idx_vars_top;i++){
+    uint sz=archive(dl_var,sizeof(dl_var),i);
     //check if filtered var
     bool filtered=memchr(dl_filter+1,i,dl_filter[0])!=NULL;
     if((*reset_mask_ptr)&mask) (*reset_mask_ptr)&=~mask; //remove reset flag
-    else{
-      //test changed
-      filtered|=(memcmp(snapshot,dl_var,sz)==0);
-    }
+    else filtered|=(memcmp(snapshot,dl_var,sz)==0);//test changed
     //pack if not filtered
     if(!filtered){
       //check buf overflow
@@ -509,7 +505,7 @@ uint Mandala::archive_downstream_hd(uint8_t *buf,uint maxSize)
     dl_reset=true;
 
   dl_timestamp+=dl_period?dl_period:(1000/TELEMETRY_FREQ);
-  dl_size=cnt+mask_cnt+3;
+  dl_size=cnt+mask_cnt+2;
   return dl_size;
 }
 uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
@@ -522,7 +518,6 @@ uint Mandala::extract_downstream_hd(uint8_t *buf,uint cnt)
 {
   //header
   dl_size=cnt;
-  dl_id=*buf++;
   dl_frcnt++;
   uint16_t ts=*buf++;
   ts|=(*buf++)<<8;

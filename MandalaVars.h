@@ -176,12 +176,13 @@ VARDEF(float, ctr_engine,     1.0,1,0, "engine tuning [0..1]")
 VARDEF(float, ctr_sweep,     -1.0,1,0, "sweep [-1..0..1]")
 
 VARDEF(uint,  ctrb,           0,1,0,   "controls bitfield [on/off]")
-BITDEF(ctrb,   gear,      1, "Landing gear retracted/extracted")
-BITDEF(ctrb,   ers,       2, "ERS on/off")
-BITDEF(ctrb,   rel,       4, "Parachute released/locked")
-BITDEF(ctrb,   drp,       8, "Drop-off open/locked")
-BITDEF(ctrb,   pump,      16,"Fuel pump on/off")
-BITDEF(ctrb,   xfeed,     32,"Crossfeed on/off")
+BITDEF(ctrb,   ers,       1,  "ERS on/off")
+BITDEF(ctrb,   rel,       2,  "Parachute released/locked")
+BITDEF(ctrb,   rev,       4,  "Reverse activated/off")
+BITDEF(ctrb,   gear,      8,  "Landing gear retracted/extracted")
+BITDEF(ctrb,   drp,       16, "Drop-off open/locked")
+BITDEF(ctrb,   pump,      32, "Fuel pump on/off")
+BITDEF(ctrb,   xfeed,     64, "Crossfeed on/off")
 
 //--------- AUTOPILOT COMMAND --------------
 VARDEF(vect,  cmd_theta,    -180,2,0,   "desired attitude: roll,pitch,yaw [deg]")
@@ -199,8 +200,9 @@ VARDEF(vect,  radar_vXYZ,  -150,2,1,     "radar velocity: Vx, Vy, Vz [m/s]")
 VARDEF(vect,  radar_dXYZ,  -3276.7,2,1,  "radar delta: dx, dy, dz [m]")
 
 //--------- OTHER SENSORS (information) --------------
-VARDEF(float, fuel,  1.0,1,0,  "fuel capacity [0..1]")
-VARDEF(float, RSS,   1.0,1,0,  "modem signal strength [0..1]")
+VARDEF(float, fuel,  1.0,1,0,   "fuel capacity [0..1]")
+VARDEF(float, frate, 0.1,1,0,   "fuel consumption rate [1/s]")
+VARDEF(float, RSS,   1.0,1,0,   "modem signal strength [0..1]")
 
 //--------- BATTERY --------------
 VARDEF(float, Ve,     25.5,1,0,   "autopilot battery voltage [v]")
@@ -247,6 +249,7 @@ BITDEF(error,  cas,     2,       "CAS error")
 BITDEF(error,  gyro,    4,       "IMU gyros bias error")
 BITDEF(error,  engine,  8,       "Engine error")
 BITDEF(error,  power,   16,      "Power supply error")
+BITDEF(error,  ers,     32,      "ERS error")
 
 VARDEF(uint,  cmode,    0,1,0, "operation mode bitfield [on/off]")
 BITDEF(cmode,  dlhd,    1,       "High precision downstream on/off")
@@ -296,7 +299,9 @@ VARDEF(float, gps_home_lon, -180,4,0,    "home longitude [deg]")
 VARDEF(float, gps_home_hmsl,-10000,2,0,  "home altitde above sea [m]")
 VARDEF(uint,  gps_SV,        0,1,0,      "GPS Satellites visible [number]")
 VARDEF(uint,  gps_SU,        0,1,0,      "GPS Satellites used [number]")
-VARDEF(float, pstatic_gnd,    35.0,4,0,    "Static pressure on ground level [inHg]")
+VARDEF(float, pstatic_gnd,   35.0,4,0,   "Static pressure on ground level [inHg]")
+VARDEF(float, safe_altitude, 15000.0,4,0,"Safe altitude [m]")
+VARDEF(float, cruise_airspeed,655.35,2,0,"Cruise airspeed [m/s]")
 
 //--------- CAM CONTROL --------------
 VARDEF(uint, cam_ch,   0,1,0, "video channel")
@@ -322,6 +327,7 @@ VARDEF(float, cam_lon,     -180,4,0,   "camera track longitude [deg]")
 VARDEF(float, cam_alt,     -10000,2,0, "camera track altitude [m]")
 VARDEF(uint, cam_ctrb, 0,1,0, "camera controls bitfield [on/off]")
 BITDEF(cam_ctrb, shot,      1,  "Snapshot")
+BITDEF(cam_ctrb, ashot,     2,  "Series snapshots")
 
 //--------- calculated by Mandala::calc() --------------
 VARDEF(vect,  NED,     -10000,2,0, "local position: north,east,down [m]")
