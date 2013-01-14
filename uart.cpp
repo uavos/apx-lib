@@ -86,14 +86,17 @@ int Uart::handle(void)
 //==============================================================================
 void Uart::write(const uint8_t v)
 {
-  if(::write(fd,&v,1))return;
+  write(&v,1);
 }
 //==============================================================================
 void Uart::write(const uint8_t *buf,uint cnt)
 {
-  unsigned short i=0;
-  while (i<cnt) {
-    i+=::write(fd,buf+i,cnt-i);
+  int pcnt=cnt;
+  int wcnt=0;
+  while (wcnt<pcnt) {
+    int cnt=::write(fd,buf+wcnt,pcnt-wcnt);
+    if(cnt<=0)continue;
+    wcnt+=cnt;
   }
 }
 //==============================================================================

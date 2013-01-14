@@ -3,7 +3,7 @@
 #include <inttypes.h>
 #include <sys/types.h>
 //=============================================================================
-#define BUS_MAX_PACKET          2048    //2048 MAX
+#define BUS_MAX_PACKET          1024    //2048 MAX
 //=============================================================================
 // node information, dynamically assigned values
 typedef uint8_t _node_sn[12]; //chip serial number
@@ -88,6 +88,8 @@ typedef enum {
   ldc_file,     // set file info <_ldc_file>, re: <_ldc_file>
   ldc_write,    // write file data <_ldc_write>, re: <_ldc_write::hdr>
   ldc_erase,    // force erase all user_app flash memory
+  ldc_lerase,   // erase loader area (used in user app only)
+  ldc_lwrite,   // write loader area (used in user app only)
 } _ldr_cmd;
 //loader data
 typedef struct{
