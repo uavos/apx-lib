@@ -396,6 +396,7 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     //unpack waypoints
     if((buf+1)>buf_top) break;
     wpcnt=*buf++;
+    if(wpcnt>MAX_WPCNT)break;
     uint i;
     for (i=0;i<wpcnt;i++) {
       if((buf+(szLLH+2))>buf_top) break;
@@ -419,6 +420,7 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     //unpack runways
     if((buf+1)>buf_top) break;
     rwcnt=*buf++;
+    if(rwcnt>MAX_RWCNT)break;
     for (i=0;i<rwcnt;i++) {
       if((buf+(szLLH+var_size[idx_NED]+6))>buf_top) break;
       buf+=extract(buf,var_size[idx_gps_lat],idx_gps_lat);

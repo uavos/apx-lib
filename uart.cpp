@@ -94,9 +94,9 @@ void Uart::write(const uint8_t *buf,uint cnt)
   int pcnt=cnt;
   int wcnt=0;
   while (wcnt<pcnt) {
-    int cnt=::write(fd,buf+wcnt,pcnt-wcnt);
-    if(cnt<=0)continue;
-    wcnt+=cnt;
+    int rcnt=::write(fd,buf+wcnt,pcnt-wcnt);
+    if(rcnt<=0)continue;
+    wcnt+=rcnt;
   }
 }
 //==============================================================================

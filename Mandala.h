@@ -57,9 +57,11 @@ typedef struct {
   //calculated
   _var_float    hdg;
 }_runway;
+#define MAX_WPCNT       100
+#define MAX_RWCNT       10
 typedef struct {
-  _waypoint waypoints[100];
-  _runway   runways[10];
+  _waypoint waypoints[MAX_WPCNT];
+  _runway   runways[MAX_RWCNT];
   struct{ //config override
     _var_float altitude;
     _var_float dHome;
