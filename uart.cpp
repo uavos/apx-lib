@@ -60,9 +60,12 @@ bool Uart::open(const char *portname,int baudrate,const char *name,int timeout,u
   //cfsetospeed(&tio_serial, baudrate);
   tcflush(fd, TCIFLUSH);
   tcsetattr(fd, TCSANOW, &tio_serial);
-
+  
   brate=baudrate;
   pname=portname;
+
+  flush();
+  usleep(200000);
 
   return true;
 }
@@ -211,6 +214,7 @@ uint Uart::readEscaped(uint8_t *buf,uint max_len)
           //frame received...
           cnt--;
           stage=0;
+          //dump(buf,bcnt);
           return cnt;
         }
         if (v==0x55) {
