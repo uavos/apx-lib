@@ -87,14 +87,11 @@ typedef enum {
   ldc_init=0,   // start loader, re: <_ldc_file> =flash size
   ldc_file,     // set file info <_ldc_file>, re: <_ldc_file>
   ldc_write,    // write file data <_ldc_write>, re: <_ldc_write::hdr>
-  ldc_erase,    // force erase all user_app flash memory
-  ldc_lerase,   // erase loader area (used in user app only)
-  ldc_lwrite,   // write loader area (used in user app only)
 } _ldr_cmd;
 //loader data
 typedef struct{
   uint32_t      start_address;
-  uint16_t      size;        // flash size in kB
+  uint32_t      size;        // flash size in kB
   uint8_t       xor_crc;     // all file data XORed
 }__attribute__((packed)) _ldc_file;
 typedef struct{
