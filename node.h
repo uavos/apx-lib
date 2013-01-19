@@ -41,14 +41,13 @@ typedef struct{
     }srv;
     struct{
       uint8_t   tag;    //user tag
-      uint8_t   id;     //wrapped <var_idx>
-      uint8_t   data[BUS_MAX_PACKET-1-2];   //tagged data
+      uint8_t   packet[BUS_MAX_PACKET-1-1];   //tagged packet
     }tagged;
   };
 }__attribute__((packed)) _bus_packet;
 #define bus_packet_size_hdr             (1)
 #define bus_packet_size_hdr_srv         (bus_packet_size_hdr+sizeof(_node_sn)+1)
-#define bus_packet_size_hdr_tagged      (bus_packet_size_hdr+2)
+#define bus_packet_size_hdr_tagged      (bus_packet_size_hdr+1)
 //=============================================================================
 // default bus commands (service packets)
 // all service packets addressed by _node_sn
@@ -57,7 +56,7 @@ enum{
   //------------------
   //system commands
   apc_info,     //return _fw_info
-  apc_debug,    //stdout message
+  apc_debug,    //debug message
   apc_reboot,   //reset/reboot node
   apc_mute,     //stop sending data (sensors)
 

@@ -4,7 +4,7 @@
 #include <sys/msg.h>
 //==============================================================================
 // messages from bus
-#define _bus_msg_size     1024
+#define _bus_msg_size     2048
 typedef struct{
   long    type;   //must be long (used by filter)
   uint8_t data[_bus_msg_size];

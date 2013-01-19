@@ -28,7 +28,7 @@
 #define idxPAD  64      //start index for regular vars
 //-----------------------------------------------------------------------------
 // Var Type enum
-enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig,vt_core_top};
+enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig};
 //=============================================================================
 // Physical constants
 #define EARTH_RATE   0.00007292115   // rotation rate of earth (rad/sec)
@@ -75,10 +75,10 @@ SIGDEF(downstream,"Downlink stream <stream>")
 SIGDEF(uplink,    "Uplink wrapped packet <var_idx>,<data..>")
 SIGDEF(sim,       "Simulator wrapped packet <var_idx>,<data..>")
 SIGDEF(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
-SIGDEF(rawbus,    "RAW bus packet <raw packet data..>")
-SIGDEF(uav_id,    "UAV identification data <packed ID>")
+SIGDEF(rawbus,    "RAW bus packet <raw data..>")
+SIGDEF(uav_id,    "UAV identification data <packed UAV_ID>")
 SIGDEF(msg,       "Message string <text string>")
-SIGDEF(ping,      "Ping packet")
+SIGDEF(ping,      "Ping packet, no reply expected")
 SIGDEF(setb,      "Set bit (uplink only) <var_idx>,<mask>")
 SIGDEF(clrb,      "Clear bit (uplink only) <var_idx>,<mask>")
 SIGDEF(downstream_hd,"Downlink stream (highest precision) <stream>")
@@ -86,11 +86,11 @@ SIGDEF(config,    "System configuration <packed config>")
 SIGDEF(flightplan,"Flight plan data <packed fligthplan>")
 //------------------------------
 // var packs
-SIGDEF(imu, "IMU sensors data pack",
+SIGDEF(imu, "IMU sensors data package",
        idx_acc, idx_gyro )
-SIGDEF(gps, "GPS fix data pack",
+SIGDEF(gps, "GPS fix data package",
       idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED)
-SIGDEF(ctr, "Fast controls",
+SIGDEF(ctr, "Fast controls, sent to bus at fixed update rate",
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_steering,idx_ctr_collective )
 SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw)
 //------------------------------
@@ -107,7 +107,7 @@ SIGDEF(autosend,  "Automatically forwarded variables to GCU",
        idx_service, idx_downstream, idx_uav_id, idx_msg, idx_downstream_hd, idx_config, idx_flightplan, idx_rawbus )
 
 //telemetry filter (never send), also calculated by mandala.extractTelemetry()
-SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
+SIGDEF(dl_filter, "Downlink variables filter (calculated, never transmitted over datalink)",
       idx_NED,idx_homeHDG,idx_dHome,idx_dWPT,idx_dN,idx_dE,idx_dAlt,
       idx_vXYZ,idx_dXYZ,
       idx_gSpeed,
@@ -124,8 +124,8 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, not transmitted)",
 // name:           variable name, used for text also. access: var.name
 // array:          for VARDEFA only (array size)
 // span:           value span (for exchange compression), <0 = signed
-// bytes:          bytes number for data exchange compression
-// tbytes:         bytes number for data exchange with GCU
+// bytes:          bytes number for data exchange via bus (compression)
+// tbytes:         bytes number for data exchange with GCU (more compression)
 // description:    text description of the variable, used mostly in GCU
 // if bitfield description contains slash '/' its status reported in console
 //------------------------------------------------------------------------------

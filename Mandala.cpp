@@ -165,7 +165,8 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   if(var_idx==idx_service)return 1; //nothing to do
   if(var_idx==idx_setb)return extract_setb(buf,size);
   if(var_idx==idx_clrb)return extract_clrb(buf,size);
-
+  if(var_idx==idx_ping)return 1;
+  
   void *ptr=var_ptr[var_idx];
   if(!ptr){
     fprintf(stderr,"Error: extract unknown var  #%u\n",var_idx);
