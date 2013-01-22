@@ -73,17 +73,17 @@ SIGDEF(service,   "Service packet <node_sn>,<cmd>,<data..>")
 //other protocols
 SIGDEF(downstream,"Downlink stream <stream>")
 SIGDEF(uplink,    "Uplink wrapped packet <var_idx>,<data..>")
-SIGDEF(sim,       "Simulator wrapped packet <var_idx>,<data..>")
 SIGDEF(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
-SIGDEF(rawbus,    "RAW bus packet <raw data..>")
-SIGDEF(uav_id,    "UAV identification data <packed UAV_ID>")
+SIGDEF(rawbus,    "RAW bus packet, forwarded to CAN <raw data..>")
 SIGDEF(msg,       "Message string <text string>")
 SIGDEF(ping,      "Ping packet, no reply expected")
 SIGDEF(setb,      "Set bit (uplink only) <var_idx>,<mask>")
 SIGDEF(clrb,      "Clear bit (uplink only) <var_idx>,<mask>")
-SIGDEF(downstream_hd,"Downlink stream (highest precision) <stream>")
-SIGDEF(config,    "System configuration <packed config>")
+SIGDEF(config,    "Autopilot configuration <packed config>")
 SIGDEF(flightplan,"Flight plan data <packed fligthplan>")
+SIGDEF(sim,       "Simulator wrapped packet <var_idx>,<data..>")
+SIGDEF(uav_id,    "UAV identification data <packed UAV_ID>")
+SIGDEF(formation, "Formation flight data <packed data>")
 //------------------------------
 // var packs
 SIGDEF(imu, "IMU sensors data package",
@@ -104,7 +104,7 @@ SIGDEF(update,  "Auto send to bus when changed",
 
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
 SIGDEF(autosend,  "Automatically forwarded variables to GCU",
-       idx_service, idx_downstream, idx_uav_id, idx_msg, idx_downstream_hd, idx_config, idx_flightplan, idx_rawbus )
+       idx_service, idx_downstream, idx_uav_id, idx_msg, idx_config, idx_flightplan, idx_rawbus )
 
 //telemetry filter (never send), also calculated by mandala.extractTelemetry()
 SIGDEF(dl_filter, "Downlink variables filter (calculated, never transmitted over datalink)",

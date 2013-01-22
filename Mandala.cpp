@@ -130,7 +130,6 @@ uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
   //check for special protocol archiveSize
   if(var_idx==idx_config)return archive_config(buf,size);
   if(var_idx==idx_downstream)return archive_downstream(buf,size);
-  if(var_idx==idx_downstream_hd)return archive_downstream_hd(buf,size);
   if(var_idx==idx_flightplan)return archive_flightplan(buf,size);
 
   void *ptr=var_ptr[var_idx];
@@ -159,7 +158,6 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   //check for special protocol archiveSize
   if(var_idx==idx_config)return extract_config(buf,size);
   if(var_idx==idx_downstream)return extract_downstream(buf,size);
-  if(var_idx==idx_downstream_hd)return extract_downstream_hd(buf,size);
   if(var_idx==idx_flightplan)return extract_flightplan(buf,size);
   if(var_idx==idx_msg)return 1; //nothing to do
   if(var_idx==idx_service)return 1; //nothing to do
@@ -462,13 +460,12 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
   return rcnt;
 }
 //=============================================================================
-uint Mandala::archive_downstream_hd(uint8_t *buf,uint maxSize)
+uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
 {
   // telemetry stream format:
   // <timestampL>,<timestampH>,<bitsig>,<archived data>,[<bitsig>,<data>...]
   // only modified vars are sent
-  // uav - dynamically assigned UAV ID
-  // timestamp - time in 10ms units
+  // timestamp - time in 10ms units & 0x7FFF, MSB = HD stream
   // bitsig - LSBF bitfield, on/off next 8 variables starting from idxPAD
   // skip vars in sig 'dl_filter' as they are calculated by 'extractTelemety'
 
@@ -477,6 +474,9 @@ uint Mandala::archive_downstream_hd(uint8_t *buf,uint maxSize)
     if(maxSize>MAX_TELEMETRY)maxSize=MAX_TELEMETRY;
   }else maxSize=sizeof(dl_snapshot);
 
+
+  alt_bytecnt=!(cmode&cmode_dlhd);
+  
   //watch alt_bytecnt changes
   if(dl_hd_save!=alt_bytecnt){
     dl_hd_save=alt_bytecnt;
@@ -484,9 +484,9 @@ uint Mandala::archive_downstream_hd(uint8_t *buf,uint maxSize)
   }
   
   //pack header
-  uint ts=dl_timestamp/10;
+  uint ts=(dl_timestamp/10)&0x7FFF;
   *buf++=ts;
-  *buf++=ts>>8;
+  *buf++=(ts>>8)|(alt_bytecnt?0x00:0x80);
   
   //pack stream
   if(dl_reset){
@@ -542,20 +542,21 @@ uint Mandala::archive_downstream_hd(uint8_t *buf,uint maxSize)
   dl_size=cnt+mask_cnt+2;
   return dl_size;
 }
-uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
-{
-  alt_bytecnt=true;    //for var pack size
-  return archive_downstream_hd(buf,maxSize);
-}
 //=============================================================================
-uint Mandala::extract_downstream_hd(uint8_t *buf,uint cnt)
+uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
 {
   //header
   dl_size=cnt;
   dl_frcnt++;
   uint16_t ts=*buf++;
   ts|=(*buf++)<<8;
-  uint16_t Pdt=ts-dl_ts;
+
+  //MSB = HD stream
+  alt_bytecnt=!(ts&0x8000);
+  ts&=0x7FFF;
+  
+  //calc delta time
+  uint16_t Pdt=(ts-dl_ts)&0x7FFF;
   dl_ts=ts;
   dl_timestamp+=Pdt*10;
   bool bErr=dl_Pdt!=Pdt; //delta different
@@ -582,11 +583,6 @@ uint Mandala::extract_downstream_hd(uint8_t *buf,uint cnt)
   // gps_deltaNED,gps_deltaXYZ,gps_distWPT,gps_distHome,
   calc();
   return tcnt;
-}
-uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
-{
-  alt_bytecnt=true;    //for var pack size
-  return extract_downstream_hd(buf,cnt);
 }
 //=============================================================================
 uint Mandala::extract_setb(uint8_t *buf,uint cnt)

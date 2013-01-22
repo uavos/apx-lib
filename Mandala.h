@@ -215,8 +215,6 @@ private:
   uint extract_flightplan(uint8_t *buf,uint cnt);//read packed waypoints from buf
   uint archive_downstream(uint8_t *buf,uint maxSize);    //pack telemetry
   uint extract_downstream(uint8_t *buf,uint cnt);  //read telemetry
-  uint archive_downstream_hd(uint8_t *buf,uint maxSize);    //pack telemetry high-precision
-  uint extract_downstream_hd(uint8_t *buf,uint cnt);  //read telemetry high-precision
   uint extract_setb(uint8_t *buf,uint cnt);  //read
   uint extract_clrb(uint8_t *buf,uint cnt);  //read
 };
