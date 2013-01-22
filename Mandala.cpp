@@ -49,8 +49,6 @@ Mandala::Mandala()
   dl_size=0;
   dl_reset=true;
 
-  gps_lat_s=0;
-  gps_lon_s=0;
   //------------------------
 
 #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
@@ -574,12 +572,7 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
   }
   alt_bytecnt=false;
   // calculate vars filtered by sig dl_filter
-  //check if to calc derivatives (gps fix)
-  if((gps_lat_s!=gps_lat)||(gps_lon_s!=gps_lon)){
-    gps_lat_s=gps_lat;
-    gps_lon_s=gps_lon;
-    NED=llh2ned(_var_vect(gps_lat*D2R,gps_lon*D2R,gps_hmsl));
-  }
+  NED=llh2ned(_var_vect(gps_lat*D2R,gps_lon*D2R,gps_hmsl));
   // gps_deltaNED,gps_deltaXYZ,gps_distWPT,gps_distHome,
   calc();
   return tcnt;

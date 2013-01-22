@@ -151,9 +151,8 @@ public:
   bool          dl_e;           // if delta was different (errors counter)
   uint          dl_size;        // last telemetry size statistics
   bool          dl_hd_save;     // to watch change in alt_bytecnt
-  //---- calc ----
-  double  gps_lat_s,gps_lon_s; //change detect
 
+  //---- PIDs ----
   const char      *reg_names[regCnt];
   const char      *reg_descr[regCnt];
 
