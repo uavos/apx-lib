@@ -56,13 +56,14 @@ enum{
   //------------------
   //system commands
   apc_info,     //return _fw_info
+  apc_status,   //return node status
   apc_debug,    //debug message
   apc_reboot,   //reset/reboot node
   apc_mute,     //stop sending data (sensors)
 
   //------------------
   //conf
-  apc_fields,           //return conf descriptor
+  apc_fields=32,        //return conf descriptor
   apc_commands,         //return node commands descrptor
   apc_rconf,            //return _node_conf structure
   apc_wconf,            //save _node_conf
@@ -70,7 +71,7 @@ enum{
 
   //------------------
   //standard commands
-  apc_data,     //send/receive some data [portNo]
+  apc_data=64,          //send/receive some data [portNo]
 
   //------------------
   //user commands
