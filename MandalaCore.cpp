@@ -28,7 +28,7 @@
 //===========================================================================
 // static signatures
 #define SIGDEF(aname, adescr, ... )   \
-  static const uint8_t signature_##aname [ VA_NUM_ARGS(__VA_ARGS__)+1 ]={VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__ }; \
+  static  uint8_t signature_##aname [ VA_NUM_ARGS(__VA_ARGS__)+1 ]={VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__ }; \
   var_typedef_##aname MandalaCore:: aname = signature_##aname ;
 #include "MandalaVars.h"
 //=============================================================================
