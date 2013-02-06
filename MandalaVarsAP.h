@@ -141,6 +141,7 @@ CFGDEF(float, takeoff_climbThr,  1,1,0.1,   "climbing throttle setting [0..1]")
 
 CFGDEF(float, ld_flaps,    1,1,0.1,     "Landing: approach flaps level [0..1]")
 CFGDEF(float, ld_finAlt,   255,1,0,     "approach final altitude AGL [m]")
+CFGDEF(float, ld_finThr,   1,1,0.1,     "approach final throttle setting [0..1]")
 CFGDEF(float, ld_minVSpeed,25.5,1,0.1,  "minimum descending speed [m/s]")
 CFGDEF(float, ld_gps_SU,   0,1,0,       "minimum gps satellites to correct altitude [N]")
 CFGDEF(float, ld_tdAGL,    25.5,1,0.1,  "touchdown stage AGL altitude [m]")
