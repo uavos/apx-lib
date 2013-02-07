@@ -76,14 +76,14 @@ Mandala::Mandala()
   reg_descr[reg##aname]=adescr;
 
 #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) \
-  cfg.var_ptr[idx_cfg_##aname]=& (cfg. aname ); \
-  cfg.var_type[idx_cfg_##aname]=vt_##atype; \
-  cfg.var_array[idx_cfg_##aname]=asize; \
-  cfg.var_size[idx_cfg_##aname]=((asize)*(abytes)*((vt_##atype==vt_vect)?3:1)); \
-  cfg.var_name[idx_cfg_##aname]=#aname; \
-  cfg.var_descr[idx_cfg_##aname]=adescr; \
-  cfg.var_round[idx_cfg_##aname]=around; \
-  cfg.var_span[idx_cfg_##aname]=aspan;
+  cfg_dsc.var_ptr[idx_cfg_##aname]=& (cfg. aname ); \
+  cfg_dsc.var_type[idx_cfg_##aname]=vt_##atype; \
+  cfg_dsc.var_array[idx_cfg_##aname]=asize; \
+  cfg_dsc.var_size[idx_cfg_##aname]=((asize)*(abytes)*((vt_##atype==vt_vect)?3:1)); \
+  cfg_dsc.var_name[idx_cfg_##aname]=#aname; \
+  cfg_dsc.var_descr[idx_cfg_##aname]=adescr; \
+  cfg_dsc.var_round[idx_cfg_##aname]=around; \
+  cfg_dsc.var_span[idx_cfg_##aname]=aspan;
 
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr) \
   CFGDEFA(atype,aname,1,aspan,abytes,around,adescr)
@@ -92,7 +92,7 @@ Mandala::Mandala()
 
   //set config signature size
   for(uint i=0;i<cfgCnt;i++)
-    var_size[idx_config]+=cfg.var_size[i];
+    var_size[idx_config]+=cfg_dsc.var_size[i];
 
 
   //fill strings
@@ -210,9 +210,9 @@ uint Mandala::archive_config(uint8_t *buf,uint bufSize)
   }
   for(uint i=0;i<cfgCnt;i++){
     fill_config_vdsc(buf,i);
-    uint asz=cfg.var_array[i];
+    uint asz=cfg_dsc.var_array[i];
     if(asz>1){
-      switch(cfg.var_type[i]){
+      switch(cfg_dsc.var_type[i]){
         case vt_float:{
           _var_float_array *v=((_var_float_array*)vdsc.ptr);
           for(uint ai=0;ai<asz;ai++){
@@ -250,10 +250,10 @@ uint Mandala::extract_config(uint8_t *buf,uint cnt)
   }
   for(uint i=0;i<cfgCnt;i++){
     fill_config_vdsc(buf,i);
-    uint asz=cfg.var_array[i];
+    uint asz=cfg_dsc.var_array[i];
     if(asz>1){
       vdsc.size/=asz;
-      switch(cfg.var_type[i]){
+      switch(cfg_dsc.var_type[i]){
         case vt_float:{
           _var_float_array *v=((_var_float_array*)vdsc.ptr);
           for(uint ai=0;ai<asz;ai++){

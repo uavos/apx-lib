@@ -125,6 +125,8 @@ public:
     uint            var_array[cfgCnt];
     uint            var_bytes[cfgCnt];
     double          var_span[cfgCnt];
+  }cfg_dsc;
+  struct {
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr)  var_typedef_cfg_##aname aname;
 #include "MandalaVarsAP.h"
   }cfg;
