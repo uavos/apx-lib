@@ -208,6 +208,7 @@ uint Uart::readEscaped(uint8_t *buf,uint max_len)
           goto case_DATA;
         }
         if (v==0x03) {
+          if(ptr==buf)break; //no data
           ptr--;
           crc-=*ptr;
           if ((crc&0x00FF)!=(*ptr))break;
