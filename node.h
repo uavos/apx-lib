@@ -17,11 +17,19 @@ typedef struct {
   uint8_t       crc;
   uint32_t      size;
 }__attribute__((packed)) _fw_info;
-// node information data to identify the node
+// node information, filled by hwInit, saved in RAM
+typedef struct{
+  uint8_t     err_cnt;        // errors counter
+  uint8_t     can_rxc;        // CAN received packets counter
+  uint8_t     can_adr;        // CAN address
+  uint8_t     can_err;        // CAN errors counter
+  uint8_t     dump[8];        // error dump
+}_node_status;
 typedef struct{
   _node_sn      sn;     //serial number
   _fw_info      fw;     //firmware info
-}__attribute__((packed)) _node_info; //filled by hwInit, saved in RAM
+  _node_status  status; //dynamic status
+}__attribute__((packed)) _node_info;
 //=============================================================================
 // bus packet structure:
 // <tag> is an optional byte (stored in conf)
@@ -56,7 +64,7 @@ enum{
   //------------------
   //system commands
   apc_info,     //return _fw_info
-  apc_status,   //return node status
+  apc_nstat,    //return _node_name + _node_status
   apc_debug,    //debug message
   apc_reboot,   //reset/reboot node
   apc_mute,     //stop sending data (sensors)
