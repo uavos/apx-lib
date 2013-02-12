@@ -134,6 +134,7 @@ CFGDEF(float, turnR,  -1270,1,10,         "turn radius, positive STBY CW, negati
 
 CFGDEF(float, takeoff_flaps,     1,1,0.1,   "Takeoff: flaps level [0..1]")
 CFGDEF(float, takeoff_thrRise,   1,1,0.01,  "initial throttle rise speed [1/s]")
+CFGDEF(float, takeoff_launcherAx,25.5,1,0.1,"launcher acceleration [m/s^2]")
 CFGDEF(float, takeoff_liftSpeed, 100,1,1,   "airspeed to start liftoff [m/s]")
 CFGDEF(float, takeoff_liftPitch, 100,1,1,   "liftoff pitch angle [deg]")
 CFGDEF(float, takeoff_liftAlt,   100,1,1,   "altitude to start climbing [m]")
