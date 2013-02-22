@@ -421,7 +421,7 @@ void MandalaCore::filter_m(const _var_vect &v,_var_vect *var_p,const _var_float 
 //=============================================================================
 //=============================================================================
 //=============================================================================
-#ifdef USE_FLOAT_TYPE
+#if defined(USE_FLOAT_TYPE) && !defined(USE_MATRIX_MATH)
 // Simplified Vector math
 Vect::Vect()
 {this->fill();}

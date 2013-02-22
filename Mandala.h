@@ -106,7 +106,7 @@ public:
   uint            var_size[256];  //size of whole packed var
   void *          var_ptr[256];
   uint            var_type[256];
-  double          var_span[256];
+  _var_float      var_span[256];
 
   uint            var_bits[256];            // number of bitfield bits
   uint8_t         var_bits_mask[256][8];    // bitmask of bitfield
@@ -118,13 +118,13 @@ public:
   struct {
     const char *    var_name[cfgCnt];  //text name
     const char *    var_descr[cfgCnt]; //text description
-    double          var_round[cfgCnt]; //round value for CFG vars
+    _var_float      var_round[cfgCnt]; //round value for CFG vars
     uint            var_size[cfgCnt];  //size of whole packed var
     void *          var_ptr[cfgCnt];
     uint            var_type[cfgCnt];
     uint            var_array[cfgCnt];
     uint            var_bytes[cfgCnt];
-    double          var_span[cfgCnt];
+    _var_float      var_span[cfgCnt];
   }cfg_dsc;
   struct {
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr)  var_typedef_cfg_##aname aname;
@@ -181,32 +181,32 @@ public:
   void print_report(FILE *stream);
 
   // math operations
-  double boundAngle(double v,double span=180.0);
-  _var_vect boundAngle(const _var_vect &v,double span=180.0);
+  _var_float boundAngle(_var_float v,_var_float span=180.0);
+  _var_vect boundAngle(const _var_vect &v,_var_float span=180.0);
   uint snap(uint v, uint snapv=10);
-  double hyst(double err,double hyst);
-  double limit(const double v,const double vL=1.0);
-  double limit(const double v,const double vMin,const double vMax);
-  double ned2hdg(const _var_vect &ned,bool back=false); //return heading to NED frm (0,0,0)
-  double ned2dist(const _var_vect &ned); //return distance to to NED frm (0,0,0)
+  _var_float hyst(_var_float err,_var_float hyst);
+  _var_float limit(const _var_float v,const _var_float vL=1.0);
+  _var_float limit(const _var_float v,const _var_float vMin,const _var_float vMax);
+  _var_float ned2hdg(const _var_vect &ned,bool back=false); //return heading to NED frm (0,0,0)
+  _var_float ned2dist(const _var_vect &ned); //return distance to to NED frm (0,0,0)
   const _var_vect lla2ned(const _var_vect &lla);  // return NED from Lat Lon AGL
 
   void calc(void); // calculate vars dependent on current and desired UAV position
 
   const _var_vect llh2ned(const _var_vect llh);
   const _var_vect llh2ned(const _var_vect llh,const _var_vect home_llh);
-  const _var_vect rotate(const _var_vect &v_in,const double theta);
+  const _var_vect rotate(const _var_vect &v_in,const _var_float theta);
   const _var_vect rotate(const _var_vect &v_in,const _var_vect &theta);
-  const _var_vect LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const double lat,const double lon);
-  const _var_vect ECEF_dist(const _var_vect &ecef1,const _var_vect &ecef2,const double lat,const double lon);
-  const _var_vect ECEF2Tangent(const _var_vect &ECEF,const double latitude,const double longitude);
-  const _var_vect Tangent2ECEF(const _var_vect &Local,const double latitude,const double longitude);
+  const _var_vect LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const _var_float lat,const _var_float lon);
+  const _var_vect ECEF_dist(const _var_vect &ecef1,const _var_vect &ecef2,const _var_float lat,const _var_float lon);
+  const _var_vect ECEF2Tangent(const _var_vect &ECEF,const _var_float latitude,const _var_float longitude);
+  const _var_vect Tangent2ECEF(const _var_vect &Local,const _var_float latitude,const _var_float longitude);
   const _var_vect ECEF2llh(const _var_vect &ECEF);
   const _var_vect llh2ECEF(const _var_vect &llh);
   const _var_vect ned2llh(const _var_vect &ned);
   const _var_vect ned2llh(const _var_vect &ned,const _var_vect &home_llh);
-  double sqr(double x);
-  double inHgToAltitude(double inHg);
+  _var_float sqr(_var_float x);
+  _var_float inHgToAltitude(_var_float inHg);
 private:
   // some special protocols
   void fill_config_vdsc(uint8_t *buf,uint i);

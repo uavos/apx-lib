@@ -141,7 +141,7 @@ const Vector<4> dpsi_dq(const Vector<4> & quat, const Matrix<3,3> & DCM) {
 //=============================================================================
 // MATH
 //=============================================================================
-const Quat qmethod(const _mat_float &a1,const _mat_float &a2,const Vect &r1,const Vect &r2,const Vect &b1,const Vect &b2)
+/*const Quat qmethod(const _mat_float &a1,const _mat_float &a2,const Vect &r1,const Vect &r2,const Vect &b1,const Vect &b2)
 {
   Vect Z=a1*cross(r1,b1)+a2*cross(r2,b2);
   Matrix<3,3> B=mult_T(a1*r1,b1)+mult_T(a2*r2,b2);
@@ -159,7 +159,7 @@ const Quat qmethod(const _mat_float &a1,const _mat_float &a2,const Vect &r1,cons
   debug(Z);
   debug(K);
   //Find the eigenvector for the smallest eigenvalue of K
-}
+}*/
 //=============================================================================
 const Matrix<4,3> Tquat(const Quat &q)
 {
@@ -177,7 +177,7 @@ const Matrix<4,3> Tquat(const Quat &q)
 //=============================================================================
 const Matrix<3,3> Wmtrx(const Vect &eps,const Vect &v)
 {
-  const double eps2=eps*eps;
+  const _mat_float eps2=eps*eps;
   const _mat_float eta=eps2>=1?0:sqrt(1-eps2);
   Matrix<3,3> W,Smtrx_v=eulerWx(v);
   W=Smtrx_v*(2.0*eta);

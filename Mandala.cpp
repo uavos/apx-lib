@@ -385,7 +385,7 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
   //save mandala tmp vars
   _var_float gps_lat_save=gps_lat,gps_lon_save=gps_lon,gps_hmsl_save=gps_hmsl;
   _var_vect NED_save=NED;
-  double lat,lon,alt;
+  _var_float lat,lon,alt;
   uint8_t *sbuf=buf,*buf_top=buf+cnt;
   uint rcnt=0;
   const uint szLLH=var_size[idx_gps_lat]+var_size[idx_gps_lon]+var_size[idx_gps_hmsl];
@@ -643,9 +643,9 @@ void Mandala::calc(void)
   gSpeed=ned2dist(gps_vNED);
 }
 //=============================================================================
-double Mandala::ned2hdg(const _var_vect &ned,bool back)
+_var_float Mandala::ned2hdg(const _var_vect &ned,bool back)
 {
-  double v=atan2(ned[1],ned[0])*R2D;
+  _var_float v=atan2(ned[1],ned[0])*R2D;
   if(back)return boundAngle(v+180.0);
   else return boundAngle(v);
 }
@@ -655,20 +655,20 @@ const _var_vect Mandala::lla2ned(const _var_vect &lla)
   return llh2ned(_var_vect(lla[0]*D2R,lla[1]*D2R,gps_home_hmsl+lla[2]));
 }
 //=============================================================================
-double Mandala::ned2dist(const _var_vect &ned)
+_var_float Mandala::ned2dist(const _var_vect &ned)
 {
   return sqrt(pow(ned[0],2)+pow(ned[1],2));
 }
 //=============================================================================
-double Mandala::boundAngle(double v,double span)
+_var_float Mandala::boundAngle(_var_float v,_var_float span)
 {
-  double dspan=span*2.0;
+  _var_float dspan=span*2.0;
   while (v >= span) v -= dspan;
   while (v < -span) v += dspan;
   return v;
 }
 //===========================================================================
-_var_vect Mandala::boundAngle(const _var_vect &v,double span)
+_var_vect Mandala::boundAngle(const _var_vect &v,_var_float span)
 {
   return _var_vect(boundAngle(v[0],span),boundAngle(v[1],span),boundAngle(v[2],span));
 }
@@ -681,48 +681,48 @@ uint Mandala::snap(uint v, uint snapv)
   return v;
 }
 //===========================================================================
-double Mandala::hyst(double err,double hyst)
+_var_float Mandala::hyst(_var_float err,_var_float ahyst)
 {
-  if (fabs(err)<=hyst)return 0.0;
-  else return err-((err>0.0)?hyst:-hyst);
+  if (fabs(err)<=ahyst)return 0.0;
+  else return err-((err>0.0)?ahyst:-ahyst);
 }
 //===========================================================================
-double Mandala::limit(const double v,const double vL)
+_var_float Mandala::limit(const _var_float v,const _var_float vL)
 {
   return limit(v,-vL,vL);
 }
-double Mandala::limit(const double v,const double vMin,const double vMax)
+_var_float Mandala::limit(const _var_float v,const _var_float vMin,const _var_float vMax)
 {
   return (v>vMax)?vMax:((v<vMin)?vMin:v);
 }
 //===========================================================================
-const _var_vect Mandala::rotate(const _var_vect &v_in,const double theta)
+const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_float atheta)
 {
-  double cos_theta=cos(theta);
-  double sin_theta=sin(theta);
+  _var_float cos_theta=cos(atheta);
+  _var_float sin_theta=sin(atheta);
   return _var_vect(v_in[0]*cos_theta+v_in[1]*sin_theta,
               v_in[1]*cos_theta-v_in[0]*sin_theta,
               v_in[2]);
 }
 //===========================================================================
-const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_vect &theta)
+const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_vect &atheta)
 {
-  const double &phi=theta[0];
-  const double &the=theta[1];
-  const double &psi=theta[2];
-  const double cpsi=cos(psi);
-  const double cphi=cos(phi);
-  const double ctheta=cos(the);
-  const double spsi=sin(psi);
-  const double sphi=sin(phi);
-  const double stheta=sin(the);
+  const _var_float &phi=atheta[0];
+  const _var_float &the=atheta[1];
+  const _var_float &psi=atheta[2];
+  const _var_float cpsi=cos(psi);
+  const _var_float cphi=cos(phi);
+  const _var_float ctheta=cos(the);
+  const _var_float spsi=sin(psi);
+  const _var_float sphi=sin(phi);
+  const _var_float stheta=sin(the);
 
   _var_vect eulerDC[3]={_var_vect(cpsi*ctheta,spsi*ctheta,-stheta),
                    _var_vect(-spsi*cphi + cpsi*stheta*sphi,cpsi*cphi + spsi*stheta*sphi,ctheta*sphi),
                    _var_vect(spsi*sphi + cpsi*stheta*cphi,-cpsi*sphi + spsi*stheta*cphi,ctheta*cphi)
                   };
   _var_vect c;
-  double s;
+  _var_float s;
   for (uint i=0;i<3;i++) {
     s=0;
     for (uint j=0;j<3;j++) s+=v_in[j]*eulerDC[i][j];
@@ -751,7 +751,7 @@ const _var_vect Mandala::ned2llh(const _var_vect &ned,const _var_vect &home_llh)
   return ECEF2llh(llh2ECEF(home_llh)+Tangent2ECEF(ned,home_llh[0],home_llh[1]));
 }
 //===========================================================================
-const _var_vect Mandala::LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const double lat,const double lon)
+const _var_vect Mandala::LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const _var_float lat,const _var_float lon)
 {
   const _var_vect &ecef1(llh2ECEF(llh1));
   const _var_vect &ecef2(llh2ECEF(llh2));
@@ -759,18 +759,18 @@ const _var_vect Mandala::LLH_dist(const _var_vect &llh1,const _var_vect &llh2,co
   return ECEF2Tangent(diff,lat,lon);
 }
 //=============================================================================
-const _var_vect Mandala::ECEF_dist(const _var_vect &ecef1,const _var_vect &ecef2,const double lat,const double lon)
+const _var_vect Mandala::ECEF_dist(const _var_vect &ecef1,const _var_vect &ecef2,const _var_float lat,const _var_float lon)
 {
   return ECEF2Tangent(ecef1-ecef2,lat,lon);
 }
 //=============================================================================
-const _var_vect Mandala::ECEF2Tangent(const _var_vect &ECEF,const double latitude,const double longitude)
+const _var_vect Mandala::ECEF2Tangent(const _var_vect &ECEF,const _var_float latitude,const _var_float longitude)
 {
-  double clat=cos(latitude);
-  double clon=cos(longitude);
-  double slat=sin(latitude);
-  double slon=sin(longitude);
-  double Re2t[3][3];
+  _var_float clat=cos(latitude);
+  _var_float clon=cos(longitude);
+  _var_float slat=sin(latitude);
+  _var_float slon=sin(longitude);
+  _var_float Re2t[3][3];
 
   Re2t[0][0]=-slat*clon;
   Re2t[0][1]=-slat*slon;
@@ -782,7 +782,7 @@ const _var_vect Mandala::ECEF2Tangent(const _var_vect &ECEF,const double latitud
   Re2t[2][1]=-clat*slon;
   Re2t[2][2]=-slat;
   _var_vect c;
-  double s;
+  _var_float s;
   for (uint i=0;i<3;i++) {
     s=0;
     for (uint j=0;j<3;j++) s+=ECEF[j]*Re2t[i][j];
@@ -791,13 +791,13 @@ const _var_vect Mandala::ECEF2Tangent(const _var_vect &ECEF,const double latitud
   return c;
 }
 //=============================================================================
-const _var_vect Mandala::Tangent2ECEF(const _var_vect &Local,const double latitude,const double longitude)
+const _var_vect Mandala::Tangent2ECEF(const _var_vect &Local,const _var_float latitude,const _var_float longitude)
 {
-  double clat=cos(latitude);
-  double clon=cos(longitude);
-  double slat=sin(latitude);
-  double slon=sin(longitude);
-  double Rt2e[3][3];
+  _var_float clat=cos(latitude);
+  _var_float clon=cos(longitude);
+  _var_float slat=sin(latitude);
+  _var_float slon=sin(longitude);
+  _var_float Rt2e[3][3];
   Rt2e[0][0]=-slat*clon;
   Rt2e[1][0]=-slat*slon;
   Rt2e[2][0]=clat;
@@ -808,7 +808,7 @@ const _var_vect Mandala::Tangent2ECEF(const _var_vect &Local,const double latitu
   Rt2e[1][2]=-clat*slon;
   Rt2e[2][2]=-slat;
   _var_vect c;
-  double s;
+  _var_float s;
   for (uint i=0;i<3;i++) {
     s=0;
     for (uint j=0;j<3;j++) s+=Local[j]*Rt2e[i][j];
@@ -817,22 +817,22 @@ const _var_vect Mandala::Tangent2ECEF(const _var_vect &Local,const double latitu
   return c;
 }
 //=============================================================================
-double Mandala::sqr(double x) {
+_var_float Mandala::sqr(_var_float x) {
   return x*x;
 }
 const _var_vect Mandala::ECEF2llh(const _var_vect &ECEF)
 {
-  double X=ECEF[0];
-  double Y=ECEF[1];
-  double Z=ECEF[2];
-  double f=(C_WGS84_a-C_WGS84_b)/C_WGS84_a;
-  double e=sqrt(2*f-f*f);
-  double h=0;
-  double N=C_WGS84_a;
+  _var_float X=ECEF[0];
+  _var_float Y=ECEF[1];
+  _var_float Z=ECEF[2];
+  _var_float f=(C_WGS84_a-C_WGS84_b)/C_WGS84_a;
+  _var_float e=sqrt(2*f-f*f);
+  _var_float h=0;
+  _var_float N=C_WGS84_a;
   _var_vect llh;
   llh[1]=atan2(Y,X);
   for (int n=0;n<50;++n) {
-    double sin_lat=Z/(N*(1-sqr(e))+h);
+    _var_float sin_lat=Z/(N*(1-sqr(e))+h);
     llh[0]=atan((Z+e*e*N*sin_lat)/sqrt(X*X+Y*Y));
     N=C_WGS84_a/sqrt(1-sqr(e)*sqr(sin(llh[0])));
     h=sqrt(X*X+Y*Y)/cos(llh[0])-N;
@@ -843,9 +843,9 @@ const _var_vect Mandala::ECEF2llh(const _var_vect &ECEF)
 //=============================================================================
 const _var_vect Mandala::llh2ECEF(const _var_vect &llh)
 {
-  double f=(C_WGS84_a-C_WGS84_b)/C_WGS84_a;
-  double e=sqrt(2*f-f*f);
-  double N=C_WGS84_a/sqrt(1-e*e*sqr(sin(llh[0])));
+  _var_float f=(C_WGS84_a-C_WGS84_b)/C_WGS84_a;
+  _var_float e=sqrt(2*f-f*f);
+  _var_float N=C_WGS84_a/sqrt(1-e*e*sqr(sin(llh[0])));
   _var_vect ECEF;
   ECEF[0]=(N+llh[2])*cos(llh[0])*cos(llh[1]);
   ECEF[1]=(N+llh[2])*cos(llh[0])*sin(llh[1]);
@@ -853,7 +853,7 @@ const _var_vect Mandala::llh2ECEF(const _var_vect &llh)
   return ECEF;
 }
 //=============================================================================
-double Mandala::inHgToAltitude(double inHg)
+_var_float Mandala::inHgToAltitude(_var_float inHg)
 {
   return (1.0-powf(inHg/pstatic_gnd,0.190284))*(145366.45*0.3048);
 }
@@ -875,7 +875,7 @@ void Mandala::dump(const uint var_idx)
   void *ptr=var_ptr[var_idx];
   switch(var_type[var_idx]){
     case vt_uint:   printf("%u",*((uint*)ptr));break;
-    case vt_float: printf("%.2f",*((double*)ptr));break;
+    case vt_float: printf("%.2f",*((_var_float*)ptr));break;
     case vt_vect:   printf("(%.2f,%.2f,%.2f)",(*((_var_vect*)ptr))[0],(*((_var_vect*)ptr))[1],(*((_var_vect*)ptr))[2] );break;
     case vt_sig:{
       printf("+sig+\n");

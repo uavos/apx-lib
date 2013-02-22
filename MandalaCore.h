@@ -32,8 +32,16 @@
 #define assert(...)
 #endif
 //=============================================================================
-//use double for ARM
 #ifdef USE_FLOAT_TYPE
+typedef float   _var_float;
+#else
+typedef double  _var_float;
+#endif
+
+#if !defined(USE_FLOAT_TYPE) || defined(USE_MATRIX_MATH)
+#include "MatrixMath.h"
+using namespace matrixmath;
+#else
 // Simplified Vector math
 typedef float   _var_float;
 class Vect
@@ -61,10 +69,6 @@ public:
 protected:
   _var_float v[3];
 };
-#else
-typedef double  _var_float;
-#include "MatrixMath.h"
-using namespace matrixmath;
 #endif
 //=============================================================================
 //=============================================================================
