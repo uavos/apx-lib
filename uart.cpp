@@ -17,6 +17,8 @@
 //==============================================================================
 #define DEFAULT_PORTNAME   "/dev/ttyS0"
 #define DEFAULT_BAUDRATE   B115200
+//#define dump(A,B,C)       {if(C){printf("%s: ",A);for(uint i=0;i<(C);i++)printf("%.2X ",((const uint8_t*)(B))[i]);printf("\n");}}
+#define dump(A,B,C)
 //==============================================================================
 Uart::Uart()
 {
@@ -101,6 +103,7 @@ void Uart::write(const uint8_t *buf,uint cnt)
     if(rcnt<=0)continue;
     wcnt+=rcnt;
   }
+  dump("S",buf,cnt);
 }
 //==============================================================================
 uint8_t Uart::getCRC(const uint8_t *buf,uint cnt)
@@ -244,6 +247,7 @@ uint Uart::read(uint8_t *buf,uint cnt)
 {
   int rcnt=::read(fd,buf,cnt);
   if(rcnt<0)return 0;
+  dump("R",buf,rcnt);
   return rcnt;
 }
 //==============================================================================

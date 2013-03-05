@@ -29,6 +29,10 @@
 Mandala::Mandala()
   : MandalaCore()
 {
+  init();
+}
+void Mandala::init(void)
+{
   for (uint i=0;i<256;i++) {
     var_name[i]="";
     var_descr[i]="";
