@@ -31,7 +31,7 @@ typedef float   _mat_float;
 #else
 typedef double  _mat_float;
 #endif
-typedef unsigned int index_t;
+typedef  int index_t;
 //=============================================================================
 //=============================================================================
 // VECTOR
