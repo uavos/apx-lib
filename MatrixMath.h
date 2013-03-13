@@ -31,8 +31,12 @@ typedef float   _mat_float;
 #else
 typedef double  _mat_float;
 #endif
-typedef  int index_t;
+typedef int index_t;
 //=============================================================================
+#define cos cosf
+#define sin sinf
+#define sqrt sqrtf
+#define pow powf
 //=============================================================================
 // VECTOR
 //=============================================================================
