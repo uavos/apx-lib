@@ -106,7 +106,7 @@ class MandalaCore
 public:
   MandalaCore();
 
-  static void filter(const _var_float &v,_var_float *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
+  static void filter(const _var_float &fv,_var_float *var_p,const _var_float &fS=0.05/100.0,const _var_float &fL=0.9/100.0);
   static void filter(const _var_vect &v,_var_vect *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
   static void filter_m(const _var_float &v,_var_float *var_p,const _var_float &f);
   static void filter_m(const _var_vect &v,_var_vect *var_p,const _var_float &f);
