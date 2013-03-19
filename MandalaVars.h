@@ -115,7 +115,8 @@ SIGDEF(dl_filter, "Downlink variables filter (calculated, never transmitted over
       idx_wpcnt,idx_rwcnt,
       idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw,
       idx_gcu_RSS,idx_gcu_Ve,idx_gcu_MT,idx_gcu_VSWR,
-      idx_pstatic, idx_dl_period )
+      idx_pstatic,
+      idx_dl_period )
 //------------------------------
 #undef SIGDEF
 //=============================================================================

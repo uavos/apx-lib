@@ -393,16 +393,14 @@ void MandalaCore::set_value(uint var_idx,uint member_idx,_var_float value)
   }
 }
 //=============================================================================
-void MandalaCore::filter(const _var_float &v,_var_float *var_p,const _var_float &S,const _var_float &L)
+void MandalaCore::filter(const _var_float &fv,_var_float *var_p,const _var_float &fS,const _var_float &fL)
 {
-  const _var_float D=v-*var_p;
-  _var_float G=S+S*(D/L)*(D/L);
-  if (*var_p==0.0)*var_p=v;
-  else {
-    if (G>1)G=1;
-    else if (G<S)G=S;
-    *var_p=*var_p+D*G;
-  }
+  _var_float fD=fv-*var_p;
+  _var_float fDL=fD/fL;
+  _var_float fG=fS+fS*(fDL*fDL);
+  if (fG>1.0)fG=1.0;
+  else if (fG<fS)fG=fS;
+  *var_p+=fD*fG;
 }
 void MandalaCore::filter(const _var_vect &v,_var_vect *var_p,const _var_float &S,const _var_float &L)
 {
