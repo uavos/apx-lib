@@ -857,9 +857,16 @@ const _var_vect Mandala::llh2ECEF(const _var_vect &llh)
   return ECEF;
 }
 //=============================================================================
-_var_float Mandala::inHgToAltitude(_var_float inHg)
+_var_float Mandala::inHgToAltitude(_var_float inHg,_var_float inHg_gnd)
 {
-  return (1.0-powf(inHg/pstatic_gnd,0.190284))*(145366.45*0.3048);
+  if(inHg_gnd==0) return 0;
+  return (1.0-powf(inHg/inHg_gnd,0.1902632))*44330.77;
+}
+_var_float Mandala::conv_pstatic_altitude(void)
+{
+  _var_float v=inHgToAltitude(pstatic,pstatic_gnd);
+  MandalaCore::filter(v,&altitude,0.01,0.5);
+  return v;
 }
 //=============================================================================
 //=============================================================================
