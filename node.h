@@ -76,7 +76,10 @@ enum{
   apc_rconf,            //return _node_conf structure
   apc_wconf,            //save _node_conf
   apc_econf,            //reset conf to defaults
-
+  //future use
+  apc_rp,               //return _node_conf parameter <num>
+  apc_wp,               //save _node_conf parameter <num>,<data>
+  
   //------------------
   //standard commands
   apc_data=64,          //send/receive some data [portNo]
