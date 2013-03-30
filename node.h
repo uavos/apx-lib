@@ -115,16 +115,17 @@ typedef struct{
 //=============================================================================
 // NODE CONF typedefs
 //=============================================================================
-enum{pt_pwm,pt_out,pt_inp,pt_adc}; //type of port
 typedef struct{
-    uint8_t var_idx;    //i.e. ctr_ailerons or any other
-    uint8_t bitmask;    //mask if var bitfield or vect idx or array idx
+  float x;
+  float y;
+  float z;
+}__attribute__((packed)) _vec;
+typedef struct{
+    uint16_t varmsk;    //var idx with mask
     int8_t  mult;       //multiplier (x0.1) -127[-12.7]..+127[+12.7]
     int8_t  diff;       //differential multiplier (x0.01+1) for pos/neg var value
-    uint8_t weight;     //weight to set port value 0..255
     uint8_t speed;      //speed of change (x0.1) 0..25.5
-    uint8_t port;       //output port number 0...x
-    uint8_t type;       //type of port
+    uint8_t pwm_ch;     //pwm channel number 0...x
 }__attribute__((packed)) _ctr;
 typedef struct {
   int8_t zero;          //pwm zero shift -127[-1]..+127[+1]
@@ -132,42 +133,46 @@ typedef struct {
   int8_t min;           //pwm minimum -127[-1]..+127[+1]
 }__attribute__((packed)) _pwm;
 typedef struct {
-  uint8_t dummy;
-}__attribute__((packed)) _out;
+  uint16_t varmsk;    //var idx with mask
+  uint8_t opt;        //option, inversion=1
+}__attribute__((packed)) _gpio;
 //-----------------------------------------------------------------------------
 typedef struct {
   uint8_t  protocol;    //protocol
-  uint32_t baudrate;    //baud rate for some protocols
+  float    baudrate;    //baud rate for some protocols
 }__attribute__((packed)) _serial;
 //-----------------------------------------------------------------------------
 typedef struct {
+  uint16_t varmsk;      //var idx with mask
   uint8_t  type;        //input capture type
-  uint8_t  var_idx;     //i.e. ctr_ailerons or any other
-  uint8_t  bitmask;    //mask if var bitfield or vect idx or array idx
 }__attribute__((packed)) _capture;
 //-----------------------------------------------------------------------------
 typedef uint8_t   _ft_option;
+typedef uint16_t  _ft_varmsk;
 typedef uint16_t  _ft_uint;
 typedef float     _ft_float;
-typedef _ctr      _ft_ctr;
-typedef _pwm      _ft_pwm;
-typedef _out      _ft_out;
-typedef _serial   _ft_serial;
-typedef _capture  _ft_capture;
+typedef _vec      _ft_vec;
 typedef uint8_t   _ft_byte;
 typedef uint8_t   _ft_string[16];
+typedef _ctr      _ft_ctr;
+typedef _pwm      _ft_pwm;
+typedef _gpio     _ft_gpio;
+typedef _serial   _ft_serial;
+typedef _capture  _ft_capture;
 //-----------------------------------------------------------------------------
 typedef enum{
   ft_option=0,
+  ft_varmsk,
   ft_uint,
   ft_float,
-  ft_ctr,
-  ft_pwm,
-  ft_out,
-  ft_serial,
-  ft_capture,
+  ft_vec,
   ft_byte,
   ft_string,
+  ft_ctr,
+  ft_pwm,
+  ft_gpio,
+  ft_serial,
+  ft_capture,
   //---------
   ft_cnt
 }_node_ft;
