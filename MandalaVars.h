@@ -83,6 +83,7 @@ SIGDEF(config,    "Autopilot configuration <packed config>")
 SIGDEF(flightplan,"Flight plan data <packed fligthplan>")
 SIGDEF(sim,       "Simulator wrapped packet <var_idx>,<data..>")
 SIGDEF(tune,      "Tuning <parameter_id>,<data..>")
+SIGDEF(data,      "Port data <port_id>,<data..>")
 SIGDEF(uav_id,    "UAV identification data <packed UAV_ID>")
 SIGDEF(formation, "Formation flight data <packed data>")
 //------------------------------
