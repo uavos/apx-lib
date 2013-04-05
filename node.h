@@ -71,14 +71,12 @@ enum{
 
   //------------------
   //conf
-  apc_fields=32,        //return conf descriptor
-  apc_commands,         //return node commands descrptor
-  apc_rconf,            //return _node_conf structure
-  apc_wconf,            //save _node_conf
-  apc_econf,            //reset conf to defaults
-  //future use
-  apc_rp,               //return _node_conf parameter <num>
-  apc_wp,               //save _node_conf parameter <num>,<data>
+  apc_conf_inf=32,      //return _conf_inf structure
+  apc_conf_cmds,        //return node commands descrptor
+  apc_conf_dsc,         //return <num> parameter descriptor, or all if <num>=0xFF
+  apc_conf_read,        //return parameter <num>, or all if <num>=0xFF
+  apc_conf_write,       //save parameter <num>,<data>, or all if <num>=0xFF
+  apc_conf_reset,       //reset all conf to defaults
   
   //------------------
   //standard commands
@@ -176,6 +174,12 @@ typedef enum{
   //---------
   ft_cnt
 }_node_ft;
+//-----------------------------------------------------------------------------
+typedef struct{
+  uint8_t       cnt;    //number of parameters
+  uint16_t      size;   //total size of 'conf' structure [bytes]
+  uint32_t      mn;     //magic number
+}__attribute__((packed)) _conf_inf;
 //=============================================================================
 #endif
 
