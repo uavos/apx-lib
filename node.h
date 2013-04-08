@@ -141,7 +141,7 @@ typedef struct {
 typedef _pwm      _ft_pwm;
 typedef struct {
   _ft_varmsk varmsk;  //var idx with mask
-  _ft_byte opt;       //option, inversion=1
+  _ft_byte   opt;     //option: b7=1 if INVERTED, b[0:6]=protocol
 }__attribute__((packed)) _gpio;
 typedef _gpio     _ft_gpio;
 //-----------------------------------------------------------------------------
