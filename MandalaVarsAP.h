@@ -119,6 +119,7 @@ CFGDEF(float, safety_Ve,       25.5,1,0.1,   "min autopilot battery voltage to g
 CFGDEF(float, safety_Vs,       45,1,0.1,     "min servo battery voltage to go home [v]")
 CFGDEF(float, safety_VeERS,    25.5,1,0.1,   "min autopilot battery voltage to launch ERS [v]")
 CFGDEF(float, safety_link,     255,1,1,      "data link timeout to go home [s]")
+CFGDEF(float, safety_altitude, 2550,1,10,    "min altitude to launch ERS [m]")
 
 CFGDEF(float, rpm,     25500,1,100,   "Engine: cruise rpm [1/min]")
 CFGDEF(float, rpm_idle,25500,1,100,   "idle rpm [1/min]")
