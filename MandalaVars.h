@@ -153,6 +153,7 @@ VARDEF(float, vspeed,          -100,2,0,    "Variometer [m/s]")
 VARDEF(float, rpm,    25500,1,0, "engine RPM [1/min]")
 VARDEF(float, agl,    25.5,1,0,  "Above Ground Level altitude [m]")
 VARDEF(float, slip,   -127,1,0,  "slip [deg]")
+VARDEF(float, AOA,    -127,1,0,  "angle of attack [deg]")
 
 //--------- Measured by GPS --------------
 VARDEF(float, gps_lat,     -90,4,0,      "latitude [deg]")
