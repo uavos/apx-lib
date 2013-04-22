@@ -22,6 +22,7 @@ public:
 
   uint8_t read_char(void);
   uint read(uint8_t *buf,uint cnt);
+  uint readEscaped2(uint8_t *buf,uint max_len);
   uint readEscaped(uint8_t *buf,uint max_len);
 
   uint8_t getCRC(const uint8_t *buf,uint cnt);
@@ -37,6 +38,8 @@ public:
 private:
   int   fd;
   uint8_t txBuf[4096];
+  uint8_t esc_rx[4096];      //data from readEscaped()
+  uint esc_cnt,esc_state,esc_crc;
 };
 //=============================================================
 #endif
