@@ -22,7 +22,6 @@ public:
 
   uint8_t read_char(void);
   uint read(uint8_t *buf,uint cnt);
-  uint readEscaped2(uint8_t *buf,uint max_len);
   uint readEscaped(uint8_t *buf,uint max_len);
 
   uint8_t getCRC(const uint8_t *buf,uint cnt);

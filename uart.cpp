@@ -17,8 +17,8 @@
 //==============================================================================
 #define DEFAULT_PORTNAME   "/dev/ttyS0"
 #define DEFAULT_BAUDRATE   B115200
-#define dump(A,B,C)       {if(C){printf("%s: ",A);for(uint i=0;i<(C);i++)printf("%.2X ",((const uint8_t*)(B))[i]);printf("\n");}}
-//#define dump(A,B,C)
+//#define dump(A,B,C)       {if(C){printf("%s: ",A);for(uint i=0;i<(C);i++)printf("%.2X ",((const uint8_t*)(B))[i]);printf("\n");}}
+#define dump(A,B,C)
 //==============================================================================
 Uart::Uart()
 {
@@ -170,77 +170,6 @@ void Uart::writeEscaped(const uint8_t *tbuf,uint dcnt)
   buf[bcnt++]=0x55;
   buf[bcnt++]=0x03;
   write(buf,bcnt);
-}
-//==============================================================================
-//extern void dump(const uint8_t *buf,uint cnt);
-uint Uart::readEscaped2(uint8_t *buf,uint max_len)
-// 0x55..0x01..DATA(0x55.0x02)..CRC..0x55..0x03
-{
-  uint cnt=0,stage=0,bcnt=0,crc=0;
-  unsigned char v,*ptr=buf;
-  while (1)//GetRxCnt())
-  {
-    if (!read(&v,1)) {
-      if (bcnt) {
-        printf("Received %u bytes.\n",bcnt);
-        //dump("rx",buf,bcnt);
-      }//else usleep(10000);
-      //printf("nc\n");
-      return 0;
-    }
-    //printf("rd %.2X.\n",v);
-    bcnt++;
-    switch (stage) {
-      case 0:
-        if (v==0x55)stage=3;
-        continue;
-      case 1: //data
-        if (v==0x55) {
-          stage=2;
-          continue;
-        }
-      case_DATA:
-          if (++cnt>max_len)break;
-          *ptr++=v;
-          crc+=v;
-          continue;
-      case 2: //escape
-        if (v==0x02) {
-          v=0x55;
-          stage=1;
-          goto case_DATA;
-        }
-        if (v==0x03) {
-          if(ptr==buf)break; //no data
-          ptr--;
-          crc-=*ptr;
-          if ((crc&0x00FF)!=(*ptr))break;
-          //frame received...
-          cnt--;
-          stage=0;
-          //dump(buf,bcnt);
-          return cnt;
-        }
-        if (v==0x55) {
-          stage=3;
-          continue;
-        }
-        //fall to case below..
-      case 3: // start..
-        if (v==0x01) {
-          stage=1;
-          ptr=buf;
-          crc=0;
-          cnt=0;
-          continue;
-        }
-        break;
-    }
-    //error
-    //printf("UART read error.");
-    stage=0;
-  }
-  return 0;
 }
 //==============================================================================
 uint Uart::readEscaped(uint8_t *buf,uint max_len)
