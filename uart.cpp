@@ -17,14 +17,17 @@
 //==============================================================================
 #define DEFAULT_PORTNAME   "/dev/ttyS0"
 #define DEFAULT_BAUDRATE   B115200
-//#define dump(A,B,C)       {if(C){printf("%s: ",A);for(uint i=0;i<(C);i++)printf("%.2X ",((const uint8_t*)(B))[i]);printf("\n");}}
-#define dump(A,B,C)
+#define dump(A,B,C)       {if(C){printf("%s: ",A);for(uint i=0;i<(C);i++)printf("%.2X ",((const uint8_t*)(B))[i]);printf("\n");}}
+//#define dump(A,B,C)
 //==============================================================================
 Uart::Uart()
 {
   fd=-1;
   pname=DEFAULT_PORTNAME;
   brate=DEFAULT_BAUDRATE;
+  esc_state=0;
+  esc_crc=0;
+  esc_cnt=0;
 }
 Uart::~Uart()
 {
@@ -62,7 +65,7 @@ bool Uart::open(const char *portname,int baudrate,const char *name,int timeout,u
   //cfsetospeed(&tio_serial, baudrate);
   tcflush(fd, TCIFLUSH);
   tcsetattr(fd, TCSANOW, &tio_serial);
-  
+
   brate=baudrate;
   pname=portname;
 
@@ -118,16 +121,13 @@ unsigned int Uart::getRxCnt(void)
   unsigned int cnt;
   ioctl(fd, FIONREAD, &cnt);
   return cnt;
-
+/*
   fd_set   fds;
   FD_ZERO(&fds);
   FD_SET(fd, &fds);
-  /*struct timeval  tv;
-  tv.tv_usec = 5;
-  tv.tv_sec = 0;*/
   int rc = select(fd+1,&fds,0,0,NULL);
   if (rc<=0)return 0;
-  return rc;
+  return rc;*/
 }
 //==============================================================================
 unsigned int Uart::getTxCnt(void)
@@ -173,7 +173,7 @@ void Uart::writeEscaped(const uint8_t *tbuf,uint dcnt)
 }
 //==============================================================================
 //extern void dump(const uint8_t *buf,uint cnt);
-uint Uart::readEscaped(uint8_t *buf,uint max_len)
+uint Uart::readEscaped2(uint8_t *buf,uint max_len)
 // 0x55..0x01..DATA(0x55.0x02)..CRC..0x55..0x03
 {
   uint cnt=0,stage=0,bcnt=0,crc=0;
@@ -183,7 +183,7 @@ uint Uart::readEscaped(uint8_t *buf,uint max_len)
     if (!read(&v,1)) {
       if (bcnt) {
         printf("Received %u bytes.\n",bcnt);
-        //dump(buf,bcnt);
+        //dump("rx",buf,bcnt);
       }//else usleep(10000);
       //printf("nc\n");
       return 0;
@@ -243,11 +243,67 @@ uint Uart::readEscaped(uint8_t *buf,uint max_len)
   return 0;
 }
 //==============================================================================
+uint Uart::readEscaped(uint8_t *buf,uint max_len)
+{
+  while(1){
+    unsigned char v;
+    if (!read(&v,1))return 0;
+    switch (esc_state) {
+      case 0:
+        if (v==0x55)esc_state=3;
+        //else break;
+        continue;
+      case 1: //data
+        if (v==0x55) {
+          esc_state=2;
+          continue;
+        }
+      case_DATA:
+          if (esc_cnt>=sizeof(esc_rx))break;
+          esc_rx[esc_cnt++]=v;
+          esc_crc+=v;
+          continue;
+      case 2: //escape
+        if (v==0x02) {
+          v=0x55;
+          esc_state=1;
+          goto case_DATA;
+        }
+        if (v==0x03) {
+          if(esc_cnt==0)break; //no data
+          esc_cnt--;
+          esc_crc-=esc_rx[esc_cnt];
+          if ((esc_crc&0xFF)!=esc_rx[esc_cnt])break;
+          //frame received...
+          esc_state=0;
+          if(esc_cnt>max_len)break;
+          memcpy(buf,esc_rx,esc_cnt);
+          return esc_cnt;
+        }
+        if (v==0x55) {
+          esc_state=3;
+          continue;
+        }
+        //fall to case below..
+      case 3: // start..
+        if (v==0x01) {
+          esc_state=1;
+          esc_crc=0;
+          esc_cnt=0;
+          continue;
+        }
+        break;
+    }
+    //error
+    esc_state=0;
+  }
+}
+//==============================================================================
 uint Uart::read(uint8_t *buf,uint cnt)
 {
   int rcnt=::read(fd,buf,cnt);
   if(rcnt<0)return 0;
-  dump("R",buf,rcnt);
+  //dump("R",buf,rcnt);
   return rcnt;
 }
 //==============================================================================
