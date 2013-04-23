@@ -14,8 +14,8 @@ typedef uint8_t _node_version[16]; //fw version string
 typedef struct {
   _node_name    name;
   _node_version version;
-  uint8_t       crc;
-  uint32_t      size;
+  uint8_t       crc;    //program crc
+  uint32_t      size;   //program memory size
 }__attribute__((packed)) _fw_info;
 // node information, filled by hwInit, saved in RAM
 typedef struct{
@@ -77,7 +77,7 @@ enum{
   apc_conf_read,        //return parameter <num>, or all if <num>=0xFF
   apc_conf_write,       //save parameter <num>,<data>, or all if <num>=0xFF
   apc_conf_reset,       //reset all conf to defaults
-  
+
   //------------------
   //standard commands
   apc_data=64,          //send/receive some data [portNo]
@@ -159,6 +159,41 @@ typedef struct {
 }__attribute__((packed)) _capture;
 typedef _capture  _ft_capture;
 //-----------------------------------------------------------------------------
+//APCFG support
+typedef struct {
+  _ft_float  Kp;
+  _ft_byte   Lp;
+  _ft_float  Kd;
+  _ft_byte   Ld;
+  _ft_float  Ki;
+  _ft_byte   Li;
+  _ft_byte   Lo;
+}__attribute__((packed)) _regPID;
+typedef _regPID  _ft_regPID;
+typedef struct {
+  _ft_float  Kp;
+  _ft_byte   Lp;
+  _ft_float  Ki;
+  _ft_byte   Li;
+  _ft_byte   Lo;
+}__attribute__((packed)) _regPI;
+typedef _regPI  _ft_regPI;
+typedef struct {
+  _ft_float  Kp;
+  _ft_byte   Lo;
+}__attribute__((packed)) _regP;
+typedef _regP  _ft_regP;
+typedef struct {
+  _ft_float  Kpp;
+  _ft_byte   Lpp;
+  _ft_float  Kp;
+  _ft_byte   Lp;
+  _ft_float  Ki;
+  _ft_byte   Li;
+  _ft_byte   Lo;
+}__attribute__((packed)) _regPPI;
+typedef _regPPI  _ft_regPPI;
+//=============================================================================
 typedef enum{
   ft_option=0,
   ft_varmsk,
@@ -172,6 +207,11 @@ typedef enum{
   ft_gpio,
   ft_serial,
   ft_capture,
+  //---------
+  ft_regPID,
+  ft_regPI,
+  ft_regP,
+  ft_regPPI,
   //---------
   ft_cnt
 }_node_ft;
