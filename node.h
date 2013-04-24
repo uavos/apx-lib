@@ -195,19 +195,21 @@ typedef struct {
 typedef _regPPI  _ft_regPPI;
 //=============================================================================
 typedef enum{
+  //basic
   ft_option=0,
   ft_varmsk,
   ft_uint,
   ft_float,
   ft_byte,
   ft_string,
+  //expandable
   ft_vec,
   ft_ctr,
   ft_pwm,
   ft_gpio,
   ft_serial,
   ft_capture,
-  //---------
+  //apcfg
   ft_regPID,
   ft_regPI,
   ft_regP,
