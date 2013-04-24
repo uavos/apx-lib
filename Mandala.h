@@ -129,7 +129,7 @@ public:
   struct {
 #define CFGDEF(atype,aname,aspan,abytes,around,adescr)  var_typedef_cfg_##aname aname;
 #include "MandalaVarsAP.h"
-  }cfg;
+  }xcfg;
 
   //---- flightplan ----
   _flightplan fp;

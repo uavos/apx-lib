@@ -43,7 +43,7 @@ void Mandala::init(void)
   }
 
   memset(&fp,0,sizeof(fp));
-  memset(&cfg,0,sizeof(cfg));
+  memset(&xcfg,0,sizeof(xcfg));
 
   dl_frcnt=0;
   dl_errcnt=0;
@@ -80,7 +80,7 @@ void Mandala::init(void)
   reg_descr[reg##aname]=adescr;
 
 #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) \
-  cfg_dsc.var_ptr[idx_cfg_##aname]=& (cfg. aname ); \
+  cfg_dsc.var_ptr[idx_cfg_##aname]=& (xcfg. aname ); \
   cfg_dsc.var_type[idx_cfg_##aname]=vt_##atype; \
   cfg_dsc.var_array[idx_cfg_##aname]=asize; \
   cfg_dsc.var_size[idx_cfg_##aname]=((asize)*(abytes)*((vt_##atype==vt_vect)?3:1)); \
@@ -301,7 +301,7 @@ void Mandala::fill_config_vdsc(uint8_t *buf,uint i)
   #define CFGDEF(atype,aname,aspan,abytes,around,adescr) CFGDEFA(atype,aname,1,aspan,abytes,around,adescr)
   #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) \
   case idx_cfg_##aname:\
-    vdsc.ptr=&(cfg. aname );\
+    vdsc.ptr=&(xcfg. aname );\
     vdsc.sbytes=(aspan<0)?(-abytes):(abytes);\
     vdsc.span=(aspan<0)?(-aspan):(aspan);\
     vdsc.type=vt_##atype;\
