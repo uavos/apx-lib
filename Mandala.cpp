@@ -43,7 +43,6 @@ void Mandala::init(void)
   }
 
   memset(&fp,0,sizeof(fp));
-  memset(&xcfg,0,sizeof(xcfg));
 
   dl_frcnt=0;
   dl_errcnt=0;
@@ -79,26 +78,6 @@ void Mandala::init(void)
   reg_names[reg##aname]=#aname; \
   reg_descr[reg##aname]=adescr;
 
-#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) \
-  cfg_dsc.var_ptr[idx_cfg_##aname]=& (xcfg. aname ); \
-  cfg_dsc.var_type[idx_cfg_##aname]=vt_##atype; \
-  cfg_dsc.var_array[idx_cfg_##aname]=asize; \
-  cfg_dsc.var_size[idx_cfg_##aname]=((asize)*(abytes)*((vt_##atype==vt_vect)?3:1)); \
-  cfg_dsc.var_name[idx_cfg_##aname]=#aname; \
-  cfg_dsc.var_descr[idx_cfg_##aname]=adescr; \
-  cfg_dsc.var_round[idx_cfg_##aname]=around; \
-  cfg_dsc.var_span[idx_cfg_##aname]=aspan;
-
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr) \
-  CFGDEFA(atype,aname,1,aspan,abytes,around,adescr)
-
-#include "MandalaVarsAP.h"
-
-  //set config signature size
-  for(uint i=0;i<cfgCnt;i++)
-    var_size[idx_config]+=cfg_dsc.var_size[i];
-
-
   //fill strings
   static const char *wt_str_s[wtCnt]={ wt_str_def };
   for(uint i=0;i<wtCnt;i++) wt_str[i]=wt_str_s[i];
@@ -130,7 +109,6 @@ void Mandala::init(void)
 uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
 {
   //check for special protocol archiveSize
-  if(var_idx==idx_config)return archive_config(buf,size);
   if(var_idx==idx_downstream)return archive_downstream(buf,size);
   if(var_idx==idx_flightplan)return archive_flightplan(buf,size);
 
@@ -158,7 +136,6 @@ uint Mandala::extract(uint8_t *buf,uint size)
 uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
 {
   //check for special protocol archiveSize
-  if(var_idx==idx_config)return extract_config(buf,size);
   if(var_idx==idx_downstream)return extract_downstream(buf,size);
   if(var_idx==idx_flightplan)return extract_flightplan(buf,size);
   if(var_idx==idx_msg)return 1; //nothing to do
@@ -190,7 +167,6 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   else return vsz;
 }
 //=============================================================================
-//=============================================================================
 uint Mandala::sig_size(_var_signature signature)
 {
   uint scnt=signature[0];
@@ -198,124 +174,6 @@ uint Mandala::sig_size(_var_signature signature)
   uint cnt=0;
   while (scnt--) cnt+=var_size[*signature++];
   return cnt;
-}
-//=============================================================================
-//=============================================================================
-//=============================================================================
-typedef _var_float _var_float_array [];
-typedef _var_uint _var_uint_array [];
-typedef _var_vect _var_vect_array [];
-uint Mandala::archive_config(uint8_t *buf,uint bufSize)
-{
-  uint sz=var_size[idx_config];
-  if(bufSize<sz){
-    fprintf(stderr,"Can't archive config, wrong buffer size (%u) need (%u).\n",bufSize,sz);
-    return 0;
-  }
-  for(uint i=0;i<cfgCnt;i++){
-    fill_config_vdsc(buf,i);
-    uint asz=cfg_dsc.var_array[i];
-    if(asz>1){
-      switch(cfg_dsc.var_type[i]){
-        case vt_float:{
-          _var_float_array *v=((_var_float_array*)vdsc.ptr);
-          for(uint ai=0;ai<asz;ai++){
-            vdsc.ptr=&((*v)[ai]);
-            do_archive_vdsc();
-          }
-        }break;
-        case vt_vect:{
-          _var_vect_array *v=((_var_vect_array*)vdsc.ptr);
-          for(uint ai=0;ai<asz;ai++){
-            vdsc.ptr=&((*v)[ai][0]);
-            do_archive_vdsc();
-          }
-        }break;
-        case vt_uint:{
-          _var_uint_array *v=((_var_uint_array*)vdsc.ptr);
-          for(uint ai=0;ai<asz;ai++){
-            vdsc.ptr=&((*v)[ai]);
-            do_archive_vdsc();
-          }
-        }break;
-      }
-    }else do_archive_vdsc();
-    buf+=vdsc.size;
-  }
-  return sz;
-}
-//=============================================================================
-uint Mandala::extract_config(uint8_t *buf,uint cnt)
-{
-  uint sz=var_size[idx_config];
-  if(cnt!=sz){
-    fprintf(stderr,"Can't extract config, wrong data size (%u) need (%u).\n",cnt,sz);
-    return 0;
-  }
-  for(uint i=0;i<cfgCnt;i++){
-    fill_config_vdsc(buf,i);
-    uint asz=cfg_dsc.var_array[i];
-    if(asz>1){
-      vdsc.size/=asz;
-      switch(cfg_dsc.var_type[i]){
-        case vt_float:{
-          _var_float_array *v=((_var_float_array*)vdsc.ptr);
-          for(uint ai=0;ai<asz;ai++){
-            vdsc.ptr=&((*v)[ai]);
-            uint vsz=do_extract_vdsc(cnt);
-            buf+=vsz;
-            cnt-=vsz;
-          }
-        }break;
-        case vt_vect:{
-          _var_vect_array *v=((_var_vect_array*)vdsc.ptr);
-          for(uint ai=0;ai<asz;ai++){
-            vdsc.ptr=&((*v)[ai][0]);
-            uint vsz=do_extract_vdsc(cnt);
-            buf+=vsz;
-            cnt-=vsz;
-          }
-        }break;
-        case vt_uint:{
-          _var_uint_array *v=((_var_uint_array*)vdsc.ptr);
-          for(uint ai=0;ai<asz;ai++){
-            vdsc.ptr=&((*v)[ai]);
-            uint vsz=do_extract_vdsc(cnt);
-            buf+=vsz;
-            cnt-=vsz;
-          }
-        }break;
-      }
-    }else{
-      uint vsz=do_extract_vdsc(cnt);
-      buf+=vsz;
-      cnt-=vsz;
-    }
-  }
-  return sz;
-}
-//=============================================================================
-void Mandala::fill_config_vdsc(uint8_t *buf,uint i)
-{
-  //_variable_descriptor
-  #define CFGDEF(atype,aname,aspan,abytes,around,adescr) CFGDEFA(atype,aname,1,aspan,abytes,around,adescr)
-  #define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) \
-  case idx_cfg_##aname:\
-    vdsc.ptr=&(xcfg. aname );\
-    vdsc.sbytes=(aspan<0)?(-abytes):(abytes);\
-    vdsc.span=(aspan<0)?(-aspan):(aspan);\
-    vdsc.type=vt_##atype;\
-    vdsc.max=(aspan>0)?(((abytes==1)?0xFF:((abytes==2)?0xFFFF:((abytes==4)?0xFFFFFFFF:0)))): \
-                      ( (aspan<0)?((abytes==1)?0x7F:((abytes==2)?0x7FFF:((abytes==4)?0x7FFFFFFF:0))):0 );\
-    vdsc.size=((asize)*(abytes)*((vt_##atype==vt_vect)?3:1));\
-    vdsc.prec1000=around*1000.0;\
-    break;
-    vdsc.buf=buf;
-    switch (i) {
-      #include "MandalaVarsAP.h"
-      default:
-        return;
-    }
 }
 //=============================================================================
 //=============================================================================

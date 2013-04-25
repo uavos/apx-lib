@@ -31,20 +31,31 @@
 #include "MandalaCore.h"
 #define printf(...) fprintf(stdout, __VA_ARGS__ )
 //=============================================================================
+// AP constants
+//=============================================================================
+#define AHRS_FREQ       100     // AHRS Update (main loop freq) [Hz]
+#define GPS_FREQ        5       // GPS Update rate (for derivatives) [Hz]
+#define CTR_FREQ        50      // ctr (fast servo) send rate [Hz]
+#define UPD_FREQ        5       // 'update' vars send rate [Hz]
+#define TELEMETRY_FREQ  10      // Telemetry send rate [Hz] MAX 10Hz!
+#define SIM_FREQ        10      // Simulator servo send rate [Hz]
+#define MAX_TELEMETRY   64      // max telemetry packet size [bytes]
+//=============================================================================
 // flight plan types
+#define MAX_WPCNT       100
+#define MAX_RWCNT       10
 typedef enum { wtHdg=0,wtLine,  wtCnt } _wpt_type;
+typedef enum { rwtApproach=0,rwtParachute,  rwtCnt } _rw_type;
+typedef enum { rwaLeft=0,rwaRight, rwaCnt } _rw_app;
 #define wt_str_def "Hdg","Line"
+#define rwt_str_def "Approach","Parachute"
+#define rwa_str_def "Left","Right"
 typedef struct {
   _var_vect     LLA;  //lat,lon,agl
   _wpt_type     type;
-  uint          cmdSize;
+  uint8_t       cmdSize;
   uint8_t       cmd[128]; //TODO: implement wpt commands
 }_waypoint;
-//----------------------
-typedef enum { rwtApproach=0,rwtParachute,  rwtCnt } _rw_type;
-typedef enum { rwaLeft=0,rwaRight, rwaCnt } _rw_app;
-#define rwt_str_def "Approach","Parachute"
-#define rwa_str_def "Left","Right"
 typedef struct {
   _var_vect     LLA;  //start pos [lat lon agl]
   _var_vect     dNED;
@@ -57,8 +68,6 @@ typedef struct {
   //calculated
   _var_float    hdg;
 }_runway;
-#define MAX_WPCNT       100
-#define MAX_RWCNT       10
 typedef struct {
   _waypoint waypoints[MAX_WPCNT];
   _runway   runways[MAX_RWCNT];
@@ -77,25 +86,6 @@ typedef struct {
   uint8_t       nodes_cnt;      //number of nodes in the system
 }_uav_id;
 //=============================================================================
-//=============================================================================
-#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr) idx_cfg_##aname,
-enum {
-  #include "MandalaVarsAP.h"
-  cfgCnt
-};
-#define REGDEF(aname,adescr) reg##aname,
-enum {
-  #include "MandalaVarsAP.h"
-  regCnt
-};
-//=============================================================================
-//-----------------------------------------------------------------------------
-// config variable typedefs
-#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) typedef _var_##atype var_typedef_cfg_##aname [asize];
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr) typedef _var_##atype var_typedef_cfg_##aname;
-#include "MandalaVarsAP.h"
-//=============================================================================
 class Mandala : public MandalaCore
 {
 public:
@@ -112,24 +102,6 @@ public:
   uint8_t         var_bits_mask[256][8];    // bitmask of bitfield
   const char      *var_bits_name[256][8];   // bit names
   const char      *var_bits_descr[256][8];  // bit descriptions
-
-
-  //---- AP CFG Vars ----
-  struct {
-    const char *    var_name[cfgCnt];  //text name
-    const char *    var_descr[cfgCnt]; //text description
-    _var_float      var_round[cfgCnt]; //round value for CFG vars
-    uint            var_size[cfgCnt];  //size of whole packed var
-    void *          var_ptr[cfgCnt];
-    uint            var_type[cfgCnt];
-    uint            var_array[cfgCnt];
-    uint            var_bytes[cfgCnt];
-    _var_float      var_span[cfgCnt];
-  }cfg_dsc;
-  struct {
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr)  var_typedef_cfg_##aname aname;
-#include "MandalaVarsAP.h"
-  }xcfg;
 
   //---- flightplan ----
   _flightplan fp;
@@ -154,18 +126,13 @@ public:
   uint          dl_size;        // last telemetry size statistics
   bool          dl_hd_save;     // to watch change in alt_bytecnt
 
-  //---- PIDs ----
-  const char      *reg_names[regCnt];
-  const char      *reg_descr[regCnt];
-
 //=============================================================================
   Mandala();
   void init(void);
   //-----------------------------------------------------------------------------
   // Core overload
-  //uint archive(uint8_t *buf,uint var_idx);
   uint extract(uint8_t *buf,uint cnt,uint var_idx);
-//public:
+
   //-----------------------------------------------------------------------------
   //overload - check buf size
   uint archive(uint8_t *buf,uint size,uint var_idx);
@@ -211,9 +178,6 @@ public:
   _var_float conv_pstatic_altitude(void); //convert and filter, return unfiltered
 private:
   // some special protocols
-  void fill_config_vdsc(uint8_t *buf,uint i);
-  uint archive_config(uint8_t *buf,uint bufSize);  //pack config to buf, return size
-  uint extract_config(uint8_t *buf,uint cnt);//read packed config from buf
   uint archive_flightplan(uint8_t *buf,uint bufSize);  //pack wypoints to buf, return size
   uint extract_flightplan(uint8_t *buf,uint cnt);//read packed waypoints from buf
   uint archive_downstream(uint8_t *buf,uint maxSize);    //pack telemetry
