@@ -243,7 +243,7 @@ VARDEF(uint,  status,   0,1,0, "status flags bitfield [on/off]")
 BITDEF(status, rc,      1,       "RC on/off")
 BITDEF(status, gps,     2,       "GPS available/lost")
 BITDEF(status, agl,     4,       "AGL available/off")
-BITDEF(status, modem,   8,       "Data link available/lost")
+BITDEF(status, modem,   8,       "Uplink available/lost")
 BITDEF(status, glide,   16,      "Glide status")
 
 VARDEF(uint,  error,    0,1,0, "error flags bitfield [set/clear]")
