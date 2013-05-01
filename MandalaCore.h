@@ -148,6 +148,9 @@ public:
   // used for telemetry (smaller size, less precision)
   bool alt_bytecnt;
 
+  //math calculations
+  _var_float inHgToAltitude(_var_float inHg,_var_float inHg_gnd);
+  _var_float conv_pstatic_altitude(void); //convert and filter, return unfiltered
 private:
 
   uint32_t limit_u(const _var_float v,const uint32_t max);

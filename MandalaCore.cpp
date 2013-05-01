@@ -416,6 +416,18 @@ void MandalaCore::filter_m(const _var_vect &v,_var_vect *var_p,const _var_float 
 }
 //===========================================================================
 //=============================================================================
+_var_float MandalaCore::inHgToAltitude(_var_float inHg,_var_float inHg_gnd)
+{
+  if(inHg_gnd==0) return 0;
+  return (1.0-powf(inHg/inHg_gnd,0.1902632))*44330.77;
+}
+_var_float MandalaCore::conv_pstatic_altitude(void)
+{
+  _var_float v=inHgToAltitude(pstatic,pstatic_gnd);
+  filter(v,&altitude,0.01,0.5);
+  return v;
+}
+//=============================================================================
 //=============================================================================
 //=============================================================================
 //=============================================================================

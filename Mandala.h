@@ -174,8 +174,6 @@ public:
   const _var_vect ned2llh(const _var_vect &ned);
   const _var_vect ned2llh(const _var_vect &ned,const _var_vect &home_llh);
   _var_float sqr(_var_float x);
-  _var_float inHgToAltitude(_var_float inHg,_var_float inHg_gnd);
-  _var_float conv_pstatic_altitude(void); //convert and filter, return unfiltered
 private:
   // some special protocols
   uint archive_flightplan(uint8_t *buf,uint bufSize);  //pack wypoints to buf, return size
