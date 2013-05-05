@@ -11,7 +11,8 @@ class Udp
 public:
   Udp(const char *name="UDP");
   ~Udp();
-
+  const char    *name;
+  
   bool bind(const char *host,uint port);
   void close();
 
@@ -19,7 +20,6 @@ public:
   uint read(uint8_t *buf,uint sz);
 private:
   int   fd;
-  const char    *name;
   struct  sockaddr_in bind_addr;
   struct  sockaddr_in dest_addr;
   struct  sockaddr_in sender_addr;

@@ -13,14 +13,14 @@
 #include <stddef.h>
 #include <termios.h>
 #include <time.h>
-#include "uart.h"
+#include "comm.h"
 //==============================================================================
 #define DEFAULT_PORTNAME   "/dev/ttyS0"
 #define DEFAULT_BAUDRATE   B115200
 //#define dump(A,B,C)       {if(C){printf("%s: ",A);for(uint i=0;i<(C);i++)printf("%.2X ",((const uint8_t*)(B))[i]);printf("\n");}}
 #define dump(A,B,C)
 //==============================================================================
-Uart::Uart()
+Comm::Comm()
 {
   fd=-1;
   pname=DEFAULT_PORTNAME;
@@ -29,12 +29,12 @@ Uart::Uart()
   esc_crc=0;
   esc_cnt=0;
 }
-Uart::~Uart()
+Comm::~Comm()
 {
   close();
 }
 //==============================================================================
-bool Uart::open(const char *portname,int baudrate,const char *name,int timeout,uint parity)
+bool Comm::open(const char *portname,int baudrate,const char *name,int timeout,uint parity)
 {
   if(!portname[0])portname=pname;
   if(!name[0])name=portname;
@@ -75,29 +75,29 @@ bool Uart::open(const char *portname,int baudrate,const char *name,int timeout,u
   return true;
 }
 //==============================================================================
-void Uart::close()
+void Comm::close()
 {
   ::close(fd);
   fd=-1;
 }
 //==============================================================================
-bool Uart::isOpen(void)
+bool Comm::isOpen(void)
 {
   return (fd>=0)&&(fcntl(fd, F_GETFL) != -1 || errno != EBADF);
 }
 //==============================================================================
-int Uart::handle(void)
+int Comm::handle(void)
 {
   return fd;
 }
 //==============================================================================
 //==============================================================================
-void Uart::write(const uint8_t v)
+void Comm::write(const uint8_t v)
 {
   write(&v,1);
 }
 //==============================================================================
-void Uart::write(const uint8_t *buf,uint cnt)
+void Comm::write(const uint8_t *buf,uint cnt)
 {
   int pcnt=cnt;
   int wcnt=0;
@@ -109,14 +109,14 @@ void Uart::write(const uint8_t *buf,uint cnt)
   dump("S",buf,cnt);
 }
 //==============================================================================
-uint8_t Uart::getCRC(const uint8_t *buf,uint cnt)
+uint8_t Comm::getCRC(const uint8_t *buf,uint cnt)
 {
   uint crc=0;
   while (cnt--)crc += *buf++;
   return crc&0x00FF;
 }
 //==============================================================================
-unsigned int Uart::getRxCnt(void)
+unsigned int Comm::getRxCnt(void)
 {
   unsigned int cnt;
   ioctl(fd, FIONREAD, &cnt);
@@ -130,14 +130,14 @@ unsigned int Uart::getRxCnt(void)
   return rc;*/
 }
 //==============================================================================
-unsigned int Uart::getTxCnt(void)
+unsigned int Comm::getTxCnt(void)
 {
   unsigned int cnt;
   ioctl(fd, TIOCOUTQ, &cnt);
   return cnt;
 }
 //==============================================================================
-uint Uart::isBusy(void)
+uint Comm::isBusy(void)
 {
   if (unsigned short v=getTxCnt()) {
     printf("[%s]Tx busy: %u\n",name,v);
@@ -146,13 +146,13 @@ uint Uart::isBusy(void)
   return 0;
 }
 //==============================================================================
-void Uart::flush(void)
+void Comm::flush(void)
 {
   tcflush(fd,TCIOFLUSH);
   tcdrain(fd);
 }
 //==============================================================================
-void Uart::writeEscaped(const uint8_t *tbuf,uint dcnt)
+void Comm::writeEscaped(const uint8_t *tbuf,uint dcnt)
 {
   uint8_t *buf=txBuf,v;
   uint max=sizeof(txBuf)-6,bcnt=0;
@@ -172,7 +172,7 @@ void Uart::writeEscaped(const uint8_t *tbuf,uint dcnt)
   write(buf,bcnt);
 }
 //==============================================================================
-uint Uart::readEscaped(uint8_t *buf,uint max_len)
+uint Comm::readEscaped(uint8_t *buf,uint max_len)
 {
   while(1){
     unsigned char v;
@@ -228,7 +228,7 @@ uint Uart::readEscaped(uint8_t *buf,uint max_len)
   }
 }
 //==============================================================================
-uint Uart::read(uint8_t *buf,uint cnt)
+uint Comm::read(uint8_t *buf,uint cnt)
 {
   int rcnt=::read(fd,buf,cnt);
   if(rcnt<0)return 0;
@@ -236,7 +236,7 @@ uint Uart::read(uint8_t *buf,uint cnt)
   return rcnt;
 }
 //==============================================================================
-uint8_t Uart::read_char(void)
+uint8_t Comm::read_char(void)
 {
   uint8_t v;
   while(!this->read(&v,1));

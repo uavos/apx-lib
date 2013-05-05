@@ -1,15 +1,15 @@
 //=============================================================
-#ifndef uart_H
-#define uart_H
+#ifndef comm_H
+#define comm_H
 //=============================================================
 #include <inttypes.h>
 #include <termios.h>
 //=============================================================
-class Uart
+class Comm
 {
 public:
-  Uart();
-  ~Uart();
+  Comm();
+  ~Comm();
 
   bool open(const char *portname="",int baudrate=0,const char *name="",int timeout=1,uint parity=0);
   void close();
