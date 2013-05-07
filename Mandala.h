@@ -45,22 +45,19 @@
 #define MAX_WPCNT       100
 #define MAX_RWCNT       10
 typedef enum { wtHdg=0,wtLine,  wtCnt } _wpt_type;
-typedef enum { rwtApproach=0,rwtParachute,  rwtCnt } _rw_type;
 typedef enum { rwaLeft=0,rwaRight, rwaCnt } _rw_app;
 #define wt_str_def "Hdg","Line"
-#define rwt_str_def "Approach","Parachute"
 #define rwa_str_def "Left","Right"
 typedef struct {
   _var_vect     LLA;  //lat,lon,agl
-  _wpt_type     type;
+  uint8_t       type;
   uint8_t       cmdSize;
   uint8_t       cmd[128]; //TODO: implement wpt commands
 }_waypoint;
 typedef struct {
   _var_vect     LLA;  //start pos [lat lon agl]
   _var_vect     dNED;
-  _rw_type      rwType;
-  _rw_app       appType;
+  uint8_t       appType;
   _var_float    distApp;
   _var_float    altApp;
   _var_float    distTA;
@@ -106,7 +103,6 @@ public:
   //---- flightplan ----
   _flightplan fp;
   const char *wt_str[wtCnt];    //wt_type string descr
-  const char *rwt_str[rwtCnt];  //wt_type string descr
   const char *rwa_str[rwaCnt];  //wt_type string descr
 
   //---- Internal use -----
