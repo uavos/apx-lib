@@ -16,7 +16,7 @@ typedef struct {
   _node_version version;
   uint8_t       crc;    //program crc
   uint32_t      size;   //program memory size
-}__attribute__((packed)) _fw_info;
+}__attribute__((packed)) _node_fw;
 // node information, filled by hwInit, saved in RAM
 typedef struct{
   uint8_t     err_cnt;        // errors counter
@@ -27,7 +27,7 @@ typedef struct{
 }_node_status;
 typedef struct{
   _node_sn      sn;     //serial number
-  _fw_info      fw;     //firmware info
+  _node_fw      fw;     //firmware info
   _node_status  status; //dynamic status
 }__attribute__((packed)) _node_info;
 //=============================================================================
@@ -63,7 +63,7 @@ enum{
   apc_ack=0,    //acknowledge - sent back in response to commands
   //------------------
   //system commands
-  apc_info,     //return _fw_info
+  apc_info,     //return _node_fw
   apc_nstat,    //return _node_name + _node_status
   apc_debug,    //debug message
   apc_reboot,   //reset/reboot node
