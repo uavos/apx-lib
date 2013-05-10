@@ -23,7 +23,7 @@ typedef struct{
   uint8_t     can_rxc;        // CAN received packets counter
   uint8_t     can_adr;        // CAN address
   uint8_t     can_err;        // CAN errors counter
-  uint8_t     dump[8];        // error dump
+  uint8_t     dump[16];       // error dump or special info
 }_node_status;
 typedef struct{
   _node_sn      sn;     //serial number
