@@ -6,17 +6,18 @@
 #define BUS_MAX_PACKET          1024    //2k MAX
 //=============================================================================
 // node information, dynamically assigned values
-typedef uint8_t _node_sn[12]; //chip serial number
-typedef uint8_t _node_name[16]; //device name string
-typedef uint8_t _node_version[16]; //fw version string
+typedef uint8_t _node_sn[12];           //chip serial number
+typedef uint8_t _node_name[16];         //device name string
+typedef uint8_t _node_hardware[16];     //device hardware string
+typedef uint8_t _node_version[16];      //fw version string
 //-------------------------------------------------
 // firmware information, saved in FLASH section [CONFIG]
 typedef struct {
   _node_name    name;
   _node_version version;
-  uint8_t       crc;    //program crc
+  _node_version hardware;
   uint32_t      size;   //program memory size
-}__attribute__((packed)) _node_fw;
+}__attribute__((packed)) _node_info;
 // node information, filled by hwInit, saved in RAM
 typedef struct{
   uint8_t     err_cnt;        // errors counter
@@ -27,9 +28,9 @@ typedef struct{
 }_node_status;
 typedef struct{
   _node_sn      sn;     //serial number
-  _node_fw      fw;     //firmware info
+  _node_info    info;   //firmware/hardware info
   _node_status  status; //dynamic status
-}__attribute__((packed)) _node_info;
+}__attribute__((packed)) _node;
 //=============================================================================
 // bus packet structure:
 // <tag> is an optional byte (stored in conf)
@@ -63,7 +64,7 @@ enum{
   apc_ack=0,    //acknowledge - sent back in response to commands
   //------------------
   //system commands
-  apc_info,     //return _node_fw
+  apc_info,     //return _node_info
   apc_nstat,    //return _node_name + _node_status
   apc_debug,    //debug message
   apc_reboot,   //reset/reboot node
