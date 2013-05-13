@@ -361,7 +361,7 @@ uint MandalaCore::unpack_float_2(void *buf,void *value_ptr,_var_float span)
 uint MandalaCore::unpack_float_4(void *buf,void *value_ptr,_var_float span)
 {
   (void)span;
-  float f=*(_var_float*)value_ptr;
+  float f;
   uint8_t *src=(uint8_t*)buf;
   uint8_t *dest=(uint8_t*)&f;
   *dest++=*src++;
