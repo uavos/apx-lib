@@ -142,12 +142,12 @@ uint MandalaCore::pack_float_1(void *buf,void *value_ptr,_var_float span)
     else if(v<-128)v=-128;
     *((int8_t*)buf)=v;
   }else if (span==-12.7){
-    int32_t v=f*0.1;
+    int32_t v=f*10.0;
     if(v>127)v=127;
     else if(v<-128)v=-128;
     *((int8_t*)buf)=v;
   }else if (span==25.5){
-    int32_t v=f*0.1;
+    int32_t v=f*10.0;
     if(v>0xFF)v=0xFF;
     else if(v<0)v=0;
     *((uint8_t*)buf)=v;
