@@ -225,6 +225,7 @@ VARDEF(float, MT,    -127,1,1,    "modem temperature [C]")
 VARDEF(float, ET,     0,1,1,      "engine temperature [C]")
 VARDEF(float, EGT,    900,1,1,    "exhaust gas temperature [C]")
 VARDEF(float, OT,     0,1,1,      "oil temperature [C]")
+VARDEF(float, OP,     25.5,1,1,   "oil pressure [atm]")
 
 //--------- STATUS FLAGS --------------
 VARDEF(uint,  stage,    0,1,1, "auto set to zero by mode change [maneuver stage]")
