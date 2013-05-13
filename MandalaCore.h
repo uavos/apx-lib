@@ -105,6 +105,9 @@ class MandalaCore
 {
 public:
   MandalaCore();
+  uint pack(uint8_t *buf,uint var_idx);
+  uint unpack(uint8_t *buf,uint cnt,uint var_idx);
+  uint unpack_stream(uint8_t *buf,uint cnt);
 
   static void filter(const _var_float &fv,_var_float *var_p,const _var_float &fS=0.05/100.0,const _var_float &fL=0.9/100.0);
   static void filter(const _var_vect &v,_var_vect *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
@@ -116,33 +119,9 @@ public:
   void set_value(uint var_m,_var_float value);
   void set_value(uint var_idx,uint member_idx,_var_float value);
   //-----------------------------------------------------------------------------
-  virtual uint archive(uint8_t *buf,uint var_idx){return do_archive(buf,var_idx);}
-  virtual uint extract(uint8_t *buf,uint cnt,uint var_idx){return do_extract(buf,cnt,var_idx);}
-
   #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr)         var_typedef_##aname aname;
   #define SIGDEF(aname,adescr,...)                        static var_typedef_##aname aname;
   #include "MandalaVars.h"
-  uint do_archive(uint8_t *buf,uint var_idx);
-  uint do_extract(uint8_t *buf,uint cnt,uint var_idx);
-
-  uint extract_stream(uint8_t *buf,uint cnt);
-  struct {
-    uint8_t     *buf;           // buffer to store/extract
-    void        *ptr;           // pointer to local var.VARNAME
-    int         sbytes;         // archived bytes cnt (if < 0 => signed)
-    _var_float  span;           // variable span (absolute, always >0)
-    uint        type;           // type of variable
-    uint32_t    max;            // max archived integer value (unsigned)
-    uint        size;           // total size of archived data
-    uint        prec1000;       // cfg vars only: round*1000
-
-    int         sbytes_t;       // for do_archive_telemetry
-    uint32_t    max_t;          // for do_archive_telemetry
-    uint        size_t;         // for do_archive_telemetry
-  }vdsc;
-  uint vdsc_fill(uint8_t *buf,uint var_idx);
-  uint do_archive_vdsc(void);
-  uint do_extract_vdsc(uint cnt);
 
   // flag to use alternate bytes field for packing vars
   // used for telemetry (smaller size, less precision)
@@ -151,19 +130,42 @@ public:
   //math calculations
   _var_float inHgToAltitude(_var_float inHg,_var_float inHg_gnd);
   _var_float conv_pstatic_altitude(void); //convert and filter, return unfiltered
-private:
 
-  uint32_t limit_u(const _var_float v,const uint32_t max);
-  uint32_t limit_ui(const uint32_t v,const uint32_t max);
-  int32_t limit_s(const _var_float v,const uint32_t max);
-  void archive_float(void);
-  void archive_uint(void);
-  void archive_vect(void);
-  void archive_sig();
-  void extract_float(void);
-  void extract_uint(void);
-  void extract_vect(void);
-  void extract_sig(uint buf_cnt);
+  //optimizations
+  static inline void memcpy(void *dest,const void *src,uint cnt)
+  {
+    if(cnt==1)*((uint8_t*)dest)=*((const uint8_t*)src);
+    else if(cnt>1)::memcpy(dest,src,cnt);
+  }
+  static inline int memcmp(const void *s1,const void *s2,uint cnt)
+  {
+    if(cnt==1)return *((const uint8_t*)s1)!=*((const uint8_t*)s2);
+    else if(cnt>1)return ::memcmp(s1,s2,cnt);
+    return -1;
+  }
+private:
+  bool get_value_ptr(uint var_idx,void **value_ptr,uint*type);
+  //pack
+  uint pack_float_1(void *buf,void *value_ptr,_var_float span);
+  uint pack_float_2(void *buf,void *value_ptr,_var_float span);
+  uint pack_float_4(void *buf,void *value_ptr,_var_float span);
+  uint pack_uint_1(void *buf,void *value_ptr,_var_float span);
+  uint pack_uint_2(void *buf,void *value_ptr,_var_float span);
+  uint pack_uint_4(void *buf,void *value_ptr,_var_float span);
+  uint pack_vect_1(void *buf,void *value_ptr,_var_float span);
+  uint pack_vect_2(void *buf,void *value_ptr,_var_float span);
+  uint pack_sig(void *buf,void *value_ptr);
+  //unpack
+  uint unpack_float_1(void *buf,void *value_ptr,_var_float span);
+  uint unpack_float_2(void *buf,void *value_ptr,_var_float span);
+  uint unpack_float_4(void *buf,void *value_ptr,_var_float span);
+  uint unpack_uint_1(void *buf,void *value_ptr,_var_float span);
+  uint unpack_uint_2(void *buf,void *value_ptr,_var_float span);
+  uint unpack_uint_4(void *buf,void *value_ptr,_var_float span);
+  uint unpack_vect_1(void *buf,void *value_ptr,_var_float span);
+  uint unpack_vect_2(void *buf,void *value_ptr,_var_float span);
+  uint unpack_sig(void *buf,uint cnt,void *value_ptr);
+
 };
 //=============================================================================
 #endif // MANDALA_CORE_H

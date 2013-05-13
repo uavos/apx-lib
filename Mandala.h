@@ -108,10 +108,10 @@ public:
   //---- Internal use -----
   // telemetry framework
   uint8_t dl_id;                // received uav_id
-  uint8_t dl_snapshot[2048];    // all archived variables snapshot
   bool    dl_reset;             // set true to send everything next time
-  uint8_t dl_reset_mask[128/8]; // bitmask 1=var send anyway, auto clear after sent
-  uint8_t dl_var[32];           // one var max size (tmp buf)
+  uint8_t dl_snapshot[1024];    // all archived variables snapshot
+  uint8_t dl_reset_mask[(idx_vars_top-idxPAD)/8+(((idx_vars_top-idxPAD)&3)?1:0)]; // bitmask 1=send var, auto clear after sent
+  uint8_t dl_var[3*4];          // one var max size (tmp buf)
   //filled by extract_downstream
   uint          dl_frcnt;       // downlink frame cnt (inc by extract_downlink)
   uint          dl_errcnt;      // errors counter (by extract_downlink)
@@ -172,12 +172,12 @@ public:
   _var_float sqr(_var_float x);
 private:
   // some special protocols
-  uint archive_flightplan(uint8_t *buf,uint bufSize);  //pack wypoints to buf, return size
-  uint extract_flightplan(uint8_t *buf,uint cnt);//read packed waypoints from buf
-  uint archive_downstream(uint8_t *buf,uint maxSize);    //pack telemetry
-  uint extract_downstream(uint8_t *buf,uint cnt);  //read telemetry
-  uint extract_setb(uint8_t *buf,uint cnt);  //read
-  uint extract_clrb(uint8_t *buf,uint cnt);  //read
+  uint archive_flightplan(uint8_t *buf,uint bufSize);   //pack flightplan
+  uint extract_flightplan(uint8_t *buf,uint cnt);       //unpack flightplan
+  uint archive_downstream(uint8_t *buf,uint maxSize);   //pack telemetry
+  uint extract_downstream(uint8_t *buf,uint cnt);       //unpack telemetry
+  uint extract_setb(uint8_t *buf,uint cnt);             //unpack and set bit
+  uint extract_clrb(uint8_t *buf,uint cnt);             //unpack and clear bit
 };
 //=============================================================================
 #endif // MANDALA_H

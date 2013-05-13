@@ -120,7 +120,7 @@ uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
     return 0;
   }
   //archive var
-  uint cnt=do_archive(buf,var_idx);
+  uint cnt=pack(buf,var_idx);
   if(!cnt)return 0;
   return cnt;//var_size[var_idx];
 }
@@ -152,7 +152,7 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
     fprintf(stderr,"Error: extract %s #%u (sz: %u, buf: %u)\n",var_name[var_idx],var_idx,vsz,size);
     return 0;
   }
-  uint cnt=do_extract(buf,size,var_idx);
+  uint cnt=unpack(buf,size,var_idx);
   if(!cnt)return 0; //error
   vsz=cnt;
   if(size<vsz){
@@ -161,7 +161,7 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   }
   size-=vsz;
   var_idx++;
-  if(size&&(var_idx>idxPAD)&&(var_idx<idx_vars_top))return vsz+do_extract(buf+vsz,size,var_idx);
+  if(size&&(var_idx>idxPAD)&&(var_idx<idx_vars_top))return vsz+unpack(buf+vsz,size,var_idx);
   else return vsz;
 }
 //=============================================================================
@@ -256,9 +256,9 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     uint i;
     for (i=0;i<wpcnt;i++) {
       if((buf+(szLLH+2))>buf_top) break;
-      buf+=do_extract(buf,var_size[idx_gps_lat],idx_gps_lat);
-      buf+=do_extract(buf,var_size[idx_gps_lon],idx_gps_lon);
-      buf+=do_extract(buf,var_size[idx_gps_hmsl],idx_gps_hmsl);
+      buf+=unpack(buf,var_size[idx_gps_lat],idx_gps_lat);
+      buf+=unpack(buf,var_size[idx_gps_lon],idx_gps_lon);
+      buf+=unpack(buf,var_size[idx_gps_hmsl],idx_gps_hmsl);
       lat=gps_lat;
       lon=gps_lon;
       alt=gps_hmsl;
@@ -279,10 +279,10 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     if(rwcnt>MAX_RWCNT)break;
     for (i=0;i<rwcnt;i++) {
       if((buf+(szLLH+var_size[idx_NED]+5))>buf_top) break;
-      buf+=do_extract(buf,var_size[idx_gps_lat],idx_gps_lat);
-      buf+=do_extract(buf,var_size[idx_gps_lon],idx_gps_lon);
-      buf+=do_extract(buf,var_size[idx_gps_hmsl],idx_gps_hmsl);
-      buf+=do_extract(buf,var_size[idx_NED],idx_NED);
+      buf+=unpack(buf,var_size[idx_gps_lat],idx_gps_lat);
+      buf+=unpack(buf,var_size[idx_gps_lon],idx_gps_lon);
+      buf+=unpack(buf,var_size[idx_gps_hmsl],idx_gps_hmsl);
+      buf+=unpack(buf,var_size[idx_NED],idx_NED);
       fp.runways[i].LLA[0]=gps_lat;
       fp.runways[i].LLA[1]=gps_lon;
       fp.runways[i].LLA[2]=gps_hmsl;
@@ -423,7 +423,7 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
   //extract data
   uint tcnt=2;
   if(cnt>2){
-    tcnt=extract_stream(buf,cnt-2);
+    tcnt=unpack_stream(buf,cnt-2);
     if(!tcnt){
       fprintf(stderr,"Error extract_downstream");
     }
@@ -449,7 +449,7 @@ uint Mandala::extract_setb(uint8_t *buf,uint cnt)
   if(bChk){
     ptr=(_var_uint*)var_ptr[var_idx];
     old_v=*ptr;
-    bChk=bChk&&do_extract(buf+1,cnt-1,var_idx);
+    bChk=bChk&&unpack(buf+1,cnt-1,var_idx);
   }
   if(!bChk){
     fprintf(stderr,"Can't extract 'set_bit'. Integrity check error.");
@@ -472,7 +472,7 @@ uint Mandala::extract_clrb(uint8_t *buf,uint cnt)
   if(bChk){
     ptr=(_var_uint*)var_ptr[var_idx];
     old_v=*ptr;
-    bChk=bChk&&do_extract(buf+1,cnt-1,var_idx);
+    bChk=bChk&&unpack(buf+1,cnt-1,var_idx);
   }
   if(!bChk){
     fprintf(stderr,"Can't extract 'clr_bit'. Integrity check error.");
