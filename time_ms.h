@@ -2,6 +2,8 @@
 #define time_ms_H
 //==============================================================================
 #ifndef _TIME_H
+#include <inttypes.h>
+#include <sys/types.h>
 extern uint time;
 #else
 #define time getSysTimeMS()
