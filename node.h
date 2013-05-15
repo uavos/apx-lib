@@ -154,12 +154,6 @@ typedef struct {
 }__attribute__((packed)) _serial;
 typedef _serial   _ft_serial;
 //-----------------------------------------------------------------------------
-typedef struct {
-  _ft_option type;    //input capture type
-  _ft_varmsk varmsk;  //var idx with mask
-}__attribute__((packed)) _capture;
-typedef _capture  _ft_capture;
-//-----------------------------------------------------------------------------
 //APCFG support
 typedef struct {
   _ft_float  Kp;
@@ -209,7 +203,6 @@ typedef enum{
   ft_pwm,
   ft_gpio,
   ft_serial,
-  ft_capture,
   //apcfg
   ft_regPID,
   ft_regPI,
