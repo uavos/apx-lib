@@ -143,7 +143,7 @@ public:
     else if(cnt>1)return ::memcmp(s1,s2,cnt);
     return -1;
   }
-private:
+protected:
   bool get_value_ptr(uint var_idx,void **value_ptr,uint*type);
   //pack
   uint pack_float_1(void *buf,void *value_ptr,_var_float span);
