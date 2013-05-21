@@ -149,7 +149,7 @@ VARDEF(float, altitude,        0,4,2,   "Altitude [m]")
 VARDEF(float, vspeed,          0,2,2,   "Variometer [m/s]")
 
 //--------- OTHER AP SENSORS --------------
-VARDEF(float, rpm,    25500,1,1, "engine RPM [1/min]")
+VARDEF(float, rpm,    25500,2,1, "engine RPM [1/min]")
 VARDEF(float, agl,    0,2,2,     "Above Ground Level altitude [m]")
 VARDEF(float, slip,   -127,1,1,  "slip [deg]")
 VARDEF(float, attack, -127,1,1,  "angle of attack [deg]")
