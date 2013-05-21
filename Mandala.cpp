@@ -33,14 +33,14 @@ Mandala::Mandala()
 }
 void Mandala::init(void)
 {
-  for (uint i=0;i<256;i++) {
+  /*for (uint i=0;i<256;i++) {
     var_name[i]="";
     var_descr[i]="";
-    var_bits[i]=0;
-    var_span[i]=0;
-    var_ptr[i]=NULL;
-    var_type[i]=vt_void;
-  }
+    //var_bits[i]=0;
+    //var_span[i]=0;
+    //var_ptr[i]=NULL;
+    //var_type[i]=vt_void;
+  }*/
 
   memset(&fp,0,sizeof(fp));
 
@@ -55,28 +55,24 @@ void Mandala::init(void)
   //------------------------
 
 #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
-  var_ptr[idx_##aname]=(void*)(& aname); \
+  /*var_ptr[idx_##aname]=(void*)(& aname); \
   var_type[idx_##aname]=vt_##atype; \
   var_size[idx_##aname]=((abytes)*((vt_##atype==vt_vect)?3:1)); \
   var_span[idx_##aname]=aspan; \
   var_name[idx_##aname]=#aname; \
-  var_descr[idx_##aname]=adescr; \
+  var_descr[idx_##aname]=adescr;*/ \
   aname=0;
 #include "MandalaVars.h"
 
-#define SIGDEF(aname,adescr,...) \
+/*#define SIGDEF(aname,adescr,...) \
   var_ptr[idx_##aname]=(void*)(& aname); \
   var_type[idx_##aname]=vt_sig; \
   var_size[idx_##aname]=sig_size(aname); \
   var_name[idx_##aname]=#aname; \
   var_descr[idx_##aname]=adescr;
-#include "MandalaVars.h"
+#include "MandalaVars.h"*/
 
   //------------------------
-
-#define REGDEF(aname,adescr) \
-  reg_names[reg##aname]=#aname; \
-  reg_descr[reg##aname]=adescr;
 
   //fill strings
   static const char *wt_str_s[wtCnt]={ wt_str_def };
@@ -86,40 +82,54 @@ void Mandala::init(void)
 
 
   //bitfield strings
-  uint bit_var=256,bit_idx=0;
-  memset(var_bits_mask,0,sizeof(var_bits_mask));
-  memset(var_bits_name,0,sizeof(var_bits_name));
-  memset(var_bits_descr,0,sizeof(var_bits_descr));
+  //uint bit_var=256,bit_idx=0;
+  //memset(var_bits_mask,0,sizeof(var_bits_mask));
+  //memset(var_bits_name,0,sizeof(var_bits_name));
+  //memset(var_bits_descr,0,sizeof(var_bits_descr));
 //  bidx=(int)(log(amask)/log(2));
-#define BITDEF(avarname,abitname,amask,adescr) var_bits[idx_##avarname]++;
-#include "MandalaVars.h"
+//#define BITDEF(avarname,abitname,amask,adescr) var_bits[idx_##avarname]++;
+//#include "MandalaVars.h"
 
-#define BITDEF(avarname,abitname,amask,adescr) \
+/*#define BITDEF(avarname,abitname,amask,adescr) \
   if(bit_var!=idx_##avarname){bit_var=idx_##avarname;bit_idx=0;}\
-  var_bits_mask[idx_##avarname][bit_idx]= avarname##_##abitname ;\
+  var_bits_mask[idx_##avarname][bit_idx]= avarname##_##abitname; \
   var_bits_name[idx_##avarname][bit_idx]= #abitname ;\
   var_bits_descr[idx_##avarname][bit_idx]= adescr ;\
   bit_idx++;
-#include "MandalaVars.h"
+#include "MandalaVars.h"*/
 }
 //===========================================================================
+bool Mandala::get_params(uint var_idx,uint member_idx,void **value_ptr,uint *type,uint8_t *mask,const char **name,const char **descr)
+{
+  if(!get_ptr(var_idx,value_ptr,type))return false;
+  *mask=0;
+  *name="";
+  *descr="";
+  if(*type==vt_bits && member_idx<=255){
+    //find bits/opts name and descr
+    uint bit_var=256,bit_idx=0;
+    #define BITDEF(avarname,abitname,amask,adescr) \
+    if(bit_var!=idx_##avarname){bit_var=idx_##avarname;bit_idx=0;}\
+    if(member_idx==bit_idx){*mask=avarname##_##abitname;*name=#abitname;*descr=adescr;return true;}\
+    bit_idx++;
+    #include "MandalaVars.h"
+    if(member_idx)return false;
+  }
+  //find name and descr (no member)
+  switch (var_idx) {
+    #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
+    case idx_##aname: *name=#aname;*descr=adescr;break;
+    #include "MandalaVars.h"
+  }
+  return true;
+}
 //===========================================================================
 uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
 {
   //check for special protocol archiveSize
   if(var_idx==idx_downstream)return archive_downstream(buf,size);
   if(var_idx==idx_flightplan)return archive_flightplan(buf,size);
-
-  void *ptr=var_ptr[var_idx];
-  if(!ptr){
-    fprintf(stderr,"Error: archive unknown var  #%u\n",var_idx);
-    return 0;
-  }
-  if(var_size[var_idx]>size){
-    fprintf(stderr,"Error: archive %s  #%u (sz: %u, buf: %u)\n",var_name[var_idx],var_idx,var_size[var_idx],size);
-    return 0;
-  }
-  //archive var
+  //basic vars
   uint cnt=pack(buf,var_idx);
   if(!cnt)return 0;
   return cnt;//var_size[var_idx];
@@ -142,37 +152,24 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   if(var_idx==idx_clrb)return extract_clrb(buf,size);
   if(var_idx==idx_ping)return 1;
 
-  void *ptr=var_ptr[var_idx];
-  if(!ptr){
-    fprintf(stderr,"Error: extract unknown var  #%u\n",var_idx);
-    return 0;
-  }
-  uint vsz=var_size[var_idx];
-  if((!alt_bytecnt)&&((!vsz)||(vsz>size))){
-    fprintf(stderr,"Error: extract %s #%u (sz: %u, buf: %u)\n",var_name[var_idx],var_idx,vsz,size);
-    return 0;
-  }
   uint cnt=unpack(buf,size,var_idx);
+  if(cnt==size)return cnt;
   if(!cnt)return 0; //error
-  vsz=cnt;
-  if(size<vsz){
-    fprintf(stderr,"Error: telemetry tail extra.\n");
-    return cnt;
-  }
-  size-=vsz;
+  if(size<cnt) return cnt;
+  size-=cnt;
   var_idx++;
-  if(size&&(var_idx>idxPAD)&&(var_idx<idx_vars_top))return vsz+unpack(buf+vsz,size,var_idx);
-  else return vsz;
+  if(size&&(var_idx>idxPAD)&&(var_idx<idx_vars_top))return cnt+unpack(buf+cnt,size,var_idx);
+  else return cnt;
 }
 //=============================================================================
-uint Mandala::sig_size(_var_signature signature)
+/*uint Mandala::sig_size(_var_signature signature)
 {
   uint scnt=signature[0];
   signature++;
   uint cnt=0;
   while (scnt--) cnt+=var_size[*signature++];
   return cnt;
-}
+}*/
 //=============================================================================
 //=============================================================================
 uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
@@ -409,46 +406,38 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
 uint Mandala::extract_setb(uint8_t *buf,uint cnt)
 {
   uint var_idx=buf[0];
-  bool bChk=true;
-  bChk=bChk&&(var_type[var_idx]==vt_uint);
-  bChk=bChk&&(var_bits[var_idx]);
-  bChk=bChk&&(var_bits_mask[var_idx][0]);
-  bChk=bChk&&(cnt==(1+var_size[var_idx]));
-  _var_uint *ptr;
-  _var_uint old_v;
-  if(bChk){
-    ptr=(_var_uint*)var_ptr[var_idx];
-    old_v=*ptr;
-    bChk=bChk&&unpack(buf+1,cnt-1,var_idx);
-  }
+  uint type;
+  void *value_ptr;
+  bool bChk=cnt==2;
+  bChk=bChk&&get_ptr(var_idx,&value_ptr,&type);
+  bChk=bChk&&(type==vt_uint);
+  //bChk=bChk&&(var_bits[var_idx]);
+  //bChk=bChk&&(var_bits_mask[var_idx][0]);
   if(!bChk){
     fprintf(stderr,"Can't extract 'set_bit'. Integrity check error.");
     return 0;
   }
-  *ptr|=old_v;
+  _var_uint *ptr;
+  ptr=(_var_uint*)value_ptr;
+  *ptr|=buf[1];
   return cnt;
 }
 //-----------------------------------------------------------------------------
 uint Mandala::extract_clrb(uint8_t *buf,uint cnt)
 {
   uint var_idx=buf[0];
-  bool bChk=true;
-  bChk=bChk&&(var_type[var_idx]==vt_uint);
-  bChk=bChk&&(var_bits[var_idx]);
-  bChk=bChk&&(var_bits_mask[var_idx][0]);
-  bChk=bChk&&(cnt==(1+var_size[var_idx]));
-  _var_uint *ptr;
-  _var_uint old_v;
-  if(bChk){
-    ptr=(_var_uint*)var_ptr[var_idx];
-    old_v=*ptr;
-    bChk=bChk&&unpack(buf+1,cnt-1,var_idx);
-  }
+  uint type;
+  void *value_ptr;
+  bool bChk=cnt==2;
+  bChk=bChk&&get_ptr(var_idx,&value_ptr,&type);
+  bChk=bChk&&(type==vt_uint);
   if(!bChk){
     fprintf(stderr,"Can't extract 'clr_bit'. Integrity check error.");
     return 0;
   }
-  *ptr=old_v&~(*ptr);
+  _var_uint *ptr;
+  ptr=(_var_uint*)value_ptr;
+  *ptr&=~((_var_uint)buf[1]);
   return cnt;
 }
 //=============================================================================
@@ -682,6 +671,17 @@ const _var_vect Mandala::llh2ECEF(const _var_vect &llh)
 }
 //=============================================================================
 //=============================================================================
+const char *Mandala::var_name(uint var_idx)
+{
+  uint type;
+  void *value_ptr;
+  uint8_t mask;
+  const char *name;
+  const char *descr;
+  get_params(var_idx,0,&value_ptr,&type,&mask,&name,&descr);
+  return name;
+}
+//=============================================================================
 void Mandala::dump(const uint8_t *ptr,uint cnt,bool hex)
 {
   //printf("\n");
@@ -694,15 +694,20 @@ void Mandala::dump(const _var_vect &v,const char *str)
 }
 void Mandala::dump(const uint var_idx)
 {
-  printf("%s: ",var_name[var_idx]);
-  void *ptr=var_ptr[var_idx];
-  switch(var_type[var_idx]){
-    case vt_uint:   printf("%u",*((uint*)ptr));break;
-    case vt_float: printf("%.2f",*((_var_float*)ptr));break;
-    case vt_vect:   printf("(%.2f,%.2f,%.2f)",(*((_var_vect*)ptr))[0],(*((_var_vect*)ptr))[1],(*((_var_vect*)ptr))[2] );break;
+  uint type;
+  void *value_ptr;
+  uint8_t mask;
+  const char *name;
+  const char *descr;
+  get_params(var_idx,0,&value_ptr,&type,&mask,&name,&descr);
+  printf("%s: ",name);
+  switch(type){
+    case vt_uint:  printf("%u",*((_var_uint*)value_ptr));break;
+    case vt_float: printf("%.2f",*((_var_float*)value_ptr));break;
+    case vt_vect:  printf("(%.2f,%.2f,%.2f)",(*((_var_vect*)value_ptr))[0],(*((_var_vect*)value_ptr))[1],(*((_var_vect*)value_ptr))[2] );break;
     case vt_sig:{
       printf("+sig+\n");
-      _var_signature signature=*(_var_signature*)ptr;
+      _var_signature signature=*(_var_signature*)value_ptr;
       uint scnt=signature[0];
       signature++;
       while (scnt--) dump(*signature++);
@@ -711,58 +716,6 @@ void Mandala::dump(const uint var_idx)
     default: break;
   }
   printf("\n");
-}
-//=============================================================================
-//=============================================================================
-void Mandala::print_report(FILE *stream)
-{
-  fprintf(stream,"======= Mandala Variables ===================\n");
-  fprintf(stream,"#\tVariableName\tDescription\tType\tSpan\tPackedSize\n");
-  for (uint i=0;i<256;i++) {
-    if ((!var_size[i])&&(var_type[i]!=vt_sig))continue;
-    if (var_type[i]==vt_void)continue;
-    //if (i==0) fprintf(stream,"== Signature Variables (internal use only) ==\n");
-    //if (i==idxCFG) fprintf(stream,"======= Configuration Variables =============\n");
-    const char *vt="";
-    switch(var_type[i]){
-      case vt_void:   vt="UNKNOWN";break;
-      case vt_uint:   vt="uint";break;
-      case vt_float:  vt="float";break;
-      case vt_vect:   vt="vector";break;
-      case vt_sig:    vt="signature";break;
-    }
-    fprintf(stream,"%u\t%s\t%s\t%s\t%g\t%u\n",
-           i,
-           var_name[i],
-           var_descr[i],
-           vt,
-           var_span[i],
-           var_size[i]
-    );
-  }
-  fprintf(stream,"=========== Bitfields =======================\n");
-  fprintf(stream,"VariableName\tBitNumber\tBitName\tDescription\n");
-  for (uint i=0;i<256;i++) {
-    if (!var_bits[i])continue;
-    for(uint ib=0;ib<var_bits[i];ib++)
-      fprintf(stream,"%s\t%u\t%s\t%s\n",
-             var_name[i],
-             ib,
-             var_bits_name[i][ib],
-             var_bits_descr[i][ib]
-      );
-  }
-  fprintf(stream,"=========== Content of Signature Variables ==\n");
-  fprintf(stream,"VariableName\tContent\n");
-  for (uint i=0;i<idxPAD;i++) {
-    if(!var_ptr[i])break;
-    _var_signature sig=*(_var_signature*)var_ptr[i];
-    if ((var_type[i]!=vt_sig)||(!sig[0]))continue;
-    fprintf(stream,"%s\t",var_name[i]);
-    for(uint ib=0;ib<sig[0];ib++)
-      fprintf(stream,"%s,",var_name[sig[ib+1]]);
-    fprintf(stream,"\n");
-  }
 }
 //=============================================================================
 //=============================================================================

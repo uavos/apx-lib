@@ -72,8 +72,9 @@ protected:
 #endif
 //=============================================================================
 //=============================================================================
-typedef Vect _var_vect;
-typedef uint _var_uint;
+typedef Vect    _var_vect;
+typedef uint    _var_uint;
+typedef uint8_t _var_bits;
 typedef const uint8_t*  _var_signature;
 //=============================================================================
 #include "MandalaVars.h" //get constants
@@ -108,6 +109,7 @@ public:
   uint pack(uint8_t *buf,uint var_idx);
   uint unpack(uint8_t *buf,uint cnt,uint var_idx);
   uint unpack_stream(uint8_t *buf,uint cnt);
+  bool get_ptr(uint var_idx,void **value_ptr,uint *type);
 
   static void filter(const _var_float &fv,_var_float *var_p,const _var_float &fS=0.05/100.0,const _var_float &fL=0.9/100.0);
   static void filter(const _var_vect &v,_var_vect *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
@@ -144,11 +146,11 @@ public:
     return -1;
   }
 protected:
-  bool get_value_ptr(uint var_idx,void **value_ptr,uint*type);
   //pack
   uint pack_float_1(void *buf,void *value_ptr,_var_float span);
   uint pack_float_2(void *buf,void *value_ptr,_var_float span);
   uint pack_float_4(void *buf,void *value_ptr,_var_float span);
+  uint pack_bits_1(void *buf,void *value_ptr,_var_float span);
   uint pack_uint_1(void *buf,void *value_ptr,_var_float span);
   uint pack_uint_2(void *buf,void *value_ptr,_var_float span);
   uint pack_uint_4(void *buf,void *value_ptr,_var_float span);
@@ -159,6 +161,7 @@ protected:
   uint unpack_float_1(void *buf,void *value_ptr,_var_float span);
   uint unpack_float_2(void *buf,void *value_ptr,_var_float span);
   uint unpack_float_4(void *buf,void *value_ptr,_var_float span);
+  uint unpack_bits_1(void *buf,void *value_ptr,_var_float span);
   uint unpack_uint_1(void *buf,void *value_ptr,_var_float span);
   uint unpack_uint_2(void *buf,void *value_ptr,_var_float span);
   uint unpack_uint_4(void *buf,void *value_ptr,_var_float span);

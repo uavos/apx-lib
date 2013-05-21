@@ -28,7 +28,7 @@
 #define idxPAD  64      //start index for regular vars
 //-----------------------------------------------------------------------------
 // Var Type enum
-enum {vt_void,vt_uint,vt_float,vt_vect,vt_sig};
+enum {vt_void,vt_uint,vt_float,vt_vect,vt_bits,vt_sig};
 //=============================================================================
 // Physical constants
 #define EARTH_RATE   0.00007292115   // rotation rate of earth (rad/sec)
@@ -149,7 +149,7 @@ VARDEF(float, altitude,        0,4,2,   "Altitude [m]")
 VARDEF(float, vspeed,          0,2,2,   "Variometer [m/s]")
 
 //--------- OTHER AP SENSORS --------------
-VARDEF(float, rpm,    25500,1,1, "engine RPM [1/min]")
+VARDEF(float, rpm,    25500,2,1, "engine RPM [1/min]")
 VARDEF(float, agl,    0,2,2,     "Above Ground Level altitude [m]")
 VARDEF(float, slip,   -127,1,1,  "slip [deg]")
 VARDEF(float, attack, -127,1,1,  "angle of attack [deg]")
@@ -179,7 +179,7 @@ VARDEF(float, ctr_mixture,    1.0,1,1, "mixture [0..1]")
 VARDEF(float, ctr_engine,     1.0,1,1, "engine tuning [0..1]")
 VARDEF(float, ctr_sweep,     -1.0,1,1, "sweep [-1..0..1]")
 
-VARDEF(uint,  ctrb,  0,1,1,   "controls bitfield [on/off]")
+VARDEF(bits,  ctrb,  0,1,1,   "controls bitfield [on/off]")
 BITDEF(ctrb,   ers,       1,  "ERS on/off")
 BITDEF(ctrb,   rel,       2,  "Parachute released/locked")
 BITDEF(ctrb,   rev,       4,  "Reverse activated/off")
@@ -229,7 +229,7 @@ VARDEF(float, OP,     25.5,1,1,   "oil pressure [atm]")
 
 //--------- STATUS FLAGS --------------
 VARDEF(uint,  stage,    0,1,1, "auto set to zero by mode change [maneuver stage]")
-VARDEF(uint,  mode,     0,1,1, "flight mode")
+VARDEF(bits,  mode,     0,1,1, "flight mode")
 BITDEF(mode,   EMG,     0,       "Realtime control")
 BITDEF(mode,   RPV,     1,       "Angles control")
 BITDEF(mode,   UAV,     2,       "Heading control")
@@ -241,14 +241,14 @@ BITDEF(mode,   STBY,    7,       "Loiter around DNED")
 BITDEF(mode,   DEMO,    8,       "Aerobatic demonstration")
 BITDEF(mode,   RECOVER, 9,       "Recovery")
 
-VARDEF(uint,  status,   0,1,1, "status flags bitfield [on/off]")
+VARDEF(bits,  status,   0,1,1, "status flags bitfield [on/off]")
 BITDEF(status, rc,      1,       "RC on/off")
 BITDEF(status, gps,     2,       "GPS available/lost")
 BITDEF(status, agl,     4,       "AGL available/off")
 BITDEF(status, modem,   8,       "Uplink available/lost")
 BITDEF(status, glide,   16,      "Glide status")
 
-VARDEF(uint,  error,    0,1,1, "error flags bitfield [set/clear]")
+VARDEF(bits,  error,    0,1,1, "error flags bitfield [set/clear]")
 BITDEF(error,  fatal,   1,       "Fatal error/ok")
 BITDEF(error,  power,   2,       "Power supply error/ok")
 BITDEF(error,  cas,     4,       "CAS error")
@@ -258,7 +258,7 @@ BITDEF(error,  engine,  32,      "Engine error/ok")
 BITDEF(error,  rpm,     64,      "RPM sensor error/ok")
 BITDEF(error,  ers,     128,     "ERS error/ok")
 
-VARDEF(uint,  cmode,    0,1,1, "operation mode bitfield [on/off]")
+VARDEF(bits,  cmode,    0,1,1, "operation mode bitfield [on/off]")
 BITDEF(cmode,  dlhd,    1,       "High precision downstream on/off")
 BITDEF(cmode,  ahrs,    2,       "AHRS mode inertial/gps")
 BITDEF(cmode,  thrcut,  4,       "Throttle cut on/off")
@@ -267,7 +267,7 @@ BITDEF(cmode,  hover,   16,      "Stabilization mode hover/run")
 BITDEF(cmode,  hdglook, 32,      "Heading control mode look/normal")
 
 //--------- POWER CONTROL --------------
-VARDEF(uint,  power,  0,1,1, "power controls bitfield [on/off]")
+VARDEF(bits,  power,  0,1,1, "power controls bitfield [on/off]")
 BITDEF(power,  ap,      1,     "Avionics")
 BITDEF(power,  servo,   2,     "Servo on/off")
 BITDEF(power,  ignition,4,     "Engine on/off")
@@ -277,7 +277,7 @@ BITDEF(power,  satcom,  32,    "Satcom on/off")
 BITDEF(power,  rfamp,   64,    "RF amplifier on/off")
 BITDEF(power,  pcam,   128,    "Pilot camera on/off")
 
-VARDEF(uint,  sw,     0,1,1, "operator controlled switches [on/off]")
+VARDEF(bits,  sw,     0,1,1, "operator controlled switches [on/off]")
 BITDEF(sw,     lights,   1,    "Lights on/off")
 BITDEF(sw,     taxi,     2,    "Taxi lights on/off")
 BITDEF(sw,     ice,      4,    "Anti-ice on/off")
@@ -319,7 +319,7 @@ VARDEF(float, user4,      0,2,2,   "User value 4")
 
 //--------- CAM CONTROL --------------
 VARDEF(uint, cam_ch,    0,1,1,          "video channel")
-VARDEF(uint, cam_ctr,   0,1,1,          "camera control type")
+VARDEF(bits, cam_ctr,   0,1,1,          "camera control type")
 BITDEF(cam_ctr, camoff,  0,               "Camera off")
 BITDEF(cam_ctr, stab,    1,               "gyro stabilization")
 BITDEF(cam_ctr, hold,    2,               "attitude hold")
@@ -331,7 +331,7 @@ VARDEF(float, cam_zoom,    1.0,1,1,     "camera zoom level [0..1]")
 VARDEF(float, cam_focus,   1.0,1,1,     "camera focus [0..1]")
 VARDEF(float, cam_bias_h,  0,2,2,       "camera heading stability bias [deg/s]")
 VARDEF(float, cam_bias_p,  0,2,2,       "camera pitch stability bias [deg/s]")
-VARDEF(uint, cam_opt,  0,1,1,           "camera options [on/off]")
+VARDEF(bits, cam_opt,  0,1,1,           "camera options [on/off]")
 BITDEF(cam_opt, PF,      1,               "Picture flip on/off")
 BITDEF(cam_opt, NIR,     2,               "NIR filter on/off")
 BITDEF(cam_opt, DSP,     4,               "Display information on/off")
@@ -339,7 +339,7 @@ BITDEF(cam_opt, FM,      8,               "Focus mode infinity/auto")
 VARDEF(float, cam_lat, 0,4,4,           "camera track latitude [deg]")
 VARDEF(float, cam_lon, 0,4,4,           "camera track longitude [deg]")
 VARDEF(float, cam_alt, 0,2,2,           "camera track altitude [m]")
-VARDEF(uint, cam_ctrb, 0,1,1,           "camera controls bitfield [on/off]")
+VARDEF(bits, cam_ctrb, 0,1,1,           "camera controls bitfield [on/off]")
 BITDEF(cam_ctrb, shot,  1,                "Snapshot")
 BITDEF(cam_ctrb, ashot, 2,                "Series snapshots")
 

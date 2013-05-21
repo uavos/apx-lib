@@ -45,13 +45,14 @@ _var_float MandalaCore::get_value(uint var_idx,uint member_idx)
 {
   uint type;
   void *value_ptr;
-  if(!get_value_ptr(var_idx,&value_ptr,&type))return 0;
+  if(!get_ptr(var_idx,&value_ptr,&type))return 0;
   switch(type){
-    case vt_float: return *(_var_float*)value_ptr;
+    case vt_float:return *(_var_float*)value_ptr;
     case vt_vect: return (*(_var_vect*)value_ptr)[member_idx];
-    case vt_uint:
-      if(member_idx) return ((*(_var_uint*)value_ptr)&member_idx)?1.0:0.0;
-      return *(_var_uint*)value_ptr;
+    case vt_uint: return *(_var_uint*)value_ptr;
+    case vt_bits:
+      if(member_idx) return ((*(_var_bits*)value_ptr)&member_idx)?1:0;
+      else return *(_var_bits*)value_ptr;
   }
   return 0;
 }
@@ -64,18 +65,19 @@ void MandalaCore::set_value(uint var_idx,uint member_idx,_var_float value)
 {
   uint type;
   void *value_ptr;
-  if(!get_value_ptr(var_idx,&value_ptr,&type))return;
+  if(!get_ptr(var_idx,&value_ptr,&type))return;
   switch(type){
-    case vt_float: *(_var_float*)value_ptr=value;break;
+    case vt_float:*(_var_float*)value_ptr=value;break;
     case vt_vect: (*(_var_vect*)value_ptr)[member_idx]=value;break;
-    case vt_uint:
-      if(member_idx) (*(_var_uint*)value_ptr)=(value==0.0)?((*(_var_uint*)value_ptr)&(~member_idx)):((*(_var_uint*)value_ptr)|member_idx);
-      else *(_var_uint*)value_ptr=value;
+    case vt_uint: *(_var_uint*)value_ptr=value;break;
+    case vt_bits:
+      if(member_idx) (*(_var_bits*)value_ptr)=(value==0.0)?((*(_var_bits*)value_ptr)&(~member_idx)):((*(_var_bits*)value_ptr)|member_idx);
+      else *(_var_bits*)value_ptr=value;
       break;
   }
 }
 //=============================================================================
-bool MandalaCore::get_value_ptr(uint var_idx,void **value_ptr,uint*type)
+bool MandalaCore::get_ptr(uint var_idx,void **value_ptr,uint*type)
 {
   switch (var_idx) {
     #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
@@ -235,16 +237,23 @@ uint MandalaCore::pack_float_4(void *buf,void *value_ptr,_var_float span)
 uint MandalaCore::pack_uint_1(void *buf,void *value_ptr,_var_float span)
 {
   (void)span;
-  uint v=*((uint*)value_ptr);
+  uint v=*((_var_uint*)value_ptr);
   if(v>0xFF)v=0xFF;
   *((uint8_t*)buf)=v;
+  return 1;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_bits_1(void *buf,void *value_ptr,_var_float span)
+{
+  (void)span;
+  *((uint8_t*)buf)=*((_var_bits*)value_ptr);
   return 1;
 }
 //------------------------------------------------------------------------------
 uint MandalaCore::pack_uint_2(void *buf,void *value_ptr,_var_float span)
 {
   (void)span;
-  uint v=*((uint*)value_ptr);
+  uint v=*((_var_uint*)value_ptr);
   if(v>0xFFFF)v=0xFFFF;
   *((uint16_t*)buf)=v;
   return 2;
@@ -253,7 +262,7 @@ uint MandalaCore::pack_uint_2(void *buf,void *value_ptr,_var_float span)
 uint MandalaCore::pack_uint_4(void *buf,void *value_ptr,_var_float span)
 {
   (void)span;
-  uint v=*((uint*)value_ptr);
+  uint v=*((_var_uint*)value_ptr);
   *((uint32_t*)buf)=v;
   return 4;
 }
@@ -373,24 +382,31 @@ uint MandalaCore::unpack_float_4(void *buf,void *value_ptr,_var_float span)
   return 4;
 }
 //------------------------------------------------------------------------------
+uint MandalaCore::unpack_bits_1(void *buf,void *value_ptr,_var_float span)
+{
+  (void)span;
+  *((_var_bits*)value_ptr)=*((uint8_t*)buf);
+  return 1;
+}
+//------------------------------------------------------------------------------
 uint MandalaCore::unpack_uint_1(void *buf,void *value_ptr,_var_float span)
 {
   (void)span;
-  *((uint*)value_ptr)=*((uint8_t*)buf);
+  *((_var_uint*)value_ptr)=*((uint8_t*)buf);
   return 1;
 }
 //------------------------------------------------------------------------------
 uint MandalaCore::unpack_uint_2(void *buf,void *value_ptr,_var_float span)
 {
   (void)span;
-  *((uint*)value_ptr)=*((uint16_t*)buf);
+  *((_var_uint*)value_ptr)=*((uint16_t*)buf);
   return 2;
 }
 //------------------------------------------------------------------------------
 uint MandalaCore::unpack_uint_4(void *buf,void *value_ptr,_var_float span)
 {
   (void)span;
-  *((uint*)value_ptr)=*((uint32_t*)buf);
+  *((_var_uint*)value_ptr)=*((uint32_t*)buf);
   return 4;
 }
 //------------------------------------------------------------------------------

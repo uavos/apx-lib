@@ -88,17 +88,20 @@ class Mandala : public MandalaCore
 public:
   _uav_id         id;
 
-  const char *    var_name[256];  //text name
-  const char *    var_descr[256]; //text description
-  uint            var_size[256];  //size of whole packed var
-  void *          var_ptr[256];
-  uint            var_type[256];
-  _var_float      var_span[256];
+  bool get_params(uint var_idx,uint member_idx,void **value_ptr,uint *type,uint8_t *mask,const char **name,const char **descr);
+  const char *var_name(uint var_idx);
+  //const char *  var_name[256];          //text name
+  //const char *  var_descr[256];         //text description
+  //const char *  var_bits_name[256][8];  // bit names
+  //const char *  var_bits_descr[256][8]; // bit descriptions
 
-  uint            var_bits[256];            // number of bitfield bits
-  uint8_t         var_bits_mask[256][8];    // bitmask of bitfield
-  const char      *var_bits_name[256][8];   // bit names
-  const char      *var_bits_descr[256][8];  // bit descriptions
+  //uint            var_size[256];  //size of whole packed var
+  //void *          var_ptr[256];
+  //uint            var_type[256];
+  //_var_float      var_span[256];
+
+  //uint            var_bits[256];            // number of bitfield bits
+  //uint8_t         var_bits_mask[256][8];    // bitmask of bitfield
 
   //---- flightplan ----
   _flightplan fp;
@@ -130,19 +133,18 @@ public:
   uint extract(uint8_t *buf,uint cnt,uint var_idx);
 
   //-----------------------------------------------------------------------------
-  //overload - check buf size
+  //extended - check buf size
   uint archive(uint8_t *buf,uint size,uint var_idx);
   uint extract(uint8_t *buf,uint size); //overloaded - first byte=var_idx
   //-----------------------------------------------------------------------------
 
-  uint sig_size(_var_signature signature);
+  //uint sig_size(_var_signature signature);
 
   //-----------------------------------------------------------------------------
   // additional methods (debug, math, NAV helper functions)
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
   void dump(const _var_vect &v,const char *str="");
   void dump(const uint var_idx);
-  void print_report(FILE *stream);
 
   // math operations
   _var_float boundAngle(_var_float v,_var_float span=180.0);
