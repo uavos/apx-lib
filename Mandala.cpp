@@ -33,15 +33,6 @@ Mandala::Mandala()
 }
 void Mandala::init(void)
 {
-  /*for (uint i=0;i<256;i++) {
-    var_name[i]="";
-    var_descr[i]="";
-    //var_bits[i]=0;
-    //var_span[i]=0;
-    //var_ptr[i]=NULL;
-    //var_type[i]=vt_void;
-  }*/
-
   memset(&fp,0,sizeof(fp));
 
   dl_frcnt=0;
@@ -55,22 +46,8 @@ void Mandala::init(void)
   //------------------------
 
 #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
-  /*var_ptr[idx_##aname]=(void*)(& aname); \
-  var_type[idx_##aname]=vt_##atype; \
-  var_size[idx_##aname]=((abytes)*((vt_##atype==vt_vect)?3:1)); \
-  var_span[idx_##aname]=aspan; \
-  var_name[idx_##aname]=#aname; \
-  var_descr[idx_##aname]=adescr;*/ \
   aname=0;
 #include "MandalaVars.h"
-
-/*#define SIGDEF(aname,adescr,...) \
-  var_ptr[idx_##aname]=(void*)(& aname); \
-  var_type[idx_##aname]=vt_sig; \
-  var_size[idx_##aname]=sig_size(aname); \
-  var_name[idx_##aname]=#aname; \
-  var_descr[idx_##aname]=adescr;
-#include "MandalaVars.h"*/
 
   //------------------------
 
@@ -79,24 +56,6 @@ void Mandala::init(void)
   for(uint i=0;i<wtCnt;i++) wt_str[i]=wt_str_s[i];
   static const char *rwa_str_s[rwaCnt]={ rwa_str_def };
   for(uint i=0;i<rwaCnt;i++) rwa_str[i]=rwa_str_s[i];
-
-
-  //bitfield strings
-  //uint bit_var=256,bit_idx=0;
-  //memset(var_bits_mask,0,sizeof(var_bits_mask));
-  //memset(var_bits_name,0,sizeof(var_bits_name));
-  //memset(var_bits_descr,0,sizeof(var_bits_descr));
-//  bidx=(int)(log(amask)/log(2));
-//#define BITDEF(avarname,abitname,amask,adescr) var_bits[idx_##avarname]++;
-//#include "MandalaVars.h"
-
-/*#define BITDEF(avarname,abitname,amask,adescr) \
-  if(bit_var!=idx_##avarname){bit_var=idx_##avarname;bit_idx=0;}\
-  var_bits_mask[idx_##avarname][bit_idx]= avarname##_##abitname; \
-  var_bits_name[idx_##avarname][bit_idx]= #abitname ;\
-  var_bits_descr[idx_##avarname][bit_idx]= adescr ;\
-  bit_idx++;
-#include "MandalaVars.h"*/
 }
 //===========================================================================
 bool Mandala::fill_params(uint var_idx,uint member_idx,void **value_ptr,uint *type,uint8_t *mask,const char **name,const char **descr)
@@ -161,15 +120,6 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   if(size&&(var_idx>idxPAD)&&(var_idx<idx_vars_top))return cnt+unpack(buf+cnt,size,var_idx);
   else return cnt;
 }
-//=============================================================================
-/*uint Mandala::sig_size(_var_signature signature)
-{
-  uint scnt=signature[0];
-  signature++;
-  uint cnt=0;
-  while (scnt--) cnt+=var_size[*signature++];
-  return cnt;
-}*/
 //=============================================================================
 //=============================================================================
 uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)

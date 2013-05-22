@@ -90,18 +90,6 @@ public:
 
   bool fill_params(uint var_idx,uint member_idx,void **value_ptr,uint *type,uint8_t *mask,const char **name,const char **descr);
   const char *get_var_name(uint var_idx);
-  //const char *  var_name[256];          //text name
-  //const char *  var_descr[256];         //text description
-  //const char *  var_bits_name[256][8];  // bit names
-  //const char *  var_bits_descr[256][8]; // bit descriptions
-
-  //uint            var_size[256];  //size of whole packed var
-  //void *          var_ptr[256];
-  //uint            var_type[256];
-  //_var_float      var_span[256];
-
-  //uint            var_bits[256];            // number of bitfield bits
-  //uint8_t         var_bits_mask[256][8];    // bitmask of bitfield
 
   //---- flightplan ----
   _flightplan fp;
@@ -137,8 +125,6 @@ public:
   uint archive(uint8_t *buf,uint size,uint var_idx);
   uint extract(uint8_t *buf,uint size); //overloaded - first byte=var_idx
   //-----------------------------------------------------------------------------
-
-  //uint sig_size(_var_signature signature);
 
   //-----------------------------------------------------------------------------
   // additional methods (debug, math, NAV helper functions)
