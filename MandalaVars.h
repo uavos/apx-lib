@@ -28,7 +28,7 @@
 #define idxPAD  64      //start index for regular vars
 //-----------------------------------------------------------------------------
 // Var Type enum
-enum {vt_void,vt_uint,vt_float,vt_vect,vt_bits,vt_sig};
+enum {vt_void=0,vt_uint,vt_float,vt_vect,vt_bits,vt_sig};
 //=============================================================================
 // Physical constants
 #define EARTH_RATE   0.00007292115   // rotation rate of earth (rad/sec)

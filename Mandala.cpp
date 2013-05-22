@@ -99,7 +99,7 @@ void Mandala::init(void)
 #include "MandalaVars.h"*/
 }
 //===========================================================================
-bool Mandala::get_params(uint var_idx,uint member_idx,void **value_ptr,uint *type,uint8_t *mask,const char **name,const char **descr)
+bool Mandala::fill_params(uint var_idx,uint member_idx,void **value_ptr,uint *type,uint8_t *mask,const char **name,const char **descr)
 {
   if(!get_ptr(var_idx,value_ptr,type))return false;
   *mask=0;
@@ -110,7 +110,7 @@ bool Mandala::get_params(uint var_idx,uint member_idx,void **value_ptr,uint *typ
     uint bit_var=256,bit_idx=0;
     #define BITDEF(avarname,abitname,amask,adescr) \
     if(bit_var!=idx_##avarname){bit_var=idx_##avarname;bit_idx=0;}\
-    if(member_idx==bit_idx){*mask=avarname##_##abitname;*name=#abitname;*descr=adescr;return true;}\
+    if(var_idx==idx_##avarname && member_idx==bit_idx){*mask=avarname##_##abitname;*name=#abitname;*descr=adescr;return true;}\
     bit_idx++;
     #include "MandalaVars.h"
     if(member_idx)return false;
@@ -132,7 +132,7 @@ uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
   //basic vars
   uint cnt=pack(buf,var_idx);
   if(!cnt)return 0;
-  return cnt;//var_size[var_idx];
+  return cnt;
 }
 //=============================================================================
 uint Mandala::extract(uint8_t *buf,uint size)
@@ -410,15 +410,15 @@ uint Mandala::extract_setb(uint8_t *buf,uint cnt)
   void *value_ptr;
   bool bChk=cnt==2;
   bChk=bChk&&get_ptr(var_idx,&value_ptr,&type);
-  bChk=bChk&&(type==vt_uint);
+  bChk=bChk&&(type==vt_bits);
   //bChk=bChk&&(var_bits[var_idx]);
   //bChk=bChk&&(var_bits_mask[var_idx][0]);
   if(!bChk){
     fprintf(stderr,"Can't extract 'set_bit'. Integrity check error.");
     return 0;
   }
-  _var_uint *ptr;
-  ptr=(_var_uint*)value_ptr;
+  _var_bits *ptr;
+  ptr=(_var_bits*)value_ptr;
   *ptr|=buf[1];
   return cnt;
 }
@@ -430,14 +430,14 @@ uint Mandala::extract_clrb(uint8_t *buf,uint cnt)
   void *value_ptr;
   bool bChk=cnt==2;
   bChk=bChk&&get_ptr(var_idx,&value_ptr,&type);
-  bChk=bChk&&(type==vt_uint);
+  bChk=bChk&&(type==vt_bits);
   if(!bChk){
     fprintf(stderr,"Can't extract 'clr_bit'. Integrity check error.");
     return 0;
   }
-  _var_uint *ptr;
-  ptr=(_var_uint*)value_ptr;
-  *ptr&=~((_var_uint)buf[1]);
+  _var_bits *ptr;
+  ptr=(_var_bits*)value_ptr;
+  *ptr&=~((_var_bits)buf[1]);
   return cnt;
 }
 //=============================================================================
@@ -671,14 +671,14 @@ const _var_vect Mandala::llh2ECEF(const _var_vect &llh)
 }
 //=============================================================================
 //=============================================================================
-const char *Mandala::var_name(uint var_idx)
+const char *Mandala::get_var_name(uint var_idx)
 {
   uint type;
   void *value_ptr;
   uint8_t mask;
   const char *name;
   const char *descr;
-  get_params(var_idx,0,&value_ptr,&type,&mask,&name,&descr);
+  fill_params(var_idx,0,&value_ptr,&type,&mask,&name,&descr);
   return name;
 }
 //=============================================================================
@@ -699,7 +699,7 @@ void Mandala::dump(const uint var_idx)
   uint8_t mask;
   const char *name;
   const char *descr;
-  get_params(var_idx,0,&value_ptr,&type,&mask,&name,&descr);
+  fill_params(var_idx,0,&value_ptr,&type,&mask,&name,&descr);
   printf("%s: ",name);
   switch(type){
     case vt_uint:  printf("%u",*((_var_uint*)value_ptr));break;

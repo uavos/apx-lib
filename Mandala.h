@@ -88,8 +88,8 @@ class Mandala : public MandalaCore
 public:
   _uav_id         id;
 
-  bool get_params(uint var_idx,uint member_idx,void **value_ptr,uint *type,uint8_t *mask,const char **name,const char **descr);
-  const char *var_name(uint var_idx);
+  bool fill_params(uint var_idx,uint member_idx,void **value_ptr,uint *type,uint8_t *mask,const char **name,const char **descr);
+  const char *get_var_name(uint var_idx);
   //const char *  var_name[256];          //text name
   //const char *  var_descr[256];         //text description
   //const char *  var_bits_name[256][8];  // bit names
