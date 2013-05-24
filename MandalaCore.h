@@ -107,7 +107,7 @@ class MandalaCore
 public:
   MandalaCore();
   uint pack(uint8_t *buf,uint var_idx);
-  uint unpack(uint8_t *buf,uint cnt,uint var_idx);
+  virtual uint unpack(uint8_t *buf,uint cnt,uint var_idx);
   uint unpack_stream(uint8_t *buf,uint cnt);
   bool get_ptr(uint var_idx,void **value_ptr,uint *type);
 
@@ -156,6 +156,7 @@ protected:
   uint pack_uint_4(void *buf,void *value_ptr,_var_float span);
   uint pack_vect_1(void *buf,void *value_ptr,_var_float span);
   uint pack_vect_2(void *buf,void *value_ptr,_var_float span);
+  uint pack_vect_4(void *buf,void *value_ptr,_var_float span);
   uint pack_sig(void *buf,void *value_ptr);
   //unpack
   uint unpack_float_1(void *buf,void *value_ptr,_var_float span);
@@ -167,6 +168,7 @@ protected:
   uint unpack_uint_4(void *buf,void *value_ptr,_var_float span);
   uint unpack_vect_1(void *buf,void *value_ptr,_var_float span);
   uint unpack_vect_2(void *buf,void *value_ptr,_var_float span);
+  uint unpack_vect_4(void *buf,void *value_ptr,_var_float span);
   uint unpack_sig(void *buf,uint cnt,void *value_ptr);
 
 };
