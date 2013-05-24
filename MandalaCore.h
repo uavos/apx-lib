@@ -32,6 +32,13 @@
 #define assert(...)
 #endif
 //=============================================================================
+//virtual members don't work for ARM
+#ifndef __arm__
+#define MANDALA_VIRTUAL virtual
+#else
+#define MANDALA_VIRTUAL
+#endif
+//=============================================================================
 #ifdef USE_FLOAT_TYPE
 typedef float   _var_float;
 #else
@@ -107,7 +114,7 @@ class MandalaCore
 public:
   MandalaCore();
   uint pack(uint8_t *buf,uint var_idx);
-  virtual uint unpack(uint8_t *buf,uint cnt,uint var_idx);
+  MANDALA_VIRTUAL uint unpack(uint8_t *buf,uint cnt,uint var_idx);
   uint unpack_stream(uint8_t *buf,uint cnt);
   bool get_ptr(uint var_idx,void **value_ptr,uint *type);
 
