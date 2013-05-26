@@ -3,33 +3,34 @@
 #include <inttypes.h>
 #include <sys/types.h>
 //=============================================================================
-#define BUS_MAX_PACKET          2048    //2k MAX
+#define BUS_MAX_PACKET          1024    //2k MAX
 //=============================================================================
 // node information, dynamically assigned values
-typedef uint8_t _node_sn[12]; //chip serial number
-typedef uint8_t _node_name[16]; //device name string
-typedef uint8_t _node_version[16]; //fw version string
+typedef uint8_t _node_sn[12];           //chip serial number
+typedef uint8_t _node_name[16];         //device name string
+typedef uint8_t _node_hardware[16];     //device hardware string
+typedef uint8_t _node_version[16];      //fw version string
 //-------------------------------------------------
 // firmware information, saved in FLASH section [CONFIG]
 typedef struct {
   _node_name    name;
   _node_version version;
-  uint8_t       crc;
-  uint32_t      size;
-}__attribute__((packed)) _fw_info;
+  _node_version hardware;
+  uint32_t      size;   //program memory size
+}__attribute__((packed)) _node_info;
 // node information, filled by hwInit, saved in RAM
 typedef struct{
   uint8_t     err_cnt;        // errors counter
   uint8_t     can_rxc;        // CAN received packets counter
   uint8_t     can_adr;        // CAN address
   uint8_t     can_err;        // CAN errors counter
-  uint8_t     dump[8];        // error dump
+  uint8_t     dump[16];       // error dump or special info
 }_node_status;
 typedef struct{
   _node_sn      sn;     //serial number
-  _fw_info      fw;     //firmware info
+  _node_info    info;   //firmware/hardware info
   _node_status  status; //dynamic status
-}__attribute__((packed)) _node_info;
+}__attribute__((packed)) _node;
 //=============================================================================
 // bus packet structure:
 // <tag> is an optional byte (stored in conf)
@@ -63,19 +64,20 @@ enum{
   apc_ack=0,    //acknowledge - sent back in response to commands
   //------------------
   //system commands
-  apc_info,     //return _fw_info
+  apc_info,     //return _node_info
   apc_nstat,    //return _node_name + _node_status
   apc_debug,    //debug message
   apc_reboot,   //reset/reboot node
   apc_mute,     //stop sending data (sensors)
+  apc_reconf,   //reset all conf to defaults
 
   //------------------
   //conf
-  apc_fields=32,        //return conf descriptor
-  apc_commands,         //return node commands descrptor
-  apc_rconf,            //return _node_conf structure
-  apc_wconf,            //save _node_conf
-  apc_econf,            //reset conf to defaults
+  apc_conf_inf=32,      //return _conf_inf structure
+  apc_conf_cmds,        //return node commands descrptor
+  apc_conf_dsc,         //return <num> parameter descriptor, or all if <num>=0xFF
+  apc_conf_read,        //return parameter <num>, or all if <num>=0xFF
+  apc_conf_write,       //save parameter <num>,<data>, or all if <num>=0xFF
 
   //------------------
   //standard commands
@@ -112,62 +114,109 @@ typedef struct{
 //=============================================================================
 // NODE CONF typedefs
 //=============================================================================
-enum{pt_pwm,pt_out,pt_inp,pt_adc}; //type of port
+typedef uint8_t   _ft_option;
+typedef uint16_t  _ft_varmsk;
+typedef uint16_t  _ft_uint;
+typedef float     _ft_float;
+typedef uint8_t   _ft_byte;
+typedef uint8_t   _ft_string[16];
 typedef struct{
-    uint8_t var_idx;    //i.e. ctr_ailerons or any other
-    uint8_t bitmask;    //mask if var bitfield or vect idx or array idx
-    int8_t  mult;       //multiplier (x0.1) -127[-12.7]..+127[+12.7]
-    int8_t  diff;       //differential multiplier (x0.01+1) for pos/neg var value
-    uint8_t weight;     //weight to set port value 0..255
-    uint8_t speed;      //speed of change (x0.1) 0..25.5
-    uint8_t port;       //output port number 0...x
-    uint8_t type;       //type of port
+  _ft_float x;
+  _ft_float y;
+  _ft_float z;
+}__attribute__((packed)) _vec;
+typedef _vec      _ft_vec;
+typedef struct{
+  _ft_varmsk varmsk;  //var idx with mask
+  int8_t  mult;       //multiplier (x0.1) -127[-12.7]..+127[+12.7]
+  int8_t  diff;       //differential multiplier (x0.01+1) for pos/neg var value
+  uint8_t speed;      //speed of change (x0.1) 0..25.5
+  uint8_t pwm_ch;     //pwm channel number 0...x
 }__attribute__((packed)) _ctr;
+typedef _ctr      _ft_ctr;
 typedef struct {
   int8_t zero;          //pwm zero shift -127[-1]..+127[+1]
   int8_t max;           //pwm maximum -127[-1]..+127[+1]
   int8_t min;           //pwm minimum -127[-1]..+127[+1]
 }__attribute__((packed)) _pwm;
-typedef struct {
-  uint8_t dummy;
-}__attribute__((packed)) _out;
-//-----------------------------------------------------------------------------
-typedef struct {
-  uint8_t  protocol;    //protocol
-  uint32_t baudrate;    //baud rate for some protocols
-}__attribute__((packed)) _serial;
-//-----------------------------------------------------------------------------
-typedef struct {
-  uint8_t  type;        //input capture type
-  uint8_t  var_idx;     //i.e. ctr_ailerons or any other
-  uint8_t  bitmask;    //mask if var bitfield or vect idx or array idx
-}__attribute__((packed)) _capture;
-//-----------------------------------------------------------------------------
-typedef uint8_t   _ft_option;
-typedef uint16_t  _ft_uint;
-typedef float     _ft_float;
-typedef _ctr      _ft_ctr;
 typedef _pwm      _ft_pwm;
-typedef _out      _ft_out;
-typedef _serial   _ft_serial;
-typedef _capture  _ft_capture;
-typedef uint8_t   _ft_byte;
-typedef uint8_t   _ft_string[16];
+typedef struct {
+  _ft_varmsk varmsk;  //var idx with mask
+  _ft_byte   opt;     //option: b7=1 if INVERTED, b[0:6]=protocol
+  _ft_float  mult;    //multiplier
+}__attribute__((packed)) _gpio;
+typedef _gpio     _ft_gpio;
 //-----------------------------------------------------------------------------
+typedef struct {
+  _ft_option protocol;    //protocol
+  _ft_float  baudrate;    //baud rate for some protocols
+  _ft_byte   port_id;     //port_id for 'data' packets
+}__attribute__((packed)) _serial;
+typedef _serial   _ft_serial;
+//-----------------------------------------------------------------------------
+//APCFG support
+typedef struct {
+  _ft_float  Kp;
+  _ft_byte   Lp;
+  _ft_float  Kd;
+  _ft_byte   Ld;
+  _ft_float  Ki;
+  _ft_byte   Li;
+  _ft_byte   Lo;
+}__attribute__((packed)) _regPID;
+typedef _regPID  _ft_regPID;
+typedef struct {
+  _ft_float  Kp;
+  _ft_byte   Lp;
+  _ft_float  Ki;
+  _ft_byte   Li;
+  _ft_byte   Lo;
+}__attribute__((packed)) _regPI;
+typedef _regPI  _ft_regPI;
+typedef struct {
+  _ft_float  Kp;
+  _ft_byte   Lo;
+}__attribute__((packed)) _regP;
+typedef _regP  _ft_regP;
+typedef struct {
+  _ft_float  Kpp;
+  _ft_byte   Lpp;
+  _ft_float  Kp;
+  _ft_byte   Lp;
+  _ft_float  Ki;
+  _ft_byte   Li;
+  _ft_byte   Lo;
+}__attribute__((packed)) _regPPI;
+typedef _regPPI  _ft_regPPI;
+//=============================================================================
 typedef enum{
+  //basic
   ft_option=0,
+  ft_varmsk,
   ft_uint,
   ft_float,
-  ft_ctr,
-  ft_pwm,
-  ft_out,
-  ft_serial,
-  ft_capture,
   ft_byte,
   ft_string,
+  //expandable
+  ft_vec,
+  ft_ctr,
+  ft_pwm,
+  ft_gpio,
+  ft_serial,
+  //apcfg
+  ft_regPID,
+  ft_regPI,
+  ft_regP,
+  ft_regPPI,
   //---------
   ft_cnt
 }_node_ft;
+//-----------------------------------------------------------------------------
+typedef struct{
+  uint8_t       cnt;    //number of parameters
+  uint16_t      size;   //total size of 'conf' structure [bytes]
+  uint32_t      mn;     //magic number
+}__attribute__((packed)) _conf_inf;
 //=============================================================================
 #endif
 

@@ -31,15 +31,19 @@ typedef float   _mat_float;
 #else
 typedef double  _mat_float;
 #endif
+typedef int index_t;
 //=============================================================================
+#define cos cosf
+#define sin sinf
+#define sqrt sqrtf
+#define pow powf
 //=============================================================================
 // VECTOR
 //=============================================================================
-template<const int n=3,class T=_mat_float>
+template<const index_t n=3,class T=_mat_float>
 class Vector {
 public:
   T v[n];
-  typedef unsigned int index_t;
   Vector() {this->fill();}
   Vector(const T &s) { this->fill(s); }
   Vector(const T &s0,const T &s1) {
@@ -111,8 +115,8 @@ public:
   }
 
 //acess by index
-  T & operator[](unsigned int index) {return this->v[index];}
-  const T & operator[](unsigned int index) const {return this->v[index];}
+  T & operator[](index_t index) {return this->v[index];}
+  const T & operator[](index_t index) const {return this->v[index];}
 
 //multiply to scalar
   const Vector operator*(const T &scale) const {return Vector(*this)*=scale;}
@@ -147,7 +151,7 @@ public:
 }; //Vector class
 //------------------------------------------------------------------------------
 //Multiplication is commutative.
-template<const int n,class T1,class T2>
+template<const index_t n,class T1,class T2>
 Vector<n,T1> operator * (const T2 & s,const Vector<n,T1> & v) {return v*s;}
 
 //cross product
@@ -160,19 +164,17 @@ const Vector<3,T> cross(const Vector<3,T> &a,const Vector<3,T> &b) {
 }
 
 //Splice extracts a portion of a vector
-template<const int size,const int n,class T>
-const Vector<size,T> slice(const Vector<n,T> &v,const int start) {
-  typedef typename Vector<n,T>::index_t index_t;
+template<const index_t size,const index_t n,class T>
+const Vector<size,T> slice(const Vector<n,T> &v,const index_t start) {
   Vector<size,T> out;
   for (index_t i= 0 ; i < size ; i++)
     out[i] = v[i+start];
   return out;
 }
 
-//insert a vector into a larger vector and returns the larger vector
-template<const int n,class T1,const int size,class T2>
-Vector<n,T1> &insert(Vector<n,T1> &v,int start,const Vector<size,T2> &in) {
-  typedef typename Vector<n,T1>::index_t index_t;
+//insert a vector index_to a larger vector and returns the larger vector
+template<const index_t n,class T1,const index_t size,class T2>
+Vector<n,T1> &insert(Vector<n,T1> &v,index_t start,const Vector<size,T2> &in) {
   for (index_t i=0 ; i<size ; i++)
     v[i + start] = in[i];
   return v;
@@ -180,11 +182,10 @@ Vector<n,T1> &insert(Vector<n,T1> &v,int start,const Vector<size,T2> &in) {
 //=============================================================================
 // MATRIX
 //=============================================================================
-template<const int n,const int m,class T = _mat_float> //rows,cols
+template<const index_t n,const index_t m,class T = _mat_float> //rows,cols
 class Matrix {
 public:
   Vector<m,T> M[n];
-  typedef typename Vector<m,T>::index_t index_t;
   Matrix() {}
   Matrix(const T & value) {this->fill(value);}
   Matrix(const Vector<m> & v0) {
@@ -227,9 +228,9 @@ public:
       (*this)[i][col_i] = v[i];
   }
 
-//Insert a submatrix into the larger matrix
-  template<class T2, int n2, int m2>
-  void insert(int base_n, int base_m,const Matrix<n2,m2,T2> &M_i) {
+//Insert a submatrix index_to the larger matrix
+  template<class T2, index_t n2, index_t m2>
+  void insert(index_t base_n, index_t base_m,const Matrix<n2,m2,T2> &M_i) {
     for (index_t i=0 ; i<n2 ; i++)
       for (index_t j=0 ; j<m2 ; j++)
         (*this)[i+base_n][j+base_m] = M_i[i][j];
@@ -261,7 +262,7 @@ public:
   }
 
 //multiplication
-  template<int p> const Matrix<n,p,T>
+  template<index_t p> const Matrix<n,p,T>
   operator*(const Matrix<m,p,T> & B) const {
     Matrix<n,p,T> C;
     const Matrix<n,m,T> & A(*this);
@@ -373,9 +374,8 @@ public:
 }; //Matrix
 //------------------------------------------------------------------------------
 //Vector<n> = Matrix<n,m> * Vector<m>
-template<const int n,const int m,class T>
+template<const index_t n,const index_t m,class T>
 const Vector<n,T> operator*(const Matrix<n,m,T> & A,const Vector<m,T> & b) {
-  typedef typename Vector<n,T>::index_t index_t;
   Vector<n,T> c;
   for (index_t i=0 ; i<n ; i++)
     c[i] = A[i] * b;
@@ -383,9 +383,8 @@ const Vector<n,T> operator*(const Matrix<n,m,T> & A,const Vector<m,T> & b) {
 }
 
 //Vector<m> = Vector<n> * Matrix<n,m>
-template<const int n,const int m,class T>
+template<const index_t n,const index_t m,class T>
 const Vector<m,T> operator*(const Vector<n,T> & a,const Matrix<n,m,T> & B) {
-  typedef typename Vector<n,T>::index_t index_t;
   Vector<m,T> c;
   for (index_t i=0 ; i<m ; i++) {
     T s(0);
@@ -397,9 +396,8 @@ const Vector<m,T> operator*(const Vector<n,T> & a,const Matrix<n,m,T> & B) {
 }
 
 //Matrix<n,n> = Vector<n> * transpose(Vector<n>)
-template<const int n,class T>
+template<const index_t n,class T>
 const Matrix<n,n,T> mult_T(const Vector<n,T> & a,const Vector<n,T> & b) {
-  typedef typename Vector<n,T>::index_t index_t;
   Matrix<n,n,T> m;
   for (index_t i=0 ; i<n ; i++)
     for (index_t j=0 ; j<n ; j++)
@@ -408,7 +406,7 @@ const Matrix<n,n,T> mult_T(const Vector<n,T> & a,const Vector<n,T> & b) {
 }
 
 //three way multiplication
-template<const int n,const int m,const int p,const int q,class T>
+template<const index_t n,const index_t m,const index_t p,const index_t q,class T>
 const Matrix<n,q,T> mult3(const Matrix<n,m,T> & a,const Matrix<m,p,T> & b,const Matrix<p,q,T> & c) {
   if (n*m*p + n*p*q < m*p*q + n*m*q)
     return (a * b) * c;
@@ -417,9 +415,8 @@ const Matrix<n,q,T> mult3(const Matrix<n,m,T> & a,const Matrix<m,p,T> & b,const 
 }
 
 //sum of the diagonal elements in a square matrix
-template<const int N,class T>
+template<const index_t N,class T>
 _mat_float trace(const Matrix<N,N,T> & m) {
-  typedef typename Matrix<N,N,T>::index_t index_t;
   _mat_float t = 0;
   for (index_t i=0 ; i<N ; i++)
     t += m[i][i];
@@ -427,9 +424,8 @@ _mat_float trace(const Matrix<N,N,T> & m) {
 }
 
 //diagonal matrix
-template<const int N,class T>
+template<const index_t N,class T>
 const Matrix<N,N,T> diag(const Vector<N,T> & v) {
-  typedef typename Matrix<N,N,T>::index_t index_t;
   Matrix<N,N,T> m;
   for (index_t i=0 ; i<N ; i++)
     m[i][i]=v[i];
@@ -437,30 +433,30 @@ const Matrix<N,N,T> diag(const Vector<N,T> & v) {
 }
 
 // Make a square identity matrix
-/*template< const int n, class T >
+/*template< const index_t n, class T >
 const Matrix<n,n,T> eye() {
     Matrix<n,n,T> A;
-    for ( int i=0 ; i<n ; i++ ) A[i][i] = T(1);
+    for ( index_t i=0 ; i<n ; i++ ) A[i][i] = T(1);
     return A;
 }*/
 // Compute the LU factorization of a square matrix * A is modified, so we pass by value.
-template<const int n, class T >
+template<const index_t n, class T >
 void LU( Matrix<n,n,T> A, Matrix<n,n,T> & L, Matrix<n,n,T> & U ) {
-    for ( int k=0 ; k<n-1 ; k++ ) {
-        for ( int i=k+1 ; i<n ; i++ ) {
+    for ( index_t k=0 ; k<n-1 ; k++ ) {
+        for ( index_t i=k+1 ; i<n ; i++ ) {
             A[i][k] = A[i][k] / A[k][k];
-            for ( int j=k+1 ; j<n ; j++ ) {
+            for ( index_t j=k+1 ; j<n ; j++ ) {
                 A[i][j] -= A[i][k] * A[k][j];
             }
         }
     }
     L.eye(); /* Separate the L matrix */
-    for ( int j=0 ; j<n-1 ; j++ )
-      for ( int i=j+1 ; i<n ; i++ )
+    for ( index_t j=0 ; j<n-1 ; j++ )
+      for ( index_t i=j+1 ; i<n ; i++ )
         L[i][j] = A[i][j]; /* Separate the M matrix */
     U.fill();
-    for ( int i=0 ; i<n ; i++ )
-      for ( int j=i ; j<n ; j++ )
+    for ( index_t i=0 ; i<n ; i++ )
+      for ( index_t j=i ; j<n ; j++ )
         U[i][j] = A[i][j];
 }
 // Invert a matrix using LU. * Special case for a 1x1 and 2x2 matrix first
@@ -480,29 +476,29 @@ const Matrix<2,2,T> invert( const Matrix<2,2,T> & A ) {
     B[1][1] = A[0][0] / det;
     return B;
 }
-template< const int n, class T >
+template< const index_t n, class T >
 const Vector<n,T> solve_upper( const Matrix<n,n,T> & A, const Vector<n,T> & b ) {
     Vector<n,T> x;
-    for ( int i=n-1 ; i>=0 ; i-- ) {
+    for ( index_t i=n-1 ; i>=0 ; i-- ) {
         T s( b[i] );
         const Vector<n,T> & A_i( A[i] );
-        for ( int j=i+1 ; j<n ; ++j ) {
+        for ( index_t j=i+1 ; j<n ; ++j ) {
             s -= A_i[j]*x[j];
         } x[i] = s / A_i[i];
     } return x;
 }
-template< const int n, class T >
+template< const index_t n, class T >
 const Vector<n,T> solve_lower( const Matrix<n,n,T> & A, const Vector<n,T> & b ) {
     Vector<n,T> x;
-    for ( int i=0; i<n; ++i) {
+    for ( index_t i=0; i<n; ++i) {
         T s( b[i] );
         const Vector<n,T> & A_i( A[i] );
-        for ( int j=0; j<i; ++j) {
+        for ( index_t j=0; j<i; ++j) {
             s -= A_i[j] * x[j];
         } x[i] = s / A_i[i];
     } return x;
 }
-template< const int n, class T >
+template< const index_t n, class T >
 const Matrix<n,n,T> invert( const Matrix<n,n,T> & M ) {
     typedef Matrix<n,n,T> Matrix;
     typedef Vector<n,T> Vector;
@@ -512,7 +508,7 @@ const Matrix<n,n,T> invert( const Matrix<n,n,T> & M ) {
     Matrix invL;
     Vector identCol;
     LU( M, L, U );
-    for ( int i=0 ; i<n ; i++ ) {
+    for ( index_t i=0 ; i<n ; i++ ) {
         identCol[i] = T(1);
         invU.col( i, solve_upper( U, identCol ) );
         invL.col( i, solve_lower( L, identCol ) );
@@ -523,19 +519,17 @@ const Matrix<n,n,T> invert( const Matrix<n,n,T> & M ) {
 // DEBUG OUTPUT
 //=============================================================================
 //Output to the stream
-template<const int n,const int m,class T>
+template<const index_t n,const index_t m,class T>
 std::ostream &operator<<(std::ostream & out,const Matrix<n,m,T> &M) {
-  typedef typename Matrix<n,m,T>::index_t index_t;
   out << '[' << std::endl;
   for (index_t i=0 ; i < M.rows() ; i++)
     out << M[i] << std::endl;
   out << ']';
   return out;
 }
-template<class T,int n>
+template<class T,index_t n>
 std::ostream &operator<<(std::ostream &out,const Vector<n,T> &v)
 {
-  typedef typename Vector<n,T>::index_t index_t;
   out << '[';
   for(index_t i=0;i<v.size();i++)
     out<<' '<<v[i];

@@ -31,25 +31,33 @@
 #include "MandalaCore.h"
 #define printf(...) fprintf(stdout, __VA_ARGS__ )
 //=============================================================================
+// AP constants
+//=============================================================================
+#define AHRS_FREQ       100     // AHRS Update (main loop freq) [Hz]
+#define GPS_FREQ        5       // GPS Update rate (for derivatives) [Hz]
+#define CTR_FREQ        50      // ctr (fast servo) send rate [Hz]
+#define UPD_FREQ        5       // 'update' vars send rate [Hz]
+#define TELEMETRY_FREQ  10      // Telemetry send rate [Hz] MAX 10Hz!
+#define SIM_FREQ        10      // Simulator servo send rate [Hz]
+#define MAX_TELEMETRY   64      // max telemetry packet size [bytes]
+//=============================================================================
 // flight plan types
+#define MAX_WPCNT       100
+#define MAX_RWCNT       10
 typedef enum { wtHdg=0,wtLine,  wtCnt } _wpt_type;
+typedef enum { rwaLeft=0,rwaRight, rwaCnt } _rw_app;
 #define wt_str_def "Hdg","Line"
+#define rwa_str_def "Left","Right"
 typedef struct {
   _var_vect     LLA;  //lat,lon,agl
-  _wpt_type     type;
-  uint          cmdSize;
+  uint8_t       type;
+  uint8_t       cmdSize;
   uint8_t       cmd[128]; //TODO: implement wpt commands
 }_waypoint;
-//----------------------
-typedef enum { rwtApproach=0,rwtParachute,  rwtCnt } _rw_type;
-typedef enum { rwaLeft=0,rwaRight, rwaCnt } _rw_app;
-#define rwt_str_def "Approach","Parachute"
-#define rwa_str_def "Left","Right"
 typedef struct {
   _var_vect     LLA;  //start pos [lat lon agl]
   _var_vect     dNED;
-  _rw_type      rwType;
-  _rw_app       appType;
+  uint8_t       appType;
   _var_float    distApp;
   _var_float    altApp;
   _var_float    distTA;
@@ -57,8 +65,6 @@ typedef struct {
   //calculated
   _var_float    hdg;
 }_runway;
-#define MAX_WPCNT       100
-#define MAX_RWCNT       10
 typedef struct {
   _waypoint waypoints[MAX_WPCNT];
   _runway   runways[MAX_RWCNT];
@@ -77,73 +83,26 @@ typedef struct {
   uint8_t       nodes_cnt;      //number of nodes in the system
 }_uav_id;
 //=============================================================================
-//=============================================================================
-#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) CFGDEF(atype,aname,aspan,abytes,around,adescr)
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr) idx_cfg_##aname,
-enum {
-  #include "MandalaVarsAP.h"
-  cfgCnt
-};
-#define REGDEF(aname,adescr) reg##aname,
-enum {
-  #include "MandalaVarsAP.h"
-  regCnt
-};
-//=============================================================================
-//-----------------------------------------------------------------------------
-// config variable typedefs
-#define CFGDEFA(atype,aname,asize,aspan,abytes,around,adescr) typedef _var_##atype var_typedef_cfg_##aname [asize];
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr) typedef _var_##atype var_typedef_cfg_##aname;
-#include "MandalaVarsAP.h"
-//=============================================================================
 class Mandala : public MandalaCore
 {
 public:
   _uav_id         id;
 
-  const char *    var_name[256];  //text name
-  const char *    var_descr[256]; //text description
-  uint            var_size[256];  //size of whole packed var
-  void *          var_ptr[256];
-  uint            var_type[256];
-  double          var_span[256];
-
-  uint            var_bits[256];            // number of bitfield bits
-  uint8_t         var_bits_mask[256][8];    // bitmask of bitfield
-  const char      *var_bits_name[256][8];   // bit names
-  const char      *var_bits_descr[256][8];  // bit descriptions
-
-
-  //---- AP CFG Vars ----
-  struct {
-    const char *    var_name[cfgCnt];  //text name
-    const char *    var_descr[cfgCnt]; //text description
-    double          var_round[cfgCnt]; //round value for CFG vars
-    uint            var_size[cfgCnt];  //size of whole packed var
-    void *          var_ptr[cfgCnt];
-    uint            var_type[cfgCnt];
-    uint            var_array[cfgCnt];
-    uint            var_bytes[cfgCnt];
-    double          var_span[cfgCnt];
-  }cfg_dsc;
-  struct {
-#define CFGDEF(atype,aname,aspan,abytes,around,adescr)  var_typedef_cfg_##aname aname;
-#include "MandalaVarsAP.h"
-  }cfg;
+  bool fill_params(uint var_idx,uint member_idx,void **value_ptr,uint *type,uint8_t *mask,const char **name,const char **descr);
+  const char *get_var_name(uint var_idx);
 
   //---- flightplan ----
   _flightplan fp;
   const char *wt_str[wtCnt];    //wt_type string descr
-  const char *rwt_str[rwtCnt];  //wt_type string descr
   const char *rwa_str[rwaCnt];  //wt_type string descr
 
   //---- Internal use -----
   // telemetry framework
   uint8_t dl_id;                // received uav_id
-  uint8_t dl_snapshot[2048];    // all archived variables snapshot
   bool    dl_reset;             // set true to send everything next time
-  uint8_t dl_reset_mask[128/8]; // bitmask 1=var send anyway, auto clear after sent
-  uint8_t dl_var[32];           // one var max size (tmp buf)
+  uint8_t dl_snapshot[1024];    // all archived variables snapshot
+  uint8_t dl_reset_mask[(idx_vars_top-idxPAD)/8+(((idx_vars_top-idxPAD)&3)?1:0)]; // bitmask 1=send var, auto clear after sent
+  uint8_t dl_var[3*4];          // one var max size (tmp buf)
   //filled by extract_downstream
   uint          dl_frcnt;       // downlink frame cnt (inc by extract_downlink)
   uint          dl_errcnt;      // errors counter (by extract_downlink)
@@ -154,70 +113,59 @@ public:
   uint          dl_size;        // last telemetry size statistics
   bool          dl_hd_save;     // to watch change in alt_bytecnt
 
-  //---- PIDs ----
-  const char      *reg_names[regCnt];
-  const char      *reg_descr[regCnt];
-
 //=============================================================================
   Mandala();
+  void init(void);
   //-----------------------------------------------------------------------------
   // Core overload
-  //uint archive(uint8_t *buf,uint var_idx);
   uint extract(uint8_t *buf,uint cnt,uint var_idx);
-//public:
+
   //-----------------------------------------------------------------------------
-  //overload - check buf size
+  //extended - check buf size
   uint archive(uint8_t *buf,uint size,uint var_idx);
   uint extract(uint8_t *buf,uint size); //overloaded - first byte=var_idx
   //-----------------------------------------------------------------------------
-
-  uint sig_size(_var_signature signature);
 
   //-----------------------------------------------------------------------------
   // additional methods (debug, math, NAV helper functions)
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
   void dump(const _var_vect &v,const char *str="");
   void dump(const uint var_idx);
-  void print_report(FILE *stream);
 
   // math operations
-  double boundAngle(double v,double span=180.0);
-  _var_vect boundAngle(const _var_vect &v,double span=180.0);
+  _var_float boundAngle(_var_float v,_var_float span=180.0);
+  _var_vect boundAngle(const _var_vect &v,_var_float span=180.0);
   uint snap(uint v, uint snapv=10);
-  double hyst(double err,double hyst);
-  double limit(const double v,const double vL=1.0);
-  double limit(const double v,const double vMin,const double vMax);
-  double ned2hdg(const _var_vect &ned,bool back=false); //return heading to NED frm (0,0,0)
-  double ned2dist(const _var_vect &ned); //return distance to to NED frm (0,0,0)
+  _var_float hyst(_var_float err,_var_float hyst);
+  _var_float limit(const _var_float v,const _var_float vL=1.0);
+  _var_float limit(const _var_float v,const _var_float vMin,const _var_float vMax);
+  _var_float ned2hdg(const _var_vect &ned,bool back=false); //return heading to NED frm (0,0,0)
+  _var_float ned2dist(const _var_vect &ned); //return distance to to NED frm (0,0,0)
   const _var_vect lla2ned(const _var_vect &lla);  // return NED from Lat Lon AGL
 
   void calc(void); // calculate vars dependent on current and desired UAV position
 
   const _var_vect llh2ned(const _var_vect llh);
   const _var_vect llh2ned(const _var_vect llh,const _var_vect home_llh);
-  const _var_vect rotate(const _var_vect &v_in,const double theta);
+  const _var_vect rotate(const _var_vect &v_in,const _var_float theta);
   const _var_vect rotate(const _var_vect &v_in,const _var_vect &theta);
-  const _var_vect LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const double lat,const double lon);
-  const _var_vect ECEF_dist(const _var_vect &ecef1,const _var_vect &ecef2,const double lat,const double lon);
-  const _var_vect ECEF2Tangent(const _var_vect &ECEF,const double latitude,const double longitude);
-  const _var_vect Tangent2ECEF(const _var_vect &Local,const double latitude,const double longitude);
+  const _var_vect LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const _var_float lat,const _var_float lon);
+  const _var_vect ECEF_dist(const _var_vect &ecef1,const _var_vect &ecef2,const _var_float lat,const _var_float lon);
+  const _var_vect ECEF2Tangent(const _var_vect &ECEF,const _var_float latitude,const _var_float longitude);
+  const _var_vect Tangent2ECEF(const _var_vect &Local,const _var_float latitude,const _var_float longitude);
   const _var_vect ECEF2llh(const _var_vect &ECEF);
   const _var_vect llh2ECEF(const _var_vect &llh);
   const _var_vect ned2llh(const _var_vect &ned);
   const _var_vect ned2llh(const _var_vect &ned,const _var_vect &home_llh);
-  double sqr(double x);
-  double inHgToAltitude(double inHg);
+  _var_float sqr(_var_float x);
 private:
   // some special protocols
-  void fill_config_vdsc(uint8_t *buf,uint i);
-  uint archive_config(uint8_t *buf,uint bufSize);  //pack config to buf, return size
-  uint extract_config(uint8_t *buf,uint cnt);//read packed config from buf
-  uint archive_flightplan(uint8_t *buf,uint bufSize);  //pack wypoints to buf, return size
-  uint extract_flightplan(uint8_t *buf,uint cnt);//read packed waypoints from buf
-  uint archive_downstream(uint8_t *buf,uint maxSize);    //pack telemetry
-  uint extract_downstream(uint8_t *buf,uint cnt);  //read telemetry
-  uint extract_setb(uint8_t *buf,uint cnt);  //read
-  uint extract_clrb(uint8_t *buf,uint cnt);  //read
+  uint archive_flightplan(uint8_t *buf,uint bufSize);   //pack flightplan
+  uint extract_flightplan(uint8_t *buf,uint cnt);       //unpack flightplan
+  uint archive_downstream(uint8_t *buf,uint maxSize);   //pack telemetry
+  uint extract_downstream(uint8_t *buf,uint cnt);       //unpack telemetry
+  uint extract_setb(uint8_t *buf,uint cnt);             //unpack and set bit
+  uint extract_clrb(uint8_t *buf,uint cnt);             //unpack and clear bit
 };
 //=============================================================================
 #endif // MANDALA_H
