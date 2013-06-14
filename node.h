@@ -80,10 +80,6 @@ enum{
   apc_conf_write,       //save parameter <num>,<data>, or all if <num>=0xFF
 
   //------------------
-  //standard commands
-  apc_data=64,          //send/receive some data [portNo]
-
-  //------------------
   //user commands
   apc_user=100,
   apc_loader=0xFF
