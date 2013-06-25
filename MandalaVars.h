@@ -31,28 +31,24 @@
 enum {vt_void=0,vt_uint,vt_float,vt_vect,vt_bits,vt_sig};
 //=============================================================================
 // Physical constants
-#define EARTH_RATE   0.00007292115   // rotation rate of earth (rad/sec)
-#define EARTH_RADIUS 6378137         // earth semi-major axis radius (m)
-#define ECCENTRICITY 0.0818191908426 // major eccentricity of earth ellipsoid
-#define FLATTENING   0.0033528106650 // flattening of the ellipsoid
-#define GRAVITY_0    9.7803730       // zeroth coefficient for gravity model
-#define GRAVITY_1    0.0052891       // first coefficient for the gravity model
-#define GRAVITY_2    0.0000059       // second coefficient for the gravity model
-#define GRAVITY_NOM  9.81            // nominal gravity
-#define SCHULER2     1.533421593170545E-06 // Sculer Frequency (rad/sec) Squared
-#define R2D          57.29577951308232     // radians to degrees conversion factor
-#define D2R          0.01745329251994      // degrees to radians conversion factor
-#define FT2M         0.3048                // feet to meters conversion factor
-#define KTS2ms       0.5144                // Knots to meters/sec conversion factor
-#define PI           3.14159265358979      // pi
-#define MAG_DEC     -0.270944862           //magnetic declination of Stanford (rad): -15.15
-#define MM2M         0.001                 //mm to m
-
-//WGS-84
-#define C_WGS84_a   6378137.0           // earth equitorial radius
-#define C_WGS84_b   6356752.3142        // earth polor radius
+#define EARTH_RATE   0.00007292115              // rotation rate of earth (rad/sec)
+#define EARTH_RADIUS 6378137                    // earth semi-major axis radius (m)
+#define ECCENTRICITY 0.0818191908426            // major eccentricity of earth ellipsoid
+#define FLATTENING   0.0033528106650            // flattening of the ellipsoid
+#define GRAVITY_0    9.7803730                  // zeroth coefficient for gravity model
+#define GRAVITY_1    0.0052891                  // first coefficient for the gravity model
+#define GRAVITY_2    0.0000059                  // second coefficient for the gravity model
+#define GRAVITY_NOM  9.81                       // nominal gravity
+#define SCHULER2     1.533421593170545E-06      // Sculer Frequency (rad/sec) Squared
+#define R2D          57.29577951308232          // radians to degrees conversion factor
+#define D2R          0.01745329251994           // degrees to radians conversion factor
+#define FT2M         0.3048                     // feet to meters conversion factor
+#define KTS2MS       0.5144                     // Knots to meters/sec conversion factor
+#define PI           3.14159265358979           // pi
+#define C_WGS84_a   6378137.0                   // earth equitorial radius
+#define C_WGS84_b   6356752.3142                // earth polor radius
 #define C_WGS84_f   ((C_WGS84_a-C_WGS84_b)/C_WGS84_a)
-#define C_WIE       7.2321151467e-05  // WGS-84 earth rotation rate (rad/s)
+#define C_WIE       7.2321151467e-05            // WGS-84 earth rotation rate (rad/s)
 //=============================================================================
 #define VA_NUM_ARGS(...) ( sizeof(#__VA_ARGS__)==sizeof("")?0:\
   VA_NUM_ARGS_IMPL(__VA_ARGS__, 32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1) )
