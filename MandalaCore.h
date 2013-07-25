@@ -138,7 +138,6 @@ public:
 
   //math calculations
   _var_float inHgToAltitude(_var_float inHg,_var_float inHg_gnd);
-  _var_float conv_pstatic_altitude(void); //convert and filter, return unfiltered
 
   //optimizations
   static inline void memcpy(void *dest,const void *src,uint cnt)

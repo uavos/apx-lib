@@ -256,11 +256,12 @@ BITDEF(error,  ers,     128,     "ERS error/ok")
 
 VARDEF(bits,  cmode,    0,1,1, "operation mode bitfield [on/off]")
 BITDEF(cmode,  dlhd,    1,       "High precision downstream on/off")
-BITDEF(cmode,  ahrs,    2,       "AHRS mode inertial/gps")
-BITDEF(cmode,  thrcut,  4,       "Throttle cut on/off")
-BITDEF(cmode,  throvr,  8,       "Throttle override on/off")
-BITDEF(cmode,  hover,   16,      "Stabilization mode hover/run")
-BITDEF(cmode,  hdglook, 32,      "Heading control mode look/normal")
+BITDEF(cmode,  agl,     2,       "Altitude correction agl/off")
+BITDEF(cmode,  ahrs,    4,       "AHRS mode inertial/gps")
+BITDEF(cmode,  thrcut,  8,       "Throttle cut on/off")
+BITDEF(cmode,  throvr,  16,      "Throttle override on/off")
+BITDEF(cmode,  hover,   32,      "Stabilization mode hover/run")
+BITDEF(cmode,  hdglook, 64,      "Heading control mode look/normal")
 
 //--------- POWER CONTROL --------------
 VARDEF(bits,  power,  0,1,1, "power controls bitfield [on/off]")
