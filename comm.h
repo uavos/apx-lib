@@ -36,9 +36,11 @@ public:
 
 private:
   int   fd;
-  uint8_t txBuf[4096];
+  uint8_t tmpBuf[4096];
+  //ESC reader
   uint8_t esc_rx[4096];      //data from readEscaped()
-  uint esc_cnt,esc_state,esc_crc;
+  uint8_t esc_tmp[16],esc_tmp_cnt;
+  uint esc_state,esc_cnt,esc_crc,esc_pos_save,esc_cnt_save;
 };
 //=============================================================
 #endif

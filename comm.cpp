@@ -25,9 +25,7 @@ Comm::Comm()
   fd=-1;
   pname=DEFAULT_PORTNAME;
   brate=DEFAULT_BAUDRATE;
-  esc_state=0;
-  esc_crc=0;
-  esc_cnt=0;
+  esc_state=esc_cnt=esc_pos_save=0;
 }
 Comm::~Comm()
 {
@@ -118,6 +116,7 @@ uint8_t Comm::getCRC(const uint8_t *buf,uint cnt)
 //==============================================================================
 unsigned int Comm::getRxCnt(void)
 {
+  //if(esc_pos_save)return esc_pos_save;
   unsigned int cnt;
   ioctl(fd, FIONREAD, &cnt);
   return cnt;
@@ -154,8 +153,8 @@ void Comm::flush(void)
 //==============================================================================
 void Comm::writeEscaped(const uint8_t *tbuf,uint dcnt)
 {
-  uint8_t *buf=txBuf,v;
-  uint max=sizeof(txBuf)-6,bcnt=0;
+  uint8_t *buf=tmpBuf,v;
+  uint max=sizeof(tmpBuf)-6,bcnt=0;
   buf[bcnt++]=0x55;
   buf[bcnt++]=0x01;
   for (uint i=0;i<dcnt;i++) {
@@ -174,6 +173,74 @@ void Comm::writeEscaped(const uint8_t *tbuf,uint dcnt)
 //==============================================================================
 uint Comm::readEscaped(uint8_t *buf,uint max_len)
 {
+  /*uint rcnt;
+  if(esc_pos_save){
+    rcnt=esc_cnt_save;
+    esc_tmp_cnt=0;
+  }else{
+    rcnt=this->read(esc_tmp,sizeof(esc_tmp));
+    esc_tmp_cnt=rcnt;
+  }
+  if(!rcnt)return 0;
+  uint8_t v,*rd=esc_tmp+esc_pos_save;
+  esc_pos_save=0;
+  while (rcnt--){
+    v=*rd++;
+    switch (esc_state) {
+      case 0:
+        if (v==0x55)esc_state=3;
+        else break;
+        continue;
+      case 1: //data
+        if (v==0x55) {
+          esc_state=2;
+          continue;
+        }
+      case_DATA:
+        if (esc_cnt>=sizeof(esc_rx))break;
+          esc_rx[esc_cnt++]=v;
+          esc_crc+=v;
+          continue;
+      case 2: //escape
+        if (v==0x02) {
+          v=0x55;
+          esc_state=1;
+          goto case_DATA;
+        }
+        if (v==0x03) {
+          if(esc_cnt==0)break; //no data
+          esc_cnt--;
+          esc_crc-=esc_rx[esc_cnt];
+          if ((esc_crc&0xFF)!=esc_rx[esc_cnt])break;
+          //frame received...
+          esc_state=0;
+          if(rcnt){
+            esc_pos_save=rd-esc_tmp;
+            esc_cnt_save=rcnt;
+          }
+          if(esc_cnt>max_len)break;
+          memcpy(buf,esc_rx,esc_cnt);
+          return esc_cnt;
+        }
+        if (v==0x55) {
+          esc_state=3;
+          continue;
+        }
+        //fall to case below..
+      case 3: // start..
+        if (v==0x01) {
+          esc_state=1;
+          esc_crc=0;
+          esc_cnt=0;
+          continue;
+        }
+        break;
+    }
+    //error
+    esc_state=0;
+    esc_pos_save=0;
+  }
+  return 0;*/
   while(1){
     unsigned char v;
     if (!read(&v,1))return 0;
