@@ -346,8 +346,9 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
     }
   }
   alt_bytecnt=false;
-  // calculate vars filtered by sig dl_filter
+  // calculate vars filtered by sig dl_filter, otherwise calculated by ahrs
   NED=llh2ned(_var_vect(gps_lat*D2R,gps_lon*D2R,gps_hmsl));
+  vXYZ=rotate(gps_vNED,theta[2]*D2R);
   // gps_deltaNED,gps_deltaXYZ,gps_distWPT,gps_distHome,
   calc();
   return tcnt;
