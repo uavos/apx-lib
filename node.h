@@ -124,7 +124,7 @@ typedef struct{
 typedef _vec      _ft_vec;
 typedef struct{
   _ft_varmsk varmsk;  //var idx with mask
-  _ft_float  mult;       //multiplier (x0.1) -127[-12.7]..+127[+12.7]
+  _ft_float  mult;    //multiplier (x0.1) -127[-12.7]..+127[+12.7]
   int8_t  diff;       //differential multiplier (x0.01+1) for pos/neg var value
   uint8_t speed;      //speed of change (x0.1) 0..25.5
   uint8_t pwm_ch;     //pwm channel number 0...x
