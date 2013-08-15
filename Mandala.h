@@ -134,7 +134,8 @@ public:
 
   // math operations
   _var_float boundAngle(_var_float v,_var_float span=180.0);
-  _var_vect boundAngle(const _var_vect &v,_var_float span=180.0);
+  _var_vect  boundAngle(const _var_vect &v,_var_float span=180.0);
+  _var_float smoothAngle(_var_float v,_var_float v_prev,_var_float speed);
   uint snap(uint v, uint snapv=10);
   _var_float hyst(_var_float err,_var_float hyst);
   _var_float limit(const _var_float v,const _var_float vL=1.0);

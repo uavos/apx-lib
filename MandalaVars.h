@@ -86,7 +86,7 @@ SIGDEF(formation, "Formation flight data <packed data>")
 SIGDEF(imu, "IMU sensors data package",
        idx_acc, idx_gyro )
 SIGDEF(gps, "GPS fix data package",
-      idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_course, idx_gps_vNED)
+      idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_vNED)
 SIGDEF(ctr, "Fast controls, sent to bus at fixed update rate",
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_steering,idx_ctr_collective )
 SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw)
@@ -143,6 +143,7 @@ VARDEF(vect,  mag,   -1.27,2,1, "magnetic field: Hx,Hy,Hz [gauss]")
 VARDEF(float, airspeed,        0,2,2,   "Airspeed [m/s]")
 VARDEF(float, altitude,        0,4,2,   "Altitude [m]")
 VARDEF(float, vspeed,          0,2,2,   "Variometer [m/s]")
+VARDEF(float, course,          0,2,2,   "Moving direction [deg]")
 
 //--------- OTHER AP SENSORS --------------
 VARDEF(float, rpm,    25500,2,1, "engine RPM [1/min]")
@@ -156,7 +157,6 @@ VARDEF(float, gps_lat,     0,4,4,       "latitude [deg]")
 VARDEF(float, gps_lon,     0,4,4,       "longitude [deg]")
 VARDEF(float, gps_hmsl,    0,4,2,       "altitude above sea [m]")
 VARDEF(vect,  gps_vNED,    0,2,2,       "velocity: Vnorth, Veast, Vdown [m/s]")
-VARDEF(float, gps_course,  0,2,2,       "GPS course [deg]")
 VARDEF(uint,  gps_time,    0,4,4,       "GPS UTC Time from 1970 1st Jan [sec]")
 
 //--------- FAST CONTROLS --------------
@@ -249,7 +249,7 @@ BITDEF(error,  fatal,   1,       "Fatal error/ok")
 BITDEF(error,  power,   2,       "Power supply error/ok")
 BITDEF(error,  cas,     4,       "CAS error")
 BITDEF(error,  pstatic, 8,       "Static pressure error/ok")
-BITDEF(error,  gyro,    16,      "IMU gyros bias error/ok")
+BITDEF(error,  gyro,    16,      "IMU gyros bias")
 BITDEF(error,  engine,  32,      "Engine error/ok")
 BITDEF(error,  rpm,     64,      "RPM sensor error/ok")
 BITDEF(error,  ers,     128,     "ERS error/ok")

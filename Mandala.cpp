@@ -409,6 +409,11 @@ void Mandala::calc(void)
   rwDelta=dWPT*sin((wpHDG+180.0-rwHDG)*D2R)-rwAdj;
   rwDV=rotate(gps_vNED,rwHDG*D2R)[1];
   gSpeed=ned2dist(gps_vNED);
+  //course
+  //_var_float crsGPS=ned2hdg(gps_vNED);
+  //_var_float crsD=boundAngle(crsGPS-theta[2]);
+  //_var_float crsK=100.0*((crsD==0)?1.0:limit((90.0/fabs(crsD))/90.0,0,1));
+  //course=smoothAngle(crsGPS,course,0.000001);//gSpeed*gSpeed*0.0001/100.0);
 }
 //=============================================================================
 _var_float Mandala::ned2hdg(const _var_vect &ned,bool back)
@@ -439,6 +444,14 @@ _var_float Mandala::boundAngle(_var_float v,_var_float span)
 _var_vect Mandala::boundAngle(const _var_vect &v,_var_float span)
 {
   return _var_vect(boundAngle(v[0],span),boundAngle(v[1],span),boundAngle(v[2],span));
+}
+//===========================================================================
+_var_float Mandala::smoothAngle(_var_float v,_var_float v_prev,_var_float speed)
+{
+  _var_float vd=boundAngle(v-v_prev);
+  if(vd>speed) v=boundAngle(v_prev+speed);
+  else if(vd<(-speed)) v=boundAngle(v_prev-speed);
+  return v;
 }
 //===========================================================================
 uint Mandala::snap(uint v, uint snapv)
