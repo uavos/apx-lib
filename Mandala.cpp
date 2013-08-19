@@ -342,7 +342,7 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
   if(cnt>2){
     tcnt=unpack_stream(buf,cnt-2);
     if(!tcnt){
-      fprintf(stderr,"Error extract_downstream");
+      //fprintf(stderr,"Error extract_downstream\n");
     }
   }
   alt_bytecnt=false;
@@ -365,7 +365,7 @@ uint Mandala::extract_setb(uint8_t *buf,uint cnt)
   //bChk=bChk&&(var_bits[var_idx]);
   //bChk=bChk&&(var_bits_mask[var_idx][0]);
   if(!bChk){
-    fprintf(stderr,"Can't extract 'set_bit'. Integrity check error.");
+    fprintf(stderr,"Can't extract 'set_bit'.");
     return 0;
   }
   _var_bits *ptr;
@@ -383,7 +383,7 @@ uint Mandala::extract_clrb(uint8_t *buf,uint cnt)
   bChk=bChk&&get_ptr(var_idx,&value_ptr,&type);
   bChk=bChk&&(type==vt_bits);
   if(!bChk){
-    fprintf(stderr,"Can't extract 'clr_bit'. Integrity check error.");
+    fprintf(stderr,"Can't extract 'clr_bit'.");
     return 0;
   }
   _var_bits *ptr;
