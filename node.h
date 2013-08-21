@@ -116,6 +116,7 @@ typedef uint16_t  _ft_uint;
 typedef float     _ft_float;
 typedef uint8_t   _ft_byte;
 typedef uint8_t   _ft_string[16];
+typedef uint8_t   _ft_lstring[64];
 typedef struct{
   _ft_float x;
   _ft_float y;
@@ -194,6 +195,7 @@ typedef enum{
   ft_float,
   ft_byte,
   ft_string,
+  ft_lstring,
   //expandable
   ft_vec,
   ft_ctr,
