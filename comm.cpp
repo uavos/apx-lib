@@ -244,6 +244,7 @@ uint Comm::readEscaped(uint8_t *buf,uint max_len)
   while(1){
     unsigned char v;
     if (!read(&v,1))return 0;
+    //uint vi=v;printf("%.2X ",vi);
     switch (esc_state) {
       case 0:
         if (v==0x55)esc_state=3;
