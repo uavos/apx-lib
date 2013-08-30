@@ -243,6 +243,7 @@ BITDEF(status, gps,     2,       "GPS available/lost")
 BITDEF(status, agl,     4,       "AGL available/off")
 BITDEF(status, modem,   8,       "Uplink available/lost")
 BITDEF(status, glide,   16,      "Glide status")
+BITDEF(status, touch,   32,      "Landing gear touchdown/floating")
 
 VARDEF(bits,  error,    0,1,1, "error flags bitfield [set/clear]")
 BITDEF(error,  fatal,   1,       "Fatal error/ok")

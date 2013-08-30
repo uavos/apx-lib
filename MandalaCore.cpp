@@ -71,7 +71,7 @@ void MandalaCore::set_value(uint var_idx,uint member_idx,_var_float value)
     case vt_vect: (*(_var_vect*)value_ptr)[member_idx]=value;break;
     case vt_uint: *(_var_uint*)value_ptr=value;break;
     case vt_bits:
-      if(member_idx) (*(_var_bits*)value_ptr)=(value==0.0)?((*(_var_bits*)value_ptr)&(~member_idx)):((*(_var_bits*)value_ptr)|member_idx);
+      if(member_idx) (*(_var_bits*)value_ptr)=(value<=0.0)?((*(_var_bits*)value_ptr)&(~member_idx)):((*(_var_bits*)value_ptr)|member_idx);
       else *(_var_bits*)value_ptr=value;
       break;
   }
