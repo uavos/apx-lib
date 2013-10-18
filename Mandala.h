@@ -33,9 +33,9 @@
 //=============================================================================
 // AP constants
 //=============================================================================
-#define AHRS_FREQ       100     // AHRS Update (main loop freq) [Hz]
+#define AHRS_FREQ       200     // AHRS Update (main loop freq) [Hz]
 #define GPS_FREQ        5       // GPS Update rate (for derivatives) [Hz]
-#define CTR_FREQ        50      // ctr (fast servo) send rate [Hz]
+#define CTR_FREQ        100     // ctr (fast servo) send rate [Hz]
 #define UPD_FREQ        5       // 'update' vars send rate [Hz]
 #define TELEMETRY_FREQ  10      // Telemetry send rate [Hz] MAX 10Hz!
 #define SIM_FREQ        10      // Simulator servo send rate [Hz]
