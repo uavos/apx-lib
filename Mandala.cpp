@@ -448,9 +448,11 @@ _var_vect Mandala::boundAngle(const _var_vect &v,_var_float span)
 //===========================================================================
 _var_float Mandala::smoothAngle(_var_float v,_var_float v_prev,_var_float speed)
 {
-  _var_float vd=boundAngle(v-v_prev);
-  if(vd>speed) v=boundAngle(v_prev+speed);
-  else if(vd<(-speed)) v=boundAngle(v_prev-speed);
+  if(speed!=0){
+    _var_float vd=boundAngle(v-v_prev);
+    if(vd>speed) v=boundAngle(v_prev+speed);
+    else if(vd<(-speed)) v=boundAngle(v_prev-speed);
+  }
   return v;
 }
 //===========================================================================
