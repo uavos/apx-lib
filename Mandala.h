@@ -107,6 +107,7 @@ public:
   uint          dl_frcnt;       // downlink frame cnt (inc by extract_downlink)
   uint          dl_errcnt;      // errors counter (by extract_downlink)
   uint          dl_timestamp;   // time[ms]
+  uint          dl_time_s;      // last dl sent time[ms]
   uint16_t      dl_ts;          // previous timestamp (to count dl_dt)
   uint16_t      dl_Pdt;         // previous delta (to count errors)
   bool          dl_e;           // if delta was different (errors counter)

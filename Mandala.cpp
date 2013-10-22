@@ -25,6 +25,7 @@
 #include <ctype.h>
 #include <math.h>
 #include "Mandala.h"
+#include "time_ms.h"
 //===========================================================================
 Mandala::Mandala()
   : MandalaCore()
@@ -38,6 +39,7 @@ void Mandala::init(void)
   dl_frcnt=0;
   dl_errcnt=0;
   dl_timestamp=0;
+  dl_time_s=time;
   dl_ts=0;
   dl_Pdt=0;
   dl_size=0;
@@ -311,7 +313,8 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
   if(!(dl_timestamp%dl_reset_interval)) // periodically send everything
     dl_reset=true;
 
-  dl_timestamp+=dl_period?dl_period:(1000/TELEMETRY_FREQ);
+  dl_timestamp+=dl_period?dl_period:(time-dl_time_s);
+  dl_time_s=time;
   dl_size=cnt+mask_cnt+2;
   return dl_size;
 }
