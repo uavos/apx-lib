@@ -112,6 +112,8 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   if(var_idx==idx_setb)return extract_setb(buf,size);
   if(var_idx==idx_clrb)return extract_clrb(buf,size);
   if(var_idx==idx_ping)return 1;
+  if(var_idx==idx_vor)return 1;
+
 
   uint cnt=unpack(buf,size,var_idx);
   if(cnt==size)return cnt;
