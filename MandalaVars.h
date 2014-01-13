@@ -82,6 +82,7 @@ SIGDEF(video,     "Video stream <data>")
 SIGDEF(tune,      "Tuning <parameter_id>,<data..>")
 SIGDEF(uav_id,    "UAV identification data <packed UAV_ID>")
 SIGDEF(formation, "Formation flight data <packed data>")
+SIGDEF(vor,       "VOR beacon <packed data>")
 //------------------------------
 // var packs
 SIGDEF(imu, "IMU sensors data package",
@@ -91,6 +92,9 @@ SIGDEF(gps, "GPS fix data package",
 SIGDEF(ctr, "Fast controls, sent to bus at fixed update rate",
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_steering,idx_ctr_collective )
 SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw)
+SIGDEF(ils, "ILS sensors data package",
+       idx_ilsb,idx_ils_HDG,idx_ils_DME,idx_ils_offsetX,idx_ils_offsetY )
+
 //------------------------------
 // Auto update/send vars
 SIGDEF(update,  "Auto send to bus when changed",
@@ -200,6 +204,15 @@ VARDEF(float, cmd_slip,     -127,2,1,   "commanded slip [deg]")
 VARDEF(vect,  radar_vXYZ,  0,2,2,       "radar velocity: Vx, Vy, Vz [m/s]")
 VARDEF(vect,  radar_dXYZ,  0,2,2,       "radar delta: dx, dy, dz [m]")
 
+//--------- ILS sensors --------------
+VARDEF(bits,  ilsb,  0,1,1,   "ILS bitfield [on/off]")
+BITDEF(ilsb,  active,      1,  "ILS available/lost")
+BITDEF(ilsb,  offset,      2,  "ILS offset available/lost")
+VARDEF(float, ils_HDG,     0,2,2,       "ILS heading to VOR1 [deg]")
+VARDEF(float, ils_DME,     0,2,2,       "ILS distance to VOR1 [m]")
+VARDEF(float, ils_offsetX, 0,2,2,       "ILS horizontal offset [deg]")
+VARDEF(float, ils_offsetY, 0,2,2,       "ILS vertical offset [deg]")
+
 //--------- OTHER SENSORS (information) --------------
 VARDEF(float, fuel,  1.0,1,1,   "fuel capacity [0..1]")
 VARDEF(float, frate, 0.01,1,1,  "fuel consumption rate [1/s]")
@@ -274,7 +287,7 @@ BITDEF(power,  payload, 8,     "Payload activated/off")
 BITDEF(power,  agl,     16,    "AGL sensor")
 BITDEF(power,  satcom,  32,    "Satcom on/off")
 BITDEF(power,  rfamp,   64,    "RF amplifier on/off")
-BITDEF(power,  pcam,   128,    "Pilot camera on/off")
+BITDEF(power,  ils,    128,    "Instrument Landing System on/off")
 
 VARDEF(bits,  sw,     0,1,1, "operator controlled switches [on/off]")
 BITDEF(sw,     lights,   1,    "Lights on/off")
