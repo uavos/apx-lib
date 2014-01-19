@@ -90,6 +90,7 @@ uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
   //check for special protocol archiveSize
   if(var_idx==idx_downstream)return archive_downstream(buf,size);
   if(var_idx==idx_flightplan)return archive_flightplan(buf,size);
+  if(var_idx<idx_imu)return 0;  //not a signature
   //basic vars
   uint cnt=pack(buf,var_idx);
   if(!cnt)return 0;
@@ -107,11 +108,9 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   //check for special protocol archiveSize
   if(var_idx==idx_downstream)return extract_downstream(buf,size);
   if(var_idx==idx_flightplan)return extract_flightplan(buf,size);
-  if(var_idx==idx_msg)return 1; //nothing to do
-  if(var_idx==idx_service)return 1; //nothing to do
   if(var_idx==idx_setb)return extract_setb(buf,size);
   if(var_idx==idx_clrb)return extract_clrb(buf,size);
-  if(var_idx==idx_ping)return 1;
+  if(var_idx<idx_imu)return 1;  //not a signature
 
   uint cnt=unpack(buf,size,var_idx);
   if(cnt==size)return cnt;

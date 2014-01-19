@@ -66,7 +66,6 @@ enum{
   //system commands
   apc_info,     //return _node_info
   apc_nstat,    //return _node_name + _node_status
-  apc_debug,    //debug message
   apc_reboot,   //reset/reboot node
   apc_mute,     //stop sending data (sensors)
   apc_reconf,   //reset all conf to defaults
@@ -75,9 +74,9 @@ enum{
   //conf
   apc_conf_inf=32,      //return _conf_inf structure
   apc_conf_cmds,        //return node commands descrptor
-  apc_conf_dsc,         //return <num> parameter descriptor, or all if <num>=0xFF
-  apc_conf_read,        //return parameter <num>, or all if <num>=0xFF
-  apc_conf_write,       //save parameter <num>,<data>, or all if <num>=0xFF
+  apc_conf_dsc,         //return <num> parameter descriptor
+  apc_conf_read,        //return parameter <num>
+  apc_conf_write,       //save parameter <num>,<data>
 
   //------------------
   //user commands
