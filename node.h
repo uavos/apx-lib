@@ -11,14 +11,14 @@ typedef uint8_t _node_name[16];         //device name string
 typedef uint8_t _node_hardware[16];     //device hardware string
 typedef uint8_t _node_version[16];      //fw version string
 //-------------------------------------------------
-// firmware information, saved in FLASH section [CONFIG]
+// hard coded firmware information
 typedef struct {
   _node_name    name;
   _node_version version;
   _node_version hardware;
   uint32_t      size;   //program memory size
 }__attribute__((packed)) _node_info;
-// node information, filled by hwInit, saved in RAM
+// node status, returned by request
 typedef struct{
   uint8_t     err_cnt;        // errors counter
   uint8_t     can_rxc;        // CAN received packets counter
@@ -26,6 +26,7 @@ typedef struct{
   uint8_t     can_err;        // CAN errors counter
   uint8_t     dump[16];       // error dump or special info
 }_node_status;
+// local node description struct (hardware.h)
 typedef struct{
   _node_sn      sn;     //serial number
   _node_info    info;   //firmware/hardware info
@@ -33,11 +34,6 @@ typedef struct{
 }__attribute__((packed)) _node;
 //=============================================================================
 // bus packet structure:
-// <tag> is an optional byte (stored in conf)
-// <tag> can be any value 7bits (<0x7F)
-// <tag>=0x7F is reserved for 'shiva'
-// MSB in <tag> flags service packet
-// all service packets start with _node_sn in <data>
 // service packets filtered by _node_sn, or 0x00000 for broadcast
 typedef struct{
   uint8_t       id;   //<var_idx>
@@ -58,8 +54,7 @@ typedef struct{
 #define bus_packet_size_hdr_srv         (bus_packet_size_hdr+sizeof(_node_sn)+1)
 #define bus_packet_size_hdr_tagged      (bus_packet_size_hdr+1)
 //=============================================================================
-// default bus commands (service packets)
-// all service packets addressed by _node_sn
+// system service commands (service packets)
 enum{
   apc_ack=0,    //acknowledge - sent back in response to commands
   //------------------
@@ -86,12 +81,11 @@ enum{
 //=============================================================================
 // Loader packet data (packet.srv.cmd=apc_loader):
 // <ldc_COMMAND>,<data...>
-// loader must reply to standard command 'apc_ID'
 //------------------------------------------------------------------------------
 typedef enum {
   ldc_init=0,   // start loader, re: <_ldc_file> =flash size
   ldc_file,     // set file info <_ldc_file>, re: <_ldc_file>
-  ldc_write,    // write file data <_ldc_write>, re: <_ldc_write::hdr>
+  ldc_write    // write file data <_ldc_write>, re: <_ldc_write::hdr>
 } _ldr_cmd;
 //loader data
 typedef struct{
