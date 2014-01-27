@@ -274,12 +274,12 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
   uint8_t *mask_ptr=buf;      //start of data
   uint8_t *ptr=mask_ptr+1;
   *mask_ptr=0;
-  for(uint i=idxPAD;i<idx_vars_top;i++){
+  for(uint i=idxPAD;i<idx_local;i++){
     uint sz=archive(dl_var,sizeof(dl_var),i);
     //check if filtered var
-    bool filtered=memchr(dl_filter+1,i,dl_filter[0])!=NULL;
+    bool filtered=false;//=memchr(dl_filter+1,i,dl_filter[0])!=NULL;
     if((*reset_mask_ptr)&mask) (*reset_mask_ptr)&=~mask; //remove reset flag
-    else filtered|=(memcmp(snapshot,dl_var,sz)==0);//test changed
+    else filtered=(memcmp(snapshot,dl_var,sz)==0);//test changed
     //pack if not filtered
     if(!filtered){
       //check buf overflow
@@ -446,6 +446,13 @@ _var_float Mandala::boundAngle(_var_float v,_var_float span)
 _var_vect Mandala::boundAngle(const _var_vect &v,_var_float span)
 {
   return _var_vect(boundAngle(v[0],span),boundAngle(v[1],span),boundAngle(v[2],span));
+}
+//===========================================================================
+_var_float Mandala::boundAngle360(_var_float v)
+{
+  while(v<0) v+=360.0;
+  while(v>=360.0) v-=360.0;
+  return v;
 }
 //===========================================================================
 _var_float Mandala::smoothAngle(_var_float v,_var_float v_prev,_var_float speed)
@@ -638,6 +645,43 @@ const _var_vect Mandala::llh2ECEF(const _var_vect &llh)
   return ECEF;
 }
 //=============================================================================
+_var_float Mandala::wind_triangle(_var_float crs)
+{
+  _var_float wnd_r=(windHdg+180.0)*D2R;
+  _var_float Kvel=airspeed>0?(windSpd/(airspeed*(corrTAS>0?corrTAS:1.0))):0;
+  _var_float aWTA=crs*D2R-wnd_r;  //fabs??
+  _var_float aWCA=asin(Kvel*sin(aWTA));
+  _var_float kWS=cos(aWCA)+Kvel*cos(aWTA);
+  return kWS;
+}
+//=============================================================================
+_var_float Mandala::wind_circle(_var_float crs,_var_float span,_var_float r)
+{
+  _var_float kWSs=0;
+  _var_float crs_step=20,crs_e;
+  _var_float wnd_r=(windHdg)*D2R;
+  _var_float Kvel=airspeed>0?(windSpd/(airspeed*(corrTAS>0?corrTAS:1.0))):0;
+  if(span<0){
+    crs_step=-crs_step;
+    crs_e=crs;
+    crs-=span;
+  }else{
+    crs_e=crs+span;
+  }
+  uint sz=fabs(span/crs_step);
+  _var_float kWS=1;
+  while(sz--){
+    _var_float aWTA=crs*D2R-wnd_r;
+    _var_float aWCA=asin(Kvel*sin(aWTA));
+    kWS=cos(aWCA)+Kvel*cos(aWTA);
+    kWSs+=1.0/kWS;
+    crs+=crs_step;  //right turn
+  }
+  if(span<0) span=fabs(crs-crs_e);
+  else span=fabs(crs_e-crs);
+  return (kWSs*fabs(crs_step)+span/kWS)*r*(2.0*M_PI/360.0);
+}
+//=============================================================================
 //=============================================================================
 const char *Mandala::get_var_name(uint var_idx)
 {
@@ -670,7 +714,9 @@ void Mandala::dump(const uint var_idx)
   fill_params(var_idx,0,&value_ptr,&type,&mask,&name,&descr);
   printf("%s: ",name);
   switch(type){
-    case vt_uint:  printf("%u",*((_var_uint*)value_ptr));break;
+    case vt_byte:  printf("%u",*((_var_byte*)value_ptr));break;
+    case vt_u16:  printf("%u",*((_var_u16*)value_ptr));break;
+    case vt_u32:  printf("%u",*((_var_u32*)value_ptr));break;
     case vt_float: printf("%.2f",*((_var_float*)value_ptr));break;
     case vt_vect:  printf("(%.2f,%.2f,%.2f)",(*((_var_vect*)value_ptr))[0],(*((_var_vect*)value_ptr))[1],(*((_var_vect*)value_ptr))[2] );break;
     case vt_sig:{

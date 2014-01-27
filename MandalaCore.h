@@ -45,7 +45,7 @@ typedef float   _var_float;
 typedef double  _var_float;
 #endif
 
-#if !defined(USE_FLOAT_TYPE) || defined(USE_MATRIX_MATH)
+#if !defined(USE_FLOAT_TYPE) || defined(MANDALA_FULL)
 #include "MatrixMath.h"
 using namespace matrixmath;
 #else
@@ -79,9 +79,11 @@ protected:
 #endif
 //=============================================================================
 //=============================================================================
-typedef Vect    _var_vect;
-typedef uint    _var_uint;
-typedef uint8_t _var_bits;
+typedef Vect            _var_vect;
+typedef uint8_t         _var_byte;
+typedef uint16_t        _var_u16;
+typedef uint32_t        _var_u32;
+typedef uint8_t         _var_bits;
 typedef const uint8_t*  _var_signature;
 //=============================================================================
 #include "MandalaVars.h" //get constants
@@ -156,10 +158,10 @@ protected:
   uint pack_float_1(void *buf,void *value_ptr,_var_float span);
   uint pack_float_2(void *buf,void *value_ptr,_var_float span);
   uint pack_float_4(void *buf,void *value_ptr,_var_float span);
-  uint pack_bits_1(void *buf,void *value_ptr,_var_float span);
-  uint pack_uint_1(void *buf,void *value_ptr,_var_float span);
-  uint pack_uint_2(void *buf,void *value_ptr,_var_float span);
-  uint pack_uint_4(void *buf,void *value_ptr,_var_float span);
+  uint pack_bits_0(void *buf,void *value_ptr,_var_float span);
+  uint pack_byte_0(void *buf,void *value_ptr,_var_float span);
+  uint pack_u16_0(void *buf,void *value_ptr,_var_float span);
+  uint pack_u32_0(void *buf,void *value_ptr,_var_float span);
   uint pack_vect_1(void *buf,void *value_ptr,_var_float span);
   uint pack_vect_2(void *buf,void *value_ptr,_var_float span);
   uint pack_vect_4(void *buf,void *value_ptr,_var_float span);
@@ -168,10 +170,10 @@ protected:
   uint unpack_float_1(void *buf,void *value_ptr,_var_float span);
   uint unpack_float_2(void *buf,void *value_ptr,_var_float span);
   uint unpack_float_4(void *buf,void *value_ptr,_var_float span);
-  uint unpack_bits_1(void *buf,void *value_ptr,_var_float span);
-  uint unpack_uint_1(void *buf,void *value_ptr,_var_float span);
-  uint unpack_uint_2(void *buf,void *value_ptr,_var_float span);
-  uint unpack_uint_4(void *buf,void *value_ptr,_var_float span);
+  uint unpack_bits_0(void *buf,void *value_ptr,_var_float span);
+  uint unpack_byte_0(void *buf,void *value_ptr,_var_float span);
+  uint unpack_u16_0(void *buf,void *value_ptr,_var_float span);
+  uint unpack_u32_0(void *buf,void *value_ptr,_var_float span);
   uint unpack_vect_1(void *buf,void *value_ptr,_var_float span);
   uint unpack_vect_2(void *buf,void *value_ptr,_var_float span);
   uint unpack_vect_4(void *buf,void *value_ptr,_var_float span);

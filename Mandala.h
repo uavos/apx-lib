@@ -137,6 +137,7 @@ public:
 
   // math operations
   _var_float boundAngle(_var_float v,_var_float span=180.0);
+  _var_float boundAngle360(_var_float v);
   _var_vect  boundAngle(const _var_vect &v,_var_float span=180.0);
   _var_float smoothAngle(_var_float v,_var_float v_prev,_var_float speed);
   uint snap(uint v, uint snapv=10);
@@ -162,6 +163,8 @@ public:
   const _var_vect ned2llh(const _var_vect &ned);
   const _var_vect ned2llh(const _var_vect &ned,const _var_vect &home_llh);
   _var_float sqr(_var_float x);
+  _var_float wind_triangle(_var_float crs); //return TAS to gSpeed multiplier for given course
+  _var_float wind_circle(_var_float crs,_var_float span,_var_float r); //return air path length for ground circle flight
 private:
   // some special protocols
   uint archive_flightplan(uint8_t *buf,uint bufSize);   //pack flightplan
