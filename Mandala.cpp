@@ -714,9 +714,9 @@ void Mandala::dump(const uint var_idx)
   fill_params(var_idx,0,&value_ptr,&type,&mask,&name,&descr);
   printf("%s: ",name);
   switch(type){
-    case vt_byte:  printf("%u",*((_var_byte*)value_ptr));break;
-    case vt_u16:  printf("%u",*((_var_u16*)value_ptr));break;
-    case vt_u32:  printf("%u",*((_var_u32*)value_ptr));break;
+    case vt_byte:  printf("%u",(uint)*((_var_byte*)value_ptr));break;
+    case vt_u16:  printf("%u",(uint)*((_var_u16*)value_ptr));break;
+    case vt_u32:  printf("%u",(uint)*((_var_u32*)value_ptr));break;
     case vt_float: printf("%.2f",*((_var_float*)value_ptr));break;
     case vt_vect:  printf("(%.2f,%.2f,%.2f)",(*((_var_vect*)value_ptr))[0],(*((_var_vect*)value_ptr))[1],(*((_var_vect*)value_ptr))[2] );break;
     case vt_sig:{
