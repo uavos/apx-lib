@@ -47,7 +47,7 @@ void Mandala::init(void)
 
   //------------------------
 
-#define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
+#define MVAR(atype,aname,...) \
   aname=0;
 #include "MandalaVars.h"
 
@@ -60,29 +60,31 @@ void Mandala::init(void)
   for(uint i=0;i<rwaCnt;i++) rwa_str[i]=rwa_str_s[i];
 }
 //===========================================================================
-bool Mandala::fill_params(uint var_idx,uint member_idx,void **value_ptr,uint *type,uint8_t *mask,const char **name,const char **descr)
+bool Mandala::get_text_names(uint16_t varmsk,const char **name,const char **descr)
 {
-  if(!get_ptr(var_idx,value_ptr,type))return false;
-  *mask=0;
+  uint type;
+  void *value_ptr;
+  if(!get_ptr(varmsk,&value_ptr,&type))return false;
   *name="";
   *descr="";
-  if(*type==vt_bits && member_idx<=255){
-    //find bits/opts name and descr
-    uint bit_var=256,bit_idx=0;
-    #define BITDEF(avarname,abitname,amask,adescr) \
-    if(bit_var!=idx_##avarname){bit_var=idx_##avarname;bit_idx=0;}\
-    if(var_idx==idx_##avarname && member_idx==bit_idx){*mask=avarname##_##abitname;*name=#abitname;*descr=adescr;return true;}\
-    bit_idx++;
+  uint8_t m=varmsk>>8;
+  if((m!=0xFF)&& ((type==vt_flag && m) || type==vt_enum)){
+    switch(varmsk){
+    #define MBIT(avarname,abitname,adescr,amask) \
+      case idx_##avarname |( avarname##_##abitname <<8): *name=#abitname;*descr=adescr;return true;
     #include "MandalaVars.h"
-    if(member_idx)return false;
+    }
+    if(m) return false;
   }
   //find name and descr (no member)
-  switch (var_idx) {
-    #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
-    case idx_##aname: *name=#aname;*descr=adescr;break;
-    #include "MandalaVars.h"
+  switch (varmsk&0xFF) {
+  #define SIGDEF(aname,adescr,...) \
+    case idx_##aname: *name=#aname;*descr=adescr;return true;
+  #define MVAR(atype,aname,adescr, ...) \
+    case idx_##aname: *name=#aname;*descr=adescr;return true;
+  #include "MandalaVars.h"
   }
-  return true;
+  return false;
 }
 //===========================================================================
 uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
@@ -90,11 +92,9 @@ uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
   //check for special protocol archiveSize
   if(var_idx==idx_downstream)return archive_downstream(buf,size);
   if(var_idx==idx_flightplan)return archive_flightplan(buf,size);
-  if(var_idx<idx_imu)return 0;  //not a signature
+  if(var_idx<idx_imu)return 0;  //other special var
   //basic vars
-  uint cnt=pack(buf,var_idx);
-  if(!cnt)return 0;
-  return cnt;
+  return pack(buf,var_idx);
 }
 //=============================================================================
 uint Mandala::extract(uint8_t *buf,uint size)
@@ -108,9 +108,6 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   //check for special protocol archiveSize
   if(var_idx==idx_downstream)return extract_downstream(buf,size);
   if(var_idx==idx_flightplan)return extract_flightplan(buf,size);
-  if(var_idx==idx_setb)return extract_setb(buf,size);
-  if(var_idx==idx_clrb)return extract_clrb(buf,size);
-  if(var_idx<idx_imu)return 1;  //not a signature
 
   uint cnt=unpack(buf,size,var_idx);
   if(cnt==size)return cnt;
@@ -135,9 +132,9 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     uint i;
     for(i=0;i<wpcnt;i++){
       if((buf+(szLLH+2+fp.waypoints[i].cmdSize))>buf_top) break;
-      buf+=pack_float_4(buf,&(fp.waypoints[i].LLA[0]),0);
-      buf+=pack_float_4(buf,&(fp.waypoints[i].LLA[1]),0);
-      buf+=pack_float_2(buf,&(fp.waypoints[i].LLA[2]),0);
+      buf+=pack_float_f4(buf,&(fp.waypoints[i].LLA[0]));
+      buf+=pack_float_f4(buf,&(fp.waypoints[i].LLA[1]));
+      buf+=pack_float_f2(buf,&(fp.waypoints[i].LLA[2]));
       *buf++=fp.waypoints[i].type;
       *buf++=fp.waypoints[i].cmdSize;
       memcpy(buf,fp.waypoints[i].cmd,fp.waypoints[i].cmdSize);
@@ -148,22 +145,22 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     *buf++=rwcnt;
     for(i=0;i<rwcnt;i++){
       if((buf+(szLLH+6+9))>buf_top) break;
-      buf+=pack_float_4(buf,&(fp.runways[i].LLA[0]),0);
-      buf+=pack_float_4(buf,&(fp.runways[i].LLA[1]),0);
-      buf+=pack_float_2(buf,&(fp.runways[i].LLA[2]),0);
-      buf+=pack_vect_2(buf,&(fp.runways[i].dNED),0);
+      buf+=pack_float_f4(buf,&(fp.runways[i].LLA[0]));
+      buf+=pack_float_f4(buf,&(fp.runways[i].LLA[1]));
+      buf+=pack_float_f2(buf,&(fp.runways[i].LLA[2]));
+      buf+=pack_vect_f2(buf,&(fp.runways[i].dNED));
       *buf++=fp.runways[i].appType;
-      buf+=pack_float_2(buf,&(fp.runways[i].distApp),0);
-      buf+=pack_float_2(buf,&(fp.runways[i].altApp),0);
-      buf+=pack_float_2(buf,&(fp.runways[i].distTA),0);
-      buf+=pack_float_2(buf,&(fp.runways[i].altTA),0);
+      buf+=pack_float_f2(buf,&(fp.runways[i].distApp));
+      buf+=pack_float_f2(buf,&(fp.runways[i].altApp));
+      buf+=pack_float_f2(buf,&(fp.runways[i].distTA));
+      buf+=pack_float_f2(buf,&(fp.runways[i].altTA));
     }
     if(i<rwcnt)break; //overflow
     //write flight place parameters
     if((buf+6)>buf_top) break;
-    buf+=pack_float_2(buf,&(fp.safety.altitude),0);
-    buf+=pack_float_2(buf,&(fp.safety.dHome),0);
-    buf+=pack_float_2(buf,&(fp.safety.dHomeERS),0);
+    buf+=pack_float_f2(buf,&(fp.safety.altitude));
+    buf+=pack_float_f2(buf,&(fp.safety.dHome));
+    buf+=pack_float_f2(buf,&(fp.safety.dHomeERS));
     //success: calc number of bytes written
     cnt=buf-sbuf;
     break;
@@ -186,9 +183,9 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     uint i;
     for (i=0;i<wpcnt;i++) {
       if((buf+(szLLH+2))>buf_top) break;
-      buf+=unpack_float_4(buf,&(fp.waypoints[i].LLA[0]),0);
-      buf+=unpack_float_4(buf,&(fp.waypoints[i].LLA[1]),0);
-      buf+=unpack_float_2(buf,&(fp.waypoints[i].LLA[2]),0);
+      buf+=unpack_float_f4(buf,&(fp.waypoints[i].LLA[0]));
+      buf+=unpack_float_f4(buf,&(fp.waypoints[i].LLA[1]));
+      buf+=unpack_float_f2(buf,&(fp.waypoints[i].LLA[2]));
       fp.waypoints[i].type=(_wpt_type)*buf++;
       uint csz=(_wpt_type)*buf++;
       uint sz=csz;
@@ -205,22 +202,22 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     if(rwcnt>MAX_RWCNT)break;
     for (i=0;i<rwcnt;i++) {
       if((buf+(szLLH+6+9))>buf_top) break;
-      buf+=unpack_float_4(buf,&(fp.runways[i].LLA[0]),0);
-      buf+=unpack_float_4(buf,&(fp.runways[i].LLA[1]),0);
-      buf+=unpack_float_2(buf,&(fp.runways[i].LLA[2]),0);
-      buf+=unpack_vect_2(buf,&(fp.runways[i].dNED),0);
+      buf+=unpack_float_f4(buf,&(fp.runways[i].LLA[0]));
+      buf+=unpack_float_f4(buf,&(fp.runways[i].LLA[1]));
+      buf+=unpack_float_f2(buf,&(fp.runways[i].LLA[2]));
+      buf+=unpack_vect_f2(buf,&(fp.runways[i].dNED));
       fp.runways[i].appType=(_rw_app)*buf++;
-      buf+=unpack_float_2(buf,&(fp.runways[i].distApp),0);
-      buf+=unpack_float_2(buf,&(fp.runways[i].altApp),0);
-      buf+=unpack_float_2(buf,&(fp.runways[i].distTA),0);
-      buf+=unpack_float_2(buf,&(fp.runways[i].altTA),0);
+      buf+=unpack_float_f2(buf,&(fp.runways[i].distApp));
+      buf+=unpack_float_f2(buf,&(fp.runways[i].altApp));
+      buf+=unpack_float_f2(buf,&(fp.runways[i].distTA));
+      buf+=unpack_float_f2(buf,&(fp.runways[i].altTA));
     }
     if(i<rwcnt)break; //overflow
     //unpack flight place parameters
     if((buf+6)>buf_top) break;
-    buf+=unpack_float_2(buf,&(fp.safety.altitude),0);
-    buf+=unpack_float_2(buf,&(fp.safety.dHome),0);
-    buf+=unpack_float_2(buf,&(fp.safety.dHomeERS),0);
+    buf+=unpack_float_f2(buf,&(fp.safety.altitude));
+    buf+=unpack_float_f2(buf,&(fp.safety.dHome));
+    buf+=unpack_float_f2(buf,&(fp.safety.dHomeERS));
     //success: calc number of bytes unpacked
     rcnt=buf-sbuf;
     break;
@@ -248,19 +245,18 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
     if(maxSize>MAX_TELEMETRY)maxSize=MAX_TELEMETRY;
   }else maxSize=sizeof(dl_snapshot);
 
+  bool hd=cmode&cmode_dlhd;
 
-  alt_bytecnt=!(cmode&cmode_dlhd);
-
-  //watch alt_bytecnt changes
-  if(dl_hd_save!=alt_bytecnt){
-    dl_hd_save=alt_bytecnt;
+  //watch hd changes
+  if(dl_hd_save!=hd){
+    dl_hd_save=hd;
     dl_reset=true;
   }
 
   //pack header
   uint ts=(dl_timestamp/10)&0x7FFF;
   *buf++=ts;
-  *buf++=(ts>>8)|(alt_bytecnt?0x00:0x80);
+  *buf++=(ts>>8)|(hd?0x80:0x00);
 
   //pack stream
   if(dl_reset){
@@ -275,7 +271,7 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
   uint8_t *ptr=mask_ptr+1;
   *mask_ptr=0;
   for(uint i=idxPAD;i<idx_local;i++){
-    uint sz=archive(dl_var,sizeof(dl_var),i);
+    uint sz=hd?pack(dl_var,i):pack_ext(dl_var,i);
     //check if filtered var
     bool filtered=false;//=memchr(dl_filter+1,i,dl_filter[0])!=NULL;
     if((*reset_mask_ptr)&mask) (*reset_mask_ptr)&=~mask; //remove reset flag
@@ -307,7 +303,6 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
       ptr++;
     }
   }
-  alt_bytecnt=false;
 
   if(!(dl_timestamp%dl_reset_interval)) // periodically send everything
     dl_reset=true;
@@ -327,7 +322,7 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
   ts|=(*buf++)<<8;
 
   //MSB = HD stream
-  alt_bytecnt=!(ts&0x8000);
+  bool hd=ts&0x8000;
   ts&=0x7FFF;
 
   //calc delta time
@@ -342,56 +337,18 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
   //extract data
   uint tcnt=2;
   if(cnt>2){
-    tcnt=unpack_stream(buf,cnt-2);
+    cnt-=2;
+    tcnt=unpack_stream(buf,cnt,hd);
     if(!tcnt){
       //fprintf(stderr,"Error extract_downstream\n");
     }
   }
-  alt_bytecnt=false;
   // calculate vars filtered by sig dl_filter, otherwise calculated by ahrs
   NED=llh2ned(_var_vect(gps_lat*D2R,gps_lon*D2R,gps_hmsl));
   vXYZ=rotate(gps_vNED,theta[2]*D2R);
   // gps_deltaNED,gps_deltaXYZ,gps_distWPT,gps_distHome,
   calc();
   return tcnt;
-}
-//=============================================================================
-uint Mandala::extract_setb(uint8_t *buf,uint cnt)
-{
-  uint var_idx=buf[0];
-  uint type;
-  void *value_ptr;
-  bool bChk=cnt==2;
-  bChk=bChk&&get_ptr(var_idx,&value_ptr,&type);
-  bChk=bChk&&(type==vt_bits);
-  //bChk=bChk&&(var_bits[var_idx]);
-  //bChk=bChk&&(var_bits_mask[var_idx][0]);
-  if(!bChk){
-    fprintf(stderr,"Can't extract 'set_bit'.");
-    return 0;
-  }
-  _var_bits *ptr;
-  ptr=(_var_bits*)value_ptr;
-  *ptr|=buf[1];
-  return cnt;
-}
-//-----------------------------------------------------------------------------
-uint Mandala::extract_clrb(uint8_t *buf,uint cnt)
-{
-  uint var_idx=buf[0];
-  uint type;
-  void *value_ptr;
-  bool bChk=cnt==2;
-  bChk=bChk&&get_ptr(var_idx,&value_ptr,&type);
-  bChk=bChk&&(type==vt_bits);
-  if(!bChk){
-    fprintf(stderr,"Can't extract 'clr_bit'.");
-    return 0;
-  }
-  _var_bits *ptr;
-  ptr=(_var_bits*)value_ptr;
-  *ptr&=~((_var_bits)buf[1]);
-  return cnt;
 }
 //=============================================================================
 //=============================================================================
@@ -683,14 +640,11 @@ _var_float Mandala::wind_circle(_var_float crs,_var_float span,_var_float r)
 }
 //=============================================================================
 //=============================================================================
-const char *Mandala::get_var_name(uint var_idx)
+const char *Mandala::var_name(uint8_t var_idx)
 {
-  uint type;
-  void *value_ptr;
-  uint8_t mask;
   const char *name;
   const char *descr;
-  fill_params(var_idx,0,&value_ptr,&type,&mask,&name,&descr);
+  get_text_names(var_idx|0xFF00,&name,&descr);
   return name;
 }
 //=============================================================================
@@ -704,19 +658,15 @@ void Mandala::dump(const _var_vect &v,const char *str)
 {
   printf("%s: %.2f\t%.2f\t%.2f\n",str,v[0],v[1],v[2]);
 }
-void Mandala::dump(const uint var_idx)
+void Mandala::dump(uint8_t var_idx)
 {
   uint type;
   void *value_ptr;
-  uint8_t mask;
-  const char *name;
-  const char *descr;
-  fill_params(var_idx,0,&value_ptr,&type,&mask,&name,&descr);
-  printf("%s: ",name);
+  if(!get_ptr(var_idx,&value_ptr,&type))return;
+  printf("%s: ",var_name(var_idx));
   switch(type){
     case vt_byte:  printf("%u",(uint)*((_var_byte*)value_ptr));break;
-    case vt_u16:  printf("%u",(uint)*((_var_u16*)value_ptr));break;
-    case vt_u32:  printf("%u",(uint)*((_var_u32*)value_ptr));break;
+    case vt_uint:  printf("%u",(uint)*((_var_uint*)value_ptr));break;
     case vt_float: printf("%.2f",*((_var_float*)value_ptr));break;
     case vt_vect:  printf("(%.2f,%.2f,%.2f)",(*((_var_vect*)value_ptr))[0],(*((_var_vect*)value_ptr))[1],(*((_var_vect*)value_ptr))[2] );break;
     case vt_sig:{

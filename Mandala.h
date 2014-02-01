@@ -90,8 +90,8 @@ class Mandala : public MandalaCore
 public:
   _uav_id         id;
 
-  bool fill_params(uint var_idx,uint member_idx,void **value_ptr,uint *type,uint8_t *mask,const char **name,const char **descr);
-  const char *get_var_name(uint var_idx);
+  bool get_text_names(uint16_t varmsk,const char **name,const char **descr);
+  const char *var_name(uint8_t var_idx);
 
   //---- flightplan ----
   _flightplan fp;
@@ -133,7 +133,7 @@ public:
   // additional methods (debug, math, NAV helper functions)
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
   void dump(const _var_vect &v,const char *str="");
-  void dump(const uint var_idx);
+  void dump(uint8_t var_idx);
 
   // math operations
   _var_float boundAngle(_var_float v,_var_float span=180.0);
@@ -171,8 +171,6 @@ private:
   uint extract_flightplan(uint8_t *buf,uint cnt);       //unpack flightplan
   uint archive_downstream(uint8_t *buf,uint maxSize);   //pack telemetry
   uint extract_downstream(uint8_t *buf,uint cnt);       //unpack telemetry
-  uint extract_setb(uint8_t *buf,uint cnt);             //unpack and set bit
-  uint extract_clrb(uint8_t *buf,uint cnt);             //unpack and clear bit
 };
 //=============================================================================
 #endif // MANDALA_H

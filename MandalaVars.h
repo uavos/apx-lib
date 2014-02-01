@@ -25,10 +25,10 @@
 //=============================================================================
 // Mandala constants
 //=============================================================================
-#define idxPAD  64      //start index for regular vars
+#define idxPAD  32      //start index for regular vars
 //-----------------------------------------------------------------------------
 // Var Type enum
-enum {vt_void=0,vt_byte,vt_u16,vt_u32,vt_bits,vt_float,vt_vect,vt_sig};
+enum {vt_void=0,vt_byte,vt_uint,vt_flag,vt_enum,vt_float,vt_vect,vt_sig};
 //=============================================================================
 // Physical constants
 #define EARTH_RATE   0.00007292115              // rotation rate of earth (rad/sec)
@@ -60,7 +60,7 @@ enum {vt_void=0,vt_byte,vt_u16,vt_u32,vt_bits,vt_float,vt_vect,vt_sig};
 //=============================================================================
 // special variables - signatures
 #ifndef SIGDEF
-#define SIGDEF(aname,adescr,...)
+#define SIGDEF(...)
 #endif
 //------------------------------
 // special protocols
@@ -110,217 +110,227 @@ SIGDEF(autosend,  "Automatically forwarded variables to GCU",
 
 //------------------------------
 #undef SIGDEF
+#ifndef MVAR
+#define MVAR(...)
+#endif
+#ifndef MBIT
+#define MBIT(...)
+#endif
 //=============================================================================
 //    Mandala variables definitions
-// type:           variable type: [float, vect, ...]
+// type:           variable type: [float,  vect,   ...]
 // name:           variable name, used for text also. access: var.name
-// array:          for VARDEFA only (array size)
+// array:          for MVARA only (array size)
 // span:           value span (for 1 byte compression only), <0 = signed
 // bytes:          bytes number for data exchange via bus (compression)
 // tbytes:         bytes number for data exchange with GCU (more compression)
 // description:    text description of the variable, used mostly in GCU
 // if bitfield description contains slash '/' its status reported in console
 //------------------------------------------------------------------------------
-#ifndef VARDEF
-#define VARDEF(atype,aname,aspan,abytes,atbytes,adescr)
-#endif
-#ifndef BITDEF
-#define BITDEF(avarname,abitname,amask,adescr)
-#endif
+// f2 - 2 bytes float
+// f4 - 4 bytes float
+// s1 - -127..+127
+// s10 - -1270..+1270
+// s001 - -1.27..+1.27
+// u1 - uint8_t
+// u2 - uint16_t
+// u4 - uint32_t
+// u01 - 0..25.5
+// u001 - 0..2.55
+// u10 - 0..2550
+// u100 - 0..25500
 //--------- IMU --------------
-VARDEF(vect,  theta, 0,2,2,     "attitude: roll,pitch,yaw [deg]")
-VARDEF(vect,  acc,   -60,2,1,   "acceleration: Ax,Ay,Az [m/s2]")
-VARDEF(vect,  gyro,  -700,2,1,  "angular rate: p,q,r [deg/s]")
-VARDEF(vect,  mag,   -1.27,2,1, "magnetic field: Hx,Hy,Hz [gauss]")
+MVAR(vect,  theta,    "attitude: roll,pitch,yaw [deg]",         f2,f2)
+MVAR(vect,  acc,      "acceleration: Ax,Ay,Az [m/s2]",          f2,s1)
+MVAR(vect,  gyro,     "angular rate: p,q,r [deg/s]",            f2,s10)
+MVAR(vect,  mag,      "magnetic field: Hx,Hy,Hz [gauss]",       f2,s001)
 
 //--------- FLIGHT CONTROL SENSORS --------------
-VARDEF(float, airspeed,        0,2,2,   "Airspeed [m/s]")
-VARDEF(float, altitude,        0,4,2,   "Altitude [m]")
-VARDEF(float, vspeed,          0,2,2,   "Variometer [m/s]")
-VARDEF(float, course,          0,2,2,   "Moving direction [deg]")
+MVAR(float, airspeed, "Airspeed [m/s]",         f2,f2)
+MVAR(float, altitude, "Altitude [m]",           f4,f2)
+MVAR(float, vspeed,   "Variometer [m/s]",       f2,f2)
+MVAR(float, course,   "Moving direction [deg]", f2,f2)
 
 //--------- OTHER AP SENSORS --------------
-VARDEF(float, rpm,    25500,2,1, "engine RPM [1/min]")
-VARDEF(float, agl,    0,2,2,     "Above Ground Level altitude [m]")
-VARDEF(float, slip,   -127,1,1,  "slip [deg]")
-VARDEF(float, attack, -127,1,1,  "angle of attack [deg]")
-VARDEF(float, venergy, 0,2,2,    "compensated variometer [m/s]")
-VARDEF(float, performance,0,2,2, "gliding performance [K]")
+MVAR(float, rpm,      "engine RPM [1/min]",             f2,u100)
+MVAR(float, agl,      "Above Ground Level altitude [m]",f2,f2)
+MVAR(float, slip,     "slip [deg]",                     f2,s01)
+MVAR(float, attack,   "angle of attack [deg]",          f2,s01)
+MVAR(float, venergy,  "compensated variometer [m/s]",   f2,f2)
+MVAR(float, ldratio,  "glide ratio [Lift/Drag]",        f2,f2)
 
 //--------- Measured by GPS --------------
-VARDEF(float, gps_lat,     0,4,4,       "latitude [deg]")
-VARDEF(float, gps_lon,     0,4,4,       "longitude [deg]")
-VARDEF(float, gps_hmsl,    0,4,2,       "altitude above sea [m]")
-VARDEF(vect,  gps_vNED,    0,2,2,       "velocity: Vnorth, Veast, Vdown [m/s]")
-VARDEF(u32,   gps_time,    0,0,0,       "GPS UTC Time from 1970 1st Jan [sec]")
+MVAR(float, gps_lat,  "latitude [deg]",                 f4,f4)
+MVAR(float, gps_lon,  "longitude [deg]",                f4,f4)
+MVAR(float, gps_hmsl, "altitude above sea [m]",         f4,f2)
+MVAR(vect,  gps_vNED, "velocity: Vnorth,Veast,Vdown [m/s]",f2,f2)
+MVAR(uint,  gps_time, "GPS UTC Time from 1970 1st Jan [sec]",u4,u4)
 
 //--------- FAST CONTROLS --------------
-VARDEF(float, ctr_ailerons,  -1.0,2,1, "ailerons [-1..0..+1]")
-VARDEF(float, ctr_elevator,  -1.0,2,1, "elevator [-1..0..+1]")
-VARDEF(float, ctr_throttle,   1.0,2,1, "throttle [0..1]")
-VARDEF(float, ctr_rudder,    -1.0,2,1, "rudder [-1..0..+1]")
+MVAR(float, ctr_ailerons,     "ailerons [-1..0..+1]",   f2,s001)
+MVAR(float, ctr_elevator,     "elevator [-1..0..+1]",   f2,s001)
+MVAR(float, ctr_throttle,     "throttle [0..1]",        f2,u001)
+MVAR(float, ctr_rudder,       "rudder [-1..0..+1]",     f2,s001)
 
 //--------- SLOW CONTROLS --------------
-VARDEF(float, ctr_flaps,      1.0,2,1, "flaps [0..1]")
-VARDEF(float, ctr_steering,  -1.0,2,1, "steering [-1..0..+1]")
-VARDEF(float, ctr_collective,-1.0,2,1, "collective pitch [-1..0..+1]")
-VARDEF(float, ctr_airbrk,     1.0,2,1, "airbrakes [0..1]")
-VARDEF(float, ctr_brake,      1.0,2,1, "brake [0..1]")
-VARDEF(float, ctr_mixture,    1.0,2,1, "mixture [0..1]")
-VARDEF(float, ctr_engine,     1.0,2,1, "engine tuning [0..1]")
-VARDEF(float, ctr_sweep,     -1.0,2,1, "sweep [-1..0..1]")
+MVAR(float, ctr_flaps,        "flaps [0..1]",           f2,u001)
+MVAR(float, ctr_steering,     "steering [-1..0..+1]",   f2,s001)
+MVAR(float, ctr_collective,   "collective pitch [-1..0..+1]",f2,s001)
+MVAR(float, ctr_airbrk,       "airbrakes [0..1]",       f2,u001)
+MVAR(float, ctr_brake,        "brake [0..1]",           f2,u001)
+MVAR(float, ctr_mixture,      "mixture [0..1]",         f2,u001)
+MVAR(float, ctr_engine,       "engine tuning [0..1]",   f2,u001)
+MVAR(float, ctr_sweep,        "sweep [-1..0..1]",       f2,s001)
 
-VARDEF(bits,  ctrb,  0,0,0,   "controls bitfield [on/off]")
-BITDEF(ctrb,   ers,       1,  "ERS on/off")
-BITDEF(ctrb,   rel,       2,  "Parachute released/locked")
-BITDEF(ctrb,   rev,       4,  "Reverse activated/off")
-BITDEF(ctrb,   gear,      8,  "Landing gear retracted/extracted")
-BITDEF(ctrb,   drp,       16, "Drop-off open/locked")
-BITDEF(ctrb,   pump,      32, "Fuel pump on/off")
-BITDEF(ctrb,   xfeed,     64, "Crossfeed on/off")
+MVAR(flag,  ctrb, "controls bitfield [on/off]",,)
+MBIT(ctrb,   ers,     "ERS on/off",                     1)
+MBIT(ctrb,   rel,     "Parachute released/locked",      2)
+MBIT(ctrb,   rev,     "Reverse activated/off",          4)
+MBIT(ctrb,   gear,    "Landing gear retracted/extracted",8)
+MBIT(ctrb,   drp,     "Drop-off open/locked",           16)
+MBIT(ctrb,   pump,    "Fuel pump on/off",               32)
+MBIT(ctrb,   xfeed,   "Crossfeed on/off",               64)
 
 //--------- AUTOPILOT COMMAND --------------
-VARDEF(vect,  cmd_theta,    0,2,2,      "commanded attitude: roll,pitch,yaw [deg]")
-VARDEF(float, cmd_N,        0,2,2,      "commanded north [m]")
-VARDEF(float, cmd_E,        0,2,2,      "commanded east [m]")
-VARDEF(float, cmd_course,   0,2,2,      "commanded course [deg]")
-VARDEF(float, cmd_rpm,      25500,2,1,  "commanded RPM [rpm]")
-VARDEF(float, cmd_altitude, 0,2,2,      "commanded altitude [m]")
-VARDEF(float, cmd_airspeed, 0,2,1,      "commanded airspeed (for regThr) [m/s]")
-VARDEF(float, cmd_vspeed,   -12.7,2,1,  "commanded vertical speed (for regPitchH) [m/s]")
-VARDEF(float, cmd_slip,     -127,2,1,   "commanded slip [deg]")
+MVAR(vect,  cmd_theta,        "commanded attitude: roll,pitch,yaw [deg]",f2,f2)
+MVAR(float, cmd_N,            "commanded north [m]",    f2,f2)
+MVAR(float, cmd_E,            "commanded east [m]",     f2,f2)
+MVAR(float, cmd_course,       "commanded course [deg]", f2,f2)
+MVAR(float, cmd_rpm,          "commanded RPM [rpm]",    f2,u100)
+MVAR(float, cmd_altitude,     "commanded altitude [m]", f2,f2)
+MVAR(float, cmd_airspeed,     "commanded airspeed (for regThr) [m/s]",          f2,f2)
+MVAR(float, cmd_vspeed,       "commanded vertical speed (for regPitchH) [m/s]", f2,s01)
+MVAR(float, cmd_slip,         "commanded slip [deg]",   f2,s1)
 
 //--------- OTHER SENSORS (information) --------------
-VARDEF(float, fuel,  1.0,1,1,   "fuel capacity [0..1]")
-VARDEF(float, frate, 0.01,1,1,  "fuel consumption rate [1/s]")
-VARDEF(float, RSS,   1.0,1,1,   "modem signal strength [0..1]")
+MVAR(float, fuel,     "fuel capacity [0..1]",           f2,u001)
+MVAR(float, frate,    "fuel flow rate [1/s]",           f2,f2)
+MVAR(float, RSS,      "modem signal strength [0..1]",   u001,u001)
 
 //--------- BATTERY --------------
-VARDEF(float, Ve,     25.5,1,1,   "autopilot battery voltage [v]")
-VARDEF(float, Vs,     25.5,1,1,   "servo battery voltage [v]")
-VARDEF(float, Vp,     25.5,1,1,   "payload battery voltage [v]")
-VARDEF(float, Vm,     45,1,1,     "engine battery voltage [v]")
-VARDEF(float, Ie,     2.55,1,1,   "autopilot current [A]")
-VARDEF(float, Is,     25.5,1,1,   "servo current [A]")
-VARDEF(float, Ip,     25.5,1,1,   "payload current [A]")
-VARDEF(float, Im,     0,1,1,      "engine current [A]")
+MVAR(float, Ve,       "autopilot battery voltage [v]",  u01,u01)
+MVAR(float, Vs,       "servo battery voltage [v]",      u01,u01)
+MVAR(float, Vp,       "payload battery voltage [v]",    u01,u01)
+MVAR(float, Vm,       "engine battery voltage [v]",     f2,f2)
+MVAR(float, Ie,       "autopilot current [A]",          u001,u001)
+MVAR(float, Is,       "servo current [A]",              u01,u01)
+MVAR(float, Ip,       "payload current [A]",            u01,u01)
+MVAR(float, Im,       "engine current [A]",             u1,u1)
 
 //--------- TEMPERATURES --------------
-VARDEF(float, AT,    -127,1,1,    "ambient temperature [C]")
-VARDEF(float, RT,    -127,1,1,    "room temperature [C]")
-VARDEF(float, MT,    -127,1,1,    "modem temperature [C]")
-VARDEF(float, ET,     0,1,1,      "engine temperature [C]")
-VARDEF(float, EGT,    900,1,1,    "exhaust gas temperature [C]")
-VARDEF(float, OT,     0,1,1,      "oil temperature [C]")
-VARDEF(float, OP,     25.5,1,1,   "oil pressure [atm]")
+MVAR(float, AT,       "ambient temperature [C]",        s1,s1)
+MVAR(float, RT,       "room temperature [C]",           s1,s1)
+MVAR(float, MT,       "modem temperature [C]",          s1,s1)
+MVAR(float, ET,       "engine temperature [C]",         u1,u1)
+MVAR(float, EGT,      "exhaust gas temperature [C]",    u10,u10)
+MVAR(float, OT,       "oil temperature [C]",            u1,u1)
+MVAR(float, OP,       "oil pressure [atm]",             u01,u01)
 
 //--------- ILS sensors --------------
-VARDEF(bits,  ilsb,  0,0,0,   "ILS bitfield [on/off]")
-BITDEF(ilsb,  active,      1,  "ILS available/lost")
-BITDEF(ilsb,  offset,      2,  "ILS offset available/lost")
-VARDEF(float, ils_HDG,     0,2,2,       "ILS heading to VOR1 [deg]")
-VARDEF(float, ils_DME,     0,2,2,       "ILS distance to VOR1 [m]")
-VARDEF(float, ils_offsetX, 0,2,2,       "ILS horizontal offset [deg]")
-VARDEF(float, ils_offsetY, 0,2,2,       "ILS vertical offset [deg]")
+MVAR(flag,  ilsb,     "ILS bitfield [on/off]",,)
+MBIT(ilsb,   active,  "ILS available/lost",             1)
+MBIT(ilsb,   offset,  "ILS offset available/lost",      2)
+MVAR(float, ils_HDG,  "ILS heading to VOR1 [deg]",      f2,f2)
+MVAR(float, ils_DME,  "ILS distance to VOR1 [m]",       f2,f2)
+MVAR(float, ils_offsetX, "ILS horizontal offset [deg]", f2,f2)
+MVAR(float, ils_offsetY, "ILS vertical offset [deg]",   f2,f2)
 
 //--------- Movement sensors --------------
-VARDEF(vect,  radar_vXYZ,  0,2,2,       "radar velocity: Vx, Vy, Vz [m/s]")
-VARDEF(vect,  radar_dXYZ,  0,2,2,       "radar delta: dx, dy, dz [m]")
+MVAR(vect,  radar_vXYZ,       "radar velocity: Vx,Vy,Vz [m/s]", f2,f2)
+MVAR(vect,  radar_dXYZ,       "radar delta: dx,dy,dz [m]",      f2,f2)
 
 //--------- STATUS FLAGS --------------
-VARDEF(byte,  stage,    0,0,0, "auto set to zero by mode change [maneuver stage]")
-VARDEF(bits,  mode,     0,0,0, "flight mode")
-BITDEF(mode,   EMG,     0,       "Realtime control")
-BITDEF(mode,   RPV,     1,       "Angles control")
-BITDEF(mode,   UAV,     2,       "Heading control")
-BITDEF(mode,   WPT,     3,       "Waypoints navigation")
-BITDEF(mode,   HOME,    4,       "Go back home")
-BITDEF(mode,   TAKEOFF, 5,       "Takeoff")
-BITDEF(mode,   LANDING, 6,       "Landing")
-BITDEF(mode,   STBY,    7,       "Loiter around DNED")
-BITDEF(mode,   DEMO,    8,       "Aerobatic demonstration")
-BITDEF(mode,   RECOVER, 9,       "Recovery")
+MVAR(byte,  stage,    "auto set to zero by mode change [maneuver stage]",u1,u1)
+MVAR(enum,  mode,     "flight mode",,)
+MBIT(mode,   EMG,     "Realtime control",       0)
+MBIT(mode,   RPV,     "Angles control",         1)
+MBIT(mode,   UAV,     "Heading control",        2)
+MBIT(mode,   WPT,     "Waypoints navigation",   3)
+MBIT(mode,   HOME,    "Go back home",           4)
+MBIT(mode,   TAKEOFF, "Takeoff",                5)
+MBIT(mode,   LANDING, "Landing",                6)
+MBIT(mode,   STBY,    "Loiter around DNED",     7)
 
-VARDEF(bits,  status,   0,0,0, "status flags bitfield [on/off]")
-BITDEF(status, rc,      1,       "RC on/off")
-BITDEF(status, gps,     2,       "GPS available/lost")
-BITDEF(status, agl,     4,       "AGL available/off")
-BITDEF(status, modem,   8,       "Uplink available/lost")
-BITDEF(status, glide,   16,      "Glide status")
-BITDEF(status, touch,   32,      "Landing gear touchdown/floating")
+MVAR(flag,  status,   "status flag bitfield [on/off]",,)
+MBIT(status, rc,      "RC on/off",              1)
+MBIT(status, gps,     "GPS available/lost",     2)
+MBIT(status, agl,     "AGL available/off",      4)
+MBIT(status, modem,   "Uplink available/lost",  8)
+MBIT(status, glide,   "Glide status",           16)
+MBIT(status, touch,   "Landing gear touchdown/floating",32)
 
-VARDEF(bits,  error,    0,0,0, "error flags bitfield [set/clear]")
-BITDEF(error,  fatal,   1,       "Fatal error/ok")
-BITDEF(error,  power,   2,       "Power supply error/ok")
-BITDEF(error,  cas,     4,       "CAS error")
-BITDEF(error,  pstatic, 8,       "Static pressure error/ok")
-BITDEF(error,  gyro,    16,      "IMU gyros bias")
-BITDEF(error,  engine,  32,      "Engine error/ok")
-BITDEF(error,  rpm,     64,      "RPM sensor error/ok")
-BITDEF(error,  ers,     128,     "ERS error/ok")
+MVAR(flag,  error,    "error flag bitfield [set/clear]",,)
+MBIT(error,  fatal,   "Fatal error/ok",         1)
+MBIT(error,  power,   "Power supply error/ok",  2)
+MBIT(error,  cas,     "CAS error",              4)
+MBIT(error,  pstatic, "Static pressure error/ok",8)
+MBIT(error,  gyro,    "IMU gyros bias",         16)
+MBIT(error,  engine,  "Engine error/ok",        32)
+MBIT(error,  rpm,     "RPM sensor error/ok",    64)
+MBIT(error,  ers,     "ERS error/ok",           128)
 
-VARDEF(bits,  cmode,    0,0,0, "operation mode bitfield [on/off]")
-BITDEF(cmode,  dlhd,    1,       "High precision downstream on/off")
-BITDEF(cmode,  agl,     2,       "Altitude correction agl/off")
-BITDEF(cmode,  ahrs,    4,       "AHRS mode inertial/gps")
-BITDEF(cmode,  thrcut,  8,       "Throttle cut on/off")
-BITDEF(cmode,  throvr,  16,      "Throttle override on/off")
-BITDEF(cmode,  hover,   32,      "Stabilization mode hover/run")
-BITDEF(cmode,  hdglook, 64,      "Heading control mode look/normal")
+MVAR(flag,  cmode,    "operation mode bitfield [on/off]",,)
+MBIT(cmode,  dlhd,    "High precision downstream on/off",1)
+MBIT(cmode,  agl,     "Altitude correction agl/off",    2)
+MBIT(cmode,  ahrs,    "AHRS mode inertial/gps",         4)
+MBIT(cmode,  thrcut,  "Throttle cut on/off",            8)
+MBIT(cmode,  throvr,  "Throttle override on/off",       16)
+MBIT(cmode,  hover,   "Stabilization mode hover/run",   32)
+MBIT(cmode,  hdglook, "Heading control mode look/normal",64)
 
 //--------- POWER CONTROL --------------
-VARDEF(bits,  power,  0,0,0, "power controls bitfield [on/off]")
-BITDEF(power,  ap,      1,     "Avionics")
-BITDEF(power,  servo,   2,     "Servo on/off")
-BITDEF(power,  ignition,4,     "Engine on/off")
-BITDEF(power,  payload, 8,     "Payload activated/off")
-BITDEF(power,  agl,     16,    "AGL sensor")
-BITDEF(power,  satcom,  32,    "Satcom on/off")
-BITDEF(power,  rfamp,   64,    "RF amplifier on/off")
-BITDEF(power,  ils,    128,    "Instrument Landing System on/off")
+MVAR(flag,  power,    "power controls bitfield [on/off]",,)
+MBIT(power,  ap,      "Avionics",               1)
+MBIT(power,  servo,   "Servo on/off",           2)
+MBIT(power,  ignition,"Engine on/off",          4)
+MBIT(power,  payload, "Payload activated/off",  8)
+MBIT(power,  agl,     "AGL sensor",             16)
+MBIT(power,  satcom,  "Satcom on/off",          32)
+MBIT(power,  rfamp,   "RF amplifier on/off",    64)
+MBIT(power,  ils,     "Instrument Landing System on/off",128)
 
-VARDEF(bits,  sw,     0,0,0, "operator controlled switches [on/off]")
-BITDEF(sw,     lights,   1,    "Lights on/off")
-BITDEF(sw,     taxi,     2,    "Taxi lights on/off")
-BITDEF(sw,     ice,      4,    "Anti-ice on/off")
-BITDEF(sw,     pheat,    8,    "Pitot tube heater on/off")
-BITDEF(sw,     sw1,     16,    "switch 1 on/off")
-BITDEF(sw,     sw2,     32,    "switch 2 on/off")
-BITDEF(sw,     sw3,     64,    "switch 3 on/off")
-BITDEF(sw,     sw4,    128,    "switch 4 on/off")
+MVAR(flag,  sw,       "operator controlled switches [on/off]",,)
+MBIT(sw,     lights,  "Lights on/off",          1)
+MBIT(sw,     taxi,    "Taxi lights on/off",     2)
+MBIT(sw,     ice,     "Anti-ice on/off",        4)
+MBIT(sw,     pheat,   "Pitot tube heater on/off",8)
+MBIT(sw,     sw1,     "switch 1 on/off",        16)
+MBIT(sw,     sw2,     "switch 2 on/off",        32)
+MBIT(sw,     sw3,     "switch 3 on/off",        64)
+MBIT(sw,     sw4,     "switch 4 on/off",        128)
 
 //--------- Flight Maneuvers --------------
-VARDEF(byte,  wpidx,     0,0,0,       "current waypoint [0...]")
-VARDEF(byte,  wpType,    0,0,0,       "current waypoint type [wp_type]")
-VARDEF(byte,  rwidx,     0,0,0,       "current runway [0...]")
-VARDEF(float, rwHDG,     0,2,2,       "current runway heading [deg]")
-VARDEF(float, turnR,        0,4,2,      "current circle radius [m]")
-VARDEF(float, delta,        0,4,2,      "general delta (depends on mode) [m]")
+MVAR(byte,  wpidx,    "current waypoint [0...]",        u1,u1)
+MVAR(byte,  wpType,   "current waypoint type [wp_type]",u1,u1)
+MVAR(byte,  rwidx,    "current runway [0...]",          u1,u1)
+MVAR(float, rwHDG,    "current runway heading [deg]",           f2,f2)
+MVAR(float, turnR,    "current circle radius [m]",              f2,f2)
+MVAR(float, delta,    "general delta (depends on mode) [m]",    f2,f2)
 
 //--------- dynamic tuning --------------
-VARDEF(float, windSpd,      25.5,2,1,   "wind speed [m/s]")
-VARDEF(float, windHdg,      360,2,1,    "wind direction to 0..360 [deg]")
-VARDEF(float, corrTAS,      25.5,2,1,   "CAS to TAS multiplier [K]")
-VARDEF(byte,  errcode,      0,0,0,      "error code")
-VARDEF(float, corr,         0,2,2,      "Correlator output [K]")
-VARDEF(float, rwAdj,        -127,1,1,   "runway displacement adjust during takeoff or landing [m]")
-VARDEF(float, gps_home_lat, 0,4,4,      "home latitude [deg]")
-VARDEF(float, gps_home_lon, 0,4,4,      "home longitude [deg]")
-VARDEF(float, gps_home_hmsl,0,4,4,      "home altitde above sea [m]")
-VARDEF(byte,  gps_SV,       0,0,0,      "GPS Satellites visible [number]")
-VARDEF(byte,  gps_SU,       0,0,0,      "GPS Satellites used [number]")
-VARDEF(float, pstatic_gnd,  0,4,4,      "Static pressure on ground level [inHg]")
-VARDEF(float, safe_altitude,0,4,4,      "Safe altitude [m]")
-VARDEF(float, cruise_airspeed,0,2,2,    "Cruise airspeed [m/s]")
+MVAR(float, windSpd,  "wind speed [m/s]",               f2,u01)
+MVAR(float, windHdg,  "wind direction to 0..360 [deg]", f2,f2)
+MVAR(float, corrTAS,  "CAS to TAS multiplier [K]",      f2,u001)
+MVAR(byte,  errcode,  "error code",                     u1,u1)
+MVAR(float, corr,     "Correlator output [K]",          f2,f2)
+MVAR(float, rwAdj,    "runway displacement adjust [m]", s1,s1)
+MVAR(float, gps_home_lat,     "home latitude [deg]",    f4,f4)
+MVAR(float, gps_home_lon,     "home longitude [deg]",   f4,f4)
+MVAR(float, gps_home_hmsl,    "home altitde above sea [m]",f4,f4)
+MVAR(byte,  gps_SV,   "GPS Satellites visible [number]",u1,u1)
+MVAR(byte,  gps_SU,   "GPS Satellites used [number]",   u1,u1)
+MVAR(float, pstatic_gnd,      "Static pressure on ground level [inHg]",f4,f4)
+MVAR(float, safe_altitude,    "Safe altitude [m]",      f4,f4)
+MVAR(float, cruise_airspeed,  "Cruise airspeed [m/s]",  f2,f2)
 
 //--------- payloads & user --------------
-VARDEF(vect,  cam_theta,    0,2,2,      "camera orientation: roll,pitch,yaw [deg]")
-VARDEF(float, user1,      0,4,2,   "User value 1")
-VARDEF(float, user2,      0,4,2,   "User value 2")
-VARDEF(float, user3,      0,4,2,   "User value 3")
-VARDEF(float, user4,      0,4,2,   "User value 4")
-VARDEF(float, user5,      0,4,2,   "User value 5")
-VARDEF(float, user6,      0,4,2,   "User value 6")
+MVAR(vect,  cam_theta,        "camera orientation: roll,pitch,yaw [deg]",f2,f2)
+MVAR(float, user1,    "User value 1",f4,f2)
+MVAR(float, user2,    "User value 2",f4,f2)
+MVAR(float, user3,    "User value 3",f4,f2)
+MVAR(float, user4,    "User value 4",f4,f2)
+MVAR(float, user5,    "User value 5",f4,f2)
+MVAR(float, user6,    "User value 6",f4,f2)
 
 //------------------------------------------------------------------------------
 // Filtered variables
@@ -328,65 +338,63 @@ VARDEF(float, user6,      0,4,2,   "User value 6")
 // Can be packed
 // Some are calculated on downstream receive
 //------------------------------------------------------------------------------
-VARDEF(byte,  local,   0,0,0,           "local byte [0...255]")
+MVAR(byte,  local,    "local byte [0...255]",   u1,u1)
 //--------- calculated by Mandala::calc() --------------
-VARDEF(vect,  NED,     0,4,2,           "local position: north,east,down [m]")
-VARDEF(float, homeHDG, 0,4,2,           "heading to home position [deg]")
-VARDEF(float, dHome,   0,4,2,           "distance to GCU [m]")
-VARDEF(float, dWPT,    0,4,2,           "distance to waypoint [m]")
-VARDEF(float, dN,      0,4,2,           "delta north [m]")
-VARDEF(float, dE,      0,4,2,           "delta east [m]")
-VARDEF(float, dAlt,    0,4,2,           "delta altitude [m]")
-VARDEF(vect,  vXYZ,    0,4,2,           "bodyframe velocity: Vx,Vy,Vz [m/s]")
-VARDEF(vect,  dXYZ,    0,4,2,           "bodyframe delta: dx,dy,dz [m]")
-VARDEF(float, gSpeed,  0,4,2,           "ground speed [m]")
-VARDEF(float, wpHDG,   0,4,2,           "current waypoint heading [deg]")
-VARDEF(float, rwDelta, 0,4,2,           "runway alignment [m]")
-VARDEF(float, rwDV,    0,4,2,           "runway alignment velocity [m/s]")
+MVAR(vect,  NED,      "local position: north,east,down [m]",    f4,f4)
+MVAR(float, homeHDG,  "heading to home position [deg]",         f4,f4)
+MVAR(float, dHome,    "distance to GCU [m]",                    f4,f4)
+MVAR(float, dWPT,     "distance to waypoint [m]",               f4,f4)
+MVAR(float, dN,       "delta north [m]",                        f4,f4)
+MVAR(float, dE,       "delta east [m]",                         f4,f4)
+MVAR(float, dAlt,     "delta altitude [m]",                     f4,f4)
+MVAR(vect,  vXYZ,     "bodyframe velocity: Vx,Vy,Vz [m/s]",     f4,f4)
+MVAR(vect,  dXYZ,     "bodyframe delta: dx,dy,dz [m]",          f4,f4)
+MVAR(float, gSpeed,   "ground speed [m]",                       f4,f4)
+MVAR(float, wpHDG,    "current waypoint heading [deg]",         f4,f4)
+MVAR(float, rwDelta,  "runway alignment [m]",                   f4,f4)
+MVAR(float, rwDV,     "runway alignment velocity [m/s]",        f4,f4)
 
 //--------- filtered dynamic tuning --------------
-VARDEF(u16,   dl_period, 0,0,0,         "downlink period [ms]")
-VARDEF(float, pstatic,   0,4,2,         "Static pressure [inHg]")
-VARDEF(u16,   wpcnt,     0,0,0,         "number of waypoints [0...]")
-VARDEF(u16,   rwcnt,     0,0,0,         "number of runways [0...]")
+MVAR(uint,  dl_period,"downlink period [ms]",           u2,u2)
+MVAR(float, pstatic,  "Static pressure [inHg]",         f4,f4)
+MVAR(uint,  wpcnt,    "number of waypoints [0...]",     u2,u2)
+MVAR(uint,  rwcnt,    "number of runways [0...]",       u2,u2)
 
 //--------- PILOT CONTROLS --------------
-VARDEF(float, rc_roll,    -1.0,1,1, "RC roll [-1..0..+1]")
-VARDEF(float, rc_pitch,   -1.0,1,1, "RC pitch [-1..0..+1]")
-VARDEF(float, rc_throttle, 1.0,1,1, "RC throttle [0..1]")
-VARDEF(float, rc_yaw,     -1.0,1,1, "RC yaw [-1..0..+1]")
+MVAR(float, rc_roll,          "RC roll [-1..0..+1]",    s001,s001)
+MVAR(float, rc_pitch,         "RC pitch [-1..0..+1]",   s001,s001)
+MVAR(float, rc_throttle,      "RC throttle [0..1]",     u001,u001)
+MVAR(float, rc_yaw,           "RC yaw [-1..0..+1]",     s001,s001)
 
 //--------- CAM CONTROL --------------
-VARDEF(byte, cam_ch,    0,0,0,          "video channel")
-VARDEF(bits, cam_ctr,   0,0,0,          "camera control type")
-BITDEF(cam_ctr, camoff,  0,               "Camera off")
-BITDEF(cam_ctr, stab,    1,               "gyro stabilization")
-BITDEF(cam_ctr, hold,    2,               "attitude hold")
-BITDEF(cam_ctr, pos,     3,               "position tracking")
-BITDEF(cam_ctr, fixed,   4,               "fixed position")
-VARDEF(float, cam_heading, 0,4,2,       "camera heading [deg]")
-VARDEF(float, cam_pitch,   0,4,2,       "camera pitch [deg]")
-VARDEF(float, cam_zoom,    1.0,1,1,     "camera zoom level [0..1]")
-VARDEF(float, cam_focus,   1.0,1,1,     "camera focus [0..1]")
-VARDEF(float, cam_bias_h,  0,4,2,       "camera heading stability bias [deg/s]")
-VARDEF(float, cam_bias_p,  0,4,2,       "camera pitch stability bias [deg/s]")
-VARDEF(bits, cam_opt,  0,0,0,           "camera options [on/off]")
-BITDEF(cam_opt, PF,      1,               "Picture flip on/off")
-BITDEF(cam_opt, NIR,     2,               "NIR filter on/off")
-BITDEF(cam_opt, DSP,     4,               "Display information on/off")
-BITDEF(cam_opt, FM,      8,               "Focus mode infinity/auto")
-VARDEF(float, cam_lat, 0,4,4,           "camera track latitude [deg]")
-VARDEF(float, cam_lon, 0,4,4,           "camera track longitude [deg]")
-VARDEF(float, cam_alt, 0,4,2,           "camera track altitude [m]")
-VARDEF(bits, cam_ctrb, 0,0,0,           "camera controls bitfield [on/off]")
-BITDEF(cam_ctrb, shot,  1,                "Snapshot")
-BITDEF(cam_ctrb, ashot, 2,                "Series snapshots")
+MVAR(byte,  cam_ch,   "video channel",          u1,u1)
+MVAR(enum,  cam_ctr,  "camera control type",,)
+MBIT(cam_ctr, camoff, "Camera off",             0)
+MBIT(cam_ctr, stab,   "gyro stabilization",     1)
+MBIT(cam_ctr, hold,   "attitude hold",          2)
+MBIT(cam_ctr, pos,    "position tracking",      3)
+MBIT(cam_ctr, fixed,  "fixed position",         4)
+MVAR(vect,  camcmd_theta,"commanded camera orientation: roll,pitch,yaw [deg]", f2,f2)
+MVAR(float, cam_zoom, "camera zoom level [0..1]",       u001,u001)
+MVAR(float, cam_focus,"camera focus [0..1]",            u001,u001)
+MVAR(vect,  cambias_theta,  "camera stability bias: roll,pitch,yaw [deg/s]",f2,f2)
+MVAR(flag,  cam_opt,  "camera options [on/off]",,)
+MBIT(cam_opt, PF,     "Picture flip on/off",            1)
+MBIT(cam_opt, NIR,    "NIR filter on/off",              2)
+MBIT(cam_opt, DSP,    "Display information on/off",     4)
+MBIT(cam_opt, FM,     "Focus mode infinity/auto",       8)
+MVAR(float, cam_lat,  "camera track latitude [deg]",            f4,f4)
+MVAR(float, cam_lon,  "camera track longitude [deg]",           f4,f4)
+MVAR(float, cam_alt,  "camera track altitude [m]",              f4,f4)
+MVAR(flag,  cam_ctrb, "camera controls bitfield [on/off]",,)
+MBIT(cam_ctrb, shot,  "Snapshot",               1)
+MBIT(cam_ctrb, ashot, "Series snapshots",       2)
 
 //--------- GCU use only --------------
-VARDEF(float, gcu_RSS,   1.0,1,1, "GCU modem signal strength [0..1]")
-VARDEF(float, gcu_Ve,   25.5,1,1, "GCU battery voltage [v]")
-VARDEF(float, gcu_MT,   -127,1,1, "GCU modem temperature [C]")
-VARDEF(float, gcu_VSWR, 25.5,1,1, "GCU modem standing wave ratio [VSWR]")
+MVAR(float, gcu_RSS,  "GCU modem signal strength [0..1]",       u001,u001)
+MVAR(float, gcu_Ve,   "GCU battery voltage [v]",                u01,u01)
+MVAR(float, gcu_MT,   "GCU modem temperature [C]",              s1,s1)
+MVAR(float, gcu_VSWR, "GCU modem standing wave ratio [VSWR]",   u01,u01)
 //=============================================================================
-#undef VARDEF
-#undef BITDEF
+#undef MVAR
+#undef MBIT

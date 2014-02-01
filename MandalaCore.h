@@ -32,13 +32,6 @@
 #define assert(...)
 #endif
 //=============================================================================
-//virtual members don't work for ARM
-#ifndef __arm__
-#define MANDALA_VIRTUAL virtual
-#else
-#define MANDALA_VIRTUAL
-#endif
-//=============================================================================
 #ifdef USE_FLOAT_TYPE
 typedef float   _var_float;
 #else
@@ -81,9 +74,9 @@ protected:
 //=============================================================================
 typedef Vect            _var_vect;
 typedef uint8_t         _var_byte;
-typedef uint16_t        _var_u16;
-typedef uint32_t        _var_u32;
-typedef uint8_t         _var_bits;
+typedef uint32_t        _var_uint;
+typedef uint8_t         _var_flag;
+typedef uint8_t         _var_enum;
 typedef const uint8_t*  _var_signature;
 //=============================================================================
 #include "MandalaVars.h" //get constants
@@ -94,7 +87,7 @@ enum {
   #include "MandalaVars.h"
   sigCnt
 };
-#define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) idx_##aname,
+#define MVAR(atype,aname,adescr, ...) idx_##aname,
 enum {
   idx_vars_start=idxPAD-1,
   #include "MandalaVars.h"
@@ -102,41 +95,42 @@ enum {
   varsCnt=(idx_vars_top-idx_vars_start+1)
 };
 //-----------------------------------------------------------------------------
-// variable typedefs
-#define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) typedef _var_##atype var_typedef_##aname;
-#define SIGDEF(aname, adescr, ... ) typedef _var_signature var_typedef_##aname;
-#include "MandalaVars.h"
-
-//bitfield constants
-#define BITDEF(avarname,abitname,amask,adescr) enum{ avarname##_##abitname=amask };
+// typedefs and consts
+#define SIGDEF(aname, adescr, ... )     typedef _var_signature var_typedef_##aname;
+#define MVAR(atype,aname,adescr, ...)   typedef _var_##atype var_typedef_##aname;
+#define MBIT(avarname,abitname,adescr,amask)   enum{ avarname##_##abitname=amask };
 #include "MandalaVars.h"
 //=============================================================================
 class MandalaCore
 {
 public:
-  MandalaCore();
   uint pack(uint8_t *buf,uint var_idx);
-  MANDALA_VIRTUAL uint unpack(uint8_t *buf,uint cnt,uint var_idx);
-  uint unpack_stream(uint8_t *buf,uint cnt);
-  bool get_ptr(uint var_idx,void **value_ptr,uint *type);
+  uint unpack(uint8_t *buf,uint cnt,uint var_idx);
+
+  // second compression level (for downstream)
+  uint pack_ext(uint8_t *buf,uint var_idx);
+  uint unpack_ext(uint8_t *buf,uint var_idx);
+
+  // basic protocols
+  uint unpack_stream(uint8_t *buf,uint cnt,bool hd);    //downstream without header
+  uint unpack_setb(uint8_t *buf,uint cnt);              //unpack and set bit <var_idx><_var_bits>
+  uint unpack_clrb(uint8_t *buf,uint cnt);              //unpack and clear bit <var_idx><_var_bits>
+
+
+  bool get_ptr(uint8_t var_idx,void **var_ptr,uint*type);
 
   static void filter(const _var_float &fv,_var_float *var_p,const _var_float &fS=0.05/100.0,const _var_float &fL=0.9/100.0);
   static void filter(const _var_vect &v,_var_vect *var_p,const _var_float &S=0.05/100.0,const _var_float &L=0.9/100.0);
   static void filter_m(const _var_float &v,_var_float *var_p,const _var_float &f);
   static void filter_m(const _var_vect &v,_var_vect *var_p,const _var_float &f);
   //member=mask, if var is a bitfield, or vect idx
-  _var_float get_value(uint var_m);
-  _var_float get_value(uint var_idx,uint member_idx);
-  void set_value(uint var_m,_var_float value);
-  void set_value(uint var_idx,uint member_idx,_var_float value);
+  _var_float get_data(uint16_t var_m);
+  void set_data(uint16_t var_m,_var_float value);
   //-----------------------------------------------------------------------------
-  #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr)         var_typedef_##aname aname;
-  #define SIGDEF(aname,adescr,...)                        static var_typedef_##aname aname;
+  #define MVAR(atype,aname, ...)        var_typedef_##aname aname;
+  #define SIGDEF(aname,adescr, ...)     static var_typedef_##aname aname;
   #include "MandalaVars.h"
 
-  // flag to use alternate bytes field for packing vars
-  // used for telemetry (smaller size, less precision)
-  bool alt_bytecnt;
 
   //math calculations
   _var_float inHgToAltitude(_var_float inHg,_var_float inHg_gnd);
@@ -155,28 +149,62 @@ public:
   }
 protected:
   //pack
-  uint pack_float_1(void *buf,void *value_ptr,_var_float span);
-  uint pack_float_2(void *buf,void *value_ptr,_var_float span);
-  uint pack_float_4(void *buf,void *value_ptr,_var_float span);
-  uint pack_bits_0(void *buf,void *value_ptr,_var_float span);
-  uint pack_byte_0(void *buf,void *value_ptr,_var_float span);
-  uint pack_u16_0(void *buf,void *value_ptr,_var_float span);
-  uint pack_u32_0(void *buf,void *value_ptr,_var_float span);
-  uint pack_vect_1(void *buf,void *value_ptr,_var_float span);
-  uint pack_vect_2(void *buf,void *value_ptr,_var_float span);
-  uint pack_vect_4(void *buf,void *value_ptr,_var_float span);
+  uint pack_float_s(void *buf,const _var_float &v);
+  uint pack_float_u(void *buf,const _var_float &v);
+
+  uint pack_float_s1(void *buf,void *value_ptr);
+  uint pack_float_s01(void *buf,void *value_ptr);
+  uint pack_float_s001(void *buf,void *value_ptr);
+  uint pack_float_s10(void *buf,void *value_ptr);
+
+  uint pack_float_u1(void *buf,void *value_ptr);
+  uint pack_float_u01(void *buf,void *value_ptr);
+  uint pack_float_u001(void *buf,void *value_ptr);
+  uint pack_float_u10(void *buf,void *value_ptr);
+  uint pack_float_u100(void *buf,void *value_ptr);
+
+  uint pack_float_f2(void *buf,void *value_ptr);
+  uint pack_float_f4(void *buf,void *value_ptr);
+
+  uint pack_vect_f2(void *buf,void *value_ptr);
+  uint pack_vect_f4(void *buf,void *value_ptr);
+  uint pack_vect_s1(void *buf,void *value_ptr);
+  uint pack_vect_s10(void *buf,void *value_ptr);
+  uint pack_vect_s001(void *buf,void *value_ptr);
+
+  uint pack_flag_(void *buf,void *value_ptr);
+  uint pack_enum_(void *buf,void *value_ptr);
+  uint pack_byte_u1(void *buf,void *value_ptr);
+  uint pack_uint_u4(void *buf,void *value_ptr);
+  uint pack_uint_u2(void *buf,void *value_ptr);
   uint pack_sig(void *buf,void *value_ptr);
+
   //unpack
-  uint unpack_float_1(void *buf,void *value_ptr,_var_float span);
-  uint unpack_float_2(void *buf,void *value_ptr,_var_float span);
-  uint unpack_float_4(void *buf,void *value_ptr,_var_float span);
-  uint unpack_bits_0(void *buf,void *value_ptr,_var_float span);
-  uint unpack_byte_0(void *buf,void *value_ptr,_var_float span);
-  uint unpack_u16_0(void *buf,void *value_ptr,_var_float span);
-  uint unpack_u32_0(void *buf,void *value_ptr,_var_float span);
-  uint unpack_vect_1(void *buf,void *value_ptr,_var_float span);
-  uint unpack_vect_2(void *buf,void *value_ptr,_var_float span);
-  uint unpack_vect_4(void *buf,void *value_ptr,_var_float span);
+  uint unpack_float_s1(void *buf,void *value_ptr);
+  uint unpack_float_s01(void *buf,void *value_ptr);
+  uint unpack_float_s001(void *buf,void *value_ptr);
+  uint unpack_float_s10(void *buf,void *value_ptr);
+
+  uint unpack_float_u1(void *buf,void *value_ptr);
+  uint unpack_float_u01(void *buf,void *value_ptr);
+  uint unpack_float_u001(void *buf,void *value_ptr);
+  uint unpack_float_u10(void *buf,void *value_ptr);
+  uint unpack_float_u100(void *buf,void *value_ptr);
+
+  uint unpack_float_f2(void *buf,void *value_ptr);
+  uint unpack_float_f4(void *buf,void *value_ptr);
+
+  uint unpack_vect_f2(void *buf,void *value_ptr);
+  uint unpack_vect_f4(void *buf,void *value_ptr);
+  uint unpack_vect_s1(void *buf,void *value_ptr);
+  uint unpack_vect_s10(void *buf,void *value_ptr);
+  uint unpack_vect_s001(void *buf,void *value_ptr);
+
+  uint unpack_flag_(void *buf,void *value_ptr);
+  uint unpack_enum_(void *buf,void *value_ptr);
+  uint unpack_byte_u1(void *buf,void *value_ptr);
+  uint unpack_uint_u4(void *buf,void *value_ptr);
+  uint unpack_uint_u2(void *buf,void *value_ptr);
   uint unpack_sig(void *buf,uint cnt,void *value_ptr);
 
 };
