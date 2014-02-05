@@ -540,6 +540,7 @@ std::ostream &operator<<(std::ostream &out,const Vector<n,T> &v)
 //Common types
 typedef Vector<4> Quat;
 typedef Vector<3> Vect;
+typedef Vector<2> Point;
 //=============================================================================
 // QUATERNIONS
 //=============================================================================

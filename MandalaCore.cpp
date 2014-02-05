@@ -32,147 +32,165 @@
   var_typedef_##aname MandalaCore:: aname = signature_##aname ;
 #include "MandalaVars.h"
 //=============================================================================
-MandalaCore::MandalaCore()
-  : alt_bytecnt(false)
-{
-}
-//===========================================================================
-_var_float MandalaCore::get_value(uint var_m)
-{
-  return get_value(var_m&0xFF,var_m>>8);
-}
-_var_float MandalaCore::get_value(uint var_idx,uint member_idx)
+_var_float MandalaCore::get_data(uint16_t var_m)
 {
   uint type;
   void *value_ptr;
-  if(!get_ptr(var_idx,&value_ptr,&type))return 0;
+  if(!get_ptr(var_m,&value_ptr,&type))return 0;
+  uint8_t m=var_m>>8;
   switch(type){
     case vt_float:return *(_var_float*)value_ptr;
-    case vt_vect: return (*(_var_vect*)value_ptr)[member_idx];
+    case vt_vect: return (*(_var_vect*)value_ptr)[m];
+    case vt_point:return (*(_var_point*)value_ptr)[m];
+    case vt_byte: return *(_var_byte*)value_ptr;
     case vt_uint: return *(_var_uint*)value_ptr;
-    case vt_bits:
-      if(member_idx) return ((*(_var_bits*)value_ptr)&member_idx)?1:0;
-      else return *(_var_bits*)value_ptr;
+    case vt_flag: return m?(((*(_var_flag*)value_ptr)&m)?1:0):(*(_var_flag*)value_ptr);
+    case vt_enum: return (*(_var_enum*)value_ptr);
   }
   return 0;
 }
 //=============================================================================
-void MandalaCore::set_value(uint var_m,_var_float value)
-{
-  set_value(var_m&0xFF,var_m>>8,value);
-}
-void MandalaCore::set_value(uint var_idx,uint member_idx,_var_float value)
+void MandalaCore::set_data(uint16_t var_m,_var_float value)
 {
   uint type;
   void *value_ptr;
-  if(!get_ptr(var_idx,&value_ptr,&type))return;
+  if(!get_ptr(var_m,&value_ptr,&type))return;
+  uint8_t m=var_m>>8;
   switch(type){
     case vt_float:*(_var_float*)value_ptr=value;break;
-    case vt_vect: (*(_var_vect*)value_ptr)[member_idx]=value;break;
+    case vt_vect: (*(_var_vect*)value_ptr)[m]=value;break;
+    case vt_point:(*(_var_point*)value_ptr)[m]=value;break;
+    case vt_byte: *(_var_byte*)value_ptr=value;break;
     case vt_uint: *(_var_uint*)value_ptr=value;break;
-    case vt_bits:
-      if(member_idx) (*(_var_bits*)value_ptr)=(value<=0.0)?((*(_var_bits*)value_ptr)&(~member_idx)):((*(_var_bits*)value_ptr)|member_idx);
-      else *(_var_bits*)value_ptr=value;
+    case vt_flag:
+      if(m) (*(_var_flag*)value_ptr)=(value<=0)?((*(_var_flag*)value_ptr)&(~m)):((*(_var_flag*)value_ptr)|m);
+      else *(_var_flag*)value_ptr=value;
       break;
+    case vt_enum: *(_var_enum*)value_ptr=value;break;
   }
 }
 //=============================================================================
-bool MandalaCore::get_ptr(uint var_idx,void **value_ptr,uint*type)
+bool MandalaCore::get_ptr(uint8_t var_idx,void **var_ptr,uint*type)
 {
   switch (var_idx) {
-    #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
-      case idx_##aname: *type=vt_##atype;*value_ptr=(void*)&(aname);return true;
-    #include "MandalaVars.h"
+  #define SIGDEF(aname,adescr,...) \
+    case idx_##aname: *type=vt_sig;*var_ptr=(void*)&(aname);return true;
+  #define MVAR(atype,aname,adescr, ...) \
+    case idx_##aname: *type=vt_##atype;*var_ptr=(void*)&(aname);return true;
+  #include "MandalaVars.h"
   }
   return false;
 }
 //=============================================================================
 uint MandalaCore::pack(uint8_t *buf,uint var_idx)
 {
-  if(alt_bytecnt){
-    switch (var_idx) {
-      #define SIGDEF(aname,adescr,...) \
-        case idx_##aname: return pack_sig(buf,(void*)&(aname));
-      #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
-        case idx_##aname: return pack_##atype##_##atbytes (buf,(void*)&(aname),aspan);
-      #include "MandalaVars.h"
-    }
-  }else{
-    switch (var_idx) {
-      #define SIGDEF(aname,adescr,...) \
-        case idx_##aname: return pack_sig(buf,(void*)&(aname));
-      #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
-        case idx_##aname: return pack_##atype##_##abytes (buf,(void*)&(aname),aspan);
-      #include "MandalaVars.h"
-    }
+  switch (var_idx) {
+  #define SIGDEF(aname,adescr,...) \
+    case idx_##aname: return pack_sig(buf,(void*)&(aname));
+  #define MVAR(atype,aname,adescr,abytes,atbytes) \
+    case idx_##aname: return pack_##atype##_##abytes (buf,(void*)&(aname));
+  #include "MandalaVars.h"
+  }
+  return 0;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_ext(uint8_t *buf,uint var_idx)
+{
+  switch (var_idx) {
+  #define MVAR(atype,aname,adescr,abytes,atbytes) \
+    case idx_##aname: return pack_##atype##_##atbytes (buf,(void*)&(aname));
+  #include "MandalaVars.h"
   }
   return 0;
 }
 //------------------------------------------------------------------------------
 uint MandalaCore::unpack(uint8_t *buf,uint cnt,uint var_idx)
 {
-  if(alt_bytecnt){
+  if(var_idx<idx_imu){
     switch (var_idx) {
-      #define SIGDEF(aname,adescr,...) \
-        case idx_##aname: return unpack_sig(buf,cnt,(void*)&(aname));
-      #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
-        case idx_##aname: return (cnt>=atbytes)?unpack_##atype##_##atbytes (buf,(void*)&(aname),aspan):0;
-      #include "MandalaVars.h"
+      case idx_setb: return unpack_setb(buf,cnt);
+      case idx_clrb: return unpack_clrb(buf,cnt);
     }
-  }else{
-    switch (var_idx) {
-      #define SIGDEF(aname,adescr,...) \
-        case idx_##aname: return unpack_sig(buf,cnt,(void*)&(aname));
-      #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
-        case idx_##aname: return (cnt>=abytes)?unpack_##atype##_##abytes (buf,(void*)&(aname),aspan):0;
-      #include "MandalaVars.h"
-    }
+    return 0;
+  }
+  switch (var_idx) {
+  #define SIGDEF(aname,adescr,...) \
+    case idx_##aname: return unpack_sig(buf,cnt,(void*)&(aname));
+  #define MVAR(atype,aname,adescr,abytes,atbytes) \
+    case idx_##aname: return unpack_##atype##_##abytes (buf,(void*)&(aname));
+  #include "MandalaVars.h"
+  }
+  return 0;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_ext(uint8_t *buf,uint var_idx)
+{
+  switch (var_idx) {
+  #define MVAR(atype,aname,adescr,abytes,atbytes) \
+    case idx_##aname: return unpack_##atype##_##atbytes (buf,(void*)&(aname));
+  #include "MandalaVars.h"
   }
   return 0;
 }
 //==============================================================================
-uint MandalaCore::pack_float_1(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::pack_float_s(void *buf,const _var_float &v)
 {
-  _var_float f=*((_var_float*)value_ptr);
-  if (span==0){
-    uint32_t v=f;
-    if(v>0xFF)v=0xFF;
-    *((uint8_t*)buf)=v;
-  }else if (span==-127){
-    int32_t v=f;
-    if(v>127)v=127;
-    else if(v<-128)v=-128;
-    *((int8_t*)buf)=v;
-  }else if (span==-12.7){
-    int32_t v=f*10.0;
-    if(v>127)v=127;
-    else if(v<-128)v=-128;
-    *((int8_t*)buf)=v;
-  }else if (span==25.5){
-    int32_t v=f*10.0;
-    if(v>0xFF)v=0xFF;
-    else if(v<0)v=0;
-    *((uint8_t*)buf)=v;
-  }else if (span>0){
-    if(f>span)f=span;
-    else if(f<-span)f=-span;
-    uint32_t v=0xFF*f/span;
-    if(v>0xFF)v=0xFF;
-    *((uint8_t*)buf)=v;
-  }else if(span<0){
-    if(f>-span)f=-span;
-    else if(f<span)f=span;
-    int32_t v=0x7F*f/(-span);
-    if(v>0x7F)v=0x7F;
-    else if(v<-(int)0x80)v=-(int)0x80;
-    *((int8_t*)buf)=v;
-  }
-  return 1;
+  *((int8_t*)buf)=(v>127)?127:((v<-128)?-128:v);
+  return sizeof(int8_t);
+}
+uint MandalaCore::pack_float_u(void *buf,const _var_float &v)
+{
+  *((uint8_t*)buf)=(v>255)?255:v;
+  return sizeof(uint8_t);
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::pack_float_2(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::pack_float_s1(void *buf,void *value_ptr)
+{
+  return pack_float_s(buf,*((_var_float*)value_ptr));
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_float_s01(void *buf,void *value_ptr)
+{
+  return pack_float_s(buf,*((_var_float*)value_ptr)*10.0);
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_float_s001(void *buf,void *value_ptr)
+{
+  return pack_float_s(buf,*((_var_float*)value_ptr)*100.0);
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_float_s10(void *buf,void *value_ptr)
+{
+  return pack_float_s(buf,*((_var_float*)value_ptr)/10.0);
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_float_u1(void *buf,void *value_ptr)
+{
+  return pack_float_u(buf,*((_var_float*)value_ptr));
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_float_u01(void *buf,void *value_ptr)
+{
+  return pack_float_u(buf,*((_var_float*)value_ptr)*10.0);
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_float_u001(void *buf,void *value_ptr)
+{
+  return pack_float_u(buf,*((_var_float*)value_ptr)*100.0);
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_float_u10(void *buf,void *value_ptr)
+{
+  return pack_float_u(buf,*((_var_float*)value_ptr)/10.0);
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_float_u100(void *buf,void *value_ptr)
+{
+  return pack_float_u(buf,*((_var_float*)value_ptr)/100.0);
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_float_f2(void *buf,void *value_ptr)
 { //IEEE 754r
-  (void)span;
   float f=*((_var_float*)value_ptr);
   uint8_t *ptr=(uint8_t*)&f;
   uint32_t x = ptr[0]|ptr[1]<<8|ptr[2]<<16|ptr[3]<<24,xs,xe,xm;
@@ -221,9 +239,8 @@ uint MandalaCore::pack_float_2(void *buf,void *value_ptr,_var_float span)
   return 2;
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::pack_float_4(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::pack_float_f4(void *buf,void *value_ptr)
 {
-  (void)span;
   float f=*(_var_float*)value_ptr;
   uint8_t *src=(uint8_t*)&f;
   uint8_t *dest=(uint8_t*)buf;
@@ -234,67 +251,103 @@ uint MandalaCore::pack_float_4(void *buf,void *value_ptr,_var_float span)
   return 4;
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::pack_uint_1(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::pack_byte_u1(void *buf,void *value_ptr)
 {
-  (void)span;
-  uint v=*((_var_uint*)value_ptr);
-  if(v>0xFF)v=0xFF;
-  *((uint8_t*)buf)=v;
-  return 1;
+  *((uint8_t*)buf)=*((_var_byte*)value_ptr);
+  return sizeof(uint8_t);
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::pack_bits_1(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::pack_flag_(void *buf,void *value_ptr)
 {
-  (void)span;
-  *((uint8_t*)buf)=*((_var_bits*)value_ptr);
-  return 1;
+  *((uint8_t*)buf)=*((_var_flag*)value_ptr);
+  return sizeof(uint8_t);
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::pack_uint_2(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::pack_enum_(void *buf,void *value_ptr)
 {
-  (void)span;
-  uint v=*((_var_uint*)value_ptr);
-  if(v>0xFFFF)v=0xFFFF;
-  *((uint16_t*)buf)=v;
-  return 2;
+  *((uint8_t*)buf)=*((_var_enum*)value_ptr);
+  return sizeof(uint8_t);
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::pack_uint_4(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::pack_uint_u4(void *buf,void *value_ptr)
 {
-  (void)span;
-  uint v=*((_var_uint*)value_ptr);
-  *((uint32_t*)buf)=v;
-  return 4;
+  *((uint32_t*)buf)=*((_var_uint*)value_ptr);
+  return sizeof(uint32_t);
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::pack_vect_1(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::pack_uint_u2(void *buf,void *value_ptr)
+{
+  _var_uint v=*((_var_uint*)value_ptr);
+  *((uint16_t*)buf)=v>0x0000FFFF?0x0000FFFF:v;
+  return sizeof(uint16_t);
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_vect_s1(void *buf,void *value_ptr)
 {
   _var_vect *v=((_var_vect*)value_ptr);
   uint8_t *ptr=(uint8_t*)buf;
-  pack_float_1(ptr++,&((*v)[0]),span);
-  pack_float_1(ptr++,&((*v)[1]),span);
-  pack_float_1(ptr,&((*v)[2]),span);
+  pack_float_s1(ptr++,&((*v)[0]));
+  pack_float_s1(ptr++,&((*v)[1]));
+  pack_float_s1(ptr,&((*v)[2]));
   return 3;
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::pack_vect_2(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::pack_vect_s10(void *buf,void *value_ptr)
+{
+  _var_vect *v=((_var_vect*)value_ptr);
+  uint8_t *ptr=(uint8_t*)buf;
+  pack_float_s10(ptr++,&((*v)[0]));
+  pack_float_s10(ptr++,&((*v)[1]));
+  pack_float_s10(ptr,&((*v)[2]));
+  return 3;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_vect_s001(void *buf,void *value_ptr)
+{
+  _var_vect *v=((_var_vect*)value_ptr);
+  uint8_t *ptr=(uint8_t*)buf;
+  pack_float_s001(ptr++,&((*v)[0]));
+  pack_float_s001(ptr++,&((*v)[1]));
+  pack_float_s001(ptr,&((*v)[2]));
+  return 3;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_vect_f2(void *buf,void *value_ptr)
 {
   _var_vect *v=((_var_vect*)value_ptr);
   uint16_t *ptr=(uint16_t*)buf;
-  pack_float_2(ptr++,&((*v)[0]),span);
-  pack_float_2(ptr++,&((*v)[1]),span);
-  pack_float_2(ptr,&((*v)[2]),span);
+  pack_float_f2(ptr++,&((*v)[0]));
+  pack_float_f2(ptr++,&((*v)[1]));
+  pack_float_f2(ptr,&((*v)[2]));
   return 6;
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::pack_vect_4(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::pack_vect_f4(void *buf,void *value_ptr)
 {
   _var_vect *v=((_var_vect*)value_ptr);
   uint32_t *ptr=(uint32_t*)buf;
-  pack_float_4(ptr++,&((*v)[0]),span);
-  pack_float_4(ptr++,&((*v)[1]),span);
-  pack_float_4(ptr,&((*v)[2]),span);
+  pack_float_f4(ptr++,&((*v)[0]));
+  pack_float_f4(ptr++,&((*v)[1]));
+  pack_float_f4(ptr,&((*v)[2]));
   return 12;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_point_f2(void *buf,void *value_ptr)
+{
+  _var_point *v=((_var_point*)value_ptr);
+  uint16_t *ptr=(uint16_t*)buf;
+  pack_float_f2(ptr++,&((*v)[0]));
+  pack_float_f2(ptr,&((*v)[1]));
+  return 4;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_point_f4(void *buf,void *value_ptr)
+{
+  _var_point *v=((_var_point*)value_ptr);
+  uint32_t *ptr=(uint32_t*)buf;
+  pack_float_f4(ptr++,&((*v)[0]));
+  pack_float_f4(ptr,&((*v)[1]));
+  return 8;
 }
 //------------------------------------------------------------------------------
 uint MandalaCore::pack_sig(void *buf,void *value_ptr)
@@ -312,29 +365,62 @@ uint MandalaCore::pack_sig(void *buf,void *value_ptr)
   return cnt;
 }
 //=============================================================================
-uint MandalaCore::unpack_float_1(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::unpack_float_s1(void *buf,void *value_ptr)
 {
-  _var_float v=0;
-  if (span==0){
-    v=*((uint8_t*)buf);
-  }else if (span==-127){
-    v=(_var_float)(*((int8_t*)buf));
-  }else if (span==-12.7){
-    v=(_var_float)(*((int8_t*)buf))*0.1;
-  }else if (span==25.5){
-    v=(_var_float)(*((uint8_t*)buf))*0.1;
-  }else if (span>0){
-    v=(_var_float)(*((uint8_t*)buf))*(span/(_var_float)0xFF);
-  }else if(span<0){
-    v=(_var_float)(*((int8_t*)buf))*(span/(_var_float)(-0x80));
-  }
-  *((_var_float*)value_ptr)=v;
+  *((_var_float*)value_ptr)=(_var_float)(*((int8_t*)buf));
   return 1;
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::unpack_float_2(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::unpack_float_s01(void *buf,void *value_ptr)
 {
-  (void)span;
+  *((_var_float*)value_ptr)=(_var_float)(*((int8_t*)buf))/10.0;
+  return 1;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_float_s001(void *buf,void *value_ptr)
+{
+  *((_var_float*)value_ptr)=(_var_float)(*((int8_t*)buf))/100.0;
+  return 1;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_float_s10(void *buf,void *value_ptr)
+{
+  *((_var_float*)value_ptr)=(_var_float)((int32_t)*((int8_t*)buf)*10);
+  return 1;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_float_u1(void *buf,void *value_ptr)
+{
+  *((_var_float*)value_ptr)=(_var_float)(*((uint8_t*)buf));
+  return 1;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_float_u01(void *buf,void *value_ptr)
+{
+  *((_var_float*)value_ptr)=(_var_float)(*((uint8_t*)buf))/10.0;
+  return 1;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_float_u001(void *buf,void *value_ptr)
+{
+  *((_var_float*)value_ptr)=(_var_float)(*((uint8_t*)buf))/100.0;
+  return 1;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_float_u10(void *buf,void *value_ptr)
+{
+  *((_var_float*)value_ptr)=(_var_float)((uint32_t)*((uint8_t*)buf)*10);
+  return 1;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_float_u100(void *buf,void *value_ptr)
+{
+  *((_var_float*)value_ptr)=(_var_float)((uint32_t)*((uint8_t*)buf)*100);
+  return 1;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_float_f2(void *buf,void *value_ptr)
+{
   float f;
   uint16_t h=*((uint16_t*)buf),hs,he,hm;
   uint32_t *xp=(uint32_t*)&f;//(uint32_t*)value_ptr;
@@ -377,9 +463,8 @@ uint MandalaCore::unpack_float_2(void *buf,void *value_ptr,_var_float span)
   return 2;
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::unpack_float_4(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::unpack_float_f4(void *buf,void *value_ptr)
 {
-  (void)span;
   float f;
   uint8_t *src=(uint8_t*)buf;
   uint8_t *dest=(uint8_t*)&f;
@@ -392,62 +477,102 @@ uint MandalaCore::unpack_float_4(void *buf,void *value_ptr,_var_float span)
   return 4;
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::unpack_bits_1(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::unpack_flag_(void *buf,void *value_ptr)
 {
-  (void)span;
-  *((_var_bits*)value_ptr)=*((uint8_t*)buf);
-  return 1;
+  *((_var_flag*)value_ptr)=*((uint8_t*)buf);
+  return sizeof(uint8_t);
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::unpack_uint_1(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::unpack_enum_(void *buf,void *value_ptr)
 {
-  (void)span;
-  *((_var_uint*)value_ptr)=*((uint8_t*)buf);
-  return 1;
+  *((_var_enum*)value_ptr)=*((uint8_t*)buf);
+  return sizeof(uint8_t);
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::unpack_uint_2(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::unpack_byte_u1(void *buf,void *value_ptr)
 {
-  (void)span;
-  *((_var_uint*)value_ptr)=*((uint16_t*)buf);
-  return 2;
+  *((_var_byte*)value_ptr)=*((uint8_t*)buf);
+  return sizeof(uint8_t);
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::unpack_uint_4(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::unpack_uint_u4(void *buf,void *value_ptr)
 {
-  (void)span;
   *((_var_uint*)value_ptr)=*((uint32_t*)buf);
-  return 4;
+  return sizeof(uint32_t);
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::unpack_vect_1(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::unpack_uint_u2(void *buf,void *value_ptr)
+{
+  *((_var_uint*)value_ptr)=*((uint16_t*)buf);
+  return sizeof(uint16_t);
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_vect_s1(void *buf,void *value_ptr)
 {
   _var_vect *v=((_var_vect*)value_ptr);
   uint8_t *ptr=(uint8_t*)buf;
-  unpack_float_1(ptr++,&((*v)[0]),span);
-  unpack_float_1(ptr++,&((*v)[1]),span);
-  unpack_float_1(ptr,&((*v)[2]),span);
+  unpack_float_s1(ptr++,&((*v)[0]));
+  unpack_float_s1(ptr++,&((*v)[1]));
+  unpack_float_s1(ptr,&((*v)[2]));
   return 3;
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::unpack_vect_2(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::unpack_vect_s10(void *buf,void *value_ptr)
+{
+  _var_vect *v=((_var_vect*)value_ptr);
+  uint8_t *ptr=(uint8_t*)buf;
+  unpack_float_s10(ptr++,&((*v)[0]));
+  unpack_float_s10(ptr++,&((*v)[1]));
+  unpack_float_s10(ptr,&((*v)[2]));
+  return 3;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_vect_s001(void *buf,void *value_ptr)
+{
+  _var_vect *v=((_var_vect*)value_ptr);
+  uint8_t *ptr=(uint8_t*)buf;
+  unpack_float_s001(ptr++,&((*v)[0]));
+  unpack_float_s001(ptr++,&((*v)[1]));
+  unpack_float_s001(ptr,&((*v)[2]));
+  return 3;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_vect_f2(void *buf,void *value_ptr)
 {
   _var_vect *v=((_var_vect*)value_ptr);
   uint16_t *ptr=(uint16_t*)buf;
-  unpack_float_2(ptr++,&((*v)[0]),span);
-  unpack_float_2(ptr++,&((*v)[1]),span);
-  unpack_float_2(ptr,&((*v)[2]),span);
+  unpack_float_f2(ptr++,&((*v)[0]));
+  unpack_float_f2(ptr++,&((*v)[1]));
+  unpack_float_f2(ptr,&((*v)[2]));
   return 6;
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::unpack_vect_4(void *buf,void *value_ptr,_var_float span)
+uint MandalaCore::unpack_vect_f4(void *buf,void *value_ptr)
 {
   _var_vect *v=((_var_vect*)value_ptr);
   uint32_t *ptr=(uint32_t*)buf;
-  unpack_float_4(ptr++,&((*v)[0]),span);
-  unpack_float_4(ptr++,&((*v)[1]),span);
-  unpack_float_4(ptr,&((*v)[2]),span);
+  unpack_float_f4(ptr++,&((*v)[0]));
+  unpack_float_f4(ptr++,&((*v)[1]));
+  unpack_float_f4(ptr,&((*v)[2]));
   return 12;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_point_f2(void *buf,void *value_ptr)
+{
+  _var_point *v=((_var_point*)value_ptr);
+  uint16_t *ptr=(uint16_t*)buf;
+  unpack_float_f2(ptr++,&((*v)[0]));
+  unpack_float_f2(ptr,&((*v)[1]));
+  return 4;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_point_f4(void *buf,void *value_ptr)
+{
+  _var_point *v=((_var_point*)value_ptr);
+  uint32_t *ptr=(uint32_t*)buf;
+  unpack_float_f4(ptr++,&((*v)[0]));
+  unpack_float_f4(ptr,&((*v)[1]));
+  return 8;
 }
 //------------------------------------------------------------------------------
 uint MandalaCore::unpack_sig(void *buf,uint cnt,void *value_ptr)
@@ -466,7 +591,7 @@ uint MandalaCore::unpack_sig(void *buf,uint cnt,void *value_ptr)
   return rcnt;
 }
 //------------------------------------------------------------------------------
-uint MandalaCore::unpack_stream(uint8_t *buf,uint cnt)
+uint MandalaCore::unpack_stream(uint8_t *buf,uint cnt,bool hd)
 {
   uint mask=1;
   uint8_t *mask_ptr=buf;
@@ -477,7 +602,7 @@ uint MandalaCore::unpack_stream(uint8_t *buf,uint cnt)
     for(uint i=0;i<8;i++){
       if((*mask_ptr)&mask){
         if(tcnt<=0)break;
-        uint sz=unpack(ptr,tcnt,idx);
+        uint sz=hd?unpack(ptr,tcnt,idx):unpack_ext(ptr,idx);
         if(!sz)return 0;
         ptr+=sz;
         tcnt-=sz;
@@ -492,6 +617,37 @@ uint MandalaCore::unpack_stream(uint8_t *buf,uint cnt)
   }while(tcnt>0);
   return cnt;
 }
+//-----------------------------------------------------------------------------
+uint MandalaCore::unpack_setb(uint8_t *buf,uint cnt)
+{
+  if(!buf[1])return 0;
+  set_data(buf[0]|buf[1]<<8,1);
+  /*uint var_idx=buf[0];
+  uint type;
+  void *value_ptr;
+  bool bChk=cnt==2;
+  bChk=bChk&&get_ptr(var_idx,&value_ptr,&type);
+  bChk=bChk&&(type==vt_flag);
+  if(!bChk) return 0;
+  *(_var_flag*)value_ptr|=(_var_flag)(buf[1]);*/
+  return cnt;
+}
+//-----------------------------------------------------------------------------
+uint MandalaCore::unpack_clrb(uint8_t *buf,uint cnt)
+{
+  if(!buf[1])return 0;
+  set_data(buf[0]|buf[1]<<8,0);
+/*  uint var_idx=buf[0];
+  uint type;
+  void *value_ptr;
+  bool bChk=cnt==2;
+  bChk=bChk&&get_ptr(var_idx,&value_ptr,&type);
+  bChk=bChk&&(type==vt_flag);
+  if(!bChk) return 0;
+  *(_var_flag*)value_ptr&=~((_var_flag)(buf[1]));*/
+  return cnt;
+}
+//=============================================================================
 //=============================================================================
 void MandalaCore::filter(const _var_float &fv,_var_float *var_p,const _var_float &fS,const _var_float &fL)
 {
@@ -525,7 +681,7 @@ _var_float MandalaCore::inHgToAltitude(_var_float inHg,_var_float inHg_gnd)
 //=============================================================================
 //=============================================================================
 //=============================================================================
-#if defined(USE_FLOAT_TYPE) && !defined(USE_MATRIX_MATH)
+#if defined(USE_FLOAT_TYPE) && !defined(MANDALA_FULL)
 // Simplified Vector math
 Vect::Vect()
 {this->fill();}

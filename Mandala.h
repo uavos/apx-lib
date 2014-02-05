@@ -58,14 +58,12 @@ typedef struct {
 }_waypoint;
 typedef struct {
   _var_vect     LLA;  //start pos [lat lon agl]
-  _var_vect     dNED;
+  _var_point    dNE;
   uint8_t       appType;
   _var_float    distApp;
   _var_float    altApp;
   _var_float    distTA;
   _var_float    altTA;
-  //calculated
-  _var_float    hdg;
 }_runway;
 typedef struct {
   _waypoint waypoints[MAX_WPCNT];
@@ -90,8 +88,8 @@ class Mandala : public MandalaCore
 public:
   _uav_id         id;
 
-  bool fill_params(uint var_idx,uint member_idx,void **value_ptr,uint *type,uint8_t *mask,const char **name,const char **descr);
-  const char *get_var_name(uint var_idx);
+  bool get_text_names(uint16_t varmsk,const char **name,const char **descr);
+  const char *var_name(uint8_t var_idx);
 
   //---- flightplan ----
   _flightplan fp;
@@ -133,43 +131,49 @@ public:
   // additional methods (debug, math, NAV helper functions)
   void dump(const uint8_t *ptr,uint cnt,bool hex=true);
   void dump(const _var_vect &v,const char *str="");
-  void dump(const uint var_idx);
+  void dump(uint8_t var_idx);
 
   // math operations
   _var_float boundAngle(_var_float v,_var_float span=180.0);
+  _var_float boundAngle360(_var_float v);
   _var_vect  boundAngle(const _var_vect &v,_var_float span=180.0);
   _var_float smoothAngle(_var_float v,_var_float v_prev,_var_float speed);
+  void filter_a(const _var_float &v,_var_float *var_p,const _var_float &f);
   uint snap(uint v, uint snapv=10);
   _var_float hyst(_var_float err,_var_float hyst);
   _var_float limit(const _var_float v,const _var_float vL=1.0);
   _var_float limit(const _var_float v,const _var_float vMin,const _var_float vMax);
-  _var_float ned2hdg(const _var_vect &ned,bool back=false); //return heading to NED frm (0,0,0)
-  _var_float ned2dist(const _var_vect &ned); //return distance to to NED frm (0,0,0)
-  const _var_vect lla2ned(const _var_vect &lla);  // return NED from Lat Lon AGL
 
   void calc(void); // calculate vars dependent on current and desired UAV position
 
-  const _var_vect llh2ned(const _var_vect llh);
-  const _var_vect llh2ned(const _var_vect llh,const _var_vect home_llh);
-  const _var_vect rotate(const _var_vect &v_in,const _var_float theta);
-  const _var_vect rotate(const _var_vect &v_in,const _var_vect &theta);
-  const _var_vect LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const _var_float lat,const _var_float lon);
-  const _var_vect ECEF_dist(const _var_vect &ecef1,const _var_vect &ecef2,const _var_float lat,const _var_float lon);
-  const _var_vect ECEF2Tangent(const _var_vect &ECEF,const _var_float latitude,const _var_float longitude);
-  const _var_vect Tangent2ECEF(const _var_vect &Local,const _var_float latitude,const _var_float longitude);
-  const _var_vect ECEF2llh(const _var_vect &ECEF);
-  const _var_vect llh2ECEF(const _var_vect &llh);
-  const _var_vect ned2llh(const _var_vect &ned);
-  const _var_vect ned2llh(const _var_vect &ned,const _var_vect &home_llh);
-  _var_float sqr(_var_float x);
+  const _var_point lla2ne(const _var_vect &lla) const;  // return NED from Lat Lon AGL
+  const _var_point llh2ne(const _var_vect llh) const;
+  const _var_point llh2ne(const _var_vect llh,const _var_vect home_llh) const;
+  _var_float heading(const _var_point &ne,bool back=false) const; //return heading to NED frm (0,0,0)
+  _var_float heading(const _var_float N,const _var_float E,bool back=false) const;
+  _var_float distance(const _var_point &ne) const; //return distance to to NED frm (0,0,0)
+  _var_float distance(const _var_float N,const _var_float E) const;
+  const _var_point rotate(const _var_point &v_in,const _var_float psi) const;
+  const _var_point rotate(const _var_float N,const _var_float E,const _var_float psi) const;
+  const _var_vect rotate(const _var_vect &v_in,const _var_float psi) const;
+  const _var_vect rotate(const _var_vect &v_in,const _var_vect &theta) const;
+  const _var_point LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const _var_float lat,const _var_float lon) const;
+  const _var_point ECEF_dist(const _var_vect &ecef1,const _var_vect &ecef2,const _var_float lat,const _var_float lon) const;
+  const _var_point ECEF2Tangent(const _var_vect &ECEF,const _var_float latitude,const _var_float longitude) const;
+  const _var_vect Tangent2ECEF(const _var_point &ne,const _var_float latitude,const _var_float longitude) const;
+  const _var_point ECEF2ll(const _var_vect &ECEF) const;
+  const _var_vect llh2ECEF(const _var_vect &llh) const;
+  const _var_point ne2ll(const _var_point &ne) const;
+  const _var_point ne2ll(const _var_point &ne,const _var_vect &home_llh) const;
+  _var_float sqr(const _var_float x) const;
+  _var_float wind_triangle(_var_float crs) const; //return TAS to gSpeed multiplier for given course
+  _var_float wind_circle(_var_float crs,_var_float span,_var_float r) const; //return air path length for ground circle flight
 private:
   // some special protocols
   uint archive_flightplan(uint8_t *buf,uint bufSize);   //pack flightplan
   uint extract_flightplan(uint8_t *buf,uint cnt);       //unpack flightplan
   uint archive_downstream(uint8_t *buf,uint maxSize);   //pack telemetry
   uint extract_downstream(uint8_t *buf,uint cnt);       //unpack telemetry
-  uint extract_setb(uint8_t *buf,uint cnt);             //unpack and set bit
-  uint extract_clrb(uint8_t *buf,uint cnt);             //unpack and clear bit
 };
 //=============================================================================
 #endif // MANDALA_H

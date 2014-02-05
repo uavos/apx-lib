@@ -47,7 +47,7 @@ void Mandala::init(void)
 
   //------------------------
 
-#define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
+#define MVAR(atype,aname,...) \
   aname=0;
 #include "MandalaVars.h"
 
@@ -60,29 +60,31 @@ void Mandala::init(void)
   for(uint i=0;i<rwaCnt;i++) rwa_str[i]=rwa_str_s[i];
 }
 //===========================================================================
-bool Mandala::fill_params(uint var_idx,uint member_idx,void **value_ptr,uint *type,uint8_t *mask,const char **name,const char **descr)
+bool Mandala::get_text_names(uint16_t varmsk,const char **name,const char **descr)
 {
-  if(!get_ptr(var_idx,value_ptr,type))return false;
-  *mask=0;
+  uint type;
+  void *value_ptr;
+  if(!get_ptr(varmsk,&value_ptr,&type))return false;
   *name="";
   *descr="";
-  if(*type==vt_bits && member_idx<=255){
-    //find bits/opts name and descr
-    uint bit_var=256,bit_idx=0;
-    #define BITDEF(avarname,abitname,amask,adescr) \
-    if(bit_var!=idx_##avarname){bit_var=idx_##avarname;bit_idx=0;}\
-    if(var_idx==idx_##avarname && member_idx==bit_idx){*mask=avarname##_##abitname;*name=#abitname;*descr=adescr;return true;}\
-    bit_idx++;
+  uint8_t m=varmsk>>8;
+  if((m!=0xFF)&& ((type==vt_flag && m) || type==vt_enum)){
+    switch(varmsk){
+    #define MBIT(avarname,abitname,adescr,amask) \
+      case idx_##avarname |( avarname##_##abitname <<8): *name=#abitname;*descr=adescr;return true;
     #include "MandalaVars.h"
-    if(member_idx)return false;
+    }
+    if(m) return false;
   }
   //find name and descr (no member)
-  switch (var_idx) {
-    #define VARDEF(atype,aname,aspan,abytes,atbytes,adescr) \
-    case idx_##aname: *name=#aname;*descr=adescr;break;
-    #include "MandalaVars.h"
+  switch (varmsk&0xFF) {
+  #define SIGDEF(aname,adescr,...) \
+    case idx_##aname: *name=#aname;*descr=adescr;return true;
+  #define MVAR(atype,aname,adescr, ...) \
+    case idx_##aname: *name=#aname;*descr=adescr;return true;
+  #include "MandalaVars.h"
   }
-  return true;
+  return false;
 }
 //===========================================================================
 uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
@@ -90,10 +92,9 @@ uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
   //check for special protocol archiveSize
   if(var_idx==idx_downstream)return archive_downstream(buf,size);
   if(var_idx==idx_flightplan)return archive_flightplan(buf,size);
+  if(var_idx<idx_imu)return 0;  //other special var
   //basic vars
-  uint cnt=pack(buf,var_idx);
-  if(!cnt)return 0;
-  return cnt;
+  return pack(buf,var_idx);
 }
 //=============================================================================
 uint Mandala::extract(uint8_t *buf,uint size)
@@ -107,11 +108,6 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   //check for special protocol archiveSize
   if(var_idx==idx_downstream)return extract_downstream(buf,size);
   if(var_idx==idx_flightplan)return extract_flightplan(buf,size);
-  if(var_idx==idx_msg)return 1; //nothing to do
-  if(var_idx==idx_service)return 1; //nothing to do
-  if(var_idx==idx_setb)return extract_setb(buf,size);
-  if(var_idx==idx_clrb)return extract_clrb(buf,size);
-  if(var_idx==idx_ping)return 1;
   if(var_idx==idx_vor)return 1;
 
 
@@ -138,9 +134,9 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     uint i;
     for(i=0;i<wpcnt;i++){
       if((buf+(szLLH+2+fp.waypoints[i].cmdSize))>buf_top) break;
-      buf+=pack_float_4(buf,&(fp.waypoints[i].LLA[0]),0);
-      buf+=pack_float_4(buf,&(fp.waypoints[i].LLA[1]),0);
-      buf+=pack_float_2(buf,&(fp.waypoints[i].LLA[2]),0);
+      buf+=pack_float_f4(buf,&(fp.waypoints[i].LLA[0]));
+      buf+=pack_float_f4(buf,&(fp.waypoints[i].LLA[1]));
+      buf+=pack_float_f2(buf,&(fp.waypoints[i].LLA[2]));
       *buf++=fp.waypoints[i].type;
       *buf++=fp.waypoints[i].cmdSize;
       memcpy(buf,fp.waypoints[i].cmd,fp.waypoints[i].cmdSize);
@@ -151,22 +147,22 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     *buf++=rwcnt;
     for(i=0;i<rwcnt;i++){
       if((buf+(szLLH+6+9))>buf_top) break;
-      buf+=pack_float_4(buf,&(fp.runways[i].LLA[0]),0);
-      buf+=pack_float_4(buf,&(fp.runways[i].LLA[1]),0);
-      buf+=pack_float_2(buf,&(fp.runways[i].LLA[2]),0);
-      buf+=pack_vect_2(buf,&(fp.runways[i].dNED),0);
+      buf+=pack_float_f4(buf,&(fp.runways[i].LLA[0]));
+      buf+=pack_float_f4(buf,&(fp.runways[i].LLA[1]));
+      buf+=pack_float_f2(buf,&(fp.runways[i].LLA[2]));
+      buf+=pack_point_f2(buf,&(fp.runways[i].dNE));
       *buf++=fp.runways[i].appType;
-      buf+=pack_float_2(buf,&(fp.runways[i].distApp),0);
-      buf+=pack_float_2(buf,&(fp.runways[i].altApp),0);
-      buf+=pack_float_2(buf,&(fp.runways[i].distTA),0);
-      buf+=pack_float_2(buf,&(fp.runways[i].altTA),0);
+      buf+=pack_float_f2(buf,&(fp.runways[i].distApp));
+      buf+=pack_float_f2(buf,&(fp.runways[i].altApp));
+      buf+=pack_float_f2(buf,&(fp.runways[i].distTA));
+      buf+=pack_float_f2(buf,&(fp.runways[i].altTA));
     }
     if(i<rwcnt)break; //overflow
     //write flight place parameters
     if((buf+6)>buf_top) break;
-    buf+=pack_float_2(buf,&(fp.safety.altitude),0);
-    buf+=pack_float_2(buf,&(fp.safety.dHome),0);
-    buf+=pack_float_2(buf,&(fp.safety.dHomeERS),0);
+    buf+=pack_float_f2(buf,&(fp.safety.altitude));
+    buf+=pack_float_f2(buf,&(fp.safety.dHome));
+    buf+=pack_float_f2(buf,&(fp.safety.dHomeERS));
     //success: calc number of bytes written
     cnt=buf-sbuf;
     break;
@@ -189,9 +185,9 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     uint i;
     for (i=0;i<wpcnt;i++) {
       if((buf+(szLLH+2))>buf_top) break;
-      buf+=unpack_float_4(buf,&(fp.waypoints[i].LLA[0]),0);
-      buf+=unpack_float_4(buf,&(fp.waypoints[i].LLA[1]),0);
-      buf+=unpack_float_2(buf,&(fp.waypoints[i].LLA[2]),0);
+      buf+=unpack_float_f4(buf,&(fp.waypoints[i].LLA[0]));
+      buf+=unpack_float_f4(buf,&(fp.waypoints[i].LLA[1]));
+      buf+=unpack_float_f2(buf,&(fp.waypoints[i].LLA[2]));
       fp.waypoints[i].type=(_wpt_type)*buf++;
       uint csz=(_wpt_type)*buf++;
       uint sz=csz;
@@ -208,22 +204,22 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     if(rwcnt>MAX_RWCNT)break;
     for (i=0;i<rwcnt;i++) {
       if((buf+(szLLH+6+9))>buf_top) break;
-      buf+=unpack_float_4(buf,&(fp.runways[i].LLA[0]),0);
-      buf+=unpack_float_4(buf,&(fp.runways[i].LLA[1]),0);
-      buf+=unpack_float_2(buf,&(fp.runways[i].LLA[2]),0);
-      buf+=unpack_vect_2(buf,&(fp.runways[i].dNED),0);
+      buf+=unpack_float_f4(buf,&(fp.runways[i].LLA[0]));
+      buf+=unpack_float_f4(buf,&(fp.runways[i].LLA[1]));
+      buf+=unpack_float_f2(buf,&(fp.runways[i].LLA[2]));
+      buf+=unpack_point_f2(buf,&(fp.runways[i].dNE));
       fp.runways[i].appType=(_rw_app)*buf++;
-      buf+=unpack_float_2(buf,&(fp.runways[i].distApp),0);
-      buf+=unpack_float_2(buf,&(fp.runways[i].altApp),0);
-      buf+=unpack_float_2(buf,&(fp.runways[i].distTA),0);
-      buf+=unpack_float_2(buf,&(fp.runways[i].altTA),0);
+      buf+=unpack_float_f2(buf,&(fp.runways[i].distApp));
+      buf+=unpack_float_f2(buf,&(fp.runways[i].altApp));
+      buf+=unpack_float_f2(buf,&(fp.runways[i].distTA));
+      buf+=unpack_float_f2(buf,&(fp.runways[i].altTA));
     }
     if(i<rwcnt)break; //overflow
     //unpack flight place parameters
     if((buf+6)>buf_top) break;
-    buf+=unpack_float_2(buf,&(fp.safety.altitude),0);
-    buf+=unpack_float_2(buf,&(fp.safety.dHome),0);
-    buf+=unpack_float_2(buf,&(fp.safety.dHomeERS),0);
+    buf+=unpack_float_f2(buf,&(fp.safety.altitude));
+    buf+=unpack_float_f2(buf,&(fp.safety.dHome));
+    buf+=unpack_float_f2(buf,&(fp.safety.dHomeERS));
     //success: calc number of bytes unpacked
     rcnt=buf-sbuf;
     break;
@@ -251,19 +247,18 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
     if(maxSize>MAX_TELEMETRY)maxSize=MAX_TELEMETRY;
   }else maxSize=sizeof(dl_snapshot);
 
+  bool hd=cmode&cmode_dlhd;
 
-  alt_bytecnt=!(cmode&cmode_dlhd);
-
-  //watch alt_bytecnt changes
-  if(dl_hd_save!=alt_bytecnt){
-    dl_hd_save=alt_bytecnt;
+  //watch hd changes
+  if(dl_hd_save!=hd){
+    dl_hd_save=hd;
     dl_reset=true;
   }
 
   //pack header
   uint ts=(dl_timestamp/10)&0x7FFF;
   *buf++=ts;
-  *buf++=(ts>>8)|(alt_bytecnt?0x00:0x80);
+  *buf++=(ts>>8)|(hd?0x80:0x00);
 
   //pack stream
   if(dl_reset){
@@ -277,12 +272,12 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
   uint8_t *mask_ptr=buf;      //start of data
   uint8_t *ptr=mask_ptr+1;
   *mask_ptr=0;
-  for(uint i=idxPAD;i<idx_vars_top;i++){
-    uint sz=archive(dl_var,sizeof(dl_var),i);
+  for(uint i=idxPAD;i<idx_local;i++){
+    uint sz=hd?pack(dl_var,i):pack_ext(dl_var,i);
     //check if filtered var
-    bool filtered=memchr(dl_filter+1,i,dl_filter[0])!=NULL;
+    bool filtered=false;//=memchr(dl_filter+1,i,dl_filter[0])!=NULL;
     if((*reset_mask_ptr)&mask) (*reset_mask_ptr)&=~mask; //remove reset flag
-    else filtered|=(memcmp(snapshot,dl_var,sz)==0);//test changed
+    else filtered=(memcmp(snapshot,dl_var,sz)==0);//test changed
     //pack if not filtered
     if(!filtered){
       //check buf overflow
@@ -310,7 +305,6 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
       ptr++;
     }
   }
-  alt_bytecnt=false;
 
   if(!(dl_timestamp%dl_reset_interval)) // periodically send everything
     dl_reset=true;
@@ -330,7 +324,7 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
   ts|=(*buf++)<<8;
 
   //MSB = HD stream
-  alt_bytecnt=!(ts&0x8000);
+  bool hd=ts&0x8000;
   ts&=0x7FFF;
 
   //calc delta time
@@ -345,56 +339,19 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
   //extract data
   uint tcnt=2;
   if(cnt>2){
-    tcnt=unpack_stream(buf,cnt-2);
+    cnt-=2;
+    tcnt=unpack_stream(buf,cnt,hd);
     if(!tcnt){
       //fprintf(stderr,"Error extract_downstream\n");
     }
   }
-  alt_bytecnt=false;
   // calculate vars filtered by sig dl_filter, otherwise calculated by ahrs
-  NED=llh2ned(_var_vect(gps_lat*D2R,gps_lon*D2R,gps_hmsl));
-  vXYZ=rotate(gps_vNED,theta[2]*D2R);
+  pos_NE=llh2ne(gps_pos);
+  gps_altitude=gps_pos[2]-home_pos[2];
+  vXY=rotate(gps_vNE,theta[2]);
   // gps_deltaNED,gps_deltaXYZ,gps_distWPT,gps_distHome,
   calc();
   return tcnt;
-}
-//=============================================================================
-uint Mandala::extract_setb(uint8_t *buf,uint cnt)
-{
-  uint var_idx=buf[0];
-  uint type;
-  void *value_ptr;
-  bool bChk=cnt==2;
-  bChk=bChk&&get_ptr(var_idx,&value_ptr,&type);
-  bChk=bChk&&(type==vt_bits);
-  //bChk=bChk&&(var_bits[var_idx]);
-  //bChk=bChk&&(var_bits_mask[var_idx][0]);
-  if(!bChk){
-    fprintf(stderr,"Can't extract 'set_bit'.");
-    return 0;
-  }
-  _var_bits *ptr;
-  ptr=(_var_bits*)value_ptr;
-  *ptr|=buf[1];
-  return cnt;
-}
-//-----------------------------------------------------------------------------
-uint Mandala::extract_clrb(uint8_t *buf,uint cnt)
-{
-  uint var_idx=buf[0];
-  uint type;
-  void *value_ptr;
-  bool bChk=cnt==2;
-  bChk=bChk&&get_ptr(var_idx,&value_ptr,&type);
-  bChk=bChk&&(type==vt_bits);
-  if(!bChk){
-    fprintf(stderr,"Can't extract 'clr_bit'.");
-    return 0;
-  }
-  _var_bits *ptr;
-  ptr=(_var_bits*)value_ptr;
-  *ptr&=~((_var_bits)buf[1]);
-  return cnt;
 }
 //=============================================================================
 //=============================================================================
@@ -402,45 +359,27 @@ uint Mandala::extract_clrb(uint8_t *buf,uint cnt)
 void Mandala::calc(void)
 {
   // vars should be filtered by dl_filter
-  dN=cmd_N-NED[0];
-  dE=cmd_E-NED[1];
+  const Point dNE=cmd_NE-pos_NE;
   dAlt=cmd_altitude-altitude;
-  _var_vect dNED(dN,dE,-dAlt);
-  dXYZ=rotate(dNED,theta[2]*D2R);
-  dWPT=ned2dist(dNED);
-  dHome=ned2dist(NED);
-  wpHDG=ned2hdg(dNED);
-  homeHDG=ned2hdg(NED,true);
-  rwDelta=dWPT*sin((wpHDG+180.0-rwHDG)*D2R)-rwAdj;
-  rwDV=rotate(gps_vNED,rwHDG*D2R)[1];
-  gSpeed=ned2dist(gps_vNED);
+  //_var_vect dNED(dN,dE,-dAlt);
+  dXY=rotate(dNE,theta[2]);
+  dWPT=distance(dNE);
+  dHome=distance(pos_NE);
+  wpHDG=heading(dNE);
+  homeHDG=heading(pos_NE,true);
+  rwDelta=dWPT*sin((wpHDG+180.0-tgHDG)*D2R)-rwAdj;
+  rwDV=rotate(gps_vNE,tgHDG)[1];
+  gSpeed=distance(gps_vNE);
   //course
-  //_var_float crsGPS=ned2hdg(gps_vNED);
+  //_var_float crsGPS=heading(gps_vNED);
   //_var_float crsD=boundAngle(crsGPS-theta[2]);
   //_var_float crsK=100.0*((crsD==0)?1.0:limit((90.0/fabs(crsD))/90.0,0,1));
   //course=smoothAngle(crsGPS,course,0.000001);//gSpeed*gSpeed*0.0001/100.0);
 }
 //=============================================================================
-_var_float Mandala::ned2hdg(const _var_vect &ned,bool back)
-{
-  _var_float v=atan2(ned[1],ned[0])*R2D;
-  if(back)return boundAngle(v+180.0);
-  else return boundAngle(v);
-}
-//=============================================================================
-const _var_vect Mandala::lla2ned(const _var_vect &lla)
-{
-  return llh2ned(_var_vect(lla[0]*D2R,lla[1]*D2R,gps_home_hmsl+lla[2]));
-}
-//=============================================================================
-_var_float Mandala::ned2dist(const _var_vect &ned)
-{
-  return sqrt(pow(ned[0],2)+pow(ned[1],2));
-}
-//=============================================================================
 _var_float Mandala::boundAngle(_var_float v,_var_float span)
 {
-  _var_float dspan=span*2.0;
+  const _var_float dspan=span*2.0;
   while (v >= span) v -= dspan;
   while (v < -span) v += dspan;
   return v;
@@ -451,6 +390,13 @@ _var_vect Mandala::boundAngle(const _var_vect &v,_var_float span)
   return _var_vect(boundAngle(v[0],span),boundAngle(v[1],span),boundAngle(v[2],span));
 }
 //===========================================================================
+_var_float Mandala::boundAngle360(_var_float v)
+{
+  while(v<0) v+=360.0;
+  while(v>=360.0) v-=360.0;
+  return v;
+}
+//===========================================================================
 _var_float Mandala::smoothAngle(_var_float v,_var_float v_prev,_var_float speed)
 {
   if(speed!=0){
@@ -459,6 +405,11 @@ _var_float Mandala::smoothAngle(_var_float v,_var_float v_prev,_var_float speed)
     else if(vd<(-speed)) v=boundAngle(v_prev-speed);
   }
   return v;
+}
+//===========================================================================
+void Mandala::filter_a(const _var_float &v,_var_float *var_p,const _var_float &f)
+{
+  *var_p=boundAngle(*var_p+boundAngle(v-*var_p)*f);
 }
 //===========================================================================
 uint Mandala::snap(uint v, uint snapv)
@@ -484,20 +435,52 @@ _var_float Mandala::limit(const _var_float v,const _var_float vMin,const _var_fl
   return (v>vMax)?vMax:((v<vMin)?vMin:v);
 }
 //===========================================================================
-const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_float atheta)
+_var_float Mandala::heading(const _var_point &ne,bool back) const
 {
-  _var_float cos_theta=cos(atheta);
-  _var_float sin_theta=sin(atheta);
-  return _var_vect(v_in[0]*cos_theta+v_in[1]*sin_theta,
-              v_in[1]*cos_theta-v_in[0]*sin_theta,
-              v_in[2]);
+  return heading(ne[0],ne[1],back);
+}
+//=============================================================================
+_var_float Mandala::heading(const _var_float N,const _var_float E,bool back) const
+{
+  if(back)return atan2(N,E)*R2D;
+  else return atan2(E,N)*R2D;
+}
+//=============================================================================
+_var_float Mandala::distance(const _var_point &ne) const
+{
+  return distance(ne[0],ne[1]);
+}
+//=============================================================================
+_var_float Mandala::distance(const _var_float N,const _var_float E) const
+{
+  return sqrt(sqr(N)+sqr(E));
+}
+//=============================================================================
+const _var_point Mandala::rotate(const _var_point &v_in,const _var_float psi) const
+{
+  return rotate(v_in[0],v_in[1],psi);
 }
 //===========================================================================
-const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_vect &atheta)
+const _var_point Mandala::rotate(const _var_float N,const _var_float E,const _var_float psi) const
 {
-  const _var_float &phi=atheta[0];
-  const _var_float &the=atheta[1];
-  const _var_float &psi=atheta[2];
+  const _var_float psi_r=psi*D2R;
+  _var_float cos_theta=cos(psi_r);
+  _var_float sin_theta=sin(psi_r);
+  return _var_point(N*cos_theta+E*sin_theta,
+                E*cos_theta-N*sin_theta);
+}
+//===========================================================================
+const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_float psi) const
+{
+  const _var_point v(rotate(v_in[0],v_in[1],psi));
+  return _var_vect(v[0],v[1],v_in[2]);
+}
+//===========================================================================
+const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_vect &atheta) const
+{
+  const _var_float phi=atheta[0]*D2R;
+  const _var_float the=atheta[1]*D2R;
+  const _var_float psi=atheta[2]*D2R;
   const _var_float cpsi=cos(psi);
   const _var_float cphi=cos(phi);
   const _var_float ctheta=cos(the);
@@ -519,27 +502,32 @@ const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_vect &atheta)
   return c;
 }
 //=============================================================================
-const _var_vect Mandala::llh2ned(const _var_vect llh)
+const _var_point Mandala::lla2ne(const _var_vect &lla) const
 {
-  return llh2ned(llh,_var_vect(gps_home_lat*D2R,gps_home_lon*D2R,gps_home_hmsl));
+  return llh2ne(_var_vect(lla[0],lla[1],home_pos[2]+lla[2]));
+}
+//=============================================================================
+const _var_point Mandala::llh2ne(const _var_vect llh) const
+{
+  return llh2ne(llh,home_pos);
 }
 //===========================================================================
-const _var_vect Mandala::llh2ned(const _var_vect llh,const _var_vect home_llh)
+const _var_point Mandala::llh2ne(const _var_vect llh,const _var_vect home_llh) const
 {
   return LLH_dist(home_llh,llh,home_llh[0],home_llh[1]);
 }
 //===========================================================================
-const _var_vect Mandala::ned2llh(const _var_vect &ned)
+const _var_point Mandala::ne2ll(const _var_point &ne) const
 {
-  return ned2llh(ned,_var_vect(gps_home_lat*D2R,gps_home_lon*D2R,gps_home_hmsl));
+  return ne2ll(ne,home_pos);
 }
 //===========================================================================
-const _var_vect Mandala::ned2llh(const _var_vect &ned,const _var_vect &home_llh)
+const _var_point Mandala::ne2ll(const _var_point &ne,const _var_vect &home_llh) const
 {
-  return ECEF2llh(llh2ECEF(home_llh)+Tangent2ECEF(ned,home_llh[0],home_llh[1]));
+  return ECEF2ll(llh2ECEF(home_llh)+Tangent2ECEF(ne,home_llh[0],home_llh[1]));
 }
 //===========================================================================
-const _var_vect Mandala::LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const _var_float lat,const _var_float lon)
+const _var_point Mandala::LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const _var_float lat,const _var_float lon) const
 {
   const _var_vect &ecef1(llh2ECEF(llh1));
   const _var_vect &ecef2(llh2ECEF(llh2));
@@ -547,18 +535,19 @@ const _var_vect Mandala::LLH_dist(const _var_vect &llh1,const _var_vect &llh2,co
   return ECEF2Tangent(diff,lat,lon);
 }
 //=============================================================================
-const _var_vect Mandala::ECEF_dist(const _var_vect &ecef1,const _var_vect &ecef2,const _var_float lat,const _var_float lon)
+const _var_point Mandala::ECEF_dist(const _var_vect &ecef1,const _var_vect &ecef2,const _var_float lat,const _var_float lon) const
 {
   return ECEF2Tangent(ecef1-ecef2,lat,lon);
 }
 //=============================================================================
-const _var_vect Mandala::ECEF2Tangent(const _var_vect &ECEF,const _var_float latitude,const _var_float longitude)
+const _var_point Mandala::ECEF2Tangent(const _var_vect &ECEF,const _var_float latitude,const _var_float longitude) const
 {
-  _var_float clat=cos(latitude);
-  _var_float clon=cos(longitude);
-  _var_float slat=sin(latitude);
-  _var_float slon=sin(longitude);
-  _var_float Re2t[3][3];
+  const _var_float lat_r=latitude*D2R,lon_r=longitude*D2R;
+  _var_float clat=cos(lat_r);
+  _var_float clon=cos(lon_r);
+  _var_float slat=sin(lat_r);
+  _var_float slon=sin(lon_r);
+  _var_float Re2t[2][3];
 
   Re2t[0][0]=-slat*clon;
   Re2t[0][1]=-slat*slon;
@@ -566,12 +555,12 @@ const _var_vect Mandala::ECEF2Tangent(const _var_vect &ECEF,const _var_float lat
   Re2t[1][0]=-slon;
   Re2t[1][1]=clon;
   Re2t[1][2]=0.0;
-  Re2t[2][0]=-clat*clon;
-  Re2t[2][1]=-clat*slon;
-  Re2t[2][2]=-slat;
-  _var_vect c;
+  //Re2t[2][0]=-clat*clon;
+  //Re2t[2][1]=-clat*slon;
+  //Re2t[2][2]=-slat;
+  _var_point c;
   _var_float s;
-  for (uint i=0;i<3;i++) {
+  for (uint i=0;i<2;i++) {
     s=0;
     for (uint j=0;j<3;j++) s+=ECEF[j]*Re2t[i][j];
     c[i]=s;
@@ -579,36 +568,38 @@ const _var_vect Mandala::ECEF2Tangent(const _var_vect &ECEF,const _var_float lat
   return c;
 }
 //=============================================================================
-const _var_vect Mandala::Tangent2ECEF(const _var_vect &Local,const _var_float latitude,const _var_float longitude)
+const _var_vect Mandala::Tangent2ECEF(const _var_point &ne,const _var_float latitude,const _var_float longitude) const
 {
-  _var_float clat=cos(latitude);
-  _var_float clon=cos(longitude);
-  _var_float slat=sin(latitude);
-  _var_float slon=sin(longitude);
-  _var_float Rt2e[3][3];
+  const _var_float lat_r=latitude*D2R,lon_r=longitude*D2R;
+  _var_float clat=cos(lat_r);
+  _var_float clon=cos(lon_r);
+  _var_float slat=sin(lat_r);
+  _var_float slon=sin(lon_r);
+  _var_float Rt2e[3][2];
   Rt2e[0][0]=-slat*clon;
   Rt2e[1][0]=-slat*slon;
   Rt2e[2][0]=clat;
   Rt2e[0][1]=-slon;
   Rt2e[1][1]=clon;
   Rt2e[2][1]=0.0;
-  Rt2e[0][2]=-clat*clon;
-  Rt2e[1][2]=-clat*slon;
-  Rt2e[2][2]=-slat;
+  //Rt2e[0][2]=-clat*clon;
+  //Rt2e[1][2]=-clat*slon;
+  //Rt2e[2][2]=-slat;
   _var_vect c;
   _var_float s;
   for (uint i=0;i<3;i++) {
     s=0;
-    for (uint j=0;j<3;j++) s+=Local[j]*Rt2e[i][j];
+    for (uint j=0;j<2;j++) s+=ne[j]*Rt2e[i][j];
     c[i]=s;
   }
   return c;
 }
 //=============================================================================
-_var_float Mandala::sqr(_var_float x) {
+_var_float Mandala::sqr(const _var_float x) const
+{
   return x*x;
 }
-const _var_vect Mandala::ECEF2llh(const _var_vect &ECEF)
+const _var_point Mandala::ECEF2ll(const _var_vect &ECEF) const
 {
   _var_float X=ECEF[0];
   _var_float Y=ECEF[1];
@@ -617,39 +608,74 @@ const _var_vect Mandala::ECEF2llh(const _var_vect &ECEF)
   _var_float e=sqrt(2*f-f*f);
   _var_float h=0;
   _var_float N=C_WGS84_a;
-  _var_vect llh;
-  llh[1]=atan2(Y,X);
+  _var_point ll;
+  ll[1]=atan2(Y,X);
   for (int n=0;n<50;++n) {
     _var_float sin_lat=Z/(N*(1-sqr(e))+h);
-    llh[0]=atan((Z+e*e*N*sin_lat)/sqrt(X*X+Y*Y));
-    N=C_WGS84_a/sqrt(1-sqr(e)*sqr(sin(llh[0])));
-    h=sqrt(X*X+Y*Y)/cos(llh[0])-N;
+    ll[0]=atan((Z+e*e*N*sin_lat)/sqrt(X*X+Y*Y));
+    N=C_WGS84_a/sqrt(1-sqr(e)*sqr(sin(ll[0])));
+    h=sqrt(X*X+Y*Y)/cos(ll[0])-N;
   }
-  llh[2]=h;
-  return llh;
+  //ll[2]=h;
+  return ll*R2D;
 }
 //=============================================================================
-const _var_vect Mandala::llh2ECEF(const _var_vect &llh)
+const _var_vect Mandala::llh2ECEF(const _var_vect &llh) const
 {
+  const _var_float lat_r=llh[0]*D2R,lon_r=llh[1]*D2R,hmsl=llh[2];
   _var_float f=(C_WGS84_a-C_WGS84_b)/C_WGS84_a;
   _var_float e=sqrt(2*f-f*f);
-  _var_float N=C_WGS84_a/sqrt(1-e*e*sqr(sin(llh[0])));
+  _var_float N=C_WGS84_a/sqrt(1-e*e*sqr(sin(lat_r)));
   _var_vect ECEF;
-  ECEF[0]=(N+llh[2])*cos(llh[0])*cos(llh[1]);
-  ECEF[1]=(N+llh[2])*cos(llh[0])*sin(llh[1]);
-  ECEF[2]=(N*(1-e*e)+llh[2])*sin(llh[0]);
+  ECEF[0]=(N+hmsl)*cos(lat_r)*cos(lon_r);
+  ECEF[1]=(N+hmsl)*cos(lat_r)*sin(lon_r);
+  ECEF[2]=(N*(1-e*e)+hmsl)*sin(lat_r);
   return ECEF;
 }
 //=============================================================================
-//=============================================================================
-const char *Mandala::get_var_name(uint var_idx)
+_var_float Mandala::wind_triangle(_var_float crs) const
 {
-  uint type;
-  void *value_ptr;
-  uint8_t mask;
+  _var_float wnd_r=(windHdg+180.0)*D2R;
+  _var_float Kvel=airspeed>0?(windSpd/(airspeed*(cas2tas>0?cas2tas:1.0))):0;
+  _var_float aWTA=crs*D2R-wnd_r;  //fabs??
+  _var_float aWCA=asin(Kvel*sin(aWTA));
+  _var_float kWS=cos(aWCA)+Kvel*cos(aWTA);
+  return kWS;
+}
+//=============================================================================
+_var_float Mandala::wind_circle(_var_float crs,_var_float span,_var_float r) const
+{
+  _var_float kWSs=0;
+  _var_float crs_step=20,crs_e;
+  _var_float wnd_r=(windHdg)*D2R;
+  _var_float Kvel=airspeed>0?(windSpd/(airspeed*(cas2tas>0?cas2tas:1.0))):0;
+  if(span<0){
+    crs_step=-crs_step;
+    crs_e=crs;
+    crs-=span;
+  }else{
+    crs_e=crs+span;
+  }
+  uint sz=fabs(span/crs_step);
+  _var_float kWS=1;
+  while(sz--){
+    _var_float aWTA=crs*D2R-wnd_r;
+    _var_float aWCA=asin(Kvel*sin(aWTA));
+    kWS=cos(aWCA)+Kvel*cos(aWTA);
+    kWSs+=1.0/kWS;
+    crs+=crs_step;  //right turn
+  }
+  if(span<0) span=fabs(crs-crs_e);
+  else span=fabs(crs_e-crs);
+  return (kWSs*fabs(crs_step)+span/kWS)*r*(2.0*M_PI/360.0);
+}
+//=============================================================================
+//=============================================================================
+const char *Mandala::var_name(uint8_t var_idx)
+{
   const char *name;
   const char *descr;
-  fill_params(var_idx,0,&value_ptr,&type,&mask,&name,&descr);
+  get_text_names(var_idx|0xFF00,&name,&descr);
   return name;
 }
 //=============================================================================
@@ -663,17 +689,15 @@ void Mandala::dump(const _var_vect &v,const char *str)
 {
   printf("%s: %.2f\t%.2f\t%.2f\n",str,v[0],v[1],v[2]);
 }
-void Mandala::dump(const uint var_idx)
+void Mandala::dump(uint8_t var_idx)
 {
   uint type;
   void *value_ptr;
-  uint8_t mask;
-  const char *name;
-  const char *descr;
-  fill_params(var_idx,0,&value_ptr,&type,&mask,&name,&descr);
-  printf("%s: ",name);
+  if(!get_ptr(var_idx,&value_ptr,&type))return;
+  printf("%s: ",var_name(var_idx));
   switch(type){
-    case vt_uint:  printf("%u",*((_var_uint*)value_ptr));break;
+    case vt_byte:  printf("%u",(uint)*((_var_byte*)value_ptr));break;
+    case vt_uint:  printf("%u",(uint)*((_var_uint*)value_ptr));break;
     case vt_float: printf("%.2f",*((_var_float*)value_ptr));break;
     case vt_vect:  printf("(%.2f,%.2f,%.2f)",(*((_var_vect*)value_ptr))[0],(*((_var_vect*)value_ptr))[1],(*((_var_vect*)value_ptr))[2] );break;
     case vt_sig:{
