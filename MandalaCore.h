@@ -69,10 +69,12 @@ public:
 protected:
   _var_float v[3];
 };
+typedef _var_float Point[2];
 #endif
 //=============================================================================
 //=============================================================================
 typedef Vect            _var_vect;
+typedef Point           _var_point;
 typedef uint8_t         _var_byte;
 typedef uint32_t        _var_uint;
 typedef uint8_t         _var_flag;
@@ -172,6 +174,9 @@ protected:
   uint pack_vect_s10(void *buf,void *value_ptr);
   uint pack_vect_s001(void *buf,void *value_ptr);
 
+  uint pack_point_f2(void *buf,void *value_ptr);
+  uint pack_point_f4(void *buf,void *value_ptr);
+
   uint pack_flag_(void *buf,void *value_ptr);
   uint pack_enum_(void *buf,void *value_ptr);
   uint pack_byte_u1(void *buf,void *value_ptr);
@@ -199,6 +204,9 @@ protected:
   uint unpack_vect_s1(void *buf,void *value_ptr);
   uint unpack_vect_s10(void *buf,void *value_ptr);
   uint unpack_vect_s001(void *buf,void *value_ptr);
+
+  uint unpack_point_f2(void *buf,void *value_ptr);
+  uint unpack_point_f4(void *buf,void *value_ptr);
 
   uint unpack_flag_(void *buf,void *value_ptr);
   uint unpack_enum_(void *buf,void *value_ptr);

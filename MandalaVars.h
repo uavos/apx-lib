@@ -28,7 +28,7 @@
 #define idxPAD  32      //start index for regular vars
 //-----------------------------------------------------------------------------
 // Var Type enum
-enum {vt_void=0,vt_byte,vt_uint,vt_flag,vt_enum,vt_float,vt_vect,vt_sig};
+enum {vt_void=0,vt_byte,vt_uint,vt_flag,vt_enum,vt_float,vt_vect,vt_point,vt_sig};
 //=============================================================================
 // Physical constants
 #define EARTH_RATE   0.00007292115              // rotation rate of earth (rad/sec)
@@ -88,12 +88,12 @@ SIGDEF(vor,       "VOR beacon <packed data>")
 SIGDEF(imu, "IMU sensors data package",
        idx_acc, idx_gyro )
 SIGDEF(gps, "GPS fix data package",
-      idx_gps_lat, idx_gps_lon, idx_gps_hmsl, idx_gps_vNED)
+       idx_gps_pos, idx_gps_vNE, idx_gps_vspeed)
 SIGDEF(ctr, "Fast controls, sent to bus at fixed update rate",
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_steering,idx_ctr_collective )
 SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw)
 SIGDEF(ils, "ILS sensors data package",
-       idx_ilsb,idx_ils_HDG,idx_ils_DME,idx_ils_offsetX,idx_ils_offsetY )
+       idx_ilsb,idx_ils_HDG,idx_ils_DME,idx_ils_offset )
 
 //------------------------------
 // Auto update/send vars
@@ -160,11 +160,10 @@ MVAR(float, venergy,  "compensated variometer [m/s]",   f2,f2)
 MVAR(float, ldratio,  "glide ratio [Lift/Drag]",        f2,f2)
 
 //--------- Measured by GPS --------------
-MVAR(float, gps_lat,  "latitude [deg]",                 f4,f4)
-MVAR(float, gps_lon,  "longitude [deg]",                f4,f4)
-MVAR(float, gps_hmsl, "altitude above sea [m]",         f4,f2)
-MVAR(vect,  gps_vNED, "velocity: Vnorth,Veast,Vdown [m/s]",f2,f2)
-MVAR(uint,  gps_time, "GPS UTC Time from 1970 1st Jan [sec]",u4,u4)
+MVAR(vect,  gps_pos,  "GPS position: lat,lon,hmsl [deg]",f4,f4)
+MVAR(point, gps_vNE,  "GPS velocity: Vnorth,Veast [m/s]",f2,f2)
+MVAR(float, gps_vspeed,"GPS vertical speed [m/s]",       f2,f2)
+MVAR(uint,  gps_time, "GPS UTC Time from 1970 1st Jan [sec]",   u4,u4)
 
 //--------- FAST CONTROLS --------------
 MVAR(float, ctr_ailerons,     "ailerons [-1..0..+1]",   f2,s001)
@@ -193,8 +192,7 @@ MBIT(ctrb,   xfeed,   "Crossfeed on/off",               64)
 
 //--------- AUTOPILOT COMMAND --------------
 MVAR(vect,  cmd_theta,        "commanded attitude: roll,pitch,yaw [deg]",f2,f2)
-MVAR(float, cmd_N,            "commanded north [m]",    f2,f2)
-MVAR(float, cmd_E,            "commanded east [m]",     f2,f2)
+MVAR(point, cmd_NE,           "commanded position: north,east [m]",     f2,f2)
 MVAR(float, cmd_course,       "commanded course [deg]", f2,f2)
 MVAR(float, cmd_rpm,          "commanded RPM [rpm]",    f2,u100)
 MVAR(float, cmd_altitude,     "commanded altitude [m]", f2,f2)
@@ -232,8 +230,7 @@ MBIT(ilsb,   active,  "ILS available/lost",             1)
 MBIT(ilsb,   offset,  "ILS offset available/lost",      2)
 MVAR(float, ils_HDG,  "ILS heading to VOR1 [deg]",      f2,f2)
 MVAR(float, ils_DME,  "ILS distance to VOR1 [m]",       f2,f2)
-MVAR(float, ils_offsetX, "ILS horizontal offset [deg]", f2,f2)
-MVAR(float, ils_offsetY, "ILS vertical offset [deg]",   f2,f2)
+MVAR(point, ils_offset, "ILS offset: x,y [deg]",        f2,f2)
 
 //--------- Movement sensors --------------
 MVAR(vect,  radar_vXYZ,       "radar velocity: Vx,Vy,Vz [m/s]", f2,f2)
@@ -303,20 +300,18 @@ MBIT(sw,     sw4,     "switch 4 on/off",        128)
 MVAR(byte,  wpidx,    "current waypoint [0...]",        u1,u1)
 MVAR(byte,  wpType,   "current waypoint type [wp_type]",u1,u1)
 MVAR(byte,  rwidx,    "current runway [0...]",          u1,u1)
-MVAR(float, rwHDG,    "current runway heading [deg]",           f2,f2)
+MVAR(float, tgHDG,    "current tangent heading [deg]",          f2,f2)
 MVAR(float, turnR,    "current circle radius [m]",              f2,f2)
 MVAR(float, delta,    "general delta (depends on mode) [m]",    f2,f2)
 
 //--------- dynamic tuning --------------
 MVAR(float, windSpd,  "wind speed [m/s]",               f2,u01)
-MVAR(float, windHdg,  "wind direction to 0..360 [deg]", f2,f2)
-MVAR(float, corrTAS,  "CAS to TAS multiplier [K]",      f2,u001)
+MVAR(float, windHdg,  "wind direction to [deg]",        f2,f2)
+MVAR(float, cas2tas,  "CAS to TAS multiplier [K]",      f2,u001)
 MVAR(byte,  errcode,  "error code",                     u1,u1)
 MVAR(float, corr,     "Correlator output [K]",          f2,f2)
 MVAR(float, rwAdj,    "runway displacement adjust [m]", s1,s1)
-MVAR(float, gps_home_lat,     "home latitude [deg]",    f4,f4)
-MVAR(float, gps_home_lon,     "home longitude [deg]",   f4,f4)
-MVAR(float, gps_home_hmsl,    "home altitde above sea [m]",f4,f4)
+MVAR(vect,  home_pos, "Home position: lat,lon,hmsl [deg]",f4,f4)
 MVAR(byte,  gps_SV,   "GPS Satellites visible [number]",u1,u1)
 MVAR(byte,  gps_SU,   "GPS Satellites used [number]",   u1,u1)
 MVAR(float, pstatic_gnd,      "Static pressure on ground level [inHg]",f4,f4)
@@ -340,15 +335,14 @@ MVAR(float, user6,    "User value 6",f4,f2)
 //------------------------------------------------------------------------------
 MVAR(byte,  local,    "local byte [0...255]",   u1,u1)
 //--------- calculated by Mandala::calc() --------------
-MVAR(vect,  NED,      "local position: north,east,down [m]",    f4,f4)
+MVAR(point, pos_NE,   "local position: north,east [m]",         f4,f4)
+MVAR(float, gps_altitude,"GPS altitude [m]",                    f4,f4)
 MVAR(float, homeHDG,  "heading to home position [deg]",         f4,f4)
 MVAR(float, dHome,    "distance to GCU [m]",                    f4,f4)
 MVAR(float, dWPT,     "distance to waypoint [m]",               f4,f4)
-MVAR(float, dN,       "delta north [m]",                        f4,f4)
-MVAR(float, dE,       "delta east [m]",                         f4,f4)
 MVAR(float, dAlt,     "delta altitude [m]",                     f4,f4)
-MVAR(vect,  vXYZ,     "bodyframe velocity: Vx,Vy,Vz [m/s]",     f4,f4)
-MVAR(vect,  dXYZ,     "bodyframe delta: dx,dy,dz [m]",          f4,f4)
+MVAR(point, vXY,      "bodyframe velocity: Vx,Vy [m/s]",        f4,f4)
+MVAR(point, dXY,      "bodyframe delta: dx,dy [m]",             f4,f4)
 MVAR(float, gSpeed,   "ground speed [m]",                       f4,f4)
 MVAR(float, wpHDG,    "current waypoint heading [deg]",         f4,f4)
 MVAR(float, rwDelta,  "runway alignment [m]",                   f4,f4)

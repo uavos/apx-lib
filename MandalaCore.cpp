@@ -41,6 +41,7 @@ _var_float MandalaCore::get_data(uint16_t var_m)
   switch(type){
     case vt_float:return *(_var_float*)value_ptr;
     case vt_vect: return (*(_var_vect*)value_ptr)[m];
+    case vt_point:return (*(_var_point*)value_ptr)[m];
     case vt_byte: return *(_var_byte*)value_ptr;
     case vt_uint: return *(_var_uint*)value_ptr;
     case vt_flag: return m?(((*(_var_flag*)value_ptr)&m)?1:0):(*(_var_flag*)value_ptr);
@@ -58,6 +59,7 @@ void MandalaCore::set_data(uint16_t var_m,_var_float value)
   switch(type){
     case vt_float:*(_var_float*)value_ptr=value;break;
     case vt_vect: (*(_var_vect*)value_ptr)[m]=value;break;
+    case vt_point:(*(_var_point*)value_ptr)[m]=value;break;
     case vt_byte: *(_var_byte*)value_ptr=value;break;
     case vt_uint: *(_var_uint*)value_ptr=value;break;
     case vt_flag:
@@ -330,6 +332,24 @@ uint MandalaCore::pack_vect_f4(void *buf,void *value_ptr)
   return 12;
 }
 //------------------------------------------------------------------------------
+uint MandalaCore::pack_point_f2(void *buf,void *value_ptr)
+{
+  _var_point *v=((_var_point*)value_ptr);
+  uint16_t *ptr=(uint16_t*)buf;
+  pack_float_f2(ptr++,&((*v)[0]));
+  pack_float_f2(ptr,&((*v)[1]));
+  return 4;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::pack_point_f4(void *buf,void *value_ptr)
+{
+  _var_point *v=((_var_point*)value_ptr);
+  uint32_t *ptr=(uint32_t*)buf;
+  pack_float_f4(ptr++,&((*v)[0]));
+  pack_float_f4(ptr,&((*v)[1]));
+  return 8;
+}
+//------------------------------------------------------------------------------
 uint MandalaCore::pack_sig(void *buf,void *value_ptr)
 {
   _var_signature signature=*((_var_signature*)value_ptr);
@@ -535,6 +555,24 @@ uint MandalaCore::unpack_vect_f4(void *buf,void *value_ptr)
   unpack_float_f4(ptr++,&((*v)[1]));
   unpack_float_f4(ptr,&((*v)[2]));
   return 12;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_point_f2(void *buf,void *value_ptr)
+{
+  _var_point *v=((_var_point*)value_ptr);
+  uint16_t *ptr=(uint16_t*)buf;
+  unpack_float_f2(ptr++,&((*v)[0]));
+  unpack_float_f2(ptr,&((*v)[1]));
+  return 4;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_point_f4(void *buf,void *value_ptr)
+{
+  _var_point *v=((_var_point*)value_ptr);
+  uint32_t *ptr=(uint32_t*)buf;
+  unpack_float_f4(ptr++,&((*v)[0]));
+  unpack_float_f4(ptr,&((*v)[1]));
+  return 8;
 }
 //------------------------------------------------------------------------------
 uint MandalaCore::unpack_sig(void *buf,uint cnt,void *value_ptr)
