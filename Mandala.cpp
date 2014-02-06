@@ -633,19 +633,19 @@ const _var_vect Mandala::llh2ECEF(const _var_vect &llh) const
 //=============================================================================
 _var_float Mandala::wind_triangle(_var_float crs) const
 {
-  _var_float wnd_r=(windHdg+180.0)*D2R;
+  _var_float wnd_r=(windHdg)*D2R;
   _var_float Kvel=airspeed>0?(windSpd/(airspeed*(cas2tas>0?cas2tas:1.0))):0;
   _var_float aWTA=crs*D2R-wnd_r;  //fabs??
   _var_float aWCA=asin(Kvel*sin(aWTA));
   _var_float kWS=cos(aWCA)+Kvel*cos(aWTA);
-  return kWS;
+  return kWS==0?1.0:kWS;
 }
 //=============================================================================
 _var_float Mandala::wind_circle(_var_float crs,_var_float span,_var_float r) const
 {
   _var_float kWSs=0;
   _var_float crs_step=20,crs_e;
-  _var_float wnd_r=(windHdg)*D2R;
+  _var_float wnd_r=(windHdg+180.0)*D2R;
   _var_float Kvel=airspeed>0?(windSpd/(airspeed*(cas2tas>0?cas2tas:1.0))):0;
   if(span<0){
     crs_step=-crs_step;
