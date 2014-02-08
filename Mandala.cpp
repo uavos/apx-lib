@@ -46,10 +46,11 @@ void Mandala::init(void)
   dl_reset=true;
 
   //------------------------
-
+  //init all vars
 #define MVAR(atype,aname,...) \
   aname=0;
 #include "MandalaVars.h"
+  cas2tas=1.0;
 
   //------------------------
 
@@ -375,7 +376,7 @@ void Mandala::calc(void)
   //course=smoothAngle(crsGPS,course,0.000001);//gSpeed*gSpeed*0.0001/100.0);
 }
 //=============================================================================
-_var_float Mandala::boundAngle(_var_float v,_var_float span)
+_var_float Mandala::boundAngle(_var_float v,_var_float span) const
 {
   const _var_float dspan=span*2.0;
   while (v >= span) v -= dspan;
@@ -383,12 +384,12 @@ _var_float Mandala::boundAngle(_var_float v,_var_float span)
   return v;
 }
 //===========================================================================
-_var_vect Mandala::boundAngle(const _var_vect &v,_var_float span)
+_var_vect Mandala::boundAngle(const _var_vect &v,_var_float span) const
 {
   return _var_vect(boundAngle(v[0],span),boundAngle(v[1],span),boundAngle(v[2],span));
 }
 //===========================================================================
-_var_float Mandala::boundAngle360(_var_float v)
+_var_float Mandala::boundAngle360(_var_float v) const
 {
   while(v<0) v+=360.0;
   while(v>=360.0) v-=360.0;
@@ -634,7 +635,7 @@ const _var_vect Mandala::llh2ECEF(const _var_vect &llh) const
 _var_float Mandala::wind_triangle(_var_float crs) const
 {
   _var_float wnd_r=(windHdg)*D2R;
-  _var_float Kvel=airspeed>0?(windSpd/(airspeed*(cas2tas>0?cas2tas:1.0))):0;
+  _var_float Kvel=airspeed>0?(windSpd/(airspeed*cas2tas)):0;
   _var_float aWTA=crs*D2R-wnd_r;  //fabs??
   _var_float aWCA=asin(Kvel*sin(aWTA));
   _var_float kWS=cos(aWCA)+Kvel*cos(aWTA);
@@ -644,27 +645,22 @@ _var_float Mandala::wind_triangle(_var_float crs) const
 _var_float Mandala::wind_circle(_var_float crs,_var_float span,_var_float r) const
 {
   _var_float kWSs=0;
-  _var_float crs_step=20,crs_e;
-  _var_float wnd_r=(windHdg+180.0)*D2R;
-  _var_float Kvel=airspeed>0?(windSpd/(airspeed*(cas2tas>0?cas2tas:1.0))):0;
-  if(span<0){
-    crs_step=-crs_step;
-    crs_e=crs;
-    crs-=span;
-  }else{
-    crs_e=crs+span;
-  }
-  uint sz=fabs(span/crs_step);
+  _var_float crs_step=30,crs_e;
+  _var_float wnd_r=(windHdg)*D2R;
+  _var_float Kvel=cmd_airspeed>0?(windSpd/(cmd_airspeed*cas2tas)):0;
+  if(span<0) crs_step=-crs_step;
+  crs_e=crs+span;
+  int sz=span/crs_step;
   _var_float kWS=1;
   while(sz--){
     _var_float aWTA=crs*D2R-wnd_r;
     _var_float aWCA=asin(Kvel*sin(aWTA));
     kWS=cos(aWCA)+Kvel*cos(aWTA);
     kWSs+=1.0/kWS;
-    crs+=crs_step;  //right turn
+    crs+=crs_step;
   }
-  if(span<0) span=fabs(crs-crs_e);
-  else span=fabs(crs_e-crs);
+  if(span<0) span=-(crs_e-crs);
+  else span=(crs_e-crs);
   return (kWSs*fabs(crs_step)+span/kWS)*r*(2.0*M_PI/360.0);
 }
 //=============================================================================

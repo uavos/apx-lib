@@ -134,9 +134,9 @@ public:
   void dump(uint8_t var_idx);
 
   // math operations
-  _var_float boundAngle(_var_float v,_var_float span=180.0);
-  _var_float boundAngle360(_var_float v);
-  _var_vect  boundAngle(const _var_vect &v,_var_float span=180.0);
+  _var_float boundAngle(_var_float v,_var_float span=180.0) const;
+  _var_float boundAngle360(_var_float v) const;
+  _var_vect  boundAngle(const _var_vect &v,_var_float span=180.0) const;
   _var_float smoothAngle(_var_float v,_var_float v_prev,_var_float speed);
   void filter_a(const _var_float &v,_var_float *var_p,const _var_float &f);
   uint snap(uint v, uint snapv=10);
