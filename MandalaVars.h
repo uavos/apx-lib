@@ -107,7 +107,7 @@ SIGDEF(update,  "Auto send to bus when changed",
 
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
 SIGDEF(autosend,  "Automatically forwarded variables to GCU",
-       idx_service, idx_msg, idx_downstream, idx_uav_id, idx_ping, idx_flightplan, idx_rawbus, idx_data )
+       idx_service, idx_msg, idx_downstream, idx_uav_id, idx_ping,
        idx_flightplan, idx_rawbus, idx_data, idx_vor)
 
 //------------------------------
