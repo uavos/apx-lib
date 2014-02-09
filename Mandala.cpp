@@ -108,7 +108,7 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   //check for special protocol archiveSize
   if(var_idx==idx_downstream)return extract_downstream(buf,size);
   if(var_idx==idx_flightplan)return extract_flightplan(buf,size);
-  if(var_idx==idx_vor)return 1;
+
 
 
   uint cnt=unpack(buf,size,var_idx);
