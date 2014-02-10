@@ -647,7 +647,7 @@ _var_float Mandala::wind_circle(_var_float crs,_var_float span,_var_float r) con
   _var_float kWSs=0;
   _var_float crs_step=30,crs_e;
   _var_float wnd_r=(windHdg)*D2R;
-  _var_float Kvel=cmd_airspeed>0?(windSpd/(cmd_airspeed*cas2tas)):0;
+  _var_float Kvel=airspeed>0?(windSpd/(airspeed*cas2tas)):0;
   if(span<0) crs_step=-crs_step;
   crs_e=crs+span;
   int sz=span/crs_step;
