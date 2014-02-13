@@ -252,7 +252,7 @@ MVAR(flag,  status,   "status flag bitfield [on/off]",,)
 MBIT(status, rc,      "RC on/off",              1)
 MBIT(status, gps,     "GPS available/lost",     2)
 MBIT(status, agl,     "AGL available/off",      4)
-MBIT(status, modem,   "Uplink available/lost",  8)
+MBIT(status, modem,   "Uplink status",          8)
 MBIT(status, glide,   "Glide status",           16)
 MBIT(status, touch,   "Landing gear touchdown/floating",32)
 

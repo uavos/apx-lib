@@ -51,13 +51,13 @@ typedef enum { rwaLeft=0,rwaRight, rwaCnt } _rw_app;
 #define wt_str_def "Hdg","Line"
 #define rwa_str_def "Left","Right"
 typedef struct {
-  _var_vect     LLA;  //lat,lon,agl
+  _var_vect     LLA;  //lat,lon,hmsl
   uint8_t       type;
   uint8_t       cmdSize;
   uint8_t       cmd[128]; //TODO: implement wpt commands
 }_waypoint;
 typedef struct {
-  _var_vect     LLA;  //start pos [lat lon agl]
+  _var_vect     LLH;  //start pos [lat lon agl]
   _var_point    dNE;
   uint8_t       appType;
   _var_float    distApp;

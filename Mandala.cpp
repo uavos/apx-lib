@@ -126,7 +126,7 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
   //save mandala tmp vars
   uint8_t *sbuf=buf,*buf_top=buf+(bufSize-1);
   uint cnt=0;
-  const uint szLLH=4+4+2;
+  const uint szLLH=4+4+4;
   while(1){
     //write waypoints
     *buf++=wpcnt;
@@ -135,7 +135,7 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
       if((buf+(szLLH+2+fp.waypoints[i].cmdSize))>buf_top) break;
       buf+=pack_float_f4(buf,&(fp.waypoints[i].LLA[0]));
       buf+=pack_float_f4(buf,&(fp.waypoints[i].LLA[1]));
-      buf+=pack_float_f2(buf,&(fp.waypoints[i].LLA[2]));
+      buf+=pack_float_f4(buf,&(fp.waypoints[i].LLA[2]));
       *buf++=fp.waypoints[i].type;
       *buf++=fp.waypoints[i].cmdSize;
       memcpy(buf,fp.waypoints[i].cmd,fp.waypoints[i].cmdSize);
@@ -146,9 +146,9 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     *buf++=rwcnt;
     for(i=0;i<rwcnt;i++){
       if((buf+(szLLH+6+9))>buf_top) break;
-      buf+=pack_float_f4(buf,&(fp.runways[i].LLA[0]));
-      buf+=pack_float_f4(buf,&(fp.runways[i].LLA[1]));
-      buf+=pack_float_f2(buf,&(fp.runways[i].LLA[2]));
+      buf+=pack_float_f4(buf,&(fp.runways[i].LLH[0]));
+      buf+=pack_float_f4(buf,&(fp.runways[i].LLH[1]));
+      buf+=pack_float_f4(buf,&(fp.runways[i].LLH[2]));
       buf+=pack_point_f2(buf,&(fp.runways[i].dNE));
       *buf++=fp.runways[i].appType;
       buf+=pack_float_f2(buf,&(fp.runways[i].distApp));
@@ -158,10 +158,10 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     }
     if(i<rwcnt)break; //overflow
     //write flight place parameters
-    if((buf+6)>buf_top) break;
-    buf+=pack_float_f2(buf,&(fp.safety.altitude));
-    buf+=pack_float_f2(buf,&(fp.safety.dHome));
-    buf+=pack_float_f2(buf,&(fp.safety.dHomeERS));
+    if((buf+12)>buf_top) break;
+    buf+=pack_float_f4(buf,&(fp.safety.altitude));
+    buf+=pack_float_f4(buf,&(fp.safety.dHome));
+    buf+=pack_float_f4(buf,&(fp.safety.dHomeERS));
     //success: calc number of bytes written
     cnt=buf-sbuf;
     break;
@@ -175,7 +175,7 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
   //save mandala tmp vars
   uint8_t *sbuf=buf,*buf_top=buf+cnt;
   int rcnt=0;
-  const uint szLLH=4+4+2;
+  const uint szLLH=4+4+4;
   while(1){
     //unpack waypoints
     if((buf+1)>buf_top) break;
@@ -186,7 +186,7 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
       if((buf+(szLLH+2))>buf_top) break;
       buf+=unpack_float_f4(buf,&(fp.waypoints[i].LLA[0]));
       buf+=unpack_float_f4(buf,&(fp.waypoints[i].LLA[1]));
-      buf+=unpack_float_f2(buf,&(fp.waypoints[i].LLA[2]));
+      buf+=unpack_float_f4(buf,&(fp.waypoints[i].LLA[2]));
       fp.waypoints[i].type=(_wpt_type)*buf++;
       uint csz=(_wpt_type)*buf++;
       uint sz=csz;
@@ -203,9 +203,9 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     if(rwcnt>MAX_RWCNT)break;
     for (i=0;i<rwcnt;i++) {
       if((buf+(szLLH+6+9))>buf_top) break;
-      buf+=unpack_float_f4(buf,&(fp.runways[i].LLA[0]));
-      buf+=unpack_float_f4(buf,&(fp.runways[i].LLA[1]));
-      buf+=unpack_float_f2(buf,&(fp.runways[i].LLA[2]));
+      buf+=unpack_float_f4(buf,&(fp.runways[i].LLH[0]));
+      buf+=unpack_float_f4(buf,&(fp.runways[i].LLH[1]));
+      buf+=unpack_float_f4(buf,&(fp.runways[i].LLH[2]));
       buf+=unpack_point_f2(buf,&(fp.runways[i].dNE));
       fp.runways[i].appType=(_rw_app)*buf++;
       buf+=unpack_float_f2(buf,&(fp.runways[i].distApp));
@@ -215,10 +215,10 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     }
     if(i<rwcnt)break; //overflow
     //unpack flight place parameters
-    if((buf+6)>buf_top) break;
-    buf+=unpack_float_f2(buf,&(fp.safety.altitude));
-    buf+=unpack_float_f2(buf,&(fp.safety.dHome));
-    buf+=unpack_float_f2(buf,&(fp.safety.dHomeERS));
+    if((buf+12)>buf_top) break;
+    buf+=unpack_float_f4(buf,&(fp.safety.altitude));
+    buf+=unpack_float_f4(buf,&(fp.safety.dHome));
+    buf+=unpack_float_f4(buf,&(fp.safety.dHomeERS));
     //success: calc number of bytes unpacked
     rcnt=buf-sbuf;
     break;
