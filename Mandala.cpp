@@ -359,9 +359,9 @@ void Mandala::calc(void)
 {
   // vars should be filtered by dl_filter
   const Point dNE=cmd_NE-pos_NE;
-  dAlt=cmd_altitude-altitude;
+  //dAlt=cmd_altitude-altitude;
   //_var_vect dNED(dN,dE,-dAlt);
-  dXY=rotate(dNE,theta[2]);
+  //dXY=rotate(dNE,theta[2]);
   dWPT=distance(dNE);
   dHome=distance(pos_NE);
   wpHDG=heading(dNE);
@@ -441,7 +441,7 @@ _var_float Mandala::heading(const _var_point &ne,bool back) const
 //=============================================================================
 _var_float Mandala::heading(const _var_float N,const _var_float E,bool back) const
 {
-  if(back)return atan2(N,E)*R2D;
+  if(back)return atan2(-E,-N)*R2D;
   else return atan2(E,N)*R2D;
 }
 //=============================================================================
