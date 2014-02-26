@@ -46,10 +46,11 @@ void Mandala::init(void)
   dl_reset=true;
 
   //------------------------
-
+  //init all vars
 #define MVAR(atype,aname,...) \
   aname=0;
 #include "MandalaVars.h"
+  cas2tas=1.0;
 
   //------------------------
 
@@ -127,7 +128,7 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
   //save mandala tmp vars
   uint8_t *sbuf=buf,*buf_top=buf+(bufSize-1);
   uint cnt=0;
-  const uint szLLH=4+4+2;
+  const uint szLLH=4+4+4;
   while(1){
     //write waypoints
     *buf++=wpcnt;
@@ -136,7 +137,7 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
       if((buf+(szLLH+2+fp.waypoints[i].cmdSize))>buf_top) break;
       buf+=pack_float_f4(buf,&(fp.waypoints[i].LLA[0]));
       buf+=pack_float_f4(buf,&(fp.waypoints[i].LLA[1]));
-      buf+=pack_float_f2(buf,&(fp.waypoints[i].LLA[2]));
+      buf+=pack_float_f4(buf,&(fp.waypoints[i].LLA[2]));
       *buf++=fp.waypoints[i].type;
       *buf++=fp.waypoints[i].cmdSize;
       memcpy(buf,fp.waypoints[i].cmd,fp.waypoints[i].cmdSize);
@@ -147,9 +148,9 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     *buf++=rwcnt;
     for(i=0;i<rwcnt;i++){
       if((buf+(szLLH+6+9))>buf_top) break;
-      buf+=pack_float_f4(buf,&(fp.runways[i].LLA[0]));
-      buf+=pack_float_f4(buf,&(fp.runways[i].LLA[1]));
-      buf+=pack_float_f2(buf,&(fp.runways[i].LLA[2]));
+      buf+=pack_float_f4(buf,&(fp.runways[i].LLH[0]));
+      buf+=pack_float_f4(buf,&(fp.runways[i].LLH[1]));
+      buf+=pack_float_f4(buf,&(fp.runways[i].LLH[2]));
       buf+=pack_point_f2(buf,&(fp.runways[i].dNE));
       *buf++=fp.runways[i].appType;
       buf+=pack_float_f2(buf,&(fp.runways[i].distApp));
@@ -159,10 +160,10 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     }
     if(i<rwcnt)break; //overflow
     //write flight place parameters
-    if((buf+6)>buf_top) break;
-    buf+=pack_float_f2(buf,&(fp.safety.altitude));
-    buf+=pack_float_f2(buf,&(fp.safety.dHome));
-    buf+=pack_float_f2(buf,&(fp.safety.dHomeERS));
+    if((buf+12)>buf_top) break;
+    buf+=pack_float_f4(buf,&(fp.safety.altitude));
+    buf+=pack_float_f4(buf,&(fp.safety.dHome));
+    buf+=pack_float_f4(buf,&(fp.safety.dHomeERS));
     //success: calc number of bytes written
     cnt=buf-sbuf;
     break;
@@ -176,7 +177,7 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
   //save mandala tmp vars
   uint8_t *sbuf=buf,*buf_top=buf+cnt;
   int rcnt=0;
-  const uint szLLH=4+4+2;
+  const uint szLLH=4+4+4;
   while(1){
     //unpack waypoints
     if((buf+1)>buf_top) break;
@@ -187,7 +188,7 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
       if((buf+(szLLH+2))>buf_top) break;
       buf+=unpack_float_f4(buf,&(fp.waypoints[i].LLA[0]));
       buf+=unpack_float_f4(buf,&(fp.waypoints[i].LLA[1]));
-      buf+=unpack_float_f2(buf,&(fp.waypoints[i].LLA[2]));
+      buf+=unpack_float_f4(buf,&(fp.waypoints[i].LLA[2]));
       fp.waypoints[i].type=(_wpt_type)*buf++;
       uint csz=(_wpt_type)*buf++;
       uint sz=csz;
@@ -204,9 +205,9 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     if(rwcnt>MAX_RWCNT)break;
     for (i=0;i<rwcnt;i++) {
       if((buf+(szLLH+6+9))>buf_top) break;
-      buf+=unpack_float_f4(buf,&(fp.runways[i].LLA[0]));
-      buf+=unpack_float_f4(buf,&(fp.runways[i].LLA[1]));
-      buf+=unpack_float_f2(buf,&(fp.runways[i].LLA[2]));
+      buf+=unpack_float_f4(buf,&(fp.runways[i].LLH[0]));
+      buf+=unpack_float_f4(buf,&(fp.runways[i].LLH[1]));
+      buf+=unpack_float_f4(buf,&(fp.runways[i].LLH[2]));
       buf+=unpack_point_f2(buf,&(fp.runways[i].dNE));
       fp.runways[i].appType=(_rw_app)*buf++;
       buf+=unpack_float_f2(buf,&(fp.runways[i].distApp));
@@ -216,10 +217,10 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     }
     if(i<rwcnt)break; //overflow
     //unpack flight place parameters
-    if((buf+6)>buf_top) break;
-    buf+=unpack_float_f2(buf,&(fp.safety.altitude));
-    buf+=unpack_float_f2(buf,&(fp.safety.dHome));
-    buf+=unpack_float_f2(buf,&(fp.safety.dHomeERS));
+    if((buf+12)>buf_top) break;
+    buf+=unpack_float_f4(buf,&(fp.safety.altitude));
+    buf+=unpack_float_f4(buf,&(fp.safety.dHome));
+    buf+=unpack_float_f4(buf,&(fp.safety.dHomeERS));
     //success: calc number of bytes unpacked
     rcnt=buf-sbuf;
     break;
@@ -360,9 +361,9 @@ void Mandala::calc(void)
 {
   // vars should be filtered by dl_filter
   const Point dNE=cmd_NE-pos_NE;
-  dAlt=cmd_altitude-altitude;
+  //dAlt=cmd_altitude-altitude;
   //_var_vect dNED(dN,dE,-dAlt);
-  dXY=rotate(dNE,theta[2]);
+  //dXY=rotate(dNE,theta[2]);
   dWPT=distance(dNE);
   dHome=distance(pos_NE);
   wpHDG=heading(dNE);
@@ -377,7 +378,7 @@ void Mandala::calc(void)
   //course=smoothAngle(crsGPS,course,0.000001);//gSpeed*gSpeed*0.0001/100.0);
 }
 //=============================================================================
-_var_float Mandala::boundAngle(_var_float v,_var_float span)
+_var_float Mandala::boundAngle(_var_float v,_var_float span) const
 {
   const _var_float dspan=span*2.0;
   while (v >= span) v -= dspan;
@@ -385,12 +386,12 @@ _var_float Mandala::boundAngle(_var_float v,_var_float span)
   return v;
 }
 //===========================================================================
-_var_vect Mandala::boundAngle(const _var_vect &v,_var_float span)
+_var_vect Mandala::boundAngle(const _var_vect &v,_var_float span) const
 {
   return _var_vect(boundAngle(v[0],span),boundAngle(v[1],span),boundAngle(v[2],span));
 }
 //===========================================================================
-_var_float Mandala::boundAngle360(_var_float v)
+_var_float Mandala::boundAngle360(_var_float v) const
 {
   while(v<0) v+=360.0;
   while(v>=360.0) v-=360.0;
@@ -442,7 +443,7 @@ _var_float Mandala::heading(const _var_point &ne,bool back) const
 //=============================================================================
 _var_float Mandala::heading(const _var_float N,const _var_float E,bool back) const
 {
-  if(back)return atan2(N,E)*R2D;
+  if(back)return atan2(-E,-N)*R2D;
   else return atan2(E,N)*R2D;
 }
 //=============================================================================
@@ -635,38 +636,33 @@ const _var_vect Mandala::llh2ECEF(const _var_vect &llh) const
 //=============================================================================
 _var_float Mandala::wind_triangle(_var_float crs) const
 {
-  _var_float wnd_r=(windHdg+180.0)*D2R;
-  _var_float Kvel=airspeed>0?(windSpd/(airspeed*(cas2tas>0?cas2tas:1.0))):0;
+  _var_float wnd_r=(windHdg)*D2R;
+  _var_float Kvel=airspeed>0?(windSpd/(airspeed*cas2tas)):0;
   _var_float aWTA=crs*D2R-wnd_r;  //fabs??
   _var_float aWCA=asin(Kvel*sin(aWTA));
   _var_float kWS=cos(aWCA)+Kvel*cos(aWTA);
-  return kWS;
+  return kWS==0?1.0:kWS;
 }
 //=============================================================================
 _var_float Mandala::wind_circle(_var_float crs,_var_float span,_var_float r) const
 {
   _var_float kWSs=0;
-  _var_float crs_step=20,crs_e;
+  _var_float crs_step=30,crs_e;
   _var_float wnd_r=(windHdg)*D2R;
-  _var_float Kvel=airspeed>0?(windSpd/(airspeed*(cas2tas>0?cas2tas:1.0))):0;
-  if(span<0){
-    crs_step=-crs_step;
-    crs_e=crs;
-    crs-=span;
-  }else{
-    crs_e=crs+span;
-  }
-  uint sz=fabs(span/crs_step);
+  _var_float Kvel=airspeed>0?(windSpd/(airspeed*cas2tas)):0;
+  if(span<0) crs_step=-crs_step;
+  crs_e=crs+span;
+  int sz=span/crs_step;
   _var_float kWS=1;
   while(sz--){
     _var_float aWTA=crs*D2R-wnd_r;
     _var_float aWCA=asin(Kvel*sin(aWTA));
     kWS=cos(aWCA)+Kvel*cos(aWTA);
     kWSs+=1.0/kWS;
-    crs+=crs_step;  //right turn
+    crs+=crs_step;
   }
-  if(span<0) span=fabs(crs-crs_e);
-  else span=fabs(crs_e-crs);
+  if(span<0) span=-(crs_e-crs);
+  else span=(crs_e-crs);
   return (kWSs*fabs(crs_step)+span/kWS)*r*(2.0*M_PI/360.0);
 }
 //=============================================================================

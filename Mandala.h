@@ -51,13 +51,13 @@ typedef enum { rwaLeft=0,rwaRight, rwaCnt } _rw_app;
 #define wt_str_def "Hdg","Line"
 #define rwa_str_def "Left","Right"
 typedef struct {
-  _var_vect     LLA;  //lat,lon,agl
+  _var_vect     LLA;  //lat,lon,hmsl
   uint8_t       type;
   uint8_t       cmdSize;
   uint8_t       cmd[128]; //TODO: implement wpt commands
 }_waypoint;
 typedef struct {
-  _var_vect     LLA;  //start pos [lat lon agl]
+  _var_vect     LLH;  //start pos [lat lon agl]
   _var_point    dNE;
   uint8_t       appType;
   _var_float    distApp;
@@ -134,9 +134,9 @@ public:
   void dump(uint8_t var_idx);
 
   // math operations
-  _var_float boundAngle(_var_float v,_var_float span=180.0);
-  _var_float boundAngle360(_var_float v);
-  _var_vect  boundAngle(const _var_vect &v,_var_float span=180.0);
+  _var_float boundAngle(_var_float v,_var_float span=180.0) const;
+  _var_float boundAngle360(_var_float v) const;
+  _var_vect  boundAngle(const _var_vect &v,_var_float span=180.0) const;
   _var_float smoothAngle(_var_float v,_var_float v_prev,_var_float speed);
   void filter_a(const _var_float &v,_var_float *var_p,const _var_float &f);
   uint snap(uint v, uint snapv=10);
