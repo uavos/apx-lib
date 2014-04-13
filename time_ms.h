@@ -5,6 +5,7 @@
 #include <inttypes.h>
 #include <sys/types.h>
 extern uint time;
+extern "C" unsigned int time_task(void);
 #else
 #define time getSysTimeMS()
 #include <sys/time.h>
@@ -15,6 +16,9 @@ static uint getSysTimeMS()
   struct timeval  tv;
   gettimeofday(&tv, NULL);
   return (tv.tv_sec)*1000+(tv.tv_usec)/1000;
+}
+static unsigned int time_task(void)
+{
 }
 #endif
 //==============================================================================
