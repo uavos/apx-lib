@@ -110,8 +110,6 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   if(var_idx==idx_downstream)return extract_downstream(buf,size);
   if(var_idx==idx_flightplan)return extract_flightplan(buf,size);
 
-
-
   uint cnt=unpack(buf,size,var_idx);
   if(cnt==size)return cnt;
   if(!cnt)return 0; //error
