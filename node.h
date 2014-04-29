@@ -24,7 +24,7 @@ typedef struct{
   uint8_t     can_rxc;        // CAN received packets counter
   uint8_t     can_adr;        // CAN address
   uint8_t     can_err;        // CAN errors counter
-  uint8_t     dump[16];       // error dump or special info
+  uint8_t     dump[16];       // error dump or information dump
 }_node_status;
 // local node description struct (hardware.h)
 typedef struct{
