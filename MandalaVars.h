@@ -83,6 +83,7 @@ SIGDEF(tune,      "Tuning <parameter_id>,<data..>")
 SIGDEF(uav_id,    "UAV identification data <packed UAV_ID>")
 SIGDEF(formation, "Formation flight data <packed data>")
 SIGDEF(vor,       "VOR beacon <packed data>")
+
 //------------------------------
 // var packs
 SIGDEF(imu, "IMU sensors data package",
@@ -106,7 +107,7 @@ SIGDEF(update,  "Auto send to bus when changed",
 
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
 SIGDEF(autosend,  "Automatically forwarded variables to GCU",
-       idx_service, idx_msg, idx_downstream, idx_uav_id, idx_ping, idx_flightplan, idx_rawbus, idx_data )
+       idx_service, idx_msg, idx_downstream, idx_uav_id, idx_ping, idx_flightplan, idx_rawbus, idx_data)
 
 //------------------------------
 #undef SIGDEF
