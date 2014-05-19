@@ -100,7 +100,7 @@ SIGDEF(ils, "ILS sensors data package",
 SIGDEF(update,  "Auto send to bus when changed",
       idx_mode,idx_status,idx_error,idx_cmode,
       idx_power,idx_sw,
-      idx_ctr_flaps,idx_ctr_airbrk,idx_ctr_brake,idx_ctr_mixture,idx_ctr_engine,idx_ctr_sweep,
+      idx_ctr_flaps,idx_ctr_airbrk,idx_ctr_brake,idx_ctr_mixture,idx_ctr_engine,idx_ctr_sweep,idx_ctr_buoyancy,
       idx_ctrb,
       idx_cam_ch,idx_cam_ctr,idx_cam_opt,idx_cam_ctrb )
 
