@@ -158,6 +158,7 @@ MVAR(float, slip,     "slip [deg]",                     f2,s01)
 MVAR(float, attack,   "angle of attack [deg]",          f2,s01)
 MVAR(float, venergy,  "compensated variometer [m/s]",   f2,f2)
 MVAR(float, ldratio,  "glide ratio [Lift/Drag]",        f2,f2)
+MVAR(float, buoyancy, "Blimp ballonet pressure [kPa]",  f2,f2)
 
 //--------- Measured by GPS --------------
 MVAR(vect,  gps_pos,  "GPS position: lat,lon,hmsl [deg,deg,m]",f4,f4)
@@ -180,6 +181,7 @@ MVAR(float, ctr_brake,        "brake [0..1]",           f2,u001)
 MVAR(float, ctr_mixture,      "mixture [0..1]",         f2,u001)
 MVAR(float, ctr_engine,       "engine tuning [0..1]",   f2,u001)
 MVAR(float, ctr_sweep,        "sweep [-1..0..1]",       f2,s001)
+MVAR(float, ctr_buoyancy,     "buoyancy [-1..0..1]",    f2,s001)
 
 MVAR(flag,  ctrb, "controls bitfield [on/off]",,)
 MBIT(ctrb,   ers,     "ERS on/off",                     1)
