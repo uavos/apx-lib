@@ -18,8 +18,14 @@ typedef struct {
   _node_version hardware;
   uint32_t      size;   //program memory size
 }__attribute__((packed)) _node_info;
+// node power, returned by request
+typedef struct {
+  uint16_t    VBAT;           // supply voltage [mV]
+  uint16_t    IBAT;           // supply current [mA]
+}__attribute__((packed)) _node_power;
 // node status, returned by request
 typedef struct{
+  _node_power power;
   uint8_t     err_cnt;        // errors counter
   uint8_t     can_rxc;        // CAN received packets counter
   uint8_t     can_adr;        // CAN address
@@ -64,6 +70,7 @@ enum{
   apc_reboot,   //reset/reboot node
   apc_mute,     //stop sending data (sensors)
   apc_reconf,   //reset all conf to defaults
+  apc_power,    //return _node_power
 
   //------------------
   //conf
