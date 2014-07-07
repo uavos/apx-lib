@@ -361,7 +361,7 @@ void Mandala::calc(void)
   const Point dNE=cmd_NE-pos_NE;
   //dAlt=cmd_altitude-altitude;
   //_var_vect dNED(dN,dE,-dAlt);
-  //dXY=rotate(dNE,theta[2]);
+  dXY=rotate(dNE,theta[2]);
   dWPT=distance(dNE);
   dHome=distance(pos_NE);
   wpHDG=heading(dNE);
