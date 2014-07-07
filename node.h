@@ -112,7 +112,7 @@ typedef struct{
 //=============================================================================
 typedef uint8_t   _ft_option;
 typedef uint16_t  _ft_varmsk;
-typedef uint16_t  _ft_uint;
+typedef uint32_t  _ft_uint;
 typedef float     _ft_float;
 typedef uint8_t   _ft_byte;
 typedef uint8_t   _ft_string[16];
@@ -147,8 +147,11 @@ typedef _gpio     _ft_gpio;
 //-----------------------------------------------------------------------------
 typedef struct {
   _ft_option protocol;    //protocol
-  _ft_float  baudrate;    //baud rate for some protocols
-  _ft_byte   port_id;     //port_id for 'data' packets
+  _ft_uint   baudrate;    //baud rate for some protocols
+  _ft_byte   opt1;        //general protocol parameter
+  _ft_byte   opt2;        //general protocol parameter
+  _ft_uint   opt3;        //general protocol parameter
+  _ft_uint   opt4;        //general protocol parameter
 }__attribute__((packed)) _serial;
 typedef _serial   _ft_serial;
 //-----------------------------------------------------------------------------

@@ -40,12 +40,12 @@ bool Udp::bind(const char *host,uint port)
 //==============================================================================
 void Udp::close()
 {
-  if(fd)::close(fd);
+  if(fd>0)::close(fd);
 }
 //==============================================================================
 void Udp::write(const uint8_t *buf,uint cnt,const char *host,uint port)
 {
-  if(!fd)return;
+  if(fd<=0)return;
   dest_addr.sin_addr.s_addr = inet_addr(host);
   dest_addr.sin_port        = port?htons(port):bind_addr.sin_port;
 
@@ -57,7 +57,7 @@ void Udp::write(const uint8_t *buf,uint cnt,const char *host,uint port)
 //==============================================================================
 uint Udp::read(uint8_t *buf,uint sz)
 {
-  if(!fd){
+  if(fd<=0){
     usleep(100000);
     return 0;
   }
