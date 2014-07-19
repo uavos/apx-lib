@@ -677,6 +677,18 @@ const char *Mandala::var_name(uint8_t var_idx)
   return name;
 }
 //=============================================================================
+uint8_t Mandala::var_index(const char *name)
+{
+  for(uint i=0;i<idx_vars_top;i++){
+    const char *iname;
+    const char *descr;
+    if(!get_text_names(i|0xFF00,&iname,&descr))continue;
+    if(strcmp(iname,name)!=0)continue;
+    return i;
+  }
+  return 0xFF;
+}
+//=============================================================================
 void Mandala::dump(const uint8_t *ptr,uint cnt,bool hex)
 {
   //printf("\n");

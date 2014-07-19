@@ -90,6 +90,7 @@ public:
 
   bool get_text_names(uint16_t varmsk,const char **name,const char **descr);
   const char *var_name(uint8_t var_idx);
+  uint8_t var_index(const char *name);
 
   //---- flightplan ----
   _flightplan fp;
