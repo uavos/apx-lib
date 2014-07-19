@@ -19,6 +19,7 @@ static uint getSysTimeMS()
 }
 static unsigned int time_task(void)
 {
+  return time;
 }
 #endif
 //==============================================================================
