@@ -719,6 +719,7 @@ void Mandala::dump(uint8_t var_idx)
     case vt_uint:  printf("%u",(uint)*((_var_uint*)value_ptr));break;
     case vt_float: printf("%.2f",*((_var_float*)value_ptr));break;
     case vt_vect:  printf("(%.2f,%.2f,%.2f)",(*((_var_vect*)value_ptr))[0],(*((_var_vect*)value_ptr))[1],(*((_var_vect*)value_ptr))[2] );break;
+    case vt_point: printf("(%.2f,%.2f)",(*((_var_point*)value_ptr))[0],(*((_var_point*)value_ptr))[1] );break;
     case vt_sig:{
       printf("+sig+\n");
       _var_signature signature=*(_var_signature*)value_ptr;
