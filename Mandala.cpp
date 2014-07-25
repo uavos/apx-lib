@@ -162,6 +162,11 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     buf+=pack_float_f4(buf,&(fp.safety.altitude));
     buf+=pack_float_f4(buf,&(fp.safety.dHome));
     buf+=pack_float_f4(buf,&(fp.safety.dHomeERS));
+    //write home position
+    if((buf+12)>buf_top) break;
+    buf+=pack_float_f4(buf,&(home_pos[0]));
+    buf+=pack_float_f4(buf,&(home_pos[1]));
+    buf+=pack_float_f4(buf,&(home_pos[2]));
     //success: calc number of bytes written
     cnt=buf-sbuf;
     break;
@@ -219,6 +224,11 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     buf+=unpack_float_f4(buf,&(fp.safety.altitude));
     buf+=unpack_float_f4(buf,&(fp.safety.dHome));
     buf+=unpack_float_f4(buf,&(fp.safety.dHomeERS));
+    //unpack home position
+    if((buf+12)>buf_top) break;
+    buf+=unpack_float_f4(buf,&(home_pos[0]));
+    buf+=unpack_float_f4(buf,&(home_pos[1]));
+    buf+=unpack_float_f4(buf,&(home_pos[2]));
     //success: calc number of bytes unpacked
     rcnt=buf-sbuf;
     break;
@@ -344,11 +354,10 @@ uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
       //fprintf(stderr,"Error extract_downstream\n");
     }
   }
-  // calculate vars filtered by sig dl_filter, otherwise calculated by ahrs
+  //calculate vars filtered by sig dl_filter, otherwise calculated by ahrs
   pos_NE=llh2ne(gps_pos);
-  gps_altitude=gps_pos[2]-home_pos[2];
-  vXY=rotate(gps_vNE,theta[2]);
-  // gps_deltaNED,gps_deltaXYZ,gps_distWPT,gps_distHome,
+  vel_NE=Point(gps_vel[0],gps_vel[1]);
+  vXY=rotate(vel_NE,theta[2]);
   calc();
   return tcnt;
 }
@@ -361,14 +370,14 @@ void Mandala::calc(void)
   const Point dNE=cmd_NE-pos_NE;
   //dAlt=cmd_altitude-altitude;
   //_var_vect dNED(dN,dE,-dAlt);
-  //dXY=rotate(dNE,theta[2]);
+  dXY=rotate(dNE,theta[2]);
   dWPT=distance(dNE);
   dHome=distance(pos_NE);
   wpHDG=heading(dNE);
   homeHDG=heading(pos_NE,true);
   rwDelta=dWPT*sin((wpHDG+180.0-tgHDG)*D2R)-rwAdj;
-  rwDV=rotate(gps_vNE,tgHDG)[1];
-  gSpeed=distance(gps_vNE);
+  rwDV=rotate(vel_NE,tgHDG)[1];
+  gSpeed=distance(vel_NE);
   //course
   //_var_float crsGPS=heading(gps_vNED);
   //_var_float crsD=boundAngle(crsGPS-theta[2]);
@@ -677,6 +686,18 @@ const char *Mandala::var_name(uint8_t var_idx)
   return name;
 }
 //=============================================================================
+uint8_t Mandala::var_index(const char *name)
+{
+  for(uint i=0;i<idx_vars_top;i++){
+    const char *iname;
+    const char *descr;
+    if(!get_text_names(i|0xFF00,&iname,&descr))continue;
+    if(strcmp(iname,name)!=0)continue;
+    return i;
+  }
+  return 0xFF;
+}
+//=============================================================================
 void Mandala::dump(const uint8_t *ptr,uint cnt,bool hex)
 {
   //printf("\n");
@@ -698,6 +719,7 @@ void Mandala::dump(uint8_t var_idx)
     case vt_uint:  printf("%u",(uint)*((_var_uint*)value_ptr));break;
     case vt_float: printf("%.2f",*((_var_float*)value_ptr));break;
     case vt_vect:  printf("(%.2f,%.2f,%.2f)",(*((_var_vect*)value_ptr))[0],(*((_var_vect*)value_ptr))[1],(*((_var_vect*)value_ptr))[2] );break;
+    case vt_point: printf("(%.2f,%.2f)",(*((_var_point*)value_ptr))[0],(*((_var_point*)value_ptr))[1] );break;
     case vt_sig:{
       printf("+sig+\n");
       _var_signature signature=*(_var_signature*)value_ptr;

@@ -88,7 +88,7 @@ SIGDEF(vor,       "VOR beacon <packed data>")
 SIGDEF(imu, "IMU sensors data package",
        idx_acc, idx_gyro )
 SIGDEF(gps, "GPS fix data package",
-       idx_gps_pos, idx_gps_vNE, idx_gps_vspeed)
+       idx_gps_pos, idx_gps_vel)
 SIGDEF(ctr, "Fast controls, sent to bus at fixed update rate",
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_steering,idx_ctr_collective )
 SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw)
@@ -146,9 +146,9 @@ MVAR(vect,  gyro,     "angular rate: p,q,r [deg/s]",            f2,s10)
 MVAR(vect,  mag,      "magnetic field: Hx,Hy,Hz [gauss]",       f2,s001)
 
 //--------- FLIGHT CONTROL SENSORS --------------
+MVAR(float, altitude, "Altitude [m]",           f4,f4)
 MVAR(float, airspeed, "Airspeed [m/s]",         f2,f2)
-MVAR(float, altitude, "Altitude [m]",           f4,f2)
-MVAR(float, vspeed,   "Variometer [m/s]",       f2,f2)
+MVAR(float, vspeed,   "Vertical speed [m/s]",   f2,f2)
 MVAR(float, course,   "Moving direction [deg]", f2,f2)
 
 //--------- OTHER AP SENSORS --------------
@@ -159,12 +159,6 @@ MVAR(float, attack,   "angle of attack [deg]",          f2,s01)
 MVAR(float, venergy,  "compensated variometer [m/s]",   f2,f2)
 MVAR(float, ldratio,  "glide ratio [Lift/Drag]",        f2,f2)
 MVAR(float, buoyancy, "Blimp ballonet pressure [kPa]",  f2,f2)
-
-//--------- Measured by GPS --------------
-MVAR(vect,  gps_pos,  "GPS position: lat,lon,hmsl [deg,deg,m]",f4,f4)
-MVAR(point, gps_vNE,  "GPS velocity: Vnorth,Veast [m/s]",f2,f2)
-MVAR(float, gps_vspeed,"GPS vertical speed [m/s]",       f2,f2)
-MVAR(uint,  gps_time, "GPS UTC Time from 1970 1st Jan [sec]",   u4,u4)
 
 //--------- FAST CONTROLS --------------
 MVAR(float, ctr_ailerons,     "ailerons [-1..0..+1]",   f2,s001)
@@ -201,6 +195,11 @@ MVAR(float, cmd_altitude,     "commanded altitude [m]", f2,f2)
 MVAR(float, cmd_airspeed,     "commanded airspeed (for regThr) [m/s]",          f2,f2)
 MVAR(float, cmd_vspeed,       "commanded vertical speed (for regPitchH) [m/s]", f2,s01)
 MVAR(float, cmd_slip,         "commanded slip [deg]",   f2,s1)
+
+//--------- GPS receiver --------------
+MVAR(vect,  gps_pos,  "GPS position: lat,lon,hmsl [deg,deg,m]",f4,f4)
+MVAR(vect,  gps_vel,  "GPS velocity: Vnorth,Veast,Vdown [m/s]",f2,f2)
+MVAR(uint,  gps_time, "GPS UTC Time from 1970 1st Jan [sec]",  u4,u4)
 
 //--------- OTHER SENSORS (information) --------------
 MVAR(float, fuel,     "fuel capacity [0..1]",           f2,u001)
@@ -246,9 +245,9 @@ MBIT(mode,   RPV,     "Angles control",         1)
 MBIT(mode,   UAV,     "Heading control",        2)
 MBIT(mode,   WPT,     "Waypoints navigation",   3)
 MBIT(mode,   HOME,    "Go back home",           4)
-MBIT(mode,   TAKEOFF, "Takeoff",                5)
-MBIT(mode,   LANDING, "Landing",                6)
-MBIT(mode,   STBY,    "Loiter around DNED",     7)
+MBIT(mode,   STBY,    "Loiter around DNED",     5)
+MBIT(mode,   TAKEOFF, "Takeoff",                6)
+MBIT(mode,   LANDING, "Landing",                7)
 
 MVAR(flag,  status,   "status flag bitfield [on/off]",,)
 MBIT(status, rc,      "RC on/off",              1)
@@ -269,13 +268,11 @@ MBIT(error,  rpm,     "RPM sensor error/ok",    64)
 MBIT(error,  ers,     "ERS error/ok",           128)
 
 MVAR(flag,  cmode,    "operation mode bitfield [on/off]",,)
-MBIT(cmode,  dlhd,    "High precision downstream on/off",1)
-MBIT(cmode,  agl,     "Altitude correction agl/off",    2)
-MBIT(cmode,  ahrs,    "AHRS mode inertial/gps",         4)
-MBIT(cmode,  thrcut,  "Throttle cut on/off",            8)
-MBIT(cmode,  throvr,  "Throttle override on/off",       16)
-MBIT(cmode,  hover,   "Stabilization mode hover/run",   32)
-MBIT(cmode,  hdglook, "Heading control mode look/normal",64)
+MBIT(cmode,  dlhd,    "High precision downstream on/off",       1)
+MBIT(cmode,  thrcut,  "Throttle cut on/off",                    2)
+MBIT(cmode,  throvr,  "Throttle override on/off",               4)
+MBIT(cmode,  hover,   "Stabilization mode hover/run",           8)
+MBIT(cmode,  ahrs,    "AHRS mode inertial/gps",                 16)
 
 //--------- POWER CONTROL --------------
 MVAR(flag,  power,    "power controls bitfield [on/off]",,)
@@ -310,15 +307,13 @@ MVAR(float, delta,    "general delta (depends on mode) [m]",    f2,f2)
 MVAR(float, windSpd,  "wind speed [m/s]",               f2,u01)
 MVAR(float, windHdg,  "wind direction to [deg]",        f2,f2)
 MVAR(float, cas2tas,  "CAS to TAS multiplier [K]",      f2,u001)
-MVAR(byte,  errcode,  "error code",                     u1,u1)
-MVAR(float, corr,     "Correlator output [K]",          f2,f2)
 MVAR(float, rwAdj,    "runway displacement adjust [m]", s1,s1)
-MVAR(vect,  home_pos, "Home position: lat,lon,hmsl [deg,deg,m]",f4,f4)
 MVAR(byte,  gps_SV,   "GPS Satellites visible [number]",u1,u1)
 MVAR(byte,  gps_SU,   "GPS Satellites used [number]",   u1,u1)
-MVAR(float, pstatic_gnd,      "Static pressure on ground level [inHg]",f4,f4)
-MVAR(float, safe_altitude,    "Safe altitude [m]",      f4,f4)
-MVAR(float, cruise_airspeed,  "Cruise airspeed [m/s]",  f2,f2)
+MVAR(vect,  home_pos, "Home position: lat,lon,hmsl [deg,deg,m]",f4,f4)
+MVAR(float, altps_gnd,"Barometric altitude on ground level [m]",f4,f4)
+MVAR(byte,  errcode,  "error code",                     u1,u1)
+MVAR(float, corr,     "Correlator output [K]",          f2,f2)
 
 //--------- payloads & user --------------
 MVAR(vect,  cam_theta,        "camera orientation: roll,pitch,yaw [deg]",f2,f2)
@@ -338,7 +333,7 @@ MVAR(float, user6,    "User value 6",f4,f2)
 MVAR(byte,  local,    "local byte [0...255]",   u1,u1)
 //--------- calculated by Mandala::calc() --------------
 MVAR(point, pos_NE,   "local position: north,east [m]",         f4,f4)
-MVAR(float, gps_altitude,"GPS altitude [m]",                    f4,f4)
+MVAR(point, vel_NE,   "local velocity: north,east [m]",         f4,f4)
 MVAR(float, homeHDG,  "heading to home position [deg]",         f4,f4)
 MVAR(float, dHome,    "distance to GCU [m]",                    f4,f4)
 MVAR(float, dWPT,     "distance to waypoint [m]",               f4,f4)
@@ -349,11 +344,14 @@ MVAR(float, wpHDG,    "current waypoint heading [deg]",         f4,f4)
 MVAR(float, rwDelta,  "runway alignment [m]",                   f4,f4)
 MVAR(float, rwDV,     "runway alignment velocity [m/s]",        f4,f4)
 
-//--------- filtered dynamic tuning --------------
+//--------- internal --------------
 MVAR(uint,  dl_period,"downlink period [ms]",           u2,u2)
-MVAR(float, pstatic,  "Static pressure [inHg]",         f4,f4)
 MVAR(uint,  wpcnt,    "number of waypoints [0...]",     u2,u2)
 MVAR(uint,  rwcnt,    "number of runways [0...]",       u2,u2)
+
+//--------- local sensors --------------
+MVAR(float, altps,    "Barometric altitude [m]",        f4,f4)
+MVAR(float, vario,    "Barometric variometer [m/s]",    f4,f4)
 
 //--------- PILOT CONTROLS --------------
 MVAR(float, rc_roll,          "RC roll [-1..0..+1]",    s001,s001)
