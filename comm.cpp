@@ -46,7 +46,6 @@ bool Comm::open(const char *portname,int baudrate,const char *name,int timeout,u
     return false;
   }
   if(::flock(fd,LOCK_EX|LOCK_NB)!=0){
-    fd=-1;
     close();
     fprintf(stderr,"Unable to lock %s - %s\n",portname,strerror(errno));
     return false;
@@ -82,6 +81,7 @@ bool Comm::open(const char *portname,int baudrate,const char *name,int timeout,u
 //==============================================================================
 void Comm::close()
 {
+  ::flock(fd,LOCK_UN);
   ::close(fd);
   fd=-1;
 }
