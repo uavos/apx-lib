@@ -61,13 +61,41 @@ uint Udp::read(uint8_t *buf,uint sz)
     usleep(100000);
     return 0;
   }
+  int cnt = 0;
   int addr_size = sizeof(sender_addr);
-  int cnt=recvfrom(fd,buf,sz,0,(sockaddr*)&sender_addr,(socklen_t *)&addr_size);
-  if(cnt<0){
-    if(!err_mute)printf("%s: Reading Packet Failed.\n",name);
-    err_mute=true;
-    return 0;
-  }
+
+  fd_set readfds;
+  struct timeval receive_timeout;
+  // clear the set ahead of time
+  FD_ZERO(&readfds);
+  // add our descriptors to the set
+  FD_SET(fd, &readfds);
+  receive_timeout.tv_sec = 5;
+  receive_timeout.tv_usec = 0;
+  int rv = select(fd+1, &readfds, NULL, NULL, &receive_timeout);
+  if (rv == -1)
+	 {
+	     perror("select\n"); // error occurred in select()
+	 }
+	 else if (rv == 0)
+	 {
+	     printf("UDP:Timeout occurred.\n");
+	     fflush(stdout);
+	 }
+	 else
+	 {
+	     // one or both of the descriptors have data
+	     if (FD_ISSET(fd, &readfds))
+	     {
+	    	 cnt=recvfrom(fd,buf,sz,0,(sockaddr*)&sender_addr,(socklen_t *)&addr_size);
+	    	 if(cnt<0){
+	    	     if(!err_mute)printf("%s: Reading Packet Failed.\n",name);
+	    	     err_mute=true;
+	    	     return 0;
+	    	   }
+	     }
+
+	 }
   return cnt;
 }
 //==============================================================================
