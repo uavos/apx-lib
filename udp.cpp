@@ -70,7 +70,7 @@ uint Udp::read(uint8_t *buf,uint sz)
   FD_ZERO(&readfds);
   // add our descriptors to the set
   FD_SET(fd, &readfds);
-  receive_timeout.tv_sec = 5;
+  receive_timeout.tv_sec = 1;
   receive_timeout.tv_usec = 0;
   int rv = select(fd+1, &readfds, NULL, NULL, &receive_timeout);
   if (rv == -1)
@@ -79,8 +79,7 @@ uint Udp::read(uint8_t *buf,uint sz)
 	 }
 	 else if (rv == 0)
 	 {
-	     printf("UDP:Timeout occurred.\n");
-	     fflush(stdout);
+	     //printf("UDP:Timeout occurred.\n");
 	 }
 	 else
 	 {
