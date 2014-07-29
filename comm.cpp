@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <termios.h>
 #include <sys/ioctl.h>
+#include <sys/file.h>
 #include <unistd.h>
 #include <stddef.h>
 #include <termios.h>
@@ -41,7 +42,12 @@ bool Comm::open(const char *portname,int baudrate,const char *name,int timeout,u
 
   fd = ::open(portname, O_RDWR | O_NOCTTY );// | O_NONBLOCK | O_NDELAY);
   if (fd <0) {
-    fprintf(stderr,"%s: unable to open %s - %s\n",name,portname,strerror(errno));
+    fprintf(stderr,"Unable to open %s - %s\n",portname,strerror(errno));
+    return false;
+  }
+  if(::flock(fd,LOCK_EX|LOCK_NB)!=0){
+    close();
+    fprintf(stderr,"Unable to lock %s - %s\n",portname,strerror(errno));
     return false;
   }
 
@@ -75,6 +81,7 @@ bool Comm::open(const char *portname,int baudrate,const char *name,int timeout,u
 //==============================================================================
 void Comm::close()
 {
+  ::flock(fd,LOCK_UN);
   ::close(fd);
   fd=-1;
 }
