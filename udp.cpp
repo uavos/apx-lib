@@ -87,7 +87,6 @@ uint Udp::read(uint8_t *buf,uint sz)
 	     if (FD_ISSET(fd, &readfds))
 	     {
 	    	 cnt=recvfrom(fd,buf,sz,0,(sockaddr*)&sender_addr,(socklen_t *)&addr_size);
-	    	 cnt=recvfrom(fd,buf,sz,0,(sockaddr*)&sender_addr,(socklen_t *)&addr_size);
 	    	 if(cnt<0){
 	    	     if(!err_mute)printf("%s: Reading Packet Failed.\n",name);
 	    	     err_mute=true;
