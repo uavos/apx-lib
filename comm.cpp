@@ -108,7 +108,7 @@ void Comm::write(const uint8_t *buf,uint cnt)
   int wcnt=0;
   while (wcnt<pcnt) {
     int rcnt=::write(fd,buf+wcnt,pcnt-wcnt);
-    if(rcnt<=0)continue;
+    if(rcnt<=0)break;
     wcnt+=rcnt;
   }
   dump("S",buf,cnt);
