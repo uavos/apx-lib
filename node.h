@@ -3,7 +3,7 @@
 #include <inttypes.h>
 #include <sys/types.h>
 //=============================================================================
-#define BUS_MAX_PACKET          2048    //2k MAX
+#define BUS_MAX_PACKET          1024    //2k MAX
 //=============================================================================
 // node information, dynamically assigned values
 typedef uint8_t _node_sn[12];           //chip serial number
