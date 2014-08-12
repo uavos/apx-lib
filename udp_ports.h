@@ -2,6 +2,7 @@
 #define udp_ports_H
 //==============================================================================
 #define UDP_MODEM_TX            9010    //modem tx (send to UAV)
+#define UDP_MODEM_CMD           9030    //modem command string (send to UAV)
 
 #define UDP_PORT_TELEMTRY       9000    //shiva: telemetry downlink/uplink
 #define UDP_PORT_SIM            9002    //simulator: imu/servo
