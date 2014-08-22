@@ -47,32 +47,29 @@
 #define MAX_WPCNT       100
 #define MAX_RWCNT       10
 typedef enum { wtHdg=0,wtLine,  wtCnt } _wpt_type;
-typedef enum { rwaLeft=0,rwaRight, rwaCnt } _rw_app;
-#define wt_str_def "Hdg","Line"
-#define rwa_str_def "Left","Right"
+typedef enum { rtLeft=0,rtRight, rtCnt } _rw_turn;
+#define wt_str_def  "Hdg","Line"
+#define rt_str_def  "Left","Right"
 typedef struct {
   _var_vect     LLA;  //lat,lon,hmsl
   uint8_t       type;
   uint8_t       cmdSize;
-  uint8_t       cmd[128]; //TODO: implement wpt commands
+  uint8_t       cmd[32]; //TODO: implement wpt commands
 }_waypoint;
 typedef struct {
-  _var_vect     LLH;  //start pos [lat lon agl]
+  _var_vect     llh;  //start pos [lat lon hmsl]
   _var_point    dNE;
-  uint8_t       appType;
-  _var_float    distApp;
-  _var_float    altApp;
-  _var_float    distTA;
-  _var_float    altTA;
+  _var_float    appLen;
+  union{
+    uint8_t     opts;
+    struct{
+      uint8_t   turn    :1;
+    };
+  };
 }_runway;
 typedef struct {
   _waypoint waypoints[MAX_WPCNT];
   _runway   runways[MAX_RWCNT];
-  struct{ //config override
-    _var_float altitude;
-    _var_float dHome;
-    _var_float dHomeERS;
-  }safety;
 }_flightplan;
 //=============================================================================
 // UAV identification
@@ -94,8 +91,8 @@ public:
 
   //---- flightplan ----
   _flightplan fp;
-  const char *wt_str[wtCnt];    //wt_type string descr
-  const char *rwa_str[rwaCnt];  //wt_type string descr
+  const char *wt_str[wtCnt];    //_wpt_type string descr
+  const char *rt_str[rtCnt];    //_rw_turn string descr
 
   //---- Internal use -----
   // telemetry framework

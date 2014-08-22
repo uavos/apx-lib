@@ -57,8 +57,8 @@ void Mandala::init(void)
   //fill strings
   static const char *wt_str_s[wtCnt]={ wt_str_def };
   for(uint i=0;i<wtCnt;i++) wt_str[i]=wt_str_s[i];
-  static const char *rwa_str_s[rwaCnt]={ rwa_str_def };
-  for(uint i=0;i<rwaCnt;i++) rwa_str[i]=rwa_str_s[i];
+  static const char *rt_str_s[rtCnt]={ rt_str_def };
+  for(uint i=0;i<rtCnt;i++) rt_str[i]=rt_str_s[i];
 }
 //===========================================================================
 bool Mandala::get_text_names(uint16_t varmsk,const char **name,const char **descr)
@@ -133,9 +133,7 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     uint i;
     for(i=0;i<wpcnt;i++){
       if((buf+(szLLH+2+fp.waypoints[i].cmdSize))>buf_top) break;
-      buf+=pack_float_f4(buf,&(fp.waypoints[i].LLA[0]));
-      buf+=pack_float_f4(buf,&(fp.waypoints[i].LLA[1]));
-      buf+=pack_float_f4(buf,&(fp.waypoints[i].LLA[2]));
+      buf+=pack_vect_f4(buf,&(fp.waypoints[i].LLA));
       *buf++=fp.waypoints[i].type;
       *buf++=fp.waypoints[i].cmdSize;
       memcpy(buf,fp.waypoints[i].cmd,fp.waypoints[i].cmdSize);
@@ -145,28 +143,16 @@ uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
     //write runways
     *buf++=rwcnt;
     for(i=0;i<rwcnt;i++){
-      if((buf+(szLLH+6+9))>buf_top) break;
-      buf+=pack_float_f4(buf,&(fp.runways[i].LLH[0]));
-      buf+=pack_float_f4(buf,&(fp.runways[i].LLH[1]));
-      buf+=pack_float_f4(buf,&(fp.runways[i].LLH[2]));
-      buf+=pack_point_f2(buf,&(fp.runways[i].dNE));
-      *buf++=fp.runways[i].appType;
-      buf+=pack_float_f2(buf,&(fp.runways[i].distApp));
-      buf+=pack_float_f2(buf,&(fp.runways[i].altApp));
-      buf+=pack_float_f2(buf,&(fp.runways[i].distTA));
-      buf+=pack_float_f2(buf,&(fp.runways[i].altTA));
+      if((buf+(szLLH+8+4+1))>buf_top) break;
+      buf+=pack_vect_f4(buf,&(fp.runways[i].llh));
+      buf+=pack_point_f4(buf,&(fp.runways[i].dNE));
+      buf+=pack_float_f4(buf,&(fp.runways[i].appLen));
+      *buf++=fp.runways[i].opts;
     }
     if(i<rwcnt)break; //overflow
-    //write flight place parameters
-    if((buf+12)>buf_top) break;
-    buf+=pack_float_f4(buf,&(fp.safety.altitude));
-    buf+=pack_float_f4(buf,&(fp.safety.dHome));
-    buf+=pack_float_f4(buf,&(fp.safety.dHomeERS));
     //write home position
     if((buf+12)>buf_top) break;
-    buf+=pack_float_f4(buf,&(home_pos[0]));
-    buf+=pack_float_f4(buf,&(home_pos[1]));
-    buf+=pack_float_f4(buf,&(home_pos[2]));
+    buf+=pack_vect_f4(buf,&(home_pos));
     //success: calc number of bytes written
     cnt=buf-sbuf;
     break;
@@ -189,9 +175,7 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     uint i;
     for (i=0;i<wpcnt;i++) {
       if((buf+(szLLH+2))>buf_top) break;
-      buf+=unpack_float_f4(buf,&(fp.waypoints[i].LLA[0]));
-      buf+=unpack_float_f4(buf,&(fp.waypoints[i].LLA[1]));
-      buf+=unpack_float_f4(buf,&(fp.waypoints[i].LLA[2]));
+      buf+=unpack_vect_f4(buf,&(fp.waypoints[i].LLA));
       fp.waypoints[i].type=(_wpt_type)*buf++;
       uint csz=(_wpt_type)*buf++;
       uint sz=csz;
@@ -207,28 +191,16 @@ uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
     rwcnt=*buf++;
     if(rwcnt>MAX_RWCNT)break;
     for (i=0;i<rwcnt;i++) {
-      if((buf+(szLLH+6+9))>buf_top) break;
-      buf+=unpack_float_f4(buf,&(fp.runways[i].LLH[0]));
-      buf+=unpack_float_f4(buf,&(fp.runways[i].LLH[1]));
-      buf+=unpack_float_f4(buf,&(fp.runways[i].LLH[2]));
-      buf+=unpack_point_f2(buf,&(fp.runways[i].dNE));
-      fp.runways[i].appType=(_rw_app)*buf++;
-      buf+=unpack_float_f2(buf,&(fp.runways[i].distApp));
-      buf+=unpack_float_f2(buf,&(fp.runways[i].altApp));
-      buf+=unpack_float_f2(buf,&(fp.runways[i].distTA));
-      buf+=unpack_float_f2(buf,&(fp.runways[i].altTA));
+      if((buf+(szLLH+8+4+1))>buf_top) break;
+      buf+=unpack_vect_f4(buf,&(fp.runways[i].llh));
+      buf+=unpack_point_f4(buf,&(fp.runways[i].dNE));
+      buf+=unpack_float_f4(buf,&(fp.runways[i].appLen));
+      fp.runways[i].opts=*buf++;
     }
     if(i<rwcnt)break; //overflow
-    //unpack flight place parameters
-    if((buf+12)>buf_top) break;
-    buf+=unpack_float_f4(buf,&(fp.safety.altitude));
-    buf+=unpack_float_f4(buf,&(fp.safety.dHome));
-    buf+=unpack_float_f4(buf,&(fp.safety.dHomeERS));
     //unpack home position
     if((buf+12)>buf_top) break;
-    buf+=unpack_float_f4(buf,&(home_pos[0]));
-    buf+=unpack_float_f4(buf,&(home_pos[1]));
-    buf+=unpack_float_f4(buf,&(home_pos[2]));
+    buf+=unpack_vect_f4(buf,&(home_pos));
     //success: calc number of bytes unpacked
     rcnt=buf-sbuf;
     break;
