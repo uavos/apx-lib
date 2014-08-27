@@ -80,7 +80,8 @@ SIGDEF(sim,       "Simulator wrapped packet <var_idx>,<data..>")
 SIGDEF(data,      "Port data <port_id>,<data..>")
 SIGDEF(ldata,     "Port data local <port_id>,<data..>")
 SIGDEF(video,     "Video stream <data>")
-SIGDEF(uav_id,    "UAV identification data <packed UAV_ID>")
+SIGDEF(uav,       "UAV datalink <id 4 bytes>,<var_idx>,<data..>")
+//SIGDEF(uav_id,    "UAV identification data <packed UAV_ID>")
 SIGDEF(formation, "Formation flight data <packed data>")
 SIGDEF(vor,       "VOR beacon <packed data>")
 //------------------------------
@@ -106,7 +107,7 @@ SIGDEF(update,  "Auto send to bus when changed",
 
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
 SIGDEF(autosend,  "Automatically forwarded variables to GCU",
-       idx_service, idx_msg, idx_downstream, idx_uav_id, idx_ping, idx_flightplan, idx_rawbus, idx_data )
+       idx_service, idx_msg, idx_downstream, idx_ping, idx_flightplan, idx_rawbus, idx_data )
 
 //------------------------------
 #undef SIGDEF
