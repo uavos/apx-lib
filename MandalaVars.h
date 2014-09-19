@@ -239,7 +239,7 @@ MVAR(vect,  radar_vXYZ,       "radar velocity: Vx,Vy,Vz [m/s]", f2,f2)
 MVAR(vect,  radar_dXYZ,       "radar delta: dx,dy,dz [m]",      f2,f2)
 
 //--------- STATUS FLAGS --------------
-MVAR(byte,  stage,    "auto set to zero by mode change [maneuver stage]",u1,u1)
+MVAR(byte,  stage,    "maneuver stage",u1,u1)
 MVAR(enum,  mode,     "flight mode",,)
 MBIT(mode,   EMG,     "Realtime control",       0)
 MBIT(mode,   RPV,     "Angles control",         1)
