@@ -1,7 +1,7 @@
 #ifndef time_ms_H
 #define time_ms_H
 //==============================================================================
-#ifndef _TIME_H
+#if (! defined _TIME_H_) && (! defined _TIME_H)
 #include <inttypes.h>
 #include <sys/types.h>
 extern uint time;
