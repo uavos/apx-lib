@@ -17,10 +17,9 @@ static uint getSysTimeMS()
   gettimeofday(&tv, NULL);
   return (tv.tv_sec)*1000+(tv.tv_usec)/1000;
 }
-static unsigned int time_task(void)
-{
-  return time;
-}
+#ifndef time_task
+#define time_task() (time)
+#endif
 #endif
 //==============================================================================
 #endif
