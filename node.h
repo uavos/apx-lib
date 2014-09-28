@@ -145,16 +145,6 @@ typedef struct {
 }__attribute__((packed)) _gpio;
 typedef _gpio     _ft_gpio;
 //-----------------------------------------------------------------------------
-typedef struct {
-  _ft_option protocol;    //protocol
-  _ft_uint   baudrate;    //baud rate for some protocols
-  _ft_byte   opt1;        //general protocol parameter
-  _ft_byte   opt2;        //general protocol parameter
-  _ft_uint   opt3;        //general protocol parameter
-  _ft_uint   opt4;        //general protocol parameter
-}__attribute__((packed)) _serial;
-typedef _serial   _ft_serial;
-//-----------------------------------------------------------------------------
 //APCFG support
 typedef struct {
   _ft_float  Kp;
@@ -191,7 +181,6 @@ typedef struct {
 typedef _regPPI  _ft_regPPI;
 //=============================================================================
 typedef enum{
-  //basic
   ft_option=0,
   ft_varmsk,
   ft_uint,
@@ -199,13 +188,10 @@ typedef enum{
   ft_byte,
   ft_string,
   ft_lstring,
-  //expandable
   ft_vec,
   ft_ctr,
   ft_pwm,
   ft_gpio,
-  ft_serial,
-  //apcfg
   ft_regPID,
   ft_regPI,
   ft_regP,
