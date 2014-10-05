@@ -58,12 +58,20 @@ bool Comm::open(const char *portname,int baudrate,const char *name,int timeout,u
   //fcntl(fd, F_SETFL, O_NONBLOCK);
   struct termios tio_serial;
   bzero(&tio_serial, sizeof(tio_serial));
-  tio_serial.c_cflag = CS8 | CLOCAL | CREAD | parity;
+  tio_serial.c_cflag = CS8 | CLOCAL | CREAD;// | parity;
   tio_serial.c_iflag = IGNBRK | IGNPAR;//(parity?INPCK:IGNPAR);
   tio_serial.c_oflag = 1;
   tio_serial.c_lflag = 0;
   tio_serial.c_cc[VMIN] = 0;
   tio_serial.c_cc[VTIME] = timeout;
+  if(parity==2){        //even
+    tio_serial.c_cflag &= ~PARODD;
+    tio_serial.c_cflag |= PARENB;
+  }else if(parity==1){ //odd
+    tio_serial.c_cflag |= PARODD;
+    tio_serial.c_cflag &= ~PARENB;
+  }
+
   cfsetspeed(&tio_serial, baudrate);
   //cfsetispeed(&tio_serial, baudrate);
   //cfsetospeed(&tio_serial, baudrate);
