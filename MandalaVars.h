@@ -400,7 +400,7 @@ MBIT(cam_ctrb, shot,  "snapshot",               1)
 MBIT(cam_ctrb, ashot, "series snapshots",       2)
 
 //--------- TURRET CONTROL --------------
-MVAR(point, turretcmd_att, "commanded turret orientation: pitch,heading [deg]", f4,f4)
+MVAR(point, turretcmd_att, "commanded turret orientation: pitch,yaw [deg]", f4,f4)
 MVAR(enum,  turret_mode,  "turret mode",,)
 MBIT(turret_mode, TGYRO,     "gyro stabilized",                 0)
 MBIT(turret_mode, TFIXED,    "relative encoded attitude",       1)
