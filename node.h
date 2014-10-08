@@ -116,7 +116,8 @@ typedef uint32_t  _ft_uint;
 typedef float     _ft_float;
 typedef uint8_t   _ft_byte;
 typedef uint8_t   _ft_string[16];
-typedef uint8_t   _ft_lstring[64];
+typedef uint8_t   _ft_lstr[64];
+typedef uint8_t   _ft_protocol[128];
 typedef struct{
   _ft_float x;
   _ft_float y;
@@ -179,6 +180,37 @@ typedef struct {
   _ft_byte   Lo;
 }__attribute__((packed)) _regPPI;
 typedef _regPPI  _ft_regPPI;
+//-----------------------------------------------------------------------------
+//serial protocol state machine
+enum{
+  sp_off=0,
+  //operation
+  sp_init,      //<fields>
+  sp_write,     //<period ms[U16]>,<fields>
+  sp_read,      //<fields>
+  sp_wupd,      //<var_idx>,<fields> [write on var update]
+  //fields
+  sp_skip=0x10, //ignore byte
+  sp_byte,      //<byte>
+  sp_float,     //<varmsk>
+  sp_value,     //<varmsk>,<type>,<bias>,<mult>
+  sp_servo,     //<pwm idx>,<type>,<bias>,<mult>
+  sp_CRC16_HL,  //<poly>,<initial>,<start pos>,<end pos>
+  sp_CRC16_LH,  //<poly>,<initial>,<start pos>,<end pos>
+  sp_CRC8XOR,   //<initial>,<start pos>,<end pos>
+  sp_CRC8SUM,   //<initial>,<start pos>,<end pos>
+  //value types
+  sp_U32=0x40,
+  sp_S32,
+  sp_U16,
+  sp_S16,
+  sp_U8,
+  sp_S8,
+  sp_F32,
+  sp_string,
+
+  sp_Cnt
+};
 //=============================================================================
 typedef enum{
   ft_option=0,
@@ -187,7 +219,7 @@ typedef enum{
   ft_float,
   ft_byte,
   ft_string,
-  ft_lstring,
+  ft_lstr,
   ft_vec,
   ft_ctr,
   ft_pwm,
@@ -196,6 +228,7 @@ typedef enum{
   ft_regPI,
   ft_regP,
   ft_regPPI,
+  ft_protocol,
   //---------
   ft_cnt
 }_node_ft;

@@ -2,10 +2,12 @@
 #define time_ms_H
 //==============================================================================
 #if (! defined _TIME_H_) && (! defined _TIME_H)
+#ifndef _HARDWARE_H_
 #include <inttypes.h>
 #include <sys/types.h>
 extern uint time;
 extern "C" unsigned int time_task(void);
+#endif
 #else
 #define time getSysTimeMS()
 #include <sys/time.h>
