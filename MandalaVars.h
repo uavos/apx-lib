@@ -414,7 +414,6 @@ MVAR(point, turretenc_att, "turret encoders: pitch,yaw [deg]", f4,f4)
 MVAR(float, gcu_RSS,  "GCU modem signal strength [0..1]",       u001,u001)
 MVAR(float, gcu_Ve,   "GCU battery voltage [v]",                u01,u01)
 MVAR(float, gcu_MT,   "GCU modem temperature [C]",              s1,s1)
-MVAR(float, gcu_VSWR, "GCU modem standing wave ratio [VSWR]",   u01,u01)
 //=============================================================================
 #undef MVAR
 #undef MBIT
