@@ -314,7 +314,10 @@ uint Comm::readEscaped(uint8_t *buf,uint max_len)
 uint Comm::read(uint8_t *buf,uint cnt)
 {
   int rcnt=::read(fd,buf,cnt);
-  if(rcnt<0)return 0;
+  if(rcnt<0){
+    //usleep(100);
+    return 0;
+  }
   //dump("R",buf,rcnt);
   return rcnt;
 }
