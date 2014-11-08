@@ -368,6 +368,8 @@ MVAR(uint,  rwcnt,    "number of runways [0...]",       u2,u2)
 //--------- local sensors --------------
 MVAR(float, altps,    "Barometric altitude [m]",        f4,f4)
 MVAR(float, vario,    "Barometric variometer [m/s]",    f4,f4)
+MVAR(float, vcas,     "Airspeed derivative [m/s^2]",    f4,f4)
+MVAR(float, denergy,  "Venergy derivative [m/s^2]",     f4,f4)
 
 //--------- PILOT CONTROLS --------------
 MVAR(float, rc_roll,          "RC roll [-1..0..+1]",    s001,s001)
@@ -414,11 +416,6 @@ MVAR(point, turretenc_att, "turret encoders: pitch,yaw [deg]", f4,f4)
 MVAR(float, gcu_RSS,  "GCU modem signal strength [0..1]",       u001,u001)
 MVAR(float, gcu_Ve,   "GCU battery voltage [v]",                u01,u01)
 MVAR(float, gcu_MT,   "GCU modem temperature [C]",              s1,s1)
-
-
-
-MVAR(float, vcas,     "Airspeed derivative [m/s^2]",    f4,f4)
-MVAR(float, denergy,  "Venergy derivative [m/s^2]",     f4,f4)
 //=============================================================================
 #undef MVAR
 #undef MBIT
