@@ -93,8 +93,7 @@ SIGDEF(gps, "GPS fix data package",
 SIGDEF(ctr, "Fast controls, sent to bus at fixed update rate",
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_steering,idx_ctr_collective )
 SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw)
-SIGDEF(ils, "ILS sensors data package",
-       idx_ilsb,idx_ils_HDG,idx_ils_DME,idx_ils_offset )
+SIGDEF(platform, "ILS platform sensors data package", idx_platform_pos,idx_platform_vel,idx_platform_hdg)
 
 //------------------------------
 // Auto update/send vars
@@ -228,15 +227,17 @@ MVAR(float, OP,       "oil pressure [atm]",             u01,u01)
 
 //--------- Instrument Landing System --------------
 MVAR(flag,  ilsb,     "ILS bitfield [on/off]",,)
-MBIT(ilsb,   approach,"ILS approach available/lost", 1)
-MBIT(ilsb,   offset,  "ILS offset available/lost",   2)
-MBIT(ilsb,   platform,"ILS platform available/lost", 4)
+MBIT(ilsb,   armed,   "ILS armed/off", 1)
+MBIT(ilsb,   approach,"ILS approach available/lost", 2)
+MBIT(ilsb,   offset,  "ILS offset available/lost",   4)
+MBIT(ilsb,   platform,"ILS platform available/lost", 8)
+MVAR(point, ils_RSS,  "ILS signal strength: IR,RF [0..1]", u001,u001)
 MVAR(float, ils_HDG,  "ILS heading to VOR1 [deg]", f2,f2)
 MVAR(float, ils_DME,  "ILS distance to VOR1 [m]", f2,f2)
 MVAR(point, ils_offset, "ILS offset: heading,altitude [deg]", f2,f2)
 MVAR(vect,  platform_pos,  "Platform position: lat,lon,hmsl [deg,deg,m]", f4,f4)
 MVAR(vect,  platform_vel,  "Platform velocity: Vnorth,Veast,Vdown [m/s]", f2,f2)
-MVAR(float, platform_HDG,  "Platform heading [deg]", f2,f2)
+MVAR(float, platform_hdg,  "Platform heading [deg]", f2,f2)
 
 //--------- Proximity & movement sensors --------------
 MVAR(float, range,      "distance to target [m]",         f2,f2)

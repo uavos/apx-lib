@@ -360,6 +360,15 @@ uint MandalaCore::pack_point_f4(void *buf,void *value_ptr)
   return 8;
 }
 //------------------------------------------------------------------------------
+uint MandalaCore::pack_point_u001(void *buf,void *value_ptr)
+{
+  _var_point *v=((_var_point*)value_ptr);
+  uint8_t *ptr=(uint8_t*)buf;
+  pack_float_u001(ptr++,&((*v)[0]));
+  pack_float_u001(ptr,&((*v)[1]));
+  return 2;
+}
+//------------------------------------------------------------------------------
 uint MandalaCore::pack_sig(void *buf,void *value_ptr)
 {
   _var_signature signature=*((_var_signature*)value_ptr);
@@ -593,6 +602,15 @@ uint MandalaCore::unpack_point_f4(void *buf,void *value_ptr)
   unpack_float_f4(ptr++,&((*v)[0]));
   unpack_float_f4(ptr,&((*v)[1]));
   return 8;
+}
+//------------------------------------------------------------------------------
+uint MandalaCore::unpack_point_u001(void *buf,void *value_ptr)
+{
+  _var_point *v=((_var_point*)value_ptr);
+  uint8_t *ptr=(uint8_t*)buf;
+  unpack_float_u001(ptr++,&((*v)[0]));
+  unpack_float_u001(ptr,&((*v)[1]));
+  return 2;
 }
 //------------------------------------------------------------------------------
 uint MandalaCore::unpack_sig(void *buf,uint cnt,void *value_ptr)

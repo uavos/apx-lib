@@ -176,6 +176,7 @@ protected:
 
   uint pack_point_f2(void *buf,void *value_ptr);
   uint pack_point_f4(void *buf,void *value_ptr);
+  uint pack_point_u001(void *buf,void *value_ptr);
 
   uint pack_flag_(void *buf,void *value_ptr);
   uint pack_enum_(void *buf,void *value_ptr);
@@ -207,6 +208,7 @@ protected:
 
   uint unpack_point_f2(void *buf,void *value_ptr);
   uint unpack_point_f4(void *buf,void *value_ptr);
+  uint unpack_point_u001(void *buf,void *value_ptr);
 
   uint unpack_flag_(void *buf,void *value_ptr);
   uint unpack_enum_(void *buf,void *value_ptr);
