@@ -202,8 +202,8 @@ MVAR(vect,  gps_vel,  "GPS velocity: Vnorth,Veast,Vdown [m/s]",f2,f2)
 MVAR(uint,  gps_time, "GPS UTC Time from 1970 1st Jan [sec]",  u4,u4)
 
 //--------- OTHER SENSORS (information) --------------
-MVAR(float, fuel,     "fuel capacity [0..1]",           f2,u001)
-MVAR(float, frate,    "fuel flow rate [1/s]",           f2,f2)
+MVAR(float, fuel,     "fuel capacity [l]",              f4,f2)
+MVAR(float, frate,    "fuel flow rate [l/h]",           f4,f2)
 MVAR(float, RSS,      "modem signal strength [0..1]",   u001,u001)
 
 //--------- BATTERY --------------
