@@ -28,15 +28,15 @@
 namespace matrixmath {
 #ifdef USE_FLOAT_TYPE
 typedef float   _mat_float;
+#define cos cosf
+#define sin sinf
+#define sqrt sqrtf
+#define pow powf
 #else
 typedef double  _mat_float;
 #endif
 typedef int index_t;
 //=============================================================================
-#define cos cosf
-#define sin sinf
-#define sqrt sqrtf
-#define pow powf
 //=============================================================================
 // VECTOR
 //=============================================================================
