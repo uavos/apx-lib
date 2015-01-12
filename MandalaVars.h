@@ -143,7 +143,7 @@ SIGDEF(autosend,  "Automatically forwarded variables to GCU",
 MVAR(vect,  theta,    "attitude: roll,pitch,yaw [deg]",         f2,f2)
 MVAR(vect,  acc,      "acceleration: Ax,Ay,Az [m/s2]",          f2,s1)
 MVAR(vect,  gyro,     "angular rate: p,q,r [deg/s]",            f2,s10)
-MVAR(vect,  mag,      "magnetic field: Hx,Hy,Hz [gauss]",       f2,s001)
+MVAR(vect,  mag,      "magnetic field: Hx,Hy,Hz [a.u.]",       f2,s001)
 
 //--------- FLIGHT CONTROL SENSORS --------------
 MVAR(float, altitude, "Altitude [m]",           f4,f4)
