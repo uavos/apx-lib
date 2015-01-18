@@ -167,7 +167,7 @@ MVAR(float, ctr_throttle,     "throttle [0..1]",        f2,u001)
 MVAR(float, ctr_rudder,       "rudder [-1..0..+1]",     f2,s001)
 
 //--------- SLOW CONTROLS --------------
-MVAR(float, ctr_flaps,        "flaps [0..1]",           f2,u001)
+MVAR(float, ctr_flaps,        "flaps [0..1]",           u001,u001)
 MVAR(float, ctr_steering,     "steering [-1..0..+1]",   f2,s001)
 MVAR(float, ctr_collective,   "collective pitch [-1..0..+1]",f2,s001)
 MVAR(float, ctr_airbrk,       "airbrakes [0..1]",       f2,u001)

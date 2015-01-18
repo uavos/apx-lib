@@ -37,6 +37,10 @@ _var_float MandalaCore::get_data(uint16_t var_m)
   uint type;
   void *value_ptr;
   if(!get_ptr(var_m,&value_ptr,&type))return 0;
+  return get_data(var_m,type,value_ptr);
+}
+_var_float MandalaCore::get_data(uint16_t var_m,uint type,void *value_ptr)
+{
   uint8_t m=var_m>>8;
   switch(type){
     case vt_float:return *(_var_float*)value_ptr;
@@ -55,6 +59,10 @@ void MandalaCore::set_data(uint16_t var_m,_var_float value)
   uint type;
   void *value_ptr;
   if(!get_ptr(var_m,&value_ptr,&type))return;
+  set_data(var_m,type,value_ptr,value);
+}
+void MandalaCore::set_data(uint16_t var_m,uint type,void *value_ptr,_var_float value)
+{
   uint8_t m=var_m>>8;
   switch(type){
     case vt_float:*(_var_float*)value_ptr=value;break;

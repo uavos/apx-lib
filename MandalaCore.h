@@ -127,7 +127,9 @@ public:
   static void filter_m(const _var_vect &v,_var_vect *var_p,const _var_float &f);
   //member=mask, if var is a bitfield, or vect idx
   _var_float get_data(uint16_t var_m);
+  _var_float get_data(uint16_t var_m,uint type,void *value_ptr);
   void set_data(uint16_t var_m,_var_float value);
+  void set_data(uint16_t var_m,uint type,void *value_ptr,_var_float value);
   //-----------------------------------------------------------------------------
   #define MVAR(atype,aname, ...)        var_typedef_##aname aname;
   #define SIGDEF(aname,adescr, ...)     static var_typedef_##aname aname;
