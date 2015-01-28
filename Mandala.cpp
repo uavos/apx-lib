@@ -360,6 +360,7 @@ void Mandala::calc(void)
 _var_float Mandala::boundAngle(_var_float v,_var_float span) const
 {
   const _var_float dspan=span*2.0;
+  //return remainder(v,dspan);
   while (v >= span) v -= dspan;
   while (v < -span) v += dspan;
   return v;
