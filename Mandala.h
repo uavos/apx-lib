@@ -43,35 +43,6 @@
 #define SIM_FREQ        10      // Simulator servo send rate [Hz]
 #define MAX_TELEMETRY   100     // max telemetry packet size [bytes]
 //=============================================================================
-// flight plan types
-#define MAX_WPCNT       100
-#define MAX_RWCNT       10
-typedef enum { wtHdg=0,wtLine,  wtCnt } _wpt_type;
-typedef enum { rtLeft=0,rtRight, rtCnt } _rw_turn;
-#define wt_str_def  "Hdg","Line"
-#define rt_str_def  "Left","Right"
-typedef struct {
-  _var_vect     LLA;  //lat,lon,hmsl
-  uint8_t       type;
-  uint8_t       cmdSize;
-  uint8_t       cmd[32]; //TODO: implement wpt commands
-}_waypoint;
-typedef struct {
-  _var_vect     llh;  //start pos [lat lon hmsl]
-  _var_point    dNE;
-  _var_float    appLen;
-  union{
-    uint8_t     opts;
-    struct{
-      uint8_t   turn    :1;
-    };
-  };
-}_runway;
-typedef struct {
-  _waypoint waypoints[MAX_WPCNT];
-  _runway   runways[MAX_RWCNT];
-}_flightplan;
-//=============================================================================
 // UAV identification
 typedef struct {
   uint8_t       id;             //dynamically assigned ID
@@ -89,10 +60,36 @@ public:
   const char *var_name(uint8_t var_idx);
   uint8_t var_index(const char *name);
 
-  //---- flightplan ----
-  _flightplan fp;
-  const char *wt_str[wtCnt];    //_wpt_type string descr
-  const char *rt_str[rtCnt];    //_rw_turn string descr
+  //---- Mission (typedefs only) ----
+  typedef enum{
+    mi_stop=0,mi_wp,mi_rw
+  } __mission_item_type;
+  typedef struct{
+    uint8_t type        :4;     //wp,rw,scr, ..
+    uint8_t option      :4;     //left,right,line,hdg, ..
+  }__attribute__((packed)) _mission_item_hdr;
+  typedef struct{
+    _mission_item_hdr hdr;
+    float           lat;
+    float           lon;
+    int16_t         alt;
+  }__attribute__((packed)) _mission_item_wp;
+  typedef enum {owp_hdg,owp_line} _mission_item_wp_option;
+  typedef struct{
+    _mission_item_hdr hdr;
+    float           lat;
+    float           lon;
+    int16_t         hmsl;
+    int16_t         dN;
+    int16_t         dE;
+    uint16_t        approach;
+  }__attribute__((packed)) _mission_item_rw;
+  typedef enum {orw_left,orw_right} _mission_item_rw_option;
+  typedef struct{
+    _mission_item_hdr hdr;
+    uint8_t   size;
+    uint8_t   data[];
+  }__attribute__((packed)) _mission_item_scr;
 
   //---- Internal use -----
   // telemetry framework
@@ -168,10 +165,8 @@ public:
   _var_float wind_circle(_var_float crs,_var_float span,_var_float r) const; //return air path length for ground circle flight
 private:
   // some special protocols
-  uint archive_flightplan(uint8_t *buf,uint bufSize);   //pack flightplan
-  uint extract_flightplan(uint8_t *buf,uint cnt);       //unpack flightplan
-  uint archive_downstream(uint8_t *buf,uint maxSize);   //pack telemetry
-  uint extract_downstream(uint8_t *buf,uint cnt);       //unpack telemetry
+  uint archive_downstream(uint8_t *buf,uint maxSize);
+  uint extract_downstream(uint8_t *buf,uint cnt);
 };
 //=============================================================================
 #endif // MANDALA_H

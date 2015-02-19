@@ -75,7 +75,7 @@ SIGDEF(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
 SIGDEF(rawbus,    "RAW bus packet, forwarded to CAN <raw data..>")
 SIGDEF(setb,      "Set bit (uplink only) <var_idx>,<mask>")
 SIGDEF(clrb,      "Clear bit (uplink only) <var_idx>,<mask>")
-SIGDEF(flightplan,"Flight plan data <packed fligthplan>")
+SIGDEF(mission,   "Mission data <packed mission>")
 SIGDEF(sim,       "Simulator wrapped packet <var_idx>,<data..>")
 SIGDEF(data,      "Port data <port_id>,<data..>")
 SIGDEF(ldata,     "Port data local <port_id>,<data..>")
@@ -106,7 +106,7 @@ SIGDEF(update,  "Auto send to bus when changed",
 
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
 SIGDEF(autosend,  "Automatically forwarded variables to GCU",
-       idx_service, idx_msg, idx_downstream, idx_ping, idx_flightplan, idx_rawbus, idx_data )
+       idx_service, idx_msg, idx_downstream, idx_ping, idx_mission, idx_rawbus, idx_data )
 
 //------------------------------
 #undef SIGDEF
@@ -303,11 +303,13 @@ MBIT(sw,     sw4,     "switch 4 on/off",        128)
 
 //--------- Flight Maneuvers --------------
 MVAR(byte,  wpidx,    "current waypoint [0...]",        u1,u1)
-MVAR(byte,  wpType,   "current waypoint type [wp_type]",u1,u1)
 MVAR(byte,  rwidx,    "current runway [0...]",          u1,u1)
 MVAR(float, tgHDG,    "current tangent heading [deg]",          f2,f2)
 MVAR(float, turnR,    "current circle radius [m]",              f2,f2)
 MVAR(float, delta,    "general delta (depends on mode) [m]",    f2,f2)
+MVAR(enum,  mtype,    "Mission maneuver type",,)
+MBIT(mtype,  hdg,     "Heading navigation",      0)
+MBIT(mtype,  line,    "Line navigation",         1)
 
 //--------- dynamic tuning --------------
 MVAR(float, windSpd,  "wind speed [m/s]",               f2,u01)
@@ -363,8 +365,6 @@ MVAR(float, rwDV,     "runway alignment velocity [m/s]",        f4,f4)
 
 //--------- internal --------------
 MVAR(uint,  dl_period,"downlink period [ms]",           u2,u2)
-MVAR(uint,  wpcnt,    "number of waypoints [0...]",     u2,u2)
-MVAR(uint,  rwcnt,    "number of runways [0...]",       u2,u2)
 
 //--------- local sensors --------------
 MVAR(float, altps,    "Barometric altitude [m]",        f4,f4)

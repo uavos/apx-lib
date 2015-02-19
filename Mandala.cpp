@@ -34,8 +34,6 @@ Mandala::Mandala()
 }
 void Mandala::init(void)
 {
-  memset(&fp,0,sizeof(fp));
-
   dl_frcnt=0;
   dl_errcnt=0;
   dl_timestamp=0;
@@ -51,14 +49,6 @@ void Mandala::init(void)
   aname=0;
 #include "MandalaVars.h"
   cas2tas=1.0;
-
-  //------------------------
-
-  //fill strings
-  static const char *wt_str_s[wtCnt]={ wt_str_def };
-  for(uint i=0;i<wtCnt;i++) wt_str[i]=wt_str_s[i];
-  static const char *rt_str_s[rtCnt]={ rt_str_def };
-  for(uint i=0;i<rtCnt;i++) rt_str[i]=rt_str_s[i];
 }
 //===========================================================================
 bool Mandala::get_text_names(uint16_t varmsk,const char **name,const char **descr)
@@ -92,7 +82,6 @@ uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
 {
   //check for special protocol archiveSize
   if(var_idx==idx_downstream)return archive_downstream(buf,size);
-  if(var_idx==idx_flightplan)return archive_flightplan(buf,size);
   if(var_idx<idx_imu)return 0;  //other special var
   //basic vars
   return pack(buf,var_idx);
@@ -108,8 +97,6 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
 {
   //check for special protocol archiveSize
   if(var_idx==idx_downstream)return extract_downstream(buf,size);
-  if(var_idx==idx_flightplan)return extract_flightplan(buf,size);
-
   uint cnt=unpack(buf,size,var_idx);
   if(cnt==size)return cnt;
   if(!cnt)return 0; //error
@@ -118,100 +105,6 @@ uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
   var_idx++;
   if(size&&(var_idx>idxPAD)&&(var_idx<idx_vars_top))return cnt+unpack(buf+cnt,size,var_idx);
   else return cnt;
-}
-//=============================================================================
-//=============================================================================
-uint Mandala::archive_flightplan(uint8_t *buf,uint bufSize)
-{
-  //save mandala tmp vars
-  uint8_t *sbuf=buf,*buf_top=buf+(bufSize-1);
-  uint cnt=0;
-  const uint szLLH=4+4+4;
-  while(1){
-    //write waypoints
-    *buf++=wpcnt;
-    uint i;
-    for(i=0;i<wpcnt;i++){
-      if((buf+(szLLH+2+fp.waypoints[i].cmdSize))>buf_top) break;
-      buf+=pack_vect_f4(buf,&(fp.waypoints[i].LLA));
-      *buf++=fp.waypoints[i].type;
-      *buf++=fp.waypoints[i].cmdSize;
-      memcpy(buf,fp.waypoints[i].cmd,fp.waypoints[i].cmdSize);
-      buf+=fp.waypoints[i].cmdSize;
-    }
-    if(i<wpcnt)break; //overflow
-    //write runways
-    *buf++=rwcnt;
-    for(i=0;i<rwcnt;i++){
-      if((buf+(szLLH+8+4+1))>buf_top) break;
-      buf+=pack_vect_f4(buf,&(fp.runways[i].llh));
-      buf+=pack_point_f4(buf,&(fp.runways[i].dNE));
-      buf+=pack_float_f4(buf,&(fp.runways[i].appLen));
-      *buf++=fp.runways[i].opts;
-    }
-    if(i<rwcnt)break; //overflow
-    //write home position
-    if((buf+12)>buf_top) break;
-    buf+=pack_vect_f4(buf,&(home_pos));
-    //success: calc number of bytes written
-    cnt=buf-sbuf;
-    break;
-  }
-  if(!cnt) fprintf(stderr,"Can't archive flight plan, buffer overflow.\n");
-  return cnt;
-}
-//=============================================================================
-uint Mandala::extract_flightplan(uint8_t *buf,uint cnt)
-{
-  //save mandala tmp vars
-  uint8_t *sbuf=buf,*buf_top=buf+cnt;
-  int rcnt=0;
-  const uint szLLH=4+4+4;
-  while(1){
-    //unpack waypoints
-    if((buf+1)>buf_top) break;
-    wpcnt=*buf++;
-    if(wpcnt>MAX_WPCNT)break;
-    uint i;
-    for (i=0;i<wpcnt;i++) {
-      if((buf+(szLLH+2))>buf_top) break;
-      buf+=unpack_vect_f4(buf,&(fp.waypoints[i].LLA));
-      fp.waypoints[i].type=(_wpt_type)*buf++;
-      uint csz=(_wpt_type)*buf++;
-      uint sz=csz;
-      if(sz>sizeof(_waypoint::cmdSize)) sz=0;
-      fp.waypoints[i].cmdSize=sz;
-      if((buf+sz)>buf_top) break;
-      memcpy(fp.waypoints[i].cmd,buf,sz);
-      buf+=csz;
-    }
-    if(i<wpcnt)break; //overflow
-    //unpack runways
-    if((buf+1)>buf_top) break;
-    rwcnt=*buf++;
-    if(rwcnt>MAX_RWCNT)break;
-    for (i=0;i<rwcnt;i++) {
-      if((buf+(szLLH+8+4+1))>buf_top) break;
-      buf+=unpack_vect_f4(buf,&(fp.runways[i].llh));
-      buf+=unpack_point_f4(buf,&(fp.runways[i].dNE));
-      buf+=unpack_float_f4(buf,&(fp.runways[i].appLen));
-      fp.runways[i].opts=*buf++;
-    }
-    if(i<rwcnt)break; //overflow
-    //unpack home position
-    if((buf+12)>buf_top) break;
-    buf+=unpack_vect_f4(buf,&(home_pos));
-    //success: calc number of bytes unpacked
-    rcnt=buf-sbuf;
-    break;
-  }
-  if(rcnt<(int)cnt)rcnt=0;
-  if(rcnt==0){
-    fprintf(stderr,"Can't extract flight plan.\n");
-    wpcnt=rwcnt=0;
-    memset(&fp,0,sizeof(fp));
-  }
-  return rcnt;
 }
 //=============================================================================
 uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
