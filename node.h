@@ -30,6 +30,7 @@ typedef struct{
   uint8_t     can_rxc;        // CAN received packets counter
   uint8_t     can_adr;        // CAN address
   uint8_t     can_err;        // CAN errors counter
+  uint8_t     load;           // MCU load
   uint8_t     dump[16];       // error dump or information dump
 }_node_status;
 // local node description struct (hardware.h)
@@ -41,24 +42,25 @@ typedef struct{
 //=============================================================================
 // bus packet structure:
 // service packets filtered by _node_sn, or 0x00000 for broadcast
+#define bus_packet_size_hdr             (1)
+#define bus_packet_size_hdr_srv         (bus_packet_size_hdr+sizeof(_node_sn)+1)
+#define bus_packet_size_hdr_tagged      (bus_packet_size_hdr+2)
 typedef struct{
   uint8_t       id;   //<var_idx>
   union {
-    uint8_t     data[BUS_MAX_PACKET-1];   //payload
+    uint8_t     data[BUS_MAX_PACKET-bus_packet_size_hdr];   //payload
     struct{
       _node_sn  sn;     //filter for service
       uint8_t   cmd;    //service command
-      uint8_t   data[BUS_MAX_PACKET-1-sizeof(_node_sn)-1];   //service data
+      uint8_t   data[BUS_MAX_PACKET-bus_packet_size_hdr_srv];   //service data
     }srv;
     struct{
       uint8_t   tag;    //user tag
-      uint8_t   packet[BUS_MAX_PACKET-1-1];   //tagged packet
+      uint8_t   id;     //<var_idx>
+      uint8_t   data[BUS_MAX_PACKET-bus_packet_size_hdr_tagged];
     }tagged;
   };
 }__attribute__((packed)) _bus_packet;
-#define bus_packet_size_hdr             (1)
-#define bus_packet_size_hdr_srv         (bus_packet_size_hdr+sizeof(_node_sn)+1)
-#define bus_packet_size_hdr_tagged      (bus_packet_size_hdr+1)
 //=============================================================================
 // system service commands (service packets)
 enum{
