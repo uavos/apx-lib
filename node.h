@@ -73,6 +73,7 @@ enum{
   apc_mute,     //stop sending data (sensors)
   apc_reconf,   //reset all conf to defaults
   apc_power,    //return _node_power
+  apc_shock,    //shock test
 
   //------------------
   //conf
