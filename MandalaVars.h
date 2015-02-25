@@ -69,7 +69,6 @@ SIGDEF(service,   "Service packet <node_sn>,<cmd>,<data..>")
 //other protocols
 SIGDEF(downstream,"Downlink stream <stream>")
 SIGDEF(uplink,    "Uplink wrapped packet <var_idx>,<data..>")
-SIGDEF(msg,       "Message <node_sn>,<text string>")
 SIGDEF(ping,      "Ping packet, no reply expected")
 SIGDEF(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
 SIGDEF(rawbus,    "RAW bus packet, forwarded to CAN <raw data..>")
@@ -106,7 +105,7 @@ SIGDEF(update,  "Auto send to bus when changed",
 
 #define dl_reset_interval  10000    //reset snapshot interval [ms]
 SIGDEF(autosend,  "Automatically forwarded variables to GCU",
-       idx_service, idx_msg, idx_downstream, idx_ping, idx_mission, idx_rawbus, idx_data )
+       idx_service, idx_downstream, idx_ping, idx_mission, idx_rawbus, idx_data )
 
 //------------------------------
 #undef SIGDEF

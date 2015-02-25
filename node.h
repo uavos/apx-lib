@@ -83,9 +83,10 @@ enum{
   apc_conf_read,        //return parameter <num>
   apc_conf_write,       //save parameter <num>,<data>
 
+  apc_msg=64,   //text message
   //------------------
   //user commands
-  apc_user=100,
+  apc_user=128,
   apc_loader=0xFF
 };
 //=============================================================================
