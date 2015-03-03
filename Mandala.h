@@ -101,7 +101,6 @@ public:
   //filled by extract_downstream
   uint          dl_frcnt;       // downlink frame cnt (inc by extract_downlink)
   uint          dl_errcnt;      // errors counter (by extract_downlink)
-  uint          dl_timestamp;   // time[ms]
   uint          dl_time_s;      // last dl sent time[ms]
   uint16_t      dl_ts;          // previous timestamp (to count dl_dt)
   uint16_t      dl_Pdt;         // previous delta (to count errors)
@@ -114,12 +113,12 @@ public:
   void init(void);
   //-----------------------------------------------------------------------------
   // Core overload
-  uint extract(uint8_t *buf,uint cnt,uint var_idx);
+  uint extract(const uint8_t *buf, uint cnt, uint var_idx);
 
   //-----------------------------------------------------------------------------
   //extended - check buf size
   uint archive(uint8_t *buf,uint size,uint var_idx);
-  uint extract(uint8_t *buf,uint size); //overloaded - first byte=var_idx
+  uint extract(const uint8_t *buf,uint size); //overloaded - first byte=var_idx
   //-----------------------------------------------------------------------------
 
   //-----------------------------------------------------------------------------
@@ -166,7 +165,7 @@ public:
 private:
   // some special protocols
   uint archive_downstream(uint8_t *buf,uint maxSize);
-  uint extract_downstream(uint8_t *buf,uint cnt);
+  uint extract_downstream(const uint8_t *buf,uint cnt);
 };
 //=============================================================================
 #endif // MANDALA_H

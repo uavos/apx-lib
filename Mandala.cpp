@@ -87,13 +87,13 @@ uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
   return pack(buf,var_idx);
 }
 //=============================================================================
-uint Mandala::extract(uint8_t *buf,uint size)
+uint Mandala::extract(const uint8_t *buf, uint size)
 {
   if(!size)return 0;
   return extract(buf+1,size-1,buf[0]);
 }
 //=============================================================================
-uint Mandala::extract(uint8_t *buf,uint size,uint var_idx)
+uint Mandala::extract(const uint8_t *buf,uint size,uint var_idx)
 {
   //check for special protocol archiveSize
   if(var_idx==idx_downstream)return extract_downstream(buf,size);
@@ -189,7 +189,7 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
   return dl_size;
 }
 //=============================================================================
-uint Mandala::extract_downstream(uint8_t *buf,uint cnt)
+uint Mandala::extract_downstream(const uint8_t *buf,uint cnt)
 {
   //header
   dl_size=cnt;

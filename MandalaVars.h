@@ -72,8 +72,7 @@ SIGDEF(uplink,    "Uplink wrapped packet <var_idx>,<data..>")
 SIGDEF(ping,      "Ping packet, no reply expected")
 SIGDEF(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
 SIGDEF(rawbus,    "RAW bus packet, forwarded to CAN <raw data..>")
-SIGDEF(setb,      "Set bit (uplink only) <var_idx>,<mask>")
-SIGDEF(clrb,      "Clear bit (uplink only) <var_idx>,<mask>")
+SIGDEF(setb,      "Set bit (uplink only) <var_idx>,<mask>,<value>")
 SIGDEF(mission,   "Mission data <packed mission>")
 SIGDEF(sim,       "Simulator wrapped packet <var_idx>,<data..>")
 SIGDEF(data,      "Port data <port_id>,<data..>")
@@ -363,7 +362,8 @@ MVAR(float, rwDelta,  "runway alignment [m]",                   f4,f4)
 MVAR(float, rwDV,     "runway alignment velocity [m/s]",        f4,f4)
 
 //--------- internal --------------
-MVAR(uint,  dl_period,"downlink period [ms]",           u2,u2)
+MVAR(uint,  dl_period,          "downlink period [ms]",         u2,u2)
+MVAR(uint,  dl_timestamp,       "downlink timestamp [ms]",      u4,u4)
 
 //--------- local sensors --------------
 MVAR(float, altps,    "Barometric altitude [m]",        f4,f4)

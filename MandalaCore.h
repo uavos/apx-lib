@@ -107,17 +107,15 @@ class MandalaCore
 {
 public:
   uint pack(uint8_t *buf,uint var_idx);
-  uint unpack(uint8_t *buf,uint cnt,uint var_idx);
+  uint unpack(const uint8_t *buf, uint cnt, uint var_idx);
 
   // second compression level (for downstream)
   uint pack_ext(uint8_t *buf,uint var_idx);
-  uint unpack_ext(uint8_t *buf,uint var_idx);
+  uint unpack_ext(const uint8_t *buf, uint var_idx);
 
   // basic protocols
-  uint unpack_stream(uint8_t *buf,uint cnt,bool hd);    //downstream without header
-  uint unpack_setb(uint8_t *buf,uint cnt);              //unpack and set bit <var_idx><_var_bits>
-  uint unpack_clrb(uint8_t *buf,uint cnt);              //unpack and clear bit <var_idx><_var_bits>
-
+  uint unpack_stream(const uint8_t *buf, uint cnt, bool hd);    //downstream without header
+  uint unpack_setb(const uint8_t *buf, uint cnt);               //unpack and set bit <var_idx><mask><value>
 
   bool get_ptr(uint8_t var_idx,void **var_ptr,uint*type);
 
@@ -188,36 +186,36 @@ protected:
   uint pack_sig(void *buf,void *value_ptr);
 
   //unpack
-  uint unpack_float_s1(void *buf,void *value_ptr);
-  uint unpack_float_s01(void *buf,void *value_ptr);
-  uint unpack_float_s001(void *buf,void *value_ptr);
-  uint unpack_float_s10(void *buf,void *value_ptr);
+  uint unpack_float_s1(const void *buf,void *value_ptr);
+  uint unpack_float_s01(const void *buf,void *value_ptr);
+  uint unpack_float_s001(const void *buf,void *value_ptr);
+  uint unpack_float_s10(const void *buf,void *value_ptr);
 
-  uint unpack_float_u1(void *buf,void *value_ptr);
-  uint unpack_float_u01(void *buf,void *value_ptr);
-  uint unpack_float_u001(void *buf,void *value_ptr);
-  uint unpack_float_u10(void *buf,void *value_ptr);
-  uint unpack_float_u100(void *buf,void *value_ptr);
+  uint unpack_float_u1(const void *buf,void *value_ptr);
+  uint unpack_float_u01(const void *buf,void *value_ptr);
+  uint unpack_float_u001(const void *buf,void *value_ptr);
+  uint unpack_float_u10(const void *buf,void *value_ptr);
+  uint unpack_float_u100(const void *buf,void *value_ptr);
 
-  uint unpack_float_f2(void *buf,void *value_ptr);
-  uint unpack_float_f4(void *buf,void *value_ptr);
+  uint unpack_float_f2(const void *buf,void *value_ptr);
+  uint unpack_float_f4(const void *buf,void *value_ptr);
 
-  uint unpack_vect_f2(void *buf,void *value_ptr);
-  uint unpack_vect_f4(void *buf,void *value_ptr);
-  uint unpack_vect_s1(void *buf,void *value_ptr);
-  uint unpack_vect_s10(void *buf,void *value_ptr);
-  uint unpack_vect_s001(void *buf,void *value_ptr);
+  uint unpack_vect_f2(const void *buf,void *value_ptr);
+  uint unpack_vect_f4(const void *buf,void *value_ptr);
+  uint unpack_vect_s1(const void *buf,void *value_ptr);
+  uint unpack_vect_s10(const void *buf,void *value_ptr);
+  uint unpack_vect_s001(const void *buf,void *value_ptr);
 
-  uint unpack_point_f2(void *buf,void *value_ptr);
-  uint unpack_point_f4(void *buf,void *value_ptr);
-  uint unpack_point_u001(void *buf,void *value_ptr);
+  uint unpack_point_f2(const void *buf,void *value_ptr);
+  uint unpack_point_f4(const void *buf,void *value_ptr);
+  uint unpack_point_u001(const void *buf,void *value_ptr);
 
-  uint unpack_flag_(void *buf,void *value_ptr);
-  uint unpack_enum_(void *buf,void *value_ptr);
-  uint unpack_byte_u1(void *buf,void *value_ptr);
-  uint unpack_uint_u4(void *buf,void *value_ptr);
-  uint unpack_uint_u2(void *buf,void *value_ptr);
-  uint unpack_sig(void *buf,uint cnt,void *value_ptr);
+  uint unpack_flag_(const void *buf,void *value_ptr);
+  uint unpack_enum_(const void *buf,void *value_ptr);
+  uint unpack_byte_u1(const void *buf,void *value_ptr);
+  uint unpack_uint_u4(const void *buf,void *value_ptr);
+  uint unpack_uint_u2(const void *buf,void *value_ptr);
+  uint unpack_sig(const void *buf, uint cnt, void *value_ptr);
 
 };
 //=============================================================================
