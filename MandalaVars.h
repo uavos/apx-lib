@@ -350,7 +350,7 @@ MVAR(float, user6,    "User value 6",f4,f2)
 MVAR(byte,  local,    "local byte [0...255]",   u1,u1)
 //--------- calculated by Mandala::calc() --------------
 MVAR(point, pos_NE,   "local position: north,east [m]",         f4,f4)
-MVAR(point, vel_NE,   "local velocity: north,east [m]",         f4,f4)
+MVAR(point, vel_NE,   "local velocity: north,east [m/s]",       f4,f4)
 MVAR(float, homeHDG,  "heading to home position [deg]",         f4,f4)
 MVAR(float, dHome,    "distance to GCU [m]",                    f4,f4)
 MVAR(float, dWPT,     "distance to waypoint [m]",               f4,f4)
