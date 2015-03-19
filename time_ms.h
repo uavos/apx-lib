@@ -2,13 +2,25 @@
 #define time_ms_H
 //==============================================================================
 #if (! defined _TIME_H_) && (! defined _TIME_H)
+
+#ifdef CHIBIOS
+#include "ch.h"
+#define time    ((uint) chVTGetSystemTimeX()/MS2ST(1) )
+#define time_task() (void)
+
+#else //_HARDWARE_H_
+
 #ifndef _HARDWARE_H_
 #include <inttypes.h>
 #include <sys/types.h>
 extern uint time;
 extern "C" unsigned int time_task(void);
-#endif
+#endif //_HARDWARE_H_
+
+#endif //CHIBIOS
+
 #else
+
 #define time getSysTimeMS()
 #include <sys/time.h>
 #include <inttypes.h>
@@ -19,9 +31,11 @@ static uint getSysTimeMS()
   gettimeofday(&tv, NULL);
   return (tv.tv_sec)*1000+(tv.tv_usec)/1000;
 }
+
 #ifndef time_task
-#define time_task() (time)
+#define time_task() (void)
 #endif
+
 #endif
 //==============================================================================
 #endif
