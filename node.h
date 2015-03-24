@@ -16,7 +16,9 @@ typedef struct {
   _node_name    name;
   _node_version version;
   _node_version hardware;
-  uint32_t      size;   //program memory size
+  struct{
+    uint32_t    conf_error:     1;
+  };
 }__attribute__((packed)) _node_info;
 // node power, returned by request
 typedef struct {
