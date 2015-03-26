@@ -92,6 +92,7 @@ public:
   }__attribute__((packed)) _mission_item_scr;
 
   //---- Internal use -----
+  bool blockDownstream;
   // telemetry framework
   uint8_t dl_id;                // received uav_id
   bool    dl_reset;             // set true to send everything next time
