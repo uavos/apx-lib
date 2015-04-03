@@ -17,9 +17,10 @@ typedef struct {
   _node_version version;
   _node_version hardware;
   struct{
-    uint32_t    conf_error:     1;
+    uint32_t    conf_reset:     1;
     uint32_t    loader_support: 1;
     uint32_t    in_loader:      1;
+    uint32_t    addressing:     1;
   };
 }__attribute__((packed)) _node_info;
 // node power, returned by request
