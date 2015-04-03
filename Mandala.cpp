@@ -42,6 +42,7 @@ void Mandala::init(void)
   dl_Pdt=0;
   dl_size=0;
   dl_reset=true;
+  blockDownstream=false;
 
   //------------------------
   //init all vars
@@ -96,15 +97,8 @@ uint Mandala::extract(const uint8_t *buf, uint size)
 uint Mandala::extract(const uint8_t *buf,uint size,uint var_idx)
 {
   //check for special protocol archiveSize
-  if(var_idx==idx_downstream)return extract_downstream(buf,size);
-  uint cnt=unpack(buf,size,var_idx);
-  if(cnt==size)return cnt;
-  if(!cnt)return 0; //error
-  if(size<cnt) return cnt;
-  size-=cnt;
-  var_idx++;
-  if(size&&(var_idx>idxPAD)&&(var_idx<idx_vars_top))return cnt+unpack(buf+cnt,size,var_idx);
-  else return cnt;
+  if(var_idx==idx_downstream)return blockDownstream?size:extract_downstream(buf,size);
+  return unpack(buf,size,var_idx);
 }
 //=============================================================================
 uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)

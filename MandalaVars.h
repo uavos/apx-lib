@@ -341,6 +341,18 @@ MVAR(float, user4,    "User value 4",f4,f2)
 MVAR(float, user5,    "User value 5",f4,f2)
 MVAR(float, user6,    "User value 6",f4,f2)
 
+//--------- FORMATION --------------
+MVAR(point, ls_att,      "left: roll,pitch [deg]",      f2,f2)
+MVAR(float, ls_alt,      "left: altitude [m]",          f2,f2)
+MVAR(float, cmd_ls,      "left: cmd [deg]",              f2,f2)
+
+MVAR(point, rs_att,      "right: roll,pitch [deg]",      f2,f2)
+MVAR(float, rs_alt,      "right: altitude [m]",          f2,f2)
+MVAR(float, cmd_rs,      "right: cmd [deg]",              f2,f2)
+
+MVAR(float, vshape,      "wing V shape [deg]",              f2,f2)
+MVAR(float, cmd_vshape,  "commanded wing V shape [deg]",    f2,f2)
+
 //------------------------------------------------------------------------------
 // Filtered variables
 // Never sent by downstream
