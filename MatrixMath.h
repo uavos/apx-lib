@@ -77,7 +77,15 @@ public:
       if((*this)[i]!=0.0)return false;
     return true;
   }
-
+//compare
+  bool operator==(const Vector &cmp) const {
+    for (index_t i=0 ; i < n ; i++)
+      if((*this)[i] != cmp[i])return false;
+    return true;
+  }
+  bool operator!=(const Vector &cmp) {
+    return !((*this)==cmp);
+  }
 //Magnitude
   const T mag2() const {return (*this)*(*this);}
   const T mag() const {return sqrt(this->mag2());}
