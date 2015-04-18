@@ -21,7 +21,6 @@
  *
  */
 #include <stdlib.h>
-#include <stdio.h>
 #include <ctype.h>
 #include <math.h>
 #include "Mandala.h"
@@ -210,7 +209,7 @@ uint Mandala::extract_downstream(const uint8_t *buf,uint cnt)
     cnt-=2;
     tcnt=unpack_stream(buf,cnt,hd);
     if(!tcnt){
-      //fprintf(stderr,"Error extract_downstream\n");
+      //fdmsg(stderr,"Error extract_downstream\n");
     }
   }
   //calculate vars filtered by sig dl_filter, otherwise calculated by ahrs
@@ -560,28 +559,27 @@ uint8_t Mandala::var_index(const char *name)
 //=============================================================================
 void Mandala::dump(const uint8_t *ptr,uint cnt,bool hex)
 {
-  //printf("\n");
-  for (uint i=0;i<cnt;i++)printf(hex?"%.2X ":"%u ",*ptr++);
-  printf("\n");
+  for (uint i=0;i<cnt;i++)dmsg(hex?"%.2X ":"%u ",*ptr++);
+  dmsg("\n");
 }
 void Mandala::dump(const _var_vect &v,const char *str)
 {
-  printf("%s: %.2f\t%.2f\t%.2f\n",str,v[0],v[1],v[2]);
+  dmsg("%s: %.2f\t%.2f\t%.2f\n",str,v[0],v[1],v[2]);
 }
 void Mandala::dump(uint8_t var_idx)
 {
   uint type;
   void *value_ptr;
   if(!get_ptr(var_idx,&value_ptr,&type))return;
-  printf("%s: ",var_name(var_idx));
+  dmsg("%s: ",var_name(var_idx));
   switch(type){
-    case vt_byte:  printf("%u",(uint)*((_var_byte*)value_ptr));break;
-    case vt_uint:  printf("%u",(uint)*((_var_uint*)value_ptr));break;
-    case vt_float: printf("%.2f",*((_var_float*)value_ptr));break;
-    case vt_vect:  printf("(%.2f,%.2f,%.2f)",(*((_var_vect*)value_ptr))[0],(*((_var_vect*)value_ptr))[1],(*((_var_vect*)value_ptr))[2] );break;
-    case vt_point: printf("(%.2f,%.2f)",(*((_var_point*)value_ptr))[0],(*((_var_point*)value_ptr))[1] );break;
+    case vt_byte:  dmsg("%u",(uint)*((_var_byte*)value_ptr));break;
+    case vt_uint:  dmsg("%u",(uint)*((_var_uint*)value_ptr));break;
+    case vt_float: dmsg("%.2f",*((_var_float*)value_ptr));break;
+    case vt_vect:  dmsg("(%.2f,%.2f,%.2f)",(*((_var_vect*)value_ptr))[0],(*((_var_vect*)value_ptr))[1],(*((_var_vect*)value_ptr))[2] );break;
+    case vt_point: dmsg("(%.2f,%.2f)",(*((_var_point*)value_ptr))[0],(*((_var_point*)value_ptr))[1] );break;
     case vt_sig:{
-      printf("+sig+\n");
+      dmsg("+sig+\n");
       _var_signature signature=*(_var_signature*)value_ptr;
       uint scnt=signature[0];
       signature++;
@@ -590,7 +588,7 @@ void Mandala::dump(uint8_t var_idx)
     }
     default: break;
   }
-  printf("\n");
+  dmsg("\n");
 }
 //=============================================================================
 //=============================================================================

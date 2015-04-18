@@ -21,7 +21,7 @@
  *
  */
 #include <stdlib.h>
-#include <stdio.h>
+#include <dmsg.h>
 #include "preprocessor.h"
 #include "MandalaCore.h"
 #include "math.h"

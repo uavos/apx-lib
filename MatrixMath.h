@@ -22,7 +22,7 @@
  */
 #ifndef MATRIXMATH_H
 #define MATRIXMATH_H
-#include <iostream>
+//#include <iostream>
 #include <math.h>
 //=============================================================================
 namespace matrixmath {
@@ -527,7 +527,7 @@ const Matrix<n,n,T> invert( const Matrix<n,n,T> & M ) {
 // DEBUG OUTPUT
 //=============================================================================
 //Output to the stream
-template<const index_t n,const index_t m,class T>
+/*template<const index_t n,const index_t m,class T>
 std::ostream &operator<<(std::ostream & out,const Matrix<n,m,T> &M) {
   out << '[' << std::endl;
   for (index_t i=0 ; i < M.rows() ; i++)
@@ -543,7 +543,7 @@ std::ostream &operator<<(std::ostream &out,const Vector<n,T> &v)
     out<<' '<<v[i];
   out<<" ]";
   return out;
-}
+}*/
 //=============================================================================
 //Common types
 typedef Vector<4> Quat;

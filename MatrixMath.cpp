@@ -21,11 +21,10 @@
  *
  */
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <iostream>
+#include <dmsg.h>
 #include "MatrixMath.h"
-#define debug(a) std::cout<< #a << a <<std::endl
 //=============================================================================
 namespace matrixmath {
 //=============================================================================
@@ -145,9 +144,9 @@ const Vector<4> dpsi_dq(const Vector<4> & quat, const Matrix<3,3> & DCM) {
 {
   Vect Z=a1*cross(r1,b1)+a2*cross(r2,b2);
   Matrix<3,3> B=mult_T(a1*r1,b1)+mult_T(a2*r2,b2);
-  debug(B);
+  dmsg(B);
   Matrix<3,3> S=B+B.transpose();
-  debug(S);
+  dmsg(S);
   _mat_float sigma=trace(B);
   //Compute the K matrixmath
   Matrix<4,4> K(
@@ -156,8 +155,8 @@ const Vector<4> dpsi_dq(const Vector<4> & quat, const Matrix<3,3> & DCM) {
     Vector<4>(Z[1],-S[1][0],-S[1][1]+sigma,-S[1][2]),
     Vector<4>(Z[2],-S[2][0],-S[2][1],-S[2][2]+sigma)
   );
-  debug(Z);
-  debug(K);
+  dmsg(Z);
+  dmsg(K);
   //Find the eigenvector for the smallest eigenvalue of K
 }*/
 //=============================================================================
