@@ -559,25 +559,25 @@ uint8_t Mandala::var_index(const char *name)
 //=============================================================================
 void Mandala::dump(const uint8_t *ptr,uint cnt,bool hex)
 {
-  for (uint i=0;i<cnt;i++)dmsgf(hex?"%.2X ":"%u ",*ptr++);
+  for (uint i=0;i<cnt;i++)dmsg(hex?"%.2X ":"%u ",*ptr++);
   dmsg("\n");
 }
 void Mandala::dump(const _var_vect &v,const char *str)
 {
-  dmsgf("%s: %.2f\t%.2f\t%.2f\n",str,(_var_float)v[0],(_var_float)v[1],(_var_float)v[2]);
+  dmsg("%s: %.2f\t%.2f\t%.2f\n",str,(_var_float)v[0],(_var_float)v[1],(_var_float)v[2]);
 }
 void Mandala::dump(uint8_t var_idx)
 {
   uint type;
   void *value_ptr;
   if(!get_ptr(var_idx,&value_ptr,&type))return;
-  dmsgf("%s: ",var_name(var_idx));
+  dmsg("%s: ",var_name(var_idx));
   switch(type){
-    case vt_byte:  dmsgf("%u",(uint)*((_var_byte*)value_ptr));break;
-    case vt_uint:  dmsgf("%u",(uint)*((_var_uint*)value_ptr));break;
-    case vt_float: dmsgf("%.2f",*((_var_float*)value_ptr));break;
-    case vt_vect:  dmsgf("(%.2f,%.2f,%.2f)",(*((_var_vect*)value_ptr))[0],(*((_var_vect*)value_ptr))[1],(*((_var_vect*)value_ptr))[2] );break;
-    case vt_point: dmsgf("(%.2f,%.2f)",(*((_var_point*)value_ptr))[0],(*((_var_point*)value_ptr))[1] );break;
+    case vt_byte:  dmsg("%u",(uint)*((_var_byte*)value_ptr));break;
+    case vt_uint:  dmsg("%u",(uint)*((_var_uint*)value_ptr));break;
+    case vt_float: dmsg("%.2f",*((_var_float*)value_ptr));break;
+    case vt_vect:  dmsg("(%.2f,%.2f,%.2f)",(*((_var_vect*)value_ptr))[0],(*((_var_vect*)value_ptr))[1],(*((_var_vect*)value_ptr))[2] );break;
+    case vt_point: dmsg("(%.2f,%.2f)",(*((_var_point*)value_ptr))[0],(*((_var_point*)value_ptr))[1] );break;
     case vt_sig:{
       dmsg("+sig+\n");
       _var_signature signature=*(_var_signature*)value_ptr;
