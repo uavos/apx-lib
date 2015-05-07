@@ -564,7 +564,7 @@ void Mandala::dump(const uint8_t *ptr,uint cnt,bool hex)
 }
 void Mandala::dump(const _var_vect &v,const char *str)
 {
-  dmsgf("%s: %.2f\t%.2f\t%.2f\n",str,v[0],v[1],v[2]);
+  dmsgf("%s: %.2f\t%.2f\t%.2f\n",str,(_var_float)v[0],(_var_float)v[1],(_var_float)v[2]);
 }
 void Mandala::dump(uint8_t var_idx)
 {

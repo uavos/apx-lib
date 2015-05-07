@@ -55,7 +55,7 @@ const Matrix<3,3> eulerDC(const Vector<3> & euler) {
            Vector<3>(2*(q1*q3 + q0*q2),2*(q2*q3 - q0*q1),1.0-2*(q1*q1 + q2*q2))
          );
 }*/
-const Matrix<3,3> eulerWx(const Vector<3> & euler) {
+/*const Matrix<3,3> eulerWx(const Vector<3> & euler) {
   const _mat_float & p = euler[0];
   const _mat_float & q = euler[1];
   const _mat_float & r = euler[2];
@@ -64,7 +64,7 @@ const Matrix<3,3> eulerWx(const Vector<3> & euler) {
            Vector<3>(r, 0, -p),
            Vector<3>(-q, p, 0)
          );
-}
+}*/
 const Matrix<4,4> quatW(const Vector<3> euler) {
   const _mat_float p = euler[0] / 2.0;
   const _mat_float q = euler[1] / 2.0;
@@ -160,7 +160,7 @@ const Vector<4> dpsi_dq(const Vector<4> & quat, const Matrix<3,3> & DCM) {
   //Find the eigenvector for the smallest eigenvalue of K
 }*/
 //=============================================================================
-const Matrix<4,3> Tquat(const Quat &q)
+/*const Matrix<4,3> Tquat(const Quat &q)
 {
   const _mat_float eta=q[0];
   const _mat_float eps1=q[1];
@@ -172,20 +172,32 @@ const Matrix<4,3> Tquat(const Quat &q)
     Vect( eps3, eta, -eps1),
     Vect(-eps2, eps1, eta)
   );
-}
+}*/
 //=============================================================================
-const Matrix<3,3> Wmtrx(const Vect &eps,const Vect &v)
+/*const Matrix<3,3> Wmtrx(const Vect &eps,const Vect &v)
 {
   const _mat_float eps2=eps*eps;
   const _mat_float eta=eps2>=1?0:sqrt(1-eps2);
-  Matrix<3,3> W,Smtrx_v=eulerWx(v);
-  W=Smtrx_v*(2.0*eta);
-  W+=Smtrx_v*(eta==0?0:(-2.0/eta))*mult_T(eps,eps);
+  Matrix<3,3> W,tmp,tmp2;
+
+  if(eta!=0){
+    tmp.eulerWx(v*(-2.0/eta));
+    tmp2.mult(eps,eps);
+    W.mult(tmp,tmp2);
+  }
+
+  tmp.eulerWx(v*(2.0*eta));
+  W+=tmp;
+
   W.eye_add(2.0*(v*eps));
-  W+=mult_T(eps,v)*2;
-  W+=mult_T(v,eps)*(-4);
+  tmp.mult(eps,v);
+  tmp*=2;
+  W+=tmp;
+  tmp.mult(v,eps);
+  tmp*=-4;
+  W+=tmp;
   return W;
-}
+}*/
 //=============================================================================
 const Quat qmult(const Quat &q1,const Quat &q2)
 {
