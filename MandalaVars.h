@@ -84,14 +84,14 @@ SIGDEF(formation, "Formation flight data <packed data>")
 SIGDEF(vor,       "VOR beacon <packed data>")
 //------------------------------
 // var packs
-SIGDEF(imu, "IMU sensors data package",
+SIGDEF(Ximu, "IMU sensors data package",
        idx_acc, idx_gyro )
-SIGDEF(gps, "GPS fix data package",
+SIGDEF(Xgps, "GPS fix data package",
        idx_gps_pos, idx_gps_vel)
 SIGDEF(ctr, "Fast controls, sent to bus at fixed update rate",
       idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_steering,idx_ctr_collective )
-SIGDEF(pilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw)
-SIGDEF(platform, "ILS platform sensors data package", idx_platform_pos,idx_platform_vel,idx_platform_hdg)
+SIGDEF(Xpilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw)
+SIGDEF(Xplatform, "ILS platform sensors data package", idx_platform_pos,idx_platform_vel,idx_platform_hdg)
 
 //------------------------------
 // Auto update/send vars
@@ -141,7 +141,7 @@ SIGDEF(autosend,  "Automatically forwarded variables to GCU",
 MVAR(vect,  theta,    "attitude: roll,pitch,yaw [deg]",         f2,f2)
 MVAR(vect,  acc,      "acceleration: Ax,Ay,Az [m/s2]",          f2,s1)
 MVAR(vect,  gyro,     "angular rate: p,q,r [deg/s]",            f2,s10)
-MVAR(vect,  mag,      "magnetic field: Hx,Hy,Hz [a.u.]",       f2,s001)
+MVAR(vect,  mag,      "magnetic field: Hx,Hy,Hz [a.u.]",        f2,s001)
 
 //--------- FLIGHT CONTROL SENSORS --------------
 MVAR(float, altitude, "Altitude [m]",           f4,f4)
@@ -301,9 +301,9 @@ MBIT(sw,     sw3,     "switch 3 on/off",        64)
 MBIT(sw,     sw4,     "switch 4 on/off",        128)
 
 //--------- Flight Maneuvers --------------
-MVAR(byte,  wpidx,    "current waypoint [0...]",        u1,u1)
-MVAR(byte,  rwidx,    "current runway [0...]",          u1,u1)
-MVAR(byte,  twidx,    "current taxiway [0...]",         u1,u1)
+MVAR(byte,  wpidx,    "current waypoint [0..255]",        u1,u1)
+MVAR(byte,  rwidx,    "current runway [0..255]",          u1,u1)
+MVAR(byte,  twidx,    "current taxiway [0..255]",         u1,u1)
 MVAR(float, tgHDG,    "current tangent heading [deg]",          f2,f2)
 MVAR(float, turnR,    "current circle radius [m]",              f2,f2)
 MVAR(float, delta,    "general delta (depends on mode) [m]",    f2,f2)
@@ -356,12 +356,11 @@ MVAR(float, vshape,      "wing V shape [deg]",              f2,f2)
 MVAR(float, cmd_vshape,  "commanded wing V shape [deg]",    f2,f2)
 
 //------------------------------------------------------------------------------
-// Filtered variables
 // Never sent by downstream
 // Can be packed
 // Some are calculated on downstream receive
 //------------------------------------------------------------------------------
-MVAR(byte,  local,    "local byte [0...255]",   u1,u1)
+MVAR(byte,  local,    "local byte [0..255]",   u1,u1)
 //--------- calculated by Mandala::calc() --------------
 MVAR(point, pos_NE,   "local position: north,east [m]",         f4,f4)
 MVAR(point, vel_NE,   "local velocity: north,east [m/s]",       f4,f4)
@@ -386,17 +385,18 @@ MVAR(float, vcas,     "Airspeed derivative [m/s^2]",    f4,f4)
 MVAR(float, denergy,  "Venergy derivative [m/s^2]",     f4,f4)
 
 //--------- PILOT CONTROLS --------------
+MVAR(byte,  rc_override,      "RC override [0..255]",   u1,u1)
 MVAR(float, rc_roll,          "RC roll [-1..0..+1]",    s001,s001)
 MVAR(float, rc_pitch,         "RC pitch [-1..0..+1]",   s001,s001)
 MVAR(float, rc_throttle,      "RC throttle [0..1]",     u001,u001)
 MVAR(float, rc_yaw,           "RC yaw [-1..0..+1]",     s001,s001)
 
 //--------- CAM CONTROL --------------
-MVAR(byte,  cam_ch,   "video channel",          u1,u1)
+MVAR(byte,  cam_ch,   "video channel [0..255]", u1,u1)
 MVAR(enum,  cam_ctr,  "camera control type",,)
 MBIT(cam_ctr, camoff, "camera off",                     0)
 MBIT(cam_ctr, stab,   "gyro stabilization",             1)
-MBIT(cam_ctr, position,"attitude position",              2)
+MBIT(cam_ctr, position,"attitude position",             2)
 MBIT(cam_ctr, speed,  "attitude speed control",         3)
 MBIT(cam_ctr, target, "target position tracking",       4)
 MBIT(cam_ctr, fixed,  "fixed position",                 5)

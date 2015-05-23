@@ -82,7 +82,7 @@ uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
 {
   //check for special protocol archiveSize
   if(var_idx==idx_downstream)return archive_downstream(buf,size);
-  if(var_idx<idx_imu)return 0;  //other special var
+  if(var_idx<idxPAD)return 0;
   //basic vars
   return pack(buf,var_idx);
 }
