@@ -28,7 +28,7 @@
 #define idxPAD  32      //start index for regular vars
 //-----------------------------------------------------------------------------
 // Var Type enum
-enum {vt_void=0,vt_byte,vt_uint,vt_flag,vt_enum,vt_float,vt_vect,vt_point,vt_sig};
+enum {vt_void=0,vt_idx,vt_byte,vt_uint,vt_flag,vt_enum,vt_float,vt_vect,vt_point};
 //=============================================================================
 // Physical constants
 #define EARTH_RATE   0.00007292115              // rotation rate of earth (rad/sec)
@@ -59,55 +59,41 @@ enum {vt_void=0,vt_byte,vt_uint,vt_flag,vt_enum,vt_float,vt_vect,vt_point,vt_sig
 //=============================================================================
 //=============================================================================
 // special variables - signatures
-#ifndef SIGDEF
-#define SIGDEF(...)
+#ifndef MIDX
+#define MIDX(...)
 #endif
 //------------------------------
-// special protocols
+// special protocols/indexes
 //service packet, must be the first, i.e. var_idx = 0
-SIGDEF(service,   "Service packet <node_sn>,<cmd>,<data..>")
+MIDX(service,   "Service packet <node_sn>,<cmd>,<data..>")
 //other protocols
-SIGDEF(downstream,"Downlink stream <stream>")
-SIGDEF(uplink,    "Uplink wrapped packet <var_idx>,<data..>")
-SIGDEF(ping,      "Ping packet, no reply expected")
-SIGDEF(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
-SIGDEF(rawbus,    "RAW bus packet, forwarded to CAN <raw data..>")
-SIGDEF(setb,      "Set bit (uplink only) <var_idx>,<mask>,<value>")
-SIGDEF(mission,   "Mission data <packed mission>")
-SIGDEF(sim,       "Simulator wrapped packet <var_idx>,<data..>")
-SIGDEF(data,      "Port data <port_id>,<data..>")
-SIGDEF(ldata,     "Port data local <port_id>,<data..>")
-SIGDEF(video,     "Video stream <data>")
-SIGDEF(uav,       "UAV datalink <id 4 bytes>,<var_idx>,<data..>")
-//SIGDEF(uav_id,    "UAV identification data <packed UAV_ID>")
-SIGDEF(formation, "Formation flight data <packed data>")
-SIGDEF(vor,       "VOR beacon <packed data>")
+MIDX(downstream,"Downlink stream <stream>")
+MIDX(uplink,    "Uplink wrapped packet <var_idx>,<data..>")
+MIDX(ping,      "Ping packet, no reply expected")
+MIDX(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
+MIDX(rawbus,    "RAW bus packet, forwarded to CAN <raw data..>")
+MIDX(setb,      "Set bit (uplink only) <var_idx>,<mask>,<value>")
+MIDX(mission,   "Mission data <packed mission>")
+MIDX(sim,       "Simulator wrapped packet <var_idx>,<data..>")
+MIDX(data,      "Port data <port_id>,<data..>")
+MIDX(ldata,     "Port data local <port_id>,<data..>")
+MIDX(video,     "Video stream <data>")
+MIDX(uav,       "UAV datalink <id 4 bytes>,<var_idx>,<data..>")
+//MIDX(uav_id,    "UAV identification data <packed UAV_ID>")
+MIDX(formation, "Formation flight data <packed data>")
+MIDX(vor,       "VOR beacon <packed data>")
 //------------------------------
-// var packs
-SIGDEF(Ximu, "IMU sensors data package",
-       idx_acc, idx_gyro )
-SIGDEF(Xgps, "GPS fix data package",
-       idx_gps_pos, idx_gps_vel)
-SIGDEF(ctr, "Fast controls, sent to bus at fixed update rate",
-      idx_ctr_ailerons,idx_ctr_elevator,idx_ctr_throttle,idx_ctr_rudder,idx_ctr_steering,idx_ctr_collective )
-SIGDEF(Xpilot, "RC Pilot fast controls override", idx_rc_roll,idx_rc_pitch,idx_rc_throttle,idx_rc_yaw)
-SIGDEF(Xplatform, "ILS platform sensors data package", idx_platform_pos,idx_platform_vel,idx_platform_hdg)
-
+// idx LISTS
+// send to bus on change
+#define MANDALA_LIST_CTR \
+  idx_mode,idx_status,idx_error,idx_cmode, \
+  idx_power,idx_sw, \
+  idx_cam_ch,idx_cam_ctr,idx_cam_opt,idx_cam_ctrb
+// send to GCU
+#define MANDALA_LIST_GCU \
+  idx_downstream, idx_ping, idx_mission, idx_rawbus, idx_data
 //------------------------------
-// Auto update/send vars
-SIGDEF(update,  "Auto send to bus when changed",
-      idx_mode,idx_status,idx_error,idx_cmode,
-      idx_power,idx_sw,
-      idx_ctr_flaps,idx_ctr_airbrk,idx_ctr_brake,idx_ctr_mixture,idx_ctr_engine,idx_ctr_sweep,idx_ctr_buoyancy,
-      idx_ctrb,
-      idx_cam_ch,idx_cam_ctr,idx_cam_opt,idx_cam_ctrb )
-
-#define dl_reset_interval  10000    //reset snapshot interval [ms]
-SIGDEF(autosend,  "Automatically forwarded variables to GCU",
-       idx_service, idx_downstream, idx_ping, idx_mission, idx_rawbus, idx_data )
-
-//------------------------------
-#undef SIGDEF
+#undef MIDX
 #ifndef MVAR
 #define MVAR(...)
 #endif
@@ -158,17 +144,18 @@ MVAR(float, venergy,  "compensated variometer [m/s]",   f2,f2)
 MVAR(float, ldratio,  "glide ratio [Lift/Drag]",        f2,f2)
 MVAR(float, buoyancy, "Blimp ballonet pressure [kPa]",  f2,f2)
 
+#define idx_UPD_START idx_ctr_ailerons
 //--------- FAST CONTROLS --------------
 MVAR(float, ctr_ailerons,     "ailerons [-1..0..+1]",   f2,s001)
 MVAR(float, ctr_elevator,     "elevator [-1..0..+1]",   f2,s001)
 MVAR(float, ctr_throttle,     "throttle [0..1]",        f2,u001)
 MVAR(float, ctr_rudder,       "rudder [-1..0..+1]",     f2,s001)
+MVAR(float, ctr_collective,   "collective pitch [-1..0..+1]",f2,s001)
 
 //--------- SLOW CONTROLS --------------
-MVAR(float, ctr_flaps,        "flaps [0..1]",           u001,u001)
 MVAR(float, ctr_steering,     "steering [-1..0..+1]",   f2,s001)
-MVAR(float, ctr_collective,   "collective pitch [-1..0..+1]",f2,s001)
 MVAR(float, ctr_airbrk,       "airbrakes [0..1]",       f2,u001)
+MVAR(float, ctr_flaps,        "flaps [0..1]",           u001,u001)
 MVAR(float, ctr_brake,        "brake [0..1]",           f2,u001)
 MVAR(float, ctr_mixture,      "mixture [0..1]",         f2,u001)
 MVAR(float, ctr_engine,       "engine tuning [0..1]",   f2,u001)
@@ -183,6 +170,7 @@ MBIT(ctrb,   gear,    "Landing gear retracted/extracted",8)
 MBIT(ctrb,   drp,     "Drop-off open/locked",           16)
 MBIT(ctrb,   pump,    "Fuel pump on/off",               32)
 MBIT(ctrb,   xfeed,   "Crossfeed on/off",               64)
+#define idx_UPD_END idx_ctrb
 
 //--------- AUTOPILOT COMMAND --------------
 MVAR(vect,  cmd_theta,        "commanded attitude: roll,pitch,yaw [deg]",f2,f2)

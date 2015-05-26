@@ -79,15 +79,13 @@ typedef uint8_t         _var_byte;
 typedef uint32_t        _var_uint;
 typedef uint8_t         _var_flag;
 typedef uint8_t         _var_enum;
-typedef const uint8_t*  _var_signature;
 //=============================================================================
 #include "MandalaVars.h" //get constants
 //-----------------------------------------------------------------------------
 // enum indexes idx_VARNAME
-#define SIGDEF(aname, ... ) idx_##aname,
+#define MIDX(aname, ... ) idx_##aname,
 enum {
   #include "MandalaVars.h"
-  sigCnt
 };
 #define MVAR(atype,aname,adescr, ...) idx_##aname,
 enum {
@@ -98,7 +96,6 @@ enum {
 };
 //-----------------------------------------------------------------------------
 // typedefs and consts
-#define SIGDEF(aname, adescr, ... )     typedef _var_signature var_typedef_##aname;
 #define MVAR(atype,aname,adescr, ...)   typedef _var_##atype var_typedef_##aname;
 #define MBIT(avarname,abitname,adescr,amask)   enum{ avarname##_##abitname=amask };
 #include "MandalaVars.h"
@@ -130,8 +127,11 @@ public:
   void set_data(uint16_t var_m,uint type,void *value_ptr,_var_float value);
   //-----------------------------------------------------------------------------
   #define MVAR(atype,aname, ...)        var_typedef_##aname aname;
-  #define SIGDEF(aname,adescr, ...)     static var_typedef_##aname aname;
   #include "MandalaVars.h"
+
+  typedef const uint8_t _vars_list [];
+  static _vars_list vars_gcu;
+  static _vars_list vars_ctr;
 
 
   //math calculations
@@ -183,7 +183,6 @@ protected:
   uint pack_byte_u1(void *buf,void *value_ptr);
   uint pack_uint_u4(void *buf,void *value_ptr);
   uint pack_uint_u2(void *buf,void *value_ptr);
-  uint pack_sig(void *buf,void *value_ptr);
 
   //unpack
   uint unpack_float_s1(const void *buf,void *value_ptr);
@@ -215,7 +214,6 @@ protected:
   uint unpack_byte_u1(const void *buf,void *value_ptr);
   uint unpack_uint_u4(const void *buf,void *value_ptr);
   uint unpack_uint_u2(const void *buf,void *value_ptr);
-  uint unpack_sig(const void *buf, uint cnt, void *value_ptr);
 
 };
 //=============================================================================

@@ -26,12 +26,9 @@
 #include "MandalaCore.h"
 #include "math.h"
 //===========================================================================
-// static signatures
-#define SIGDEF(aname, adescr, ... )   \
-  static  uint8_t signature_##aname [ VA_NUM_ARGS(__VA_ARGS__)+1 ]={VA_NUM_ARGS(__VA_ARGS__), __VA_ARGS__ }; \
-  var_typedef_##aname MandalaCore:: aname = signature_##aname ;
-#include "MandalaVars.h"
-//=============================================================================
+const MandalaCore::_vars_list MandalaCore::vars_gcu = { MANDALA_LIST_GCU,0};
+const MandalaCore::_vars_list MandalaCore::vars_ctr = { MANDALA_LIST_CTR,0};
+//===========================================================================
 _var_float MandalaCore::get_data(uint16_t var_m)
 {
   uint type;
@@ -81,8 +78,8 @@ void MandalaCore::set_data(uint16_t var_m,uint type,void *value_ptr,_var_float v
 bool MandalaCore::get_ptr(uint8_t var_idx,void **var_ptr,uint*type)
 {
   switch (var_idx) {
-  #define SIGDEF(aname,adescr,...) \
-    case idx_##aname: *type=vt_sig;*var_ptr=(void*)&(aname);return true;
+  #define MIDX(aname,adescr,...) \
+    case idx_##aname: *type=vt_idx;*var_ptr=NULL;return true;
   #define MVAR(atype,aname,adescr, ...) \
     case idx_##aname: *type=vt_##atype;*var_ptr=(void*)&(aname);return true;
   #include "MandalaVars.h"
@@ -93,8 +90,6 @@ bool MandalaCore::get_ptr(uint8_t var_idx,void **var_ptr,uint*type)
 uint MandalaCore::pack(uint8_t *buf,uint var_idx)
 {
   switch (var_idx) {
-  #define SIGDEF(aname,adescr,...) \
-    case idx_##aname: return pack_sig(buf,(void*)&(aname));
   #define MVAR(atype,aname,adescr,abytes,atbytes) \
     case idx_##aname: return pack_##atype##_##abytes (buf,(void*)&(aname));
   #include "MandalaVars.h"
@@ -119,8 +114,6 @@ uint MandalaCore::unpack(const uint8_t *buf,uint cnt,uint var_idx)
     return 0;
   }
   switch (var_idx) {
-  #define SIGDEF(aname,adescr,...) \
-    case idx_##aname: return unpack_sig(buf,cnt,(void*)&(aname));
   #define MVAR(atype,aname,adescr,abytes,atbytes) \
     case idx_##aname: return unpack_##atype##_##abytes (buf,(void*)&(aname));
   #include "MandalaVars.h"
@@ -373,21 +366,6 @@ uint MandalaCore::pack_point_u001(void *buf,void *value_ptr)
   pack_float_u001(ptr,&((*v)[1]));
   return 2;
 }
-//------------------------------------------------------------------------------
-uint MandalaCore::pack_sig(void *buf,void *value_ptr)
-{
-  _var_signature signature=*((_var_signature*)value_ptr);
-  uint cnt=0,scnt=signature[0];
-  signature++;
-  uint8_t *ptr=(uint8_t*)buf;
-  while (scnt--) {
-    uint sz=pack(ptr,*signature++);
-    if(!sz)break;
-    ptr+=sz;
-    cnt+=sz;
-  }
-  return cnt;
-}
 //=============================================================================
 uint MandalaCore::unpack_float_s1(const void *buf, void *value_ptr)
 {
@@ -616,22 +594,6 @@ uint MandalaCore::unpack_point_u001(const void *buf,void *value_ptr)
   unpack_float_u001(ptr++,&((*v)[0]));
   unpack_float_u001(ptr,&((*v)[1]));
   return 2;
-}
-//------------------------------------------------------------------------------
-uint MandalaCore::unpack_sig(const void *buf,uint cnt,void *value_ptr)
-{
-  _var_signature signature=*((_var_signature*)value_ptr);
-  uint rcnt=0,scnt=signature[0];
-  signature++;
-  const uint8_t *ptr=(const uint8_t*)buf;
-  while ((scnt--)&&cnt) {
-    uint sz=unpack(ptr,cnt,*signature++);
-    if(!sz)break;
-    ptr+=sz;
-    rcnt+=sz;
-    cnt-=sz;
-  }
-  return rcnt;
 }
 //------------------------------------------------------------------------------
 uint MandalaCore::unpack_stream(const uint8_t *buf,uint cnt,bool hd)

@@ -27,7 +27,7 @@
 #include "time_ms.h"
 //===========================================================================
 Mandala::Mandala()
-  : MandalaCore()
+: MandalaCore()
 {
   init();
 }
@@ -49,6 +49,14 @@ void Mandala::init(void)
   aname=0;
 #include "MandalaVars.h"
   cas2tas=1.0;
+  //debug
+  uint cnt=0,sz=0,sz_hd=0;
+  for(uint i=idxPAD;i<idx_local;i++){
+    cnt++;
+    sz+=pack_ext(dl_var,i);
+    sz_hd+=pack(dl_var,i);
+  }
+  dmsg("Mandala %u vars, dl:%u hd:%u\n",cnt,sz,sz_hd);
 }
 //===========================================================================
 bool Mandala::get_text_names(uint16_t varmsk,const char **name,const char **descr)
@@ -69,7 +77,7 @@ bool Mandala::get_text_names(uint16_t varmsk,const char **name,const char **desc
   }
   //find name and descr (no member)
   switch (varmsk&0xFF) {
-  #define SIGDEF(aname,adescr,...) \
+  #define MIDX(aname,adescr,...) \
     case idx_##aname: *name=#aname;*descr=adescr;return true;
   #define MVAR(atype,aname,adescr, ...) \
     case idx_##aname: *name=#aname;*descr=adescr;return true;
@@ -173,7 +181,7 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
     }
   }
 
-  if(!(dl_timestamp%dl_reset_interval)) // periodically send everything
+  if(!(dl_timestamp%10000)) // periodically send everything
     dl_reset=true;
 
   dl_timestamp+=dl_period?dl_period:(time-dl_time_s);
@@ -578,14 +586,6 @@ void Mandala::dump(uint8_t var_idx)
     case vt_float: dmsg("%.2f",*((_var_float*)value_ptr));break;
     case vt_vect:  dmsg("(%.2f,%.2f,%.2f)",(*((_var_vect*)value_ptr))[0],(*((_var_vect*)value_ptr))[1],(*((_var_vect*)value_ptr))[2] );break;
     case vt_point: dmsg("(%.2f,%.2f)",(*((_var_point*)value_ptr))[0],(*((_var_point*)value_ptr))[1] );break;
-    case vt_sig:{
-      dmsg("+sig+\n");
-      _var_signature signature=*(_var_signature*)value_ptr;
-      uint scnt=signature[0];
-      signature++;
-      while (scnt--) dump(*signature++);
-      return;
-    }
     default: break;
   }
   dmsg("\n");
