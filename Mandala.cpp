@@ -50,13 +50,13 @@ void Mandala::init(void)
 #include "MandalaVars.h"
   cas2tas=1.0;
   //debug
-  uint cnt=0,sz=0,sz_hd=0;
+  /*uint cnt=0,sz=0,sz_hd=0;
   for(uint i=idxPAD;i<idx_local;i++){
     cnt++;
     sz+=pack_ext(dl_var,i);
     sz_hd+=pack(dl_var,i);
   }
-  dmsg("Mandala %u vars, dl:%u hd:%u\n",cnt,sz,sz_hd);
+  dmsg("Mandala %u vars, dl:%u hd:%u\n",cnt,sz,sz_hd);*/
 }
 //===========================================================================
 bool Mandala::get_text_names(uint16_t varmsk,const char **name,const char **descr)
