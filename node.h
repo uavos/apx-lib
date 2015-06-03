@@ -88,6 +88,13 @@ enum{
   apc_conf_read,        //return parameter <num>
   apc_conf_write,       //save parameter <num>,<data>
 
+  //------------------
+  //general flash commands
+  apc_flash_inf,        //get available size, re: <uint32_t> avail size
+  apc_flash_file,       //get or set file info [<_flash_file>], re: <_flash_file>
+  apc_flash_read,       //read data <_flash_data::hdr>, re: <_flash_data>
+  apc_flash_write,      //write data <_flash_data>, re: <_flash_data::hdr>
+
   apc_msg=64,   //text message
   //------------------
   //user commands
@@ -99,23 +106,23 @@ enum{
 // <ldc_COMMAND>,<data...>
 //------------------------------------------------------------------------------
 typedef enum {
-  ldc_init=0,   // start loader, re: <_ldc_file> =flash size
-  ldc_file,     // set file info <_ldc_file>, re: <_ldc_file>
-  ldc_write    // write file data <_ldc_write>, re: <_ldc_write::hdr>
+  ldc_init=0,   // start loader, re: <_flash_file> =flash size
+  ldc_file,     // set file info <_flash_file>, re: <_flash_file>
+  ldc_write     // write data <_flash_data>, re: <_flash_data::hdr>
 } _ldr_cmd;
 //loader data
 typedef struct{
   uint32_t      start_address;
-  uint32_t      size;        // flash size in kB
+  uint32_t      size;        // available size in bytes
   uint8_t       xor_crc;     // all file data XORed
-}__attribute__((packed)) _ldc_file;
+}__attribute__((packed)) _flash_file;
 typedef struct{
   struct{
     uint32_t    start_address;
     uint16_t    data_size;
   }__attribute__((packed)) hdr;
   uint8_t       data[256];
-}__attribute__((packed)) _ldc_write;
+}__attribute__((packed)) _flash_data;
 //=============================================================================
 // NODE CONF typedefs
 //=============================================================================
@@ -126,7 +133,7 @@ typedef float     _ft_float;
 typedef uint8_t   _ft_byte;
 typedef uint8_t   _ft_string[16];
 typedef uint8_t   _ft_lstr[64];
-typedef uint8_t   _ft_raw[128];
+typedef uint32_t  _ft_script;
 typedef struct{
   _ft_float x;
   _ft_float y;
@@ -189,37 +196,6 @@ typedef struct {
   _ft_byte   Lo;
 }__attribute__((packed)) _regPPI;
 typedef _regPPI  _ft_regPPI;
-//-----------------------------------------------------------------------------
-//serial protocol state machine
-enum{
-  sp_off=0,
-  //operation
-  sp_init,      //<fields>
-  sp_write,     //<period ms[U16]>,<fields>
-  sp_read,      //<fields>
-  sp_wupd,      //<var_idx>,<fields> [write on var update]
-  //fields
-  sp_skip=0x10, //ignore byte
-  sp_byte,      //<byte>
-  sp_float,     //<varmsk>
-  sp_value,     //<varmsk>,<type>,<bias>,<mult>
-  sp_servo,     //<pwm idx>,<type>,<bias>,<mult>
-  sp_CRC16_HL,  //<poly>,<initial>,<start pos>,<end pos>
-  sp_CRC16_LH,  //<poly>,<initial>,<start pos>,<end pos>
-  sp_CRC8XOR,   //<initial>,<start pos>,<end pos>
-  sp_CRC8SUM,   //<initial>,<start pos>,<end pos>
-  //value types
-  sp_U32=0x40,
-  sp_S32,
-  sp_U16,
-  sp_S16,
-  sp_U8,
-  sp_S8,
-  sp_F32,
-  sp_string,
-
-  sp_Cnt
-};
 //=============================================================================
 typedef enum{
   ft_option=0,
@@ -237,7 +213,7 @@ typedef enum{
   ft_regPI,
   ft_regP,
   ft_regPPI,
-  ft_raw,
+  ft_script,
   //---------
   ft_cnt
 }_node_ft;
