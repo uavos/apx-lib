@@ -110,7 +110,7 @@ uint MandalaCore::pack_ext(uint8_t *buf,uint var_idx)
 uint MandalaCore::unpack(const uint8_t *buf,uint cnt,uint var_idx)
 {
   if(var_idx<idxPAD){
-    if(var_idx==idx_setb) return unpack_setb(buf,cnt);
+    if(var_idx==idx_set) return unpack_set(buf,cnt);
     return 0;
   }
   switch (var_idx) {
@@ -623,11 +623,20 @@ uint MandalaCore::unpack_stream(const uint8_t *buf,uint cnt,bool hd)
   return cnt;
 }
 //-----------------------------------------------------------------------------
-uint MandalaCore::unpack_setb(const uint8_t *buf,uint cnt)
+uint MandalaCore::pack_set(uint8_t *buf, uint16_t var_m)
 {
-  if((!buf[1])||cnt<3)return 0;
-  set_data((uint16_t)buf[0]|(uint16_t)buf[1]<<8,buf[2]);
-  return 3;
+  *buf++=var_m;
+  *buf++=var_m>>8;
+  _var_float v=get_data(var_m);
+  return pack_float_f4(buf,&v)+2;
+}
+uint MandalaCore::unpack_set(const uint8_t *buf,uint cnt)
+{
+  if(cnt!=2+4)return 0;
+  _var_float v;
+  unpack_float_f4(buf+2,&v);
+  set_data((uint16_t)buf[0]|(uint16_t)buf[1]<<8,v);
+  return cnt;
 }
 //=============================================================================
 //=============================================================================

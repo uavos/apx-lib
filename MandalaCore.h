@@ -112,7 +112,8 @@ public:
 
   // basic protocols
   uint unpack_stream(const uint8_t *buf, uint cnt, bool hd);    //downstream without header
-  uint unpack_setb(const uint8_t *buf, uint cnt);               //unpack and set bit <var_idx><mask><value>
+  uint unpack_set(const uint8_t *buf, uint cnt);                //unpack component <var_idx><mask><value>
+  uint pack_set(uint8_t *buf, uint16_t var_m);                 //pack component <var_idx><mask><value>
 
   bool get_ptr(uint8_t var_idx,void **var_ptr,uint*type);
 
@@ -149,7 +150,7 @@ public:
     else if(cnt>1)return ::memcmp(s1,s2,cnt);
     return -1;
   }
-protected:
+
   //pack
   uint pack_float_s(void *buf,const _var_float &v);
   uint pack_float_u(void *buf,const _var_float &v);
