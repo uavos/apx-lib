@@ -58,7 +58,7 @@ enum {vt_void=0,vt_idx,vt_byte,vt_uint,vt_flag,vt_enum,vt_float,vt_vect,vt_point
 //=============================================================================
 //=============================================================================
 //=============================================================================
-// special variables - signatures
+//simple indexes
 #ifndef MIDX
 #define MIDX(...)
 #endif
@@ -66,17 +66,18 @@ enum {vt_void=0,vt_idx,vt_byte,vt_uint,vt_flag,vt_enum,vt_float,vt_vect,vt_point
 // special protocols/indexes
 //service packet, must be the first, i.e. var_idx = 0
 MIDX(service,   "Service packet <node_sn>,<cmd>,<data..>")
-//other protocols
+//special protocols
 MIDX(downstream,"Downlink stream <stream>")
 MIDX(uplink,    "Uplink wrapped packet <var_idx>,<data..>")
+MIDX(mission,   "Mission data <packed mission>")
+MIDX(set,       "Set component <var_idx>,<msk>,<float/byte>")
 MIDX(ping,      "Ping packet, no reply expected")
 MIDX(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
-MIDX(rawbus,    "RAW bus packet, forwarded to CAN <raw data..>")
-MIDX(set,       "Set component <var_idx>,<msk>,<float/byte>")
-MIDX(mission,   "Mission data <packed mission>")
-MIDX(sim,       "Simulator wrapped packet <var_idx>,<data..>")
-MIDX(data,      "Port data <port_id>,<data..>")
+MIDX(data,      "Port serial data <port_id>,<data..>")
 MIDX(ldata,     "Port data local <port_id>,<data..>")
+MIDX(servo,     "Servo control packet <cmd>,<data..>")
+//other & temporary
+MIDX(sim,       "Simulator wrapped packet <var_idx>,<data..>")
 MIDX(video,     "Video stream <data>")
 MIDX(uav,       "UAV datalink <id 4 bytes>,<var_idx>,<data..>")
 //MIDX(uav_id,    "UAV identification data <packed UAV_ID>")
@@ -91,7 +92,7 @@ MIDX(vor,       "VOR beacon <packed data>")
   idx_cam_ch,idx_cam_ctr,idx_cam_opt,idx_cam_ctrb
 // send to GCU
 #define MANDALA_LIST_GCU \
-  idx_downstream, idx_ping, idx_mission, idx_rawbus, idx_data
+  idx_downstream, idx_ping, idx_mission, idx_data
 //------------------------------
 #undef MIDX
 #ifndef MVAR
