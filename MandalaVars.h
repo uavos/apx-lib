@@ -75,7 +75,7 @@ MIDX(ping,      "Ping packet, no reply expected")
 MIDX(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
 MIDX(data,      "Port serial data <port_id>,<data..>")
 MIDX(ldata,     "Port data local <port_id>,<data..>")
-MIDX(servo,     "Servo control packet <cmd>,<data..>")
+MIDX(can,       "Auxilary CAN data <hdr>,<data..>")
 //other & temporary
 MIDX(sim,       "Simulator wrapped packet <var_idx>,<data..>")
 MIDX(video,     "Video stream <data>")
@@ -105,12 +105,8 @@ MIDX(vor,       "VOR beacon <packed data>")
 //    Mandala variables definitions
 // type:           variable type: [float,  vect,   ...]
 // name:           variable name, used for text also. access: var.name
-// array:          for MVARA only (array size)
-// span:           value span (for 1 byte compression only), <0 = signed
-// bytes:          bytes number for data exchange via bus (compression)
-// tbytes:         bytes number for data exchange with GCU (more compression)
 // description:    text description of the variable, used mostly in GCU
-// if bitfield description contains slash '/' its status reported in console
+// if bitfield description contains slash '/' then changes reported in dmsg
 //------------------------------------------------------------------------------
 // f2 - 2 bytes float
 // f4 - 4 bytes float
