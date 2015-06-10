@@ -1,5 +1,5 @@
-#ifndef _DEBUG_H_
-#define _DEBUG_H_
+#ifndef _DEBUG_DMSG_H_
+#define _DEBUG_DMSG_H_
 //=============================================================================
 
 #ifdef QT_CORE_LIB
@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define dmsg(...)       printf(__VA_ARGS__)
-
 #endif
 
 //=============================================================================
