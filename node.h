@@ -89,11 +89,10 @@ enum{
   apc_conf_write,       //save parameter <num>,<data>
 
   //------------------
-  //general flash commands
-  apc_flash_inf,        //get available size, re: <uint32_t> avail size
-  apc_flash_file,       //get or set file info [<_flash_file>], re: <_flash_file>
-  apc_flash_read,       //read data <_flash_data::hdr>, re: <_flash_data>
-  apc_flash_write,      //write data <_flash_data>, re: <_flash_data::hdr>
+  //script storage
+  apc_script_file,     //get or set file info [<_flash_file>], re: [<_flash_file>]
+  apc_script_read,     //read data <_flash_data_hdr>, re: <_flash_data>
+  apc_script_write,    //write data <_flash_data>, re: <_flash_data_hdr>
 
   apc_msg=64,   //text message
   //------------------
@@ -108,7 +107,7 @@ enum{
 typedef enum {
   ldc_init=0,   // start loader, re: <_flash_file> =flash size
   ldc_file,     // set file info <_flash_file>, re: <_flash_file>
-  ldc_write     // write data <_flash_data>, re: <_flash_data::hdr>
+  ldc_write     // write data <_flash_data>, re: <_flash_data_hdr>
 } _ldr_cmd;
 //loader data
 typedef struct{
@@ -117,10 +116,11 @@ typedef struct{
   uint8_t       xor_crc;     // all file data XORed
 }__attribute__((packed)) _flash_file;
 typedef struct{
-  struct{
-    uint32_t    start_address;
-    uint16_t    data_size;
-  }__attribute__((packed)) hdr;
+  uint32_t    start_address;
+  uint16_t    data_size;
+}__attribute__((packed)) _flash_data_hdr;
+typedef struct{
+  _flash_data_hdr hdr;
   uint8_t       data[256];
 }__attribute__((packed)) _flash_data;
 //=============================================================================
@@ -133,34 +133,35 @@ typedef float     _ft_float;
 typedef uint8_t   _ft_byte;
 typedef uint8_t   _ft_string[16];
 typedef uint8_t   _ft_lstr[64];
-typedef uint32_t  _ft_script;
 typedef struct{
   _ft_float x;
   _ft_float y;
   _ft_float z;
-}__attribute__((packed)) _vec;
-typedef _vec      _ft_vec;
+}__attribute__((packed)) _ft_vec;
+typedef struct{
+  uint32_t size;
+  uint32_t code_size;
+  uint32_t crc;
+  char name[32];
+}__attribute__((packed)) _ft_script;
 typedef struct{
   _ft_varmsk varmsk;  //var idx with mask
   _ft_float  mult;    //multiplier (x0.1) -127[-12.7]..+127[+12.7]
   int8_t  diff;       //differential multiplier (x0.01+1) for pos/neg var value
   uint8_t speed;      //speed of change (x0.1) 0..25.5
   uint8_t pwm_ch;     //pwm channel number 0...x
-}__attribute__((packed)) _ctr;
-typedef _ctr      _ft_ctr;
+}__attribute__((packed)) _ft_ctr;
 typedef struct {
   int8_t zero;          //pwm zero shift -127[-1]..+127[+1]
   int8_t max;           //pwm maximum -127[-1]..+127[+1]
   int8_t min;           //pwm minimum -127[-1]..+127[+1]
-}__attribute__((packed)) _pwm;
-typedef _pwm      _ft_pwm;
+}__attribute__((packed)) _ft_pwm;
 typedef struct {
   _ft_varmsk varmsk;  //var idx with mask
   _ft_byte   opt;     //option: b7=1 if INVERTED, b[0:6]=protocol
   _ft_float  mult;    //multiplier
   _ft_float  bias;    //bias
-}__attribute__((packed)) _gpio;
-typedef _gpio     _ft_gpio;
+}__attribute__((packed)) _ft_gpio;
 //-----------------------------------------------------------------------------
 //APCFG support
 typedef struct {
@@ -171,21 +172,18 @@ typedef struct {
   _ft_float  Ki;
   _ft_byte   Li;
   _ft_byte   Lo;
-}__attribute__((packed)) _regPID;
-typedef _regPID  _ft_regPID;
+}__attribute__((packed)) _ft_regPID;
 typedef struct {
   _ft_float  Kp;
   _ft_byte   Lp;
   _ft_float  Ki;
   _ft_byte   Li;
   _ft_byte   Lo;
-}__attribute__((packed)) _regPI;
-typedef _regPI  _ft_regPI;
+}__attribute__((packed)) _ft_regPI;
 typedef struct {
   _ft_float  Kp;
   _ft_byte   Lo;
-}__attribute__((packed)) _regP;
-typedef _regP  _ft_regP;
+}__attribute__((packed)) _ft_regP;
 typedef struct {
   _ft_float  Kpp;
   _ft_byte   Lpp;
@@ -194,8 +192,7 @@ typedef struct {
   _ft_float  Ki;
   _ft_byte   Li;
   _ft_byte   Lo;
-}__attribute__((packed)) _regPPI;
-typedef _regPPI  _ft_regPPI;
+}__attribute__((packed)) _ft_regPPI;
 //=============================================================================
 typedef enum{
   ft_option=0,
