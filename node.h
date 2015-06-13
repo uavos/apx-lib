@@ -133,6 +133,7 @@ typedef float     _ft_float;
 typedef uint8_t   _ft_byte;
 typedef uint8_t   _ft_string[16];
 typedef uint8_t   _ft_lstr[64];
+typedef uint8_t   _ft_raw[128];
 typedef struct{
   _ft_float x;
   _ft_float y;
@@ -210,6 +211,7 @@ typedef enum{
   ft_regPI,
   ft_regP,
   ft_regPPI,
+  ft_raw,
   ft_script,
   //---------
   ft_cnt
