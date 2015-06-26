@@ -244,11 +244,6 @@ void Mandala::calc(void)
   rwDelta=dWPT*sin((wpHDG+180.0-tgHDG)*D2R)-rwAdj;
   rwDV=rotate(vel_NE,tgHDG)[1];
   gSpeed=distance(vel_NE);
-  //course
-  //_var_float crsGPS=heading(gps_vNED);
-  //_var_float crsD=boundAngle(crsGPS-theta[2]);
-  //_var_float crsK=100.0*((crsD==0)?1.0:limit((90.0/fabs(crsD))/90.0,0,1));
-  //course=smoothAngle(crsGPS,course,0.000001);//gSpeed*gSpeed*0.0001/100.0);
 }
 //=============================================================================
 _var_float Mandala::boundAngle(_var_float v,_var_float span) const

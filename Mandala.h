@@ -60,7 +60,7 @@ public:
 
   //---- Mission (typedefs only) ----
   typedef enum{
-    mi_stop=0,mi_wp,mi_rw,mi_tw
+    mi_stop=0,mi_wp,mi_rw,mi_tw,mi_pi
   } __mission_item_type;
   typedef struct{
     uint8_t type        :4;     //wp,rw,scr, ..
@@ -88,6 +88,15 @@ public:
     float           lat;
     float           lon;
   }__attribute__((packed)) _mission_item_tw;
+  typedef struct{
+    _mission_item_hdr hdr;
+    float           lat;
+    float           lon;
+    int16_t         hmsl;
+    int16_t         turnR;
+    uint8_t         loops;
+    uint16_t        timeS;
+  }__attribute__((packed)) _mission_item_pi;
   typedef struct{
     _mission_item_hdr hdr;
     uint8_t   size;
