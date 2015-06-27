@@ -89,7 +89,7 @@ MIDX(vor,       "VOR beacon <packed data>")
 #define MANDALA_LIST_CTR \
   idx_mode,idx_status,idx_error,idx_cmode, \
   idx_power,idx_sw, \
-  idx_cam_ch,idx_cam_ctr,idx_cam_opt,idx_cam_ctrb
+  idx_cam_ch,idx_cam_mode,idx_cam_opt,idx_cam_ctrb
 // send to GCU
 #define MANDALA_LIST_GCU \
   idx_downstream, idx_ping, idx_mission, idx_data
@@ -379,14 +379,14 @@ MVAR(float, rc_throttle,      "RC throttle [0..1]",     u001,u001)
 MVAR(float, rc_yaw,           "RC yaw [-1..0..+1]",     s001,s001)
 
 //--------- CAM CONTROL --------------
-MVAR(byte,  cam_ch,   "video channel [0..255]", u1,u1)
-MVAR(enum,  cam_ctr,  "camera control type",,)
-MBIT(cam_ctr, camoff, "camera off",                     0)
-MBIT(cam_ctr, stab,   "gyro stabilization",             1)
-MBIT(cam_ctr, position,"attitude position",             2)
-MBIT(cam_ctr, speed,  "attitude speed control",         3)
-MBIT(cam_ctr, target, "target position tracking",       4)
-MBIT(cam_ctr, fixed,  "fixed position",                 5)
+MVAR(byte,  cam_ch,    "video channel [0..255]", u1,u1)
+MVAR(enum,  cam_mode,  "camera control mode",,)
+MBIT(cam_mode, camoff, "camera off",                     0)
+MBIT(cam_mode, stab,   "gyro stabilization",             1)
+MBIT(cam_mode, position,"attitude position",             2)
+MBIT(cam_mode, speed,  "attitude speed control",         3)
+MBIT(cam_mode, target, "target position tracking",       4)
+MBIT(cam_mode, fixed,  "fixed position",                 5)
 MVAR(vect,  camcmd_theta,"commanded camera orientation: roll,pitch,yaw [deg]", f2,f2)
 MVAR(float, cam_zoom, "camera zoom level [0..1]",       u001,u001)
 MVAR(float, cam_focus,"camera focus [0..1]",            u001,u001)
@@ -398,7 +398,7 @@ MBIT(cam_opt, DSP,    "display information on/off",     4)
 MBIT(cam_opt, FMI,    "focus mode infinity/auto",       8)
 MBIT(cam_opt, FM,     "focus manual/auto",              16)
 MVAR(byte,  cam_src,  "camera source",u1,u1)
-MVAR(vect,  cam_tpos, "GPS position: lat,lon,hmsl [deg,deg,m]",f4,f4)
+MVAR(vect,  cam_tpos, "camera tracking position: lat,lon,hmsl [deg,deg,m]",f4,f4)
 MVAR(flag,  cam_ctrb, "camera controls bitfield [on/off]",,)
 MBIT(cam_ctrb, shot,  "snapshot",               1)
 MBIT(cam_ctrb, ashot, "series snapshots",       2)
@@ -408,8 +408,8 @@ MVAR(uint,  cam_timestamp,"timestamp [ms]",             u4,u4) //must be last fo
 //--------- TURRET CONTROL --------------
 MVAR(point, turretcmd_att, "commanded turret orientation: pitch,yaw [deg]", f4,f4)
 MVAR(enum,  turret_mode,  "turret mode",,)
-MBIT(turret_mode, TGYRO,     "gyro stabilized",                 0)
-MBIT(turret_mode, TFIXED,    "relative encoded attitude",       1)
+MBIT(turret_mode, gyro,     "gyro stabilized",                 0)
+MBIT(turret_mode, fixed,    "relative encoded attitude",       1)
 MVAR(point, turretenc_att, "turret encoders: pitch,yaw [deg]", f4,f4)
 
 

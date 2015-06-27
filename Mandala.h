@@ -71,6 +71,7 @@ public:
     float           lat;
     float           lon;
     int16_t         alt;
+    uint8_t         speed;
   }__attribute__((packed)) _mission_item_wp;
   typedef enum {owp_hdg,owp_line} _mission_item_wp_option;
   typedef struct{
