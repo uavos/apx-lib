@@ -83,14 +83,14 @@ static inline uint16_t CRC_16(uint16_t poly,const uint8_t *buf,uint size,uint16_
 {
   while(size--){
     crc^=(*buf++)<<8;
-    crc=crc&0x8000?(crc<<1)^poly:crc<<1;
-    crc=crc&0x8000?(crc<<1)^poly:crc<<1;
-    crc=crc&0x8000?(crc<<1)^poly:crc<<1;
-    crc=crc&0x8000?(crc<<1)^poly:crc<<1;
-    crc=crc&0x8000?(crc<<1)^poly:crc<<1;
-    crc=crc&0x8000?(crc<<1)^poly:crc<<1;
-    crc=crc&0x8000?(crc<<1)^poly:crc<<1;
-    crc=crc&0x8000?(crc<<1)^poly:crc<<1;
+    crc=(crc&0x8000)?(crc<<1)^poly:crc<<1;
+    crc=(crc&0x8000)?(crc<<1)^poly:crc<<1;
+    crc=(crc&0x8000)?(crc<<1)^poly:crc<<1;
+    crc=(crc&0x8000)?(crc<<1)^poly:crc<<1;
+    crc=(crc&0x8000)?(crc<<1)^poly:crc<<1;
+    crc=(crc&0x8000)?(crc<<1)^poly:crc<<1;
+    crc=(crc&0x8000)?(crc<<1)^poly:crc<<1;
+    crc=(crc&0x8000)?(crc<<1)^poly:crc<<1;
   }
   return crc;
 }
