@@ -167,7 +167,10 @@ MBIT(ctrb,   gear,    "Landing gear retracted/extracted",8)
 MBIT(ctrb,   drp,     "Drop-off open/locked",           16)
 MBIT(ctrb,   pump,    "Fuel pump on/off",               32)
 MBIT(ctrb,   xfeed,   "Crossfeed on/off",               64)
-#define idx_UPD_END idx_ctrb
+
+MVAR(float, ctr_brakeL,       "left brake [0..1]",      f2,u001)
+MVAR(float, ctr_brakeR,       "right brake [0..1]",     f2,u001)
+#define idx_UPD_END idx_ctr_brakeR
 
 //--------- AUTOPILOT COMMAND --------------
 MVAR(vect,  cmd_theta,        "commanded attitude: roll,pitch,yaw [deg]",f2,f2)
