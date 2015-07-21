@@ -163,8 +163,8 @@ public:
   _var_float distance(const _var_float N,const _var_float E) const;
   const _var_point rotate(const _var_point &v_in,const _var_float psi) const;
   const _var_point rotate(const _var_float N,const _var_float E,const _var_float psi) const;
-  const _var_vect rotate(const _var_vect &v_in,const _var_float psi) const;
-  const _var_vect rotate(const _var_vect &v_in,const _var_vect &theta) const;
+  const _var_vect rotate(const _var_vect &v_in,const _var_float psi);
+  const _var_vect rotate(const _var_vect &v_in,const _var_vect &theta);
   const _var_point LLH_dist(const _var_vect &llh1,const _var_vect &llh2,const _var_float lat,const _var_float lon) const;
   const _var_point ECEF_dist(const _var_vect &ecef1,const _var_vect &ecef2,const _var_float lat,const _var_float lon) const;
   const _var_point ECEF2Tangent(const _var_vect &ECEF,const _var_float latitude,const _var_float longitude) const;
@@ -180,6 +180,10 @@ private:
   // some special protocols
   uint archive_downstream(uint8_t *buf,uint maxSize);
   uint extract_downstream(const uint8_t *buf,uint cnt);
+
+  //math optimizations
+  _var_vect rotate_s;
+  _var_vect rotate_DC[3];
 };
 //=============================================================================
 #endif // MANDALA_H

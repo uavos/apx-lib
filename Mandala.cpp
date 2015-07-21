@@ -248,11 +248,12 @@ void Mandala::calc(void)
 //=============================================================================
 _var_float Mandala::boundAngle(_var_float v,_var_float span) const
 {
-  const _var_float dspan=span*2.0;
-  //return remainder(v,dspan);
+  const float dspan=span*2.0;
+  return v-floor(v/dspan+0.5)*dspan;
+  /*const _var_float dspan=span*2.0;
   while (v >= span) v -= dspan;
   while (v < -span) v += dspan;
-  return v;
+  return v;*/
 }
 //===========================================================================
 _var_vect Mandala::boundAngle(const _var_vect &v,_var_float span) const
@@ -340,15 +341,15 @@ const _var_point Mandala::rotate(const _var_float N,const _var_float E,const _va
                 E*cos_theta-N*sin_theta);
 }
 //===========================================================================
-const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_float psi) const
+const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_float psi)
 {
   const _var_point v(rotate(v_in[0],v_in[1],psi));
   return _var_vect(v[0],v[1],v_in[2]);
 }
 //===========================================================================
-const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_vect &atheta) const
+const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_vect &atheta)
 {
-  const _var_float phi=atheta[0]*D2R;
+  /*const _var_float phi=atheta[0]*D2R;
   const _var_float the=atheta[1]*D2R;
   const _var_float psi=atheta[2]*D2R;
   const _var_float cpsi=cos(psi);
@@ -357,7 +358,6 @@ const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_vect &atheta) c
   const _var_float spsi=sin(psi);
   const _var_float sphi=sin(phi);
   const _var_float stheta=sin(the);
-
   _var_vect eulerDC[3]={_var_vect(cpsi*ctheta,spsi*ctheta,-stheta),
                    _var_vect(-spsi*cphi + cpsi*stheta*sphi,cpsi*cphi + spsi*stheta*sphi,ctheta*sphi),
                    _var_vect(spsi*sphi + cpsi*stheta*cphi,-cpsi*sphi + spsi*stheta*cphi,ctheta*cphi)
@@ -370,6 +370,41 @@ const _var_vect Mandala::rotate(const _var_vect &v_in,const _var_vect &atheta) c
     c[i]=s;
   }
   return c;
+*/
+  if(atheta[0]!=0||atheta[1]!=0||atheta[2]!=0){
+    if(rotate_s!=atheta){
+      rotate_s=atheta;
+      const _var_float phi=atheta[0]*D2R;
+      const _var_float the=atheta[1]*D2R;
+      const _var_float psi=atheta[2]*D2R;
+      const _var_float cpsi=cos(psi);
+      const _var_float cphi=cos(phi);
+      const _var_float ctheta=cos(the);
+      const _var_float spsi=sin(psi);
+      const _var_float sphi=sin(phi);
+      const _var_float stheta=sin(the);
+      const _var_float spsi_stheta=spsi*stheta;
+      const _var_float cpsi_stheta=cpsi*stheta;
+      rotate_DC[0][0]=cpsi*ctheta;
+      rotate_DC[0][1]=spsi*ctheta;
+      rotate_DC[0][2]=-stheta;
+      rotate_DC[1][0]=-spsi*cphi + cpsi_stheta*sphi;
+      rotate_DC[1][1]=cpsi*cphi + spsi_stheta*sphi;
+      rotate_DC[1][2]=ctheta*sphi;
+      rotate_DC[2][0]=spsi*sphi + cpsi_stheta*cphi;
+      rotate_DC[2][1]=-cpsi*sphi + spsi_stheta*cphi;
+      rotate_DC[2][2]=ctheta*cphi;
+    }
+    _var_vect c;
+    _var_float s;
+    for (uint i=0;i<3;i++) {
+      s=0;
+      for (uint j=0;j<3;j++) s+=v_in[j]*rotate_DC[i][j];
+      c[i]=s;
+    }
+    return c;
+  }
+  return v_in;
 }
 //=============================================================================
 const _var_point Mandala::lla2ne(const _var_vect &lla) const
@@ -471,11 +506,11 @@ _var_float Mandala::sqr(const _var_float x) const
 }
 const _var_point Mandala::ECEF2ll(const _var_vect &ECEF) const
 {
-  _var_float X=ECEF[0];
-  _var_float Y=ECEF[1];
-  _var_float Z=ECEF[2];
-  _var_float f=(C_WGS84_a-C_WGS84_b)/C_WGS84_a;
-  _var_float e=sqrt(2*f-f*f);
+  const _var_float X=ECEF[0];
+  const _var_float Y=ECEF[1];
+  const _var_float Z=ECEF[2];
+  const _var_float f=(C_WGS84_a-C_WGS84_b)/C_WGS84_a;
+  const _var_float e=sqrt(2*f-f*f);
   _var_float h=0;
   _var_float N=C_WGS84_a;
   _var_point ll;
@@ -493,13 +528,15 @@ const _var_point Mandala::ECEF2ll(const _var_vect &ECEF) const
 const _var_vect Mandala::llh2ECEF(const _var_vect &llh) const
 {
   const _var_float lat_r=llh[0]*D2R,lon_r=llh[1]*D2R,hmsl=llh[2];
-  _var_float f=(C_WGS84_a-C_WGS84_b)/C_WGS84_a;
-  _var_float e=sqrt(2*f-f*f);
-  _var_float N=C_WGS84_a/sqrt(1-e*e*sqr(sin(lat_r)));
+  const _var_float clat=cos(lat_r);
+  const _var_float slat=sin(lat_r);
+  const _var_float f=(C_WGS84_a-C_WGS84_b)/C_WGS84_a;
+  const _var_float e=sqrt(2*f-f*f);
+  const _var_float N=C_WGS84_a/sqrt(1-e*e*sqr(slat));
   _var_vect ECEF;
-  ECEF[0]=(N+hmsl)*cos(lat_r)*cos(lon_r);
-  ECEF[1]=(N+hmsl)*cos(lat_r)*sin(lon_r);
-  ECEF[2]=(N*(1-e*e)+hmsl)*sin(lat_r);
+  ECEF[0]=(N+hmsl)*clat*cos(lon_r);
+  ECEF[1]=(N+hmsl)*clat*sin(lon_r);
+  ECEF[2]=(N*(1-e*e)+hmsl)*slat;
   return ECEF;
 }
 //=============================================================================
@@ -507,22 +544,22 @@ _var_float Mandala::wind_triangle(_var_float crs) const
 {
   _var_float spd=(airspeed*cas2tas);
   if(spd<=windSpd) return 0.0001;
-  _var_float wnd_r=(windHdg)*D2R;
-  _var_float Kvel=windSpd/spd;
-  _var_float aWTA=crs*D2R-wnd_r;  //fabs??
-  _var_float aWCA=asin(Kvel*sin(aWTA));
-  _var_float kWS=cos(aWCA)+Kvel*cos(aWTA);
+  const _var_float wnd_r=(windHdg)*D2R;
+  const _var_float Kvel=windSpd/spd;
+  const _var_float aWTA=crs*D2R-wnd_r;  //fabs??
+  const _var_float aWCA=asin(Kvel*sin(aWTA));
+  const _var_float kWS=cos(aWCA)+Kvel*cos(aWTA);
   return kWS;
 }
 //=============================================================================
 _var_float Mandala::wind_circle(_var_float crs,_var_float span,_var_float r) const
 {
-  _var_float spd=(airspeed*cas2tas);
+  const _var_float spd=(airspeed*cas2tas);
   if(spd<=windSpd) return 65535;
   _var_float kWSs=0;
   _var_float crs_step=30,crs_e;
-  _var_float wnd_r=(windHdg)*D2R;
-  _var_float Kvel=windSpd/spd;
+  const _var_float wnd_r=(windHdg)*D2R;
+  const _var_float Kvel=windSpd/spd;
   if(span<0) crs_step=-crs_step;
   crs_e=crs+span;
   int sz=span/crs_step;

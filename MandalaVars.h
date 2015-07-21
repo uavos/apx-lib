@@ -178,8 +178,8 @@ MVAR(point, cmd_NE,           "commanded position: north,east [m]",     f2,f2)
 MVAR(float, cmd_course,       "commanded course [deg]", f2,f2)
 MVAR(uint,  cmd_rpm,          "commanded RPM [rpm]",    u2,u2)
 MVAR(float, cmd_altitude,     "commanded altitude [m]", f2,f2)
-MVAR(float, cmd_airspeed,     "commanded airspeed (for regThr) [m/s]",          f2,f2)
-MVAR(float, cmd_vspeed,       "commanded vertical speed (for regPitchH) [m/s]", f2,s01)
+MVAR(float, cmd_airspeed,     "commanded airspeed [m/s]",          f2,f2)
+MVAR(float, cmd_vspeed,       "commanded vertical speed [m/s]", f2,s01)
 MVAR(float, cmd_slip,         "commanded slip [deg]",   f2,s1)
 
 //--------- GPS receiver --------------

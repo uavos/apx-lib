@@ -37,6 +37,7 @@ typedef float   _mat_float;
 #define sqrt sqrtf
 #define pow powf
 #define fabs fabsf
+#define floor floorf
 #else
 typedef double  _mat_float;
 #endif
@@ -88,7 +89,7 @@ public:
       if((*this)[i] != cmp[i])return false;
     return true;
   }
-  bool operator!=(const Vector &cmp) {
+  bool operator!=(const Vector &cmp) const {
     return !((*this)==cmp);
   }
 //Magnitude
