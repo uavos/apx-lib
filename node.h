@@ -135,9 +135,14 @@ typedef uint8_t   _ft_string[16];
 typedef uint8_t   _ft_lstr[64];
 typedef uint8_t   _ft_raw[128];
 typedef struct{
-  _ft_float x;
-  _ft_float y;
-  _ft_float z;
+  union{
+    struct{
+    _ft_float x;
+    _ft_float y;
+    _ft_float z;
+    }__attribute__((packed));
+    _ft_float v[3];
+  }__attribute__((packed));
 }__attribute__((packed)) _ft_vec;
 typedef struct{
   uint32_t size;
