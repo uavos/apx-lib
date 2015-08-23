@@ -96,7 +96,7 @@ void Comm::close()
 //==============================================================================
 bool Comm::isOpen(void)
 {
-  return (fd>=0)&&(fcntl(fd, F_GETFL) != -1 || errno != EBADF);
+  return (fd>=0)&&(::fcntl(fd, F_GETFL) != -1 || errno != EBADF);
 }
 //==============================================================================
 int Comm::handle(void)
@@ -308,6 +308,7 @@ uint Comm::readEscaped(uint8_t *buf,uint max_len)
     }
     //error
     esc_state=0;
+    //uint vi=v;printf("%.2X \n",vi);
   }
 }
 //==============================================================================
