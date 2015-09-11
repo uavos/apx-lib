@@ -363,6 +363,7 @@ MVAR(float, gSpeed,   "ground speed [m]",                       f4,f4)
 MVAR(float, wpHDG,    "current waypoint heading [deg]",         f4,f4)
 MVAR(float, rwDelta,  "runway alignment [m]",                   f4,f4)
 MVAR(float, rwDV,     "runway alignment velocity [m/s]",        f4,f4)
+MVAR(uint,  ETA,      "estimated time of arrival [s]",          u4,u4)
 
 //--------- internal --------------
 MVAR(uint,  dl_period,          "downlink period [ms]",         u2,u2)
