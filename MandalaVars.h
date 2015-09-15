@@ -314,8 +314,8 @@ MVAR(byte,  errcode,  "error code",                     u1,u1)
 MVAR(float, corr,     "correlator output [K]",          f2,f2)
 
 //--------- payloads --------------
-MVAR(vect,  cam_theta,        "camera orientation: roll,pitch,yaw [deg]",f2,f2)
-MVAR(point, turret_att,       "turret orientation: pitch,heading [deg]",f2,f2)
+MVAR(vect,  cam_theta,        "camera orientation: roll,pitch,yaw [deg]",f4,f2)
+MVAR(point, turret_att,       "turret orientation: pitch,heading [deg]",f4,f2)
 MVAR(flag,  turret,     "turret controls bitfield [on/off]",,)
 MBIT(turret, armed,     "turret armed/disarmed",        1)
 MBIT(turret, shoot,     "turret shooting/standby",      2)
