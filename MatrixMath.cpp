@@ -25,6 +25,7 @@
 #include <iostream>
 #include <dmsg.h>
 #include "MatrixMath.h"
+#include <float.h>
 //=============================================================================
 namespace matrixmath {
 //=============================================================================
@@ -74,33 +75,6 @@ const Matrix<4,4> quatW(const Vector<3> euler) {
            Vector<4>(p, 0, r, -q),
            Vector<4>(q, -r, 0, p),
            Vector<4>(r, q, -p, 0)
-         );
-}
-const Vector<3> quat2euler(const Quat & q) {
-  const _mat_float & q0 = q[0];
-  const _mat_float & q1 = q[1];
-  const _mat_float & q2 = q[2];
-  const _mat_float & q3 = q[3];
-  _mat_float theta = -asin(2*(q1*q3 - q0*q2));
-  _mat_float phi = atan2(2.0*(q2*q3 + q0*q1), 1.0-2.0*(q1*q1 + q2*q2));
-  _mat_float psi = atan2(2.0*(q1*q2 + q0*q3), 1.0-2.0*(q2*q2 + q3*q3));
-  return Vector<3>(phi, theta, psi);
-}
-const Quat euler2quat(const Vector<3> & euler) {
-  const _mat_float phi = euler[0] / 2.0;
-  const _mat_float theta = euler[1] / 2.0;
-  const _mat_float psi = euler[2] / 2.0;
-  const _mat_float shphi0 = sin(phi);
-  const _mat_float chphi0 = cos(phi);
-  const _mat_float shtheta0 = sin(theta);
-  const _mat_float chtheta0 = cos(theta);
-  const _mat_float shpsi0 = sin(psi);
-  const _mat_float chpsi0 = cos(psi);
-  return Quat(
-           chphi0 * chtheta0 * chpsi0 + shphi0 * shtheta0 * shpsi0,
-           -chphi0 * shtheta0 * shpsi0 + shphi0 * chtheta0 * chpsi0,
-           chphi0 * shtheta0 * chpsi0 + shphi0 * chtheta0 * shpsi0,
-           chphi0 * chtheta0 * shpsi0 - shphi0 * shtheta0 * chpsi0
          );
 }
 const Vector<4> dphi_dq(const Vector<4> & quat, const Matrix<3,3> & DCM) {
@@ -199,17 +173,6 @@ const Vector<4> dpsi_dq(const Vector<4> & quat, const Matrix<3,3> & DCM) {
   return W;
 }*/
 //=============================================================================
-const Quat qmult(const Quat &q1,const Quat &q2)
-{
-  const _mat_float eta1=q1[0];
-  const Vect eps1=Vect(q1[1],q1[2],q1[3]);
-  const _mat_float eta2=q2[0];
-  const Vect eps2=Vect(q2[1],q2[2],q2[3]);
-  const _mat_float eta=eta1*eta2 - eps1*eps2;
-  const Vect eps=eta1*eps2+eta2*eps1+cross(eps1,eps2);
-  return Quat(eta,eps[0],eps[1],eps[2]);
-}
-//=============================================================================
 const Matrix<4,4> Omega(const Vect &w)
 {
   const _mat_float x=w[0];
@@ -222,6 +185,165 @@ const Matrix<4,4> Omega(const Vect &w)
   A[3]=Quat(z,y,-x,0);
   return A;
 }
+//=============================================================================
+//=============================================================================
+const Vector<3> Quat::toEuler() const
+{
+  const _mat_float & q0 = (*this)[0];
+  const _mat_float & q1 = (*this)[1];
+  const _mat_float & q2 = (*this)[2];
+  const _mat_float & q3 = (*this)[3];
+  _mat_float theta = -asin(2*(q1*q3 - q0*q2));
+  _mat_float phi = atan2(2.0*(q2*q3 + q0*q1), 1.0-2.0*(q1*q1 + q2*q2));
+  _mat_float psi = atan2(2.0*(q1*q2 + q0*q3), 1.0-2.0*(q2*q2 + q3*q3));
+  return Vector<3>(phi, theta, psi);
+}
+//=============================================================================
+void Quat::qmult(const Quat &q)
+{
+  const _mat_float eta1=(*this)[0];
+  const Vect eps1=Vect((*this)[1],(*this)[2],(*this)[3]);
+  const _mat_float eta2=q[0];
+  const Vect eps2=Vect(q[1],q[2],q[3]);
+  const _mat_float eta=eta1*eta2 - eps1*eps2;
+  const Vect eps=eta1*eps2+eta2*eps1+cross(eps1,eps2);
+  (*this)[0]=eta;
+  (*this)[1]=eps[0];
+  (*this)[2]=eps[1];
+  (*this)[3]=eps[2];
+}
+//=============================================================================
+void Quat::fromEuler(const Vector<3> & euler)
+{
+  const _mat_float phi = euler[0] / 2.0;
+  const _mat_float theta = euler[1] / 2.0;
+  const _mat_float psi = euler[2] / 2.0;
+  const _mat_float shphi0 = sin(phi);
+  const _mat_float chphi0 = cos(phi);
+  const _mat_float shtheta0 = sin(theta);
+  const _mat_float chtheta0 = cos(theta);
+  const _mat_float shpsi0 = sin(psi);
+  const _mat_float chpsi0 = cos(psi);
+  (*this)[0]= chphi0 * chtheta0 * chpsi0 + shphi0 * shtheta0 * shpsi0;
+  (*this)[1]=-chphi0 * shtheta0 * shpsi0 + shphi0 * chtheta0 * chpsi0;
+  (*this)[2]= chphi0 * shtheta0 * chpsi0 + shphi0 * chtheta0 * shpsi0;
+  (*this)[3]= chphi0 * chtheta0 * shpsi0 - shphi0 * shtheta0 * chpsi0;
+}
+//=============================================================================
+#define EulFrm(ord)  ((unsigned)(ord)&1)
+#define EulRep(ord)  (((unsigned)(ord)>>1)&1)
+#define EulPar(ord)  (((unsigned)(ord)>>2)&1)
+#define EulSafe      "\000\001\002\000"
+#define EulNext      "\001\002\000\001"
+#define EulAxI(ord)  ((int)(EulSafe[(((unsigned)(ord)>>3)&3)]))
+#define EulAxJ(ord)  ((int)(EulNext[EulAxI(ord)+(EulPar(ord)==EulParOdd)]))
+#define EulAxK(ord)  ((int)(EulNext[EulAxI(ord)+(EulPar(ord)!=EulParOdd)]))
+#define EulAxH(ord)  ((EulRep(ord)==EulRepNo)?EulAxK(ord):EulAxI(ord))
+#define EulGetOrd(ord,i,j,k,h,n,s,f) {unsigned o=ord;f=o&1;o>>=1;s=o&1;o>>=1;\
+  n=o&1;o>>=1;i=EulSafe[o&3];j=EulNext[i+n];k=EulNext[i+1-n];h=s?k:i;}
+_mat_float Quat::HMatrix[4][4];
+const Vector<3> Quat::toEuler(int order) const
+{
+  {
+    _mat_float Nq = (*this)[1]*(*this)[1]+(*this)[2]*(*this)[2]+(*this)[3]*(*this)[3]+(*this)[0]*(*this)[0];
+    _mat_float s = (Nq > 0.0) ? (2.0 / Nq) : 0.0;
+    _mat_float xs = (*this)[1]*s,    ys = (*this)[2]*s,    zs = (*this)[3]*s;
+    _mat_float wx = (*this)[0]*xs,   wy = (*this)[0]*ys,   wz = (*this)[0]*zs;
+    _mat_float xx = (*this)[1]*xs,   xy = (*this)[1]*ys,   xz = (*this)[1]*zs;
+    _mat_float yy = (*this)[2]*ys,   yz = (*this)[2]*zs,   zz = (*this)[3]*zs;
+    HMatrix[0][0] = 1.0 - (yy + zz); HMatrix[0][1] = xy - wz; HMatrix[0][2] = xz + wy;
+    HMatrix[1][0] = xy + wz; HMatrix[1][1] = 1.0 - (xx + zz); HMatrix[1][2] = yz - wx;
+    HMatrix[2][0] = xz - wy; HMatrix[2][1] = yz + wx; HMatrix[2][2] = 1.0 - (xx + yy);
+    HMatrix[3][0]=HMatrix[3][1]=HMatrix[3][2]=HMatrix[0][3]=HMatrix[1][3]=HMatrix[2][3]=0.0; HMatrix[3][3]=1.0;
+  }
+  return HMatrix2euler(order);
+}
+//=============================================================================
+void Quat::fromEuler(Vector<3> euler,int order)
+{
+  _mat_float *a=&((*this)[1]);
+  _mat_float ti, tj, th, ci, cj, ch, si, sj, sh, cc, cs, sc, ss;
+  int i,j,k,h,n,s,f;
+  EulGetOrd(order,i,j,k,h,n,s,f);
+  (void)h;
+  if (f==EulFrmR) {float t = euler[0]; euler[0] = euler[2]; euler[2] = t;}
+  if (n==EulParOdd) euler[1] = -euler[1];
+  ti = euler[0]*0.5; tj = euler[1]*0.5; th = euler[2]*0.5;
+  ci = cos(ti);  cj = cos(tj);  ch = cos(th);
+  si = sin(ti);  sj = sin(tj);  sh = sin(th);
+  cc = ci*ch; cs = ci*sh; sc = si*ch; ss = si*sh;
+  if (s==EulRepYes) {
+    a[i] = cj*(cs + sc);    /* Could speed up with */
+    a[j] = sj*(cc + ss);    /* trig identities. */
+    a[k] = sj*(cs - sc);
+    (*this)[0] = cj*(cc - ss);
+  } else {
+    a[i] = cj*sc - sj*cs;
+    a[j] = cj*ss + sj*cc;
+    a[k] = cj*cs - sj*sc;
+    (*this)[0] = cj*cc + sj*ss;
+  }
+  if (n==EulParOdd) a[j] = -a[j];
+}
+//=============================================================================
+void Quat::euler2HMatrix(Vector<3> euler,int order)
+{
+  _mat_float ti, tj, th, ci, cj, ch, si, sj, sh, cc, cs, sc, ss;
+  int i,j,k,h,n,s,f;
+  EulGetOrd(order,i,j,k,h,n,s,f);
+  (void)h;
+  if (f==EulFrmR) {float t = euler[0]; euler[0] = euler[2]; euler[2] = t;}
+  if (n==EulParOdd) {euler[0] = -euler[0]; euler[1] = -euler[1]; euler[2] = -euler[2];}
+  ti = euler[0];    tj = euler[1];    th = euler[2];
+  ci = cos(ti); cj = cos(tj); ch = cos(th);
+  si = sin(ti); sj = sin(tj); sh = sin(th);
+  cc = ci*ch; cs = ci*sh; sc = si*ch; ss = si*sh;
+  if (s==EulRepYes) {
+    HMatrix[i][i] = cj;     HMatrix[i][j] =  sj*si;    HMatrix[i][k] =  sj*ci;
+    HMatrix[j][i] = sj*sh;  HMatrix[j][j] = -cj*ss+cc; HMatrix[j][k] = -cj*cs-sc;
+    HMatrix[k][i] = -sj*ch; HMatrix[k][j] =  cj*sc+cs; HMatrix[k][k] =  cj*cc-ss;
+  } else {
+    HMatrix[i][i] = cj*ch; HMatrix[i][j] = sj*sc-cs; HMatrix[i][k] = sj*cc+ss;
+    HMatrix[j][i] = cj*sh; HMatrix[j][j] = sj*ss+cc; HMatrix[j][k] = sj*cs-sc;
+    HMatrix[k][i] = -sj;   HMatrix[k][j] = cj*si;    HMatrix[k][k] = cj*ci;
+  }
+  HMatrix[3][0]=HMatrix[3][1]=HMatrix[3][2]=HMatrix[0][3]=HMatrix[1][3]=HMatrix[2][3]=0.0; HMatrix[3][3]=1.0;
+}
+//=============================================================================
+const Vector<3> Quat::HMatrix2euler(int order) const
+{
+  Vector<3> euler;
+  int i,j,k,h,n,s,f;
+  EulGetOrd(order,i,j,k,h,n,s,f);
+  (void)h;
+  if (s==EulRepYes) {
+    _mat_float sy = sqrt(HMatrix[i][j]*HMatrix[i][j] + HMatrix[i][k]*HMatrix[i][k]);
+    if (sy > 16*FLT_EPSILON) {
+      euler[0] = atan2(HMatrix[i][j], HMatrix[i][k]);
+      euler[1] = atan2(sy, HMatrix[i][i]);
+      euler[2] = atan2(HMatrix[j][i], -HMatrix[k][i]);
+    } else {
+      euler[0] = atan2(-HMatrix[j][k], HMatrix[j][j]);
+      euler[1] = atan2(sy, HMatrix[i][i]);
+      euler[2] = 0;
+    }
+  } else {
+    _mat_float cy = sqrt(HMatrix[i][i]*HMatrix[i][i] + HMatrix[j][i]*HMatrix[j][i]);
+    if (cy > 16*FLT_EPSILON) {
+      euler[0] = atan2(HMatrix[k][j], HMatrix[k][k]);
+      euler[1] = atan2(-HMatrix[k][i], cy);
+      euler[2] = atan2(HMatrix[j][i], HMatrix[i][i]);
+    } else {
+      euler[0] = atan2(-HMatrix[j][k], HMatrix[j][j]);
+      euler[1] = atan2(-HMatrix[k][i], cy);
+      euler[2] = 0;
+    }
+  }
+  if (n==EulParOdd) {euler[0] = -euler[0]; euler[1] = - euler[1]; euler[2] = -euler[2];}
+  if (f==EulFrmR) {float t = euler[0]; euler[0] = euler[2]; euler[2] = t;}
+  return euler;
+}
+//=============================================================================
 //=============================================================================
 //=============================================================================
 }//namespace

@@ -679,12 +679,73 @@ std::ostream &operator<<(std::ostream &out,const Vector<n,T> &v)
 }*/
 //=============================================================================
 //Common types
-typedef Vector<4> Quat;
+//typedef Vector<4> Quat;
 typedef Vector<3> Vect;
 typedef Vector<2> Point;
 //=============================================================================
 // QUATERNIONS
 //=============================================================================
+class Quat: public Vector<4>
+{
+public:
+  Quat():Vector<4>(){}
+  Quat(const _mat_float &s0,const _mat_float &s1,const _mat_float &s2,const _mat_float &s3) {
+    (*this)[0] = s0;
+    (*this)[1] = s1;
+    (*this)[2] = s2;
+    (*this)[3] = s3;
+  }
+  void qmult(const Quat &q);
+  const Vector<3> toEuler() const; //Aerospace
+  void fromEuler(const Vector<3> & euler);
+
+
+  //euler angles conversions
+  const Vector<3> toEuler(int order) const;
+  void fromEuler(Vector<3> euler,int order);
+
+  void euler2HMatrix(Vector<3> euler,int order);
+  const Vector<3> HMatrix2euler(int order) const;
+
+  static _mat_float HMatrix[4][4];
+  #define EulOrd(i,p,r,f)    (((((((i)<<1)+(p))<<1)+(r))<<1)+(f))
+  enum{
+    EulFrmS=0,
+    EulFrmR=1,
+    EulRepNo=0,
+    EulRepYes=1,
+    EulParEven=0,
+    EulParOdd=1
+  };
+  typedef enum{
+    /* Static axes */
+    EulOrdXYZs=EulOrd(0,EulParEven,EulRepNo,EulFrmS),
+    EulOrdXYXs=EulOrd(0,EulParEven,EulRepYes,EulFrmS),
+    EulOrdXZYs=EulOrd(0,EulParOdd,EulRepNo,EulFrmS),
+    EulOrdXZXs=EulOrd(0,EulParOdd,EulRepYes,EulFrmS),
+    EulOrdYZXs=EulOrd(1,EulParEven,EulRepNo,EulFrmS),
+    EulOrdYZYs=EulOrd(1,EulParEven,EulRepYes,EulFrmS),
+    EulOrdYXZs=EulOrd(1,EulParOdd,EulRepNo,EulFrmS),
+    EulOrdYXYs=EulOrd(1,EulParOdd,EulRepYes,EulFrmS),
+    EulOrdZXYs=EulOrd(2,EulParEven,EulRepNo,EulFrmS),
+    EulOrdZXZs=EulOrd(2,EulParEven,EulRepYes,EulFrmS),
+    EulOrdZYXs=EulOrd(2,EulParOdd,EulRepNo,EulFrmS),
+    EulOrdZYZs=EulOrd(2,EulParOdd,EulRepYes,EulFrmS),
+    /* Rotating axes */
+    EulOrdZYXr=EulOrd(0,EulParEven,EulRepNo,EulFrmR),
+    EulOrdXYXr=EulOrd(0,EulParEven,EulRepYes,EulFrmR),
+    EulOrdYZXr=EulOrd(0,EulParOdd,EulRepNo,EulFrmR),
+    EulOrdXZXr=EulOrd(0,EulParOdd,EulRepYes,EulFrmR),
+    EulOrdXZYr=EulOrd(1,EulParEven,EulRepNo,EulFrmR),
+    EulOrdYZYr=EulOrd(1,EulParEven,EulRepYes,EulFrmR),
+    EulOrdZXYr=EulOrd(1,EulParOdd,EulRepNo,EulFrmR),
+    EulOrdYXYr=EulOrd(1,EulParOdd,EulRepYes,EulFrmR),
+    EulOrdYXZr=EulOrd(2,EulParEven,EulRepNo,EulFrmR),
+    EulOrdZXZr=EulOrd(2,EulParEven,EulRepYes,EulFrmR),
+    EulOrdXYZr=EulOrd(2,EulParOdd,EulRepNo,EulFrmR),
+    EulOrdZYZr=EulOrd(2,EulParOdd,EulRepYes,EulFrmR)
+  }_euler_order;
+};
 // construct a direction cosine matrix from euler angles in the standard
 // rotation sequence [phi][theta][psi] from NED to body frame
 // body = tBL(3,3)*NED
@@ -702,12 +763,6 @@ typedef Vector<2> Point;
 // construct the quaternion omega matrix W(4,4)
 // p, q, r (rad/sec)
 //extern const Matrix<4,4> quatW(const Vector<3> euler);
-
-// convert from quaternions to euler angles q(4,1) -> euler[phi;theta;psi] (rad)
-extern const Vector<3> quat2euler(const Quat & q);
-
-// convert from euler angles to quaternion vector phi, theta, psi -> q(4,1)
-extern const Quat euler2quat(const Vector<3> & euler);
 
 // Functions to compute the partial derivative of the quaterion with
 // respect to the Euler angles. These are used for computation of the
@@ -763,9 +818,6 @@ extern const Quat euler2quat(const Vector<3> & euler);
 // Returns the partial derivative of  R(q)'*v  with
 // respect to eps, when q = [sqrt(1-eps'*eps); eps].
 //extern const Matrix<3,3> Wmtrx(const Vect &eps,const Vect &v);
-
-// Quaternion multiplication
-extern const Quat qmult(const Quat &q1,const Quat &q2);
 
 // For the quaternion differential equation:
 // q_dot = Omega(w)*q;

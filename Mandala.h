@@ -36,7 +36,7 @@
 #endif
 #define GPS_FREQ        5       // GPS Update rate (for derivatives) [Hz]
 #define SIM_FREQ        10      // Simulator servo send rate [Hz]
-#define MAX_TELEMETRY   500     // max telemetry packet size [bytes]
+#define MAX_TELEMETRY   80      // max telemetry packet size [bytes]
 //=============================================================================
 // UAV identification
 typedef struct {
@@ -122,6 +122,8 @@ public:
   uint time_calc_s;
   _var_float last_dWPT;
   _var_float dot_dWPT;
+
+  Quat quat; //quaternion from AHRS (bodyframe to NED)
 
 
   //=============================================================================
