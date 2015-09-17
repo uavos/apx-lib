@@ -202,11 +202,11 @@ const Vector<3> Quat::toEuler() const
 void Quat::qmult(const Quat &q)
 {
   const _mat_float eta1=(*this)[0];
-  const Vect eps1=Vect((*this)[1],(*this)[2],(*this)[3]);
+  const Vect eps1((*this)[1],(*this)[2],(*this)[3]);
   const _mat_float eta2=q[0];
-  const Vect eps2=Vect(q[1],q[2],q[3]);
+  const Vect eps2(q[1],q[2],q[3]);
   const _mat_float eta=eta1*eta2 - eps1*eps2;
-  const Vect eps=eta1*eps2+eta2*eps1+cross(eps1,eps2);
+  const Vect eps(eta1*eps2+eta2*eps1+cross(eps1,eps2));
   (*this)[0]=eta;
   (*this)[1]=eps[0];
   (*this)[2]=eps[1];
@@ -228,6 +228,14 @@ void Quat::fromEuler(const Vector<3> & euler)
   (*this)[1]=-chphi0 * shtheta0 * shpsi0 + shphi0 * chtheta0 * chpsi0;
   (*this)[2]= chphi0 * shtheta0 * chpsi0 + shphi0 * chtheta0 * shpsi0;
   (*this)[3]= chphi0 * chtheta0 * shpsi0 - shphi0 * shtheta0 * chpsi0;
+}
+//=============================================================================
+void Quat::conjugate(void)
+{
+  //(*this)[0]=-(*this)[0];
+  (*this)[1]=-(*this)[1];
+  (*this)[2]=-(*this)[2];
+  (*this)[3]=-(*this)[3];
 }
 //=============================================================================
 #define EulFrm(ord)  ((unsigned)(ord)&1)

@@ -695,9 +695,13 @@ public:
     (*this)[2] = s2;
     (*this)[3] = s3;
   }
+  Quat(const Vector<3> & euler) {
+    fromEuler(euler);
+  }
   void qmult(const Quat &q);
   const Vector<3> toEuler() const; //Aerospace
   void fromEuler(const Vector<3> & euler);
+  void conjugate(void);
 
 
   //euler angles conversions
@@ -719,7 +723,7 @@ public:
   };
   typedef enum{
     /* Static axes */
-    EulOrdXYZs=EulOrd(0,EulParEven,EulRepNo,EulFrmS),
+    EulOrdXYZs=EulOrd(0,EulParEven,EulRepNo,EulFrmS), //Aerospace
     EulOrdXYXs=EulOrd(0,EulParEven,EulRepYes,EulFrmS),
     EulOrdXZYs=EulOrd(0,EulParOdd,EulRepNo,EulFrmS),
     EulOrdXZXs=EulOrd(0,EulParOdd,EulRepYes,EulFrmS),
