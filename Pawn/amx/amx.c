@@ -27,6 +27,7 @@
 # endif
 #endif
 
+#include "ch.h"
 #include <assert.h>
 #include <stdarg.h>
 #include <stddef.h>     /* for wchar_t */
@@ -57,6 +58,10 @@
 #if (defined _Windows && !defined AMX_NODYNALOAD) || (defined AMX_JIT && __WIN32__)
   #include <windows.h>
 #endif
+
+extern void amx_dmsg(void *amx,const char *s);
+static char dmsg_str[256];
+#define dmsg(a,...) {sprintf(dmsg_str,__VA_ARGS__);amx_dmsg(a,dmsg_str);}
 
 
 /* When one or more of the AMX_funcname macros are defined, we want
@@ -681,12 +686,16 @@ static int VerifyPcode(AMX *amx)
   } /* if */
   amx->sysreq_d=0;      /* preset */
 
+  //dmsg(amx,"VerifyPcode (%u)...\n",amx->codesize);
+
   /* start browsing code */
   assert(amx->code!=NULL);  /* should already have been set in amx_Init() */
   for (cip=0; cip<amx->codesize; ) {
     op=*(cell *)(amx->code+(int)cip);
+    //dmsg(amx,"amx: %u\n",op);
     if ((op & opmask)>=max_opcode) {
       amx->flags &= ~AMX_FLAG_VERIFY;
+      dmsg(amx,"amx: cip=%u, op=%u\n",cip,op);
       return AMX_ERR_INVINSTR;
     } /* if */
     /* relocate opcode (only works if the size of an opcode is at least
@@ -2236,8 +2245,12 @@ int AMXAPI amx_Exec(AMX *amx, cell *retval, int index)
   hea=amx->hea;
   stk=amx->stk;
 
+  uint8_t chCnt=0;
   /* start running */
   for ( ;; ) {
+    if(((++chCnt)&15)==0)chThdSleep(1);
+    //uint ix=cip-(cell *)amx->code;
+    //dmsg(amx,"%x,%x\n",ix,*cip);
     op=_RCODE();
     switch (GETOPCODE(op)) {
     /* core instruction set */
@@ -2457,6 +2470,8 @@ int AMXAPI amx_Exec(AMX *amx, cell *retval, int index)
       if ((long)offs>=amx->codesize)
         ABORT(amx,AMX_ERR_MEMACCESS);
       cip=(cell *)(amx->code+(int)offs);
+      //uint ix=(long)offs;
+      //dmsg(amx,"ret: %x,%x\n",ix,amx->codesize);
       stk+=_R(data,stk)+sizeof(cell);   /* remove parameters from the stack */
       break;
     case OP_CALL:
@@ -3361,6 +3376,7 @@ int AMXAPI amx_Exec(AMX *amx, cell *retval, int index)
       break;
 #endif /* AMX_NO_PACKED_OPC */
     default:
+      dmsg(amx,"amx: cip=%x, op=%x\n",amx->cip,op);
       assert(0);  /* invalid instructions should already have been caught in VerifyPcode() */
       ABORT(amx,AMX_ERR_INVINSTR);
     } /* switch */

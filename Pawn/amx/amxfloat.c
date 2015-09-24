@@ -40,7 +40,7 @@
 #define PI  3.1415926535897932384626433832795
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_float(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_float(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -57,7 +57,7 @@ static cell AMX_NATIVE_CALL n_float(AMX *amx,const cell *params)
 }
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_strfloat(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_strfloat(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -90,7 +90,7 @@ static cell AMX_NATIVE_CALL n_strfloat(AMX *amx,const cell *params)
 }
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_floatmul(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatmul(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -103,7 +103,7 @@ static cell AMX_NATIVE_CALL n_floatmul(AMX *amx,const cell *params)
 }
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_floatdiv(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatdiv(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -116,7 +116,7 @@ static cell AMX_NATIVE_CALL n_floatdiv(AMX *amx,const cell *params)
 }
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_floatadd(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatadd(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -129,7 +129,7 @@ static cell AMX_NATIVE_CALL n_floatadd(AMX *amx,const cell *params)
 }
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_floatsub(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatsub(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -143,7 +143,7 @@ static cell AMX_NATIVE_CALL n_floatsub(AMX *amx,const cell *params)
 
 /******************************************************************/
 /* Return fractional part of float */
-static cell AMX_NATIVE_CALL n_floatfract(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatfract(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -157,7 +157,7 @@ static cell AMX_NATIVE_CALL n_floatfract(AMX *amx,const cell *params)
 
 /******************************************************************/
 /* Return integer part of float, rounded */
-static cell AMX_NATIVE_CALL n_floatround(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatround(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -190,7 +190,7 @@ static cell AMX_NATIVE_CALL n_floatround(AMX *amx,const cell *params)
 }
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_floatcmp(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatcmp(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -212,7 +212,7 @@ static cell AMX_NATIVE_CALL n_floatcmp(AMX *amx,const cell *params)
 }
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_floatsqroot(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatsqroot(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -226,7 +226,7 @@ static cell AMX_NATIVE_CALL n_floatsqroot(AMX *amx,const cell *params)
 }
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_floatpower(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatpower(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -241,7 +241,7 @@ static cell AMX_NATIVE_CALL n_floatpower(AMX *amx,const cell *params)
 }
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_floatlog(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatlog(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -260,7 +260,7 @@ static cell AMX_NATIVE_CALL n_floatlog(AMX *amx,const cell *params)
     return amx_ftoc(fValue);
 }
 
-static REAL ToRadians(REAL angle, int radix)
+REAL ToRadians(REAL angle, int radix)
 {
     switch (radix)
     {
@@ -274,7 +274,7 @@ static REAL ToRadians(REAL angle, int radix)
 }
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_floatsin(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatsin(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -289,7 +289,7 @@ static cell AMX_NATIVE_CALL n_floatsin(AMX *amx,const cell *params)
 }
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_floatcos(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatcos(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -304,7 +304,7 @@ static cell AMX_NATIVE_CALL n_floatcos(AMX *amx,const cell *params)
 }
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_floattan(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floattan(AMX *amx,const cell *params)
 {
     /*
     *   params[0] = number of bytes
@@ -319,7 +319,7 @@ static cell AMX_NATIVE_CALL n_floattan(AMX *amx,const cell *params)
 }
 
 /******************************************************************/
-static cell AMX_NATIVE_CALL n_floatabs(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatabs(AMX *amx,const cell *params)
 {
     REAL fA = amx_ctof(params[1]);
     fA = (fA >= 0) ? fA : -fA;
@@ -332,7 +332,7 @@ static cell AMX_NATIVE_CALL n_floatabs(AMX *amx,const cell *params)
 /* Return integer part of float, truncated (same as floatround
  * with mode 3)
  */
-static cell AMX_NATIVE_CALL n_floatint(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_floatint(AMX *amx,const cell *params)
 {
     REAL fA = amx_ctof(params[1]);
     if ( fA>=0.0 )
@@ -341,39 +341,4 @@ static cell AMX_NATIVE_CALL n_floatint(AMX *amx,const cell *params)
         fA = (REAL)(ceil((double)fA));
     (void)amx;
     return (cell)fA;
-}
-
-#if defined __cplusplus
-  extern "C"
-#endif
-const AMX_NATIVE_INFO float_Natives[] = {
-  { "float",       n_float      },
-  { "strfloat",    n_strfloat   },
-  { "floatmul",    n_floatmul   },
-  { "floatdiv",    n_floatdiv   },
-  { "floatadd",    n_floatadd   },
-  { "floatsub",    n_floatsub   },
-  { "floatfract",  n_floatfract },
-  { "floatround",  n_floatround },
-  { "floatcmp",    n_floatcmp   },
-  { "floatsqroot", n_floatsqroot},
-  { "floatpower",  n_floatpower },
-  { "floatlog",    n_floatlog   },
-  { "floatsin",    n_floatsin   },
-  { "floatcos",    n_floatcos   },
-  { "floattan",    n_floattan   },
-  { "floatabs",    n_floatabs   },
-  { "floatint",    n_floatint   },  // also add user-defined operator "="
-  { NULL, NULL }        /* terminator */
-};
-
-int AMXEXPORT AMXAPI amx_FloatInit(AMX *amx)
-{
-  return amx_Register(amx,float_Natives,-1);
-}
-
-int AMXEXPORT AMXAPI amx_FloatCleanup(AMX *amx)
-{
-  (void)amx;
-  return AMX_ERR_NONE;
 }

@@ -180,7 +180,7 @@ static cell extractchar(cell *string,int index,int mklower)
 
 /* strlen(const string[])
  */
-static cell AMX_NATIVE_CALL n_strlen(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_strlen(AMX *amx,const cell *params)
 {
   cell *cptr;
   int len = 0;
@@ -193,7 +193,7 @@ static cell AMX_NATIVE_CALL n_strlen(AMX *amx,const cell *params)
 
 /* strpack(dest[], const source[], maxlength=sizeof dest)
  */
-static cell AMX_NATIVE_CALL n_strpack(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_strpack(AMX *amx,const cell *params)
 {
   cell *cdest,*csrc;
   int len,err;
@@ -213,7 +213,7 @@ static cell AMX_NATIVE_CALL n_strpack(AMX *amx,const cell *params)
 
 /* strunpack(dest[], const source[], maxlength=sizeof dest)
  */
-static cell AMX_NATIVE_CALL n_strunpack(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_strunpack(AMX *amx,const cell *params)
 {
   cell *cdest,*csrc;
   int len,err;
@@ -236,7 +236,7 @@ static cell AMX_NATIVE_CALL n_strunpack(AMX *amx,const cell *params)
  * packed/unpacked attribute is taken from dest[], or from source[] if dest[]
  * is an empty string.
  */
-static cell AMX_NATIVE_CALL n_strcat(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_strcat(AMX *amx,const cell *params)
 {
   cell *cdest,*csrc;
   int len,len2;
@@ -272,7 +272,7 @@ static cell AMX_NATIVE_CALL n_strcat(AMX *amx,const cell *params)
 /* strcopy(dest[], const source[], maxlength=sizeof dest)
  * packed/unpacked attribute from source[]
  */
-static cell AMX_NATIVE_CALL n_strcopy(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_strcopy(AMX *amx,const cell *params)
 {
   cell *cdest,*csrc;
   int len,packed,err;
@@ -322,7 +322,7 @@ static int compare(cell *cstr1,cell *cstr2,int ignorecase,int length,int offs1)
 
 /* strcmp(const string1[], const string2[], bool:ignorecase=false, length=cellmax)
  */
-static cell AMX_NATIVE_CALL n_strcmp(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_strcmp(AMX *amx,const cell *params)
 {
   cell *cstr1,*cstr2;
   int len1,len2,len;
@@ -351,7 +351,7 @@ static cell AMX_NATIVE_CALL n_strcmp(AMX *amx,const cell *params)
 
 /* strfind(const string[], const sub[], bool:ignorecase=false, offset=0)
  */
-static cell AMX_NATIVE_CALL n_strfind(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_strfind(AMX *amx,const cell *params)
 {
   cell *cstr,*csub;
   int lenstr,lensub,offs;
@@ -386,7 +386,7 @@ static cell AMX_NATIVE_CALL n_strfind(AMX *amx,const cell *params)
 /* strmid(dest[], const source[], start, end, maxlength=sizeof dest)
  * packed/unpacked attribute is taken from source[]
  */
-static cell AMX_NATIVE_CALL n_strmid(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_strmid(AMX *amx,const cell *params)
 {
   cell *cdest,*csrc;
   int len,err;
@@ -447,7 +447,7 @@ static cell AMX_NATIVE_CALL n_strmid(AMX *amx,const cell *params)
 
 /* strdel(string[], start, end)
  */
-static cell AMX_NATIVE_CALL n_strdel(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_strdel(AMX *amx,const cell *params)
 {
   cell *cstr;
   int index,offs,length;
@@ -488,7 +488,7 @@ static cell AMX_NATIVE_CALL n_strdel(AMX *amx,const cell *params)
 
 /* strins(string[], const substr[], offset, maxlength=sizeof string)
  */
-static cell AMX_NATIVE_CALL n_strins(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_strins(AMX *amx,const cell *params)
 {
   cell *cstr,*csub;
   int index,lenstr,lensub,count;
@@ -544,7 +544,7 @@ static cell AMX_NATIVE_CALL n_strins(AMX *amx,const cell *params)
 
 /* strval(const string[], index=0)
  */
-static cell AMX_NATIVE_CALL n_strval(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_strval(AMX *amx,const cell *params)
 {
   TCHAR str[50],*ptr;
   cell *cstr,result;
@@ -601,7 +601,7 @@ static cell AMX_NATIVE_CALL n_strval(AMX *amx,const cell *params)
 }
 
 /* valstr(dest[], value, bool:pack=false) */
-static cell AMX_NATIVE_CALL n_valstr(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_valstr(AMX *amx,const cell *params)
 {
   TCHAR str[50];
   cell value,temp;
@@ -636,7 +636,7 @@ static cell AMX_NATIVE_CALL n_valstr(AMX *amx,const cell *params)
 }
 
 /* ispacked(const string[]) */
-static cell AMX_NATIVE_CALL n_ispacked(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_ispacked(AMX *amx,const cell *params)
 {
   cell *cstr=amx_Address(amx,params[1]);
   (void)(amx);
@@ -710,7 +710,7 @@ static int uuencode(char *target, unsigned char *source, int length)
  * than the source size.
  * Endian issues (for multi-byte values in the data stream) are not handled.
  */
-static cell AMX_NATIVE_CALL n_uudecode(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_uudecode(AMX *amx,const cell *params)
 {
   cell *cstr;
   unsigned char dst[BITMASK+2];
@@ -740,7 +740,7 @@ static cell AMX_NATIVE_CALL n_uudecode(AMX *amx,const cell *params)
  * end. A buffer may be encoded "in-place" if the destination is large enough.
  * Endian issues (for multi-byte values in the data stream) are not handled.
  */
-static cell AMX_NATIVE_CALL n_uuencode(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_uuencode(AMX *amx,const cell *params)
 {
   cell *cstr;
   unsigned char src[BITMASK+2];
@@ -773,7 +773,7 @@ static cell AMX_NATIVE_CALL n_uuencode(AMX *amx,const cell *params)
  * A buffer may be decoded "in-place"; the destination size is always
  * smaller than the source size.
  */
-static cell AMX_NATIVE_CALL n_urldecode(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_urldecode(AMX *amx,const cell *params)
 {
   cell *cstr;
   TCHAR *str;
@@ -843,7 +843,7 @@ static cell AMX_NATIVE_CALL n_urldecode(AMX *amx,const cell *params)
  * end. A buffer may be encoded "in-place" if the destination is large enough.
  * Endian issues (for multi-byte values in the data stream) are not handled.
  */
-static cell AMX_NATIVE_CALL n_urlencode(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_urlencode(AMX *amx,const cell *params)
 {
   cell *cstr;
   int length,destlen,count,lastwidth;
@@ -905,7 +905,7 @@ static cell AMX_NATIVE_CALL n_urlencode(AMX *amx,const cell *params)
  * This function allows copying in-place, for aligning memory buffers.
  * Endian issues (for multi-byte values in the data stream) are not handled.
  */
-static cell AMX_NATIVE_CALL n_memcpy(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_memcpy(AMX *amx,const cell *params)
 {
   cell *cdest,*csrc;
   unsigned char *pdest,*psrc;
@@ -942,7 +942,7 @@ static cell AMX_NATIVE_CALL n_memcpy(AMX *amx,const cell *params)
 
 /* strformat(dest[], size=sizeof dest, bool:pack=false, const format[], {Fixed,_}:...)
  */
-static cell AMX_NATIVE_CALL n_strformat(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_strformat(AMX *amx,const cell *params)
 {
   #if defined AMX_NOSTRFMT
     (void)amx;
@@ -973,40 +973,3 @@ static cell AMX_NATIVE_CALL n_strformat(AMX *amx,const cell *params)
   #endif
 }
 
-
-#if defined __cplusplus
-  extern "C"
-#endif
-const AMX_NATIVE_INFO string_Natives[] = {
-  { "ispacked",  n_ispacked },
-  { "memcpy",    n_memcpy },
-  { "strcat",    n_strcat },
-  { "strcmp",    n_strcmp },
-  { "strcopy",   n_strcopy },
-  { "strdel",    n_strdel },
-  { "strfind",   n_strfind },
-  { "strformat", n_strformat },
-  { "strins",    n_strins },
-  { "strlen",    n_strlen },
-  { "strmid",    n_strmid },
-  { "strpack",   n_strpack },
-  { "strunpack", n_strunpack },
-  { "strval",    n_strval },
-  { "uudecode",  n_uudecode },
-  { "uuencode",  n_uuencode },
-  { "urldecode", n_urldecode },
-  { "urlencode", n_urlencode },
-  { "valstr",    n_valstr },
-  { NULL, NULL }        /* terminator */
-};
-
-int AMXEXPORT AMXAPI amx_StringInit(AMX *amx)
-{
-  return amx_Register(amx, string_Natives, -1);
-}
-
-int AMXEXPORT AMXAPI amx_StringCleanup(AMX *amx)
-{
-  (void)amx;
-  return AMX_ERR_NONE;
-}

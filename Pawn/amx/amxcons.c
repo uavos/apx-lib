@@ -63,16 +63,20 @@
 #if defined _UNICODE
 # include <tchar.h>
 #elif !defined __T
-  typedef char          TCHAR;
+#include "ch.h"
+#include "chprintf.h"
+#include "memstreams.h"
+#define _stprintf(s,...)      chsnprintf(s,256,__VA_ARGS__)
+typedef char          TCHAR;
 # define __T(string)    string
 # define _fgetts        fgets
 # define _puttchar      putchar
-# define _stprintf      sprintf
+//# define _stprintf      sprintf
 # define _tcschr        strchr
 # define _tcscpy        strcpy
 # define _tcsdup        strdup
 # define _tcslen        strlen
-# define _tprintf       printf
+//# define _tprintf       printf
 #endif
 #include "amxcons.h"
 
@@ -1079,7 +1083,7 @@ int amx_printstring(AMX *amx,cell *cstr,AMX_FMTINFO *info)
 
 #if defined AMX_ALTPRINT
 /* print(const string[], start=0, end=cellmax) */
-static cell AMX_NATIVE_CALL n_print(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_print(AMX *amx,const cell *params)
 {
   cell *cstr;
   AMX_FMTINFO info;
@@ -1096,7 +1100,7 @@ static cell AMX_NATIVE_CALL n_print(AMX *amx,const cell *params)
 }
 #else
 /* print(const string[], foreground=-1, background=-1, highlight=-1) */
-static cell AMX_NATIVE_CALL n_print(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_print(AMX *amx,const cell *params)
 {
   cell *cstr;
   int oldcolours;
@@ -1116,7 +1120,7 @@ static cell AMX_NATIVE_CALL n_print(AMX *amx,const cell *params)
 }
 #endif
 
-static cell AMX_NATIVE_CALL n_printf(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_printf(AMX *amx,const cell *params)
 {
   cell *cstr;
   AMX_FMTINFO info;
@@ -1135,7 +1139,7 @@ static cell AMX_NATIVE_CALL n_printf(AMX *amx,const cell *params)
 }
 
 /* getchar(bool:echo=true) */
-static cell AMX_NATIVE_CALL n_getchar(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_getchar(AMX *amx,const cell *params)
 {
   int c;
 
@@ -1154,7 +1158,7 @@ static cell AMX_NATIVE_CALL n_getchar(AMX *amx,const cell *params)
 }
 
 /* getstring(string[], size=sizeof string, bool:pack=false) */
-static cell AMX_NATIVE_CALL n_getstring(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_getstring(AMX *amx,const cell *params)
 {
   int c,chars,max;
   cell *cptr;
@@ -1245,7 +1249,7 @@ static int inlist(AMX *amx,int c,const cell *params,int num)
   return 0;
 }
 
-static cell AMX_NATIVE_CALL n_getvalue(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_getvalue(AMX *amx,const cell *params)
 {
   cell value;
   int base,sign,c,d;
@@ -1313,7 +1317,7 @@ static cell AMX_NATIVE_CALL n_getvalue(AMX *amx,const cell *params)
   return sign*value;
 }
 
-static cell AMX_NATIVE_CALL n_clrscr(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_clrscr(AMX *amx,const cell *params)
 {
   (void)amx;
   (void)params;
@@ -1322,7 +1326,7 @@ static cell AMX_NATIVE_CALL n_clrscr(AMX *amx,const cell *params)
   return 0;
 }
 
-static cell AMX_NATIVE_CALL n_clreol(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_clreol(AMX *amx,const cell *params)
 {
   (void)amx;
   (void)params;
@@ -1331,14 +1335,14 @@ static cell AMX_NATIVE_CALL n_clreol(AMX *amx,const cell *params)
   return 0;
 }
 
-static cell AMX_NATIVE_CALL n_gotoxy(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_gotoxy(AMX *amx,const cell *params)
 {
   (void)amx;
   CreateConsole();
   return amx_gotoxy((int)params[1],(int)params[2]);
 }
 
-static cell AMX_NATIVE_CALL n_wherexy(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_wherexy(AMX *amx,const cell *params)
 {
   cell *px,*py;
   int x,y;
@@ -1353,7 +1357,7 @@ static cell AMX_NATIVE_CALL n_wherexy(AMX *amx,const cell *params)
   return 0;
 }
 
-static cell AMX_NATIVE_CALL n_setattr(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_setattr(AMX *amx,const cell *params)
 {
   (void)amx;
   CreateConsole();
@@ -1361,7 +1365,7 @@ static cell AMX_NATIVE_CALL n_setattr(AMX *amx,const cell *params)
   return 0;
 }
 
-static cell AMX_NATIVE_CALL n_consctrl(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_consctrl(AMX *amx,const cell *params)
 {
   (void)amx;
   CreateConsole();
@@ -1369,7 +1373,7 @@ static cell AMX_NATIVE_CALL n_consctrl(AMX *amx,const cell *params)
   return 0;
 }
 
-static cell AMX_NATIVE_CALL n_console(AMX *amx,const cell *params)
+cell AMX_NATIVE_CALL n_console(AMX *amx,const cell *params)
 {
   (void)amx;
   CreateConsole();
