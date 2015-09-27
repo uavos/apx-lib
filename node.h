@@ -21,6 +21,7 @@ typedef struct {
     uint32_t    loader_support: 1;
     uint32_t    in_loader:      1;
     uint32_t    addressing:     1;
+    uint32_t    rebooting:      1;
   }flags;
 }__attribute__((packed)) _node_info;
 // node power, returned by request

@@ -76,7 +76,7 @@ MIDX(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
 MIDX(data,      "Port serial data <port_id>,<data..>")
 MIDX(ldata,     "Port data local <port_id>,<data..>")
 MIDX(can,       "Auxilary CAN data <hdr>,<data..>")
-MIDX(exec,      "Execute VM script <@function>")
+MIDX(vmexec,    "Execute VM script <@function>")
 //other & temporary
 MIDX(sim,       "Simulator wrapped packet <var_idx>,<data..>")
 MIDX(video,     "Video stream <data>")
