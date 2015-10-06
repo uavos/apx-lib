@@ -1,0 +1,162 @@
+//==============================================================================
+#include "Mission.h"
+#include <dmsg.h>
+#include <string.h>
+#include <Mandala>
+//==============================================================================
+Mission::Mission()
+  : size(0)
+{
+}
+void Mission::clear(void)
+{
+  data[0]=0;
+  size=0;
+  current_wp=NULL;
+  current_pi=NULL;
+}
+//==============================================================================
+bool Mission::update(uint8_t *buf,uint cnt)
+{
+  if(cnt>(int)sizeof(data)){
+    dmsg("Error in mission, buffer overflow.\n");
+    return false;
+  }
+  size=cnt;
+  if(buf!=data)memcpy(data,buf,cnt);
+  //check consistency
+  int pos=0;
+  while(pos<(int)cnt){
+    int npos=next(pos,Mission::mi_stop);
+    if(npos<0)break;
+    pos=npos;
+  }
+  if(data[size-1] || (pos+1)!=(int)size){
+    dmsg("Error in mission (%u/%u).\n",pos,cnt);
+    clear();
+    return false;
+  }
+  //default home_pos from mission
+  if(var.home_pos.mag()==0){
+    _item_rw *rw0=rw(0);
+    if(rw0){
+      var.home_pos=Vect(rw0->lat,rw0->lon,rw0->hmsl);
+    }else{
+      _item_wp *wp0=wp(0);
+      if(wp0){
+        var.home_pos=Vect(wp0->lat,wp0->lon,wp0->alt);
+      }
+    }
+  }
+  return true;
+}
+//==============================================================================
+int Mission::next(int pos,_item_type type)
+{
+  bool bFirst;
+  if(pos<0){
+    pos=0;
+    bFirst=true;
+  }else bFirst=false;
+  while(pos<(int)size){
+    if(!bFirst){
+      _item_hdr *hdr=(_item_hdr*)(data+pos);
+      switch(hdr->type){
+        case Mission::mi_wp:
+          pos+=sizeof(_item_wp);
+          break;
+        case Mission::mi_rw:
+          pos+=sizeof(_item_rw);
+          break;
+        case Mission::mi_tw:
+          pos+=sizeof(_item_tw);
+          break;
+        case Mission::mi_pi:
+          pos+=sizeof(_item_pi);
+          break;
+        case Mission::mi_action:
+          pos+=action_size(hdr->option);
+          break;
+        default:
+          return -1;
+      }
+    }else bFirst=false;
+    _item_hdr *hdr=(_item_hdr*)(data+pos);
+    if(type==Mission::mi_stop || type==hdr->type)
+      return pos;
+  }
+  return -1;
+}
+//==============================================================================
+Mission::_item_wp * Mission::wp(int idx)
+{
+  //find waypoint by idx
+  current_wp=NULL;
+  int pos=-1,wpidx=0;
+  while(1){
+    pos=next(pos,Mission::mi_wp);
+    if(pos<0)break;
+    if(idx!=wpidx++)continue;
+    current_wp=(_item_wp*)(data+pos);
+    return current_wp;
+  }
+  return NULL;
+}
+//==============================================================================
+Mission::_item_rw * Mission::rw(int idx)
+{
+  //find runway by idx
+  int pos=-1,rwidx=0;
+  while(1){
+    pos=next(pos,Mission::mi_rw);
+    if(pos<0)break;
+    if(idx!=rwidx++)continue;
+    return (_item_rw*)(data+pos);
+  }
+  return NULL;
+}
+//==============================================================================
+Mission::_item_tw * Mission::tw(int idx)
+{
+  //find taxiway by idx
+  int pos=-1,twidx=0;
+  while(1){
+    pos=next(pos,Mission::mi_tw);
+    if(pos<0)break;
+    if(idx!=twidx++)continue;
+    return (_item_tw*)(data+pos);
+  }
+  return NULL;
+}
+//==============================================================================
+Mission::_item_pi * Mission::pi(int idx)
+{
+  //find point of interest by idx
+  current_pi=NULL;
+  int pos=-1,piidx=0;
+  while(1){
+    pos=next(pos,Mission::mi_pi);
+    if(pos<0)break;
+    if(idx!=piidx++)continue;
+    current_pi=(_item_pi*)(data+pos);
+    return current_pi;
+  }
+  return NULL;
+}
+//==============================================================================
+Mission::_item_action * Mission::action(int idx)
+{
+  if(!current_wp)return NULL;
+  int pos=(uint8_t*)current_wp-data,aidx=0;
+  while(1){
+    pos=next(pos,Mission::mi_stop);
+    if(pos<0)break;
+    _item_action *a=(_item_action*)(data+pos);
+    if(a->hdr.type!=mi_action)return NULL;
+    if(idx!=aidx++)continue;
+    return a;
+  }
+  return NULL;
+}
+//==============================================================================
+

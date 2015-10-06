@@ -55,52 +55,6 @@ public:
   const char *var_name(uint8_t var_idx);
   uint8_t var_index(const char *name);
 
-  //---- Mission (typedefs only) ----
-  typedef enum{
-    mi_stop=0,mi_wp,mi_rw,mi_tw,mi_pi
-  } __mission_item_type;
-  typedef struct{
-    uint8_t type        :4;     //wp,rw,scr, ..
-    uint8_t option      :4;     //left,right,line,hdg, ..
-  }__attribute__((packed)) _mission_item_hdr;
-  typedef struct{
-    _mission_item_hdr hdr;
-    float           lat;
-    float           lon;
-    int16_t         alt;
-    uint8_t         speed;
-  }__attribute__((packed)) _mission_item_wp;
-  typedef enum {owp_hdg,owp_line} _mission_item_wp_option;
-  typedef struct{
-    _mission_item_hdr hdr;
-    float           lat;
-    float           lon;
-    int16_t         hmsl;
-    int16_t         dN;
-    int16_t         dE;
-    uint16_t        approach;
-  }__attribute__((packed)) _mission_item_rw;
-  typedef enum {orw_left,orw_right} _mission_item_rw_option;
-  typedef struct{
-    _mission_item_hdr hdr;
-    float           lat;
-    float           lon;
-  }__attribute__((packed)) _mission_item_tw;
-  typedef struct{
-    _mission_item_hdr hdr;
-    float           lat;
-    float           lon;
-    int16_t         hmsl;
-    int16_t         turnR;
-    uint8_t         loops;
-    uint16_t        timeS;
-  }__attribute__((packed)) _mission_item_pi;
-  typedef struct{
-    _mission_item_hdr hdr;
-    uint8_t   size;
-    uint8_t   data[];
-  }__attribute__((packed)) _mission_item_scr;
-
   //---- Internal use -----
   bool blockDownstream;
   // telemetry framework
