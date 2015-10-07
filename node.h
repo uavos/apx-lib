@@ -21,7 +21,7 @@ typedef struct {
     uint32_t    loader_support: 1;
     uint32_t    in_loader:      1;
     uint32_t    addressing:     1;
-    uint32_t    rebooting:      1;
+    uint32_t    reboot:         1;
   }flags;
 }__attribute__((packed)) _node_info;
 // node power, returned by request
@@ -79,6 +79,7 @@ enum{
   apc_mute,     //stop sending data (sensors)
   apc_reconf,   //reset all conf to defaults
   apc_power,    //return _node_power
+  apc_mem,      //print node memory usage
   apc_shock,    //shock test
 
   //------------------
