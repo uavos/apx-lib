@@ -17,11 +17,12 @@ typedef struct {
   _node_version version;
   _node_version hardware;
   struct{
-    uint32_t    conf_reset:     1;
-    uint32_t    loader_support: 1;
-    uint32_t    in_loader:      1;
-    uint32_t    addressing:     1;
-    uint32_t    reboot:         1;
+    uint32_t    conf_reset:     1;      //set when conf was reset
+    uint32_t    loader_support: 1;      //set if loader available
+    uint32_t    in_loader:      1;      //set in loader
+    uint32_t    addressing:     1;      //set while CAN addressing
+    uint32_t    reboot:         1;      //set when reboot requested
+    uint32_t    busy:           1;      //set when flash write sequence
   }flags;
 }__attribute__((packed)) _node_info;
 // node power, returned by request
