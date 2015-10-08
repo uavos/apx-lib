@@ -49,7 +49,7 @@ typedef struct {
 class Mandala : public MandalaCore
 {
 public:
-  _uav_id         id;
+  _uav_id  id;
 
   bool get_text_names(uint16_t varmsk,const char **name,const char **descr);
   const char *var_name(uint8_t var_idx);

@@ -57,6 +57,8 @@ void Mandala::init(void)
     sz_hd+=pack(dl_var,i);
   }
   dmsg("Mandala %u vars, dl:%u hd:%u\n",cnt,sz,sz_hd);*/
+
+  //dmsg("Mandala %u vars, %X\n",varsCnt,hash32());
 }
 //===========================================================================
 bool Mandala::get_text_names(uint16_t varmsk,const char **name,const char **descr)

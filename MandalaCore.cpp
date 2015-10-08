@@ -20,14 +20,39 @@
  * Floor, Boston, MA 02110-1301, USA.
  *
  */
+#include <string.h>
 #include <stdlib.h>
 #include <dmsg.h>
+#include "crc.h"
 #include "preprocessor.h"
 #include "MandalaCore.h"
 #include "math.h"
 //===========================================================================
 const MandalaCore::_vars_list MandalaCore::vars_gcu = { MANDALA_LIST_GCU,0};
 const MandalaCore::_vars_list MandalaCore::vars_ctr = { MANDALA_LIST_CTR,0};
+//===========================================================================
+/*uint32_t MandalaCore::hash32()
+{
+  uint32_t v=varsCnt<<16;
+  #define MVAR(atype,aname,adescr, ...) \
+  v=hash32_calc(#aname,v); \
+  v=hash32_calc(adescr,v); \
+
+  #define MBIT(avarname,abitname,adescr,amask) \
+  v=hash32_calc(#abitname,v); \
+  v=hash32_calc(adescr,v); \
+  v+=idx_##avarname |( avarname##_##abitname <<8);
+
+  #include "MandalaVars.h"
+  return v;
+}
+uint32_t MandalaCore::hash32_calc(const char *str,uint32_t v)
+{
+  uint sz=strlen(str);
+  uint16_t hL=CRC_16_IBM((const uint8_t*)str,sz,v);
+  uint16_t hH=CRC_SUM((const uint8_t*)str,sz,v>>16);
+  return hL|hH<<16;
+}*/
 //===========================================================================
 _var_float MandalaCore::get_data(uint16_t var_m)
 {

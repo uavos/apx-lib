@@ -1,5 +1,7 @@
-#ifndef CRC_H
-#define CRC_H
+#ifndef CRC_CALC_H
+#define CRC_CALC_H
+#include <inttypes.h>
+#include <sys/types.h>
 //==============================================================================
 static const uint16_t crc16_table[256] =
 {

@@ -216,6 +216,8 @@ public:
   uint unpack_uint_u4(const void *buf,void *value_ptr);
   uint unpack_uint_u2(const void *buf,void *value_ptr);
 
+  //uint32_t hash32(void); //structure hash
+  //uint32_t hash32_calc(const char *str,uint32_t v);
 };
 //=============================================================================
 #endif // MANDALA_CORE_H
