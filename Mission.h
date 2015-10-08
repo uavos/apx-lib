@@ -75,9 +75,12 @@ public:
     union{
       uint8_t         speed;      //0=cruise
       uint8_t         poi;        //linked POI [1...n]
-      uint8_t         loops;      //loops to loiter
       char            scr[16];    //public func @name
-    };
+      struct{
+        uint8_t       loops;      //loops to loiter
+        uint16_t      timeS;      //time to loiter
+      }__attribute__((packed));
+    }__attribute__((packed));
   }__attribute__((packed)) _item_action;
   typedef enum {mo_speed,mo_poi,mo_scr,mo_loiter,mo_shot} _item_action_option;
 
@@ -94,6 +97,8 @@ public:
   _item_wp *current_wp;
   _item_pi *current_pi;
 
+  uint current_timeS; //loiter timeout
+
   static inline int action_size(uint8_t option)
   {
     int sz=sizeof(_item_hdr);
@@ -101,7 +106,7 @@ public:
       case mo_speed: sz+=sizeof(_item_action::speed);break;
       case mo_poi:   sz+=sizeof(_item_action::poi);break;
       case mo_scr:   sz+=sizeof(_item_action::scr);break;
-      case mo_loiter:sz+=sizeof(_item_action::loops);break;
+      case mo_loiter:sz+=sizeof(_item_action::loops)+sizeof(_item_action::timeS);break;
     }
     return sz;
   }
