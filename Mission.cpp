@@ -12,8 +12,11 @@ void Mission::clear(void)
 {
   data[0]=0;
   size=0;
-  current_wp=NULL;
-  current_pi=NULL;
+}
+//==============================================================================
+void Mission::reset_current(void)
+{
+  memset(&current,0,sizeof(current));
 }
 //==============================================================================
 bool Mission::update(uint8_t *buf,uint cnt)
@@ -91,14 +94,14 @@ int Mission::next(int pos,_item_type type)
 Mission::_item_wp * Mission::wp(int idx)
 {
   //find waypoint by idx
-  current_wp=NULL;
+  current.wp=NULL;
   int pos=-1,wpidx=0;
   while(1){
     pos=next(pos,Mission::mi_wp);
     if(pos<0)break;
     if(idx!=wpidx++)continue;
-    current_wp=(_item_wp*)(data+pos);
-    return current_wp;
+    current.wp=(_item_wp*)(data+pos);
+    return current.wp;
   }
   return NULL;
 }
@@ -132,22 +135,22 @@ Mission::_item_tw * Mission::tw(int idx)
 Mission::_item_pi * Mission::pi(int idx)
 {
   //find point of interest by idx
-  current_pi=NULL;
+  current.pi=NULL;
   int pos=-1,piidx=0;
   while(1){
     pos=next(pos,Mission::mi_pi);
     if(pos<0)break;
     if(idx!=piidx++)continue;
-    current_pi=(_item_pi*)(data+pos);
-    return current_pi;
+    current.pi=(_item_pi*)(data+pos);
+    return current.pi;
   }
   return NULL;
 }
 //==============================================================================
 Mission::_item_action * Mission::action(int idx)
 {
-  if(!current_wp)return NULL;
-  int pos=(uint8_t*)current_wp-data,aidx=0;
+  if(!current.wp)return NULL;
+  int pos=(uint8_t*)current.wp-data,aidx=0;
   while(1){
     pos=next(pos,Mission::mi_stop);
     if(pos<0)break;

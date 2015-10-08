@@ -73,10 +73,6 @@ public:
   uint          dl_size;        // last telemetry size statistics
   bool          dl_hd_save;     // to watch change in alt_bytecnt
 
-  uint time_calc_s;
-  _var_float last_dWPT;
-  _var_float dot_dWPT;
-
   Quat quat; //quaternion from AHRS (bodyframe to NED)
 
 

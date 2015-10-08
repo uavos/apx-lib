@@ -43,10 +43,6 @@ void Mandala::init(void)
   dl_reset=true;
   blockDownstream=false;
 
-  time_calc_s=0;
-  last_dWPT=0;
-  dot_dWPT=0;
-
   //------------------------
   //init all vars
 #define MVAR(atype,aname,...) \
@@ -245,34 +241,6 @@ void Mandala::calc(void)
   rwDelta=dWPT*sin((wpHDG+180.0-tgHDG)*D2R)-rwAdj;
   rwDV=rotate(vel_NE,tgHDG)[1];
   gSpeed=distance(vel_NE);
-
-  //ETA
-  uint idt=time-time_calc_s;
-  if(idt>=1000){
-    time_calc_s=time;
-    _var_float dot=(last_dWPT-dWPT);
-    last_dWPT=dWPT;
-    if(dot>(gSpeed*2.0)){ //wpt moved
-      dot_dWPT=gSpeed;
-      ETA=0;
-    }else if(ETA && dot<1){ //stopped after move
-      dot_dWPT=0;
-      //ETA++;
-    }else if(gSpeed<1){ //stopped
-      dot_dWPT=0;
-      ETA=0;
-    }else if(dot<(gSpeed*0.7)){ // wrong course
-      dot_dWPT=gSpeed;
-      ETA=dWPT/dot_dWPT;
-    }else{ //arriving
-      dot_dWPT=gSpeed*0.5+dot_dWPT*0.5;
-      ETA=dWPT/dot_dWPT;
-    }
-    if(ETA>(60*60*48)){
-      ETA=0;
-      dot_dWPT=0;
-    }
-  }
 }
 //=============================================================================
 _var_float Mandala::boundAngle(_var_float v,_var_float span) const
