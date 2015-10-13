@@ -147,8 +147,8 @@ enum{
 #define MGRP1_END       } MGRP1;
 #define MGRP2_BEGIN     class ATPASTE6(_,MGRP0,_,MGRP1,_,MGRP2) : public _mandala_grp { public:
 #define MGRP2_END       } MGRP2;
-#define MFIELD(atype,aname,...)                 MFIELD_TYPE(aname) aname;
-#define MFVECT(atype,aname,v1,v2,v3,...)   MFIELD_TYPE(aname) aname;
+#define MFIELD(atype,aname,...)           MFIELD_TYPE(aname) aname;
+#define MFVECT(atype,aname,v1,v2,v3,...)  MFIELD_TYPE(aname) aname;
 #define MFVEC2(atype,aname,v1,v2,...)     MFIELD_TYPE(aname) aname;
 #include "MandalaFields.h"
 
@@ -194,9 +194,9 @@ public:
     #define MFVEC2(atype,aname,v1,v2,v3,...) \
       case MFIELD_INDEX_VEC(aname,v1): MFIELD_VAR(aname).v1=v;break; \
       case MFIELD_INDEX_VEC(aname,v2): MFIELD_VAR(aname).v2=v;break;
-      switch(index){
-        #include "MandalaFields.h"
-      }
+    switch(index){
+      #include "MandalaFields.h"
+    }
   }
   const char * name(const uint index) const
   {
@@ -208,6 +208,21 @@ public:
     #define MFVEC2(atype,aname,v1,v2,...) \
       case MFIELD_INDEX_VEC(aname,v1): return ASTRINGZ(MFIELD_VAR(aname).v1); \
       case MFIELD_INDEX_VEC(aname,v2): return ASTRINGZ(MFIELD_VAR(aname).v2);
+    switch(index){
+      #include "MandalaFields.h"
+    }
+    return "";
+  }
+  const char * shortname(const uint index) const
+  {
+    #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): return #aname;
+    #define MFVECT(atype,aname,v1,v2,v3,...) \
+      case MFIELD_INDEX_VEC(aname,v1): return #aname; \
+      case MFIELD_INDEX_VEC(aname,v2): return #aname; \
+      case MFIELD_INDEX_VEC(aname,v3): return #aname;
+    #define MFVEC2(atype,aname,v1,v2,...) \
+      case MFIELD_INDEX_VEC(aname,v1): return #aname; \
+      case MFIELD_INDEX_VEC(aname,v2): return #aname;
     switch(index){
       #include "MandalaFields.h"
     }
@@ -235,7 +250,7 @@ public:
       return MFIELD_INDEX_VEC(aname,v1); case MFIELD_INDEX_VEC(aname,v1): \
       return MFIELD_INDEX_VEC(aname,v2); case MFIELD_INDEX_VEC(aname,v2): \
       return MFIELD_INDEX_VEC(aname,v3); case MFIELD_INDEX_VEC(aname,v3):
-      #define MFVEC2(atype,aname,v1,v2,...) \
+    #define MFVEC2(atype,aname,v1,v2,...) \
       return MFIELD_INDEX_VEC(aname,v1); case MFIELD_INDEX_VEC(aname,v1): \
       return MFIELD_INDEX_VEC(aname,v2); case MFIELD_INDEX_VEC(aname,v2):
     switch(index){
@@ -245,6 +260,10 @@ public:
     }
     return 0;
   }
+  static inline bool is_grp0(const uint index) {return (index&((1<<11)-1))==0;}
+  static inline bool is_grp1(const uint index) {return (index&((1<<9)-1))==0;}
+  static inline bool is_grp2(const uint index) {return (index&((1<<4)-1))==0;}
+
 };
 #undef MFIELD_TYPE
 #undef MFIELD_VAR
