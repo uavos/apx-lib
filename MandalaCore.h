@@ -139,12 +139,12 @@ public:
   _var_float inHgToAltitude(_var_float inHg,_var_float inHg_gnd);
 
   //optimizations
-  static inline void memcpy(void *dest,const void *src,uint cnt)
+  static void memcpy(void *dest,const void *src,uint cnt)
   {
     if(cnt==1)*((uint8_t*)dest)=*((const uint8_t*)src);
     else if(cnt>1)::memcpy(dest,src,cnt);
   }
-  static inline int memcmp(const void *s1,const void *s2,uint cnt)
+  static int memcmp(const void *s1,const void *s2,uint cnt)
   {
     if(cnt==1)return *((const uint8_t*)s1)!=*((const uint8_t*)s2);
     else if(cnt>1)return ::memcmp(s1,s2,cnt);

@@ -313,7 +313,7 @@ MVAR(byte,  gps_SU,   "GPS Satellites used [number]",   u1,u1)
 MVAR(vect,  home_pos, "home position: lat,lon,hmsl [deg,deg,m]",f4,f4)
 MVAR(float, altps_gnd,"barometric altitude on ground level [m]",f4,f4)
 MVAR(byte,  errcode,  "error code",                     u1,u1)
-MVAR(float, corr,     "correlator output [K]",          f2,f2)
+MVAR(float, stab,     "Stability [0..1]",          f2,u001)
 
 //--------- payloads --------------
 MVAR(vect,  cam_theta,        "camera orientation: roll,pitch,yaw [deg]",f4,f2)

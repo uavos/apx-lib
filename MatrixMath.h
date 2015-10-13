@@ -49,7 +49,9 @@ typedef int index_t;
 template<const index_t n=3,class T=_mat_float>
 class Vector {
 public:
-  T v[n];
+  typedef T _array[n];
+  _array v;
+
   Vector() {this->fill();}
   Vector(const T &s) { this->fill(s); }
   Vector(const T &s0,const T &s1) {
@@ -150,17 +152,6 @@ public:
 //Normalize a vector
   inline const Vector norm() const {T m=this->mag();if(m==0)return (*this)*m;return (*this)/m;}
   inline Vector & norm_self() {T m=this->mag();if(m==0)return (*this)*=m;return (*this)/=m;}
-
-//quaternion
-  inline const Vector<4> & qbuild(const Vector<3> &eps) {
-    const _mat_float eps2=1.0-eps*eps;
-    const _mat_float eta=eps2<=0?0:sqrt(eps2);
-    (*this)[0]=eta;
-    (*this)[1]=eps[0];
-    (*this)[2]=eps[1];
-    (*this)[3]=eps[2];
-    return (*this);
-  }
 
 }; //Vector class
 //------------------------------------------------------------------------------
@@ -689,15 +680,29 @@ class Quat: public Vector<4>
 {
 public:
   Quat():Vector<4>(){}
-  Quat(const _mat_float &s0,const _mat_float &s1,const _mat_float &s2,const _mat_float &s3) {
+  Quat(const _mat_float &s0,const _mat_float &s1,const _mat_float &s2,const _mat_float &s3)
+  {
     (*this)[0] = s0;
     (*this)[1] = s1;
     (*this)[2] = s2;
     (*this)[3] = s3;
   }
-  Quat(const Vector<3> & euler) {
+
+  Quat(const Vector<3> & euler)
+  {
     fromEuler(euler);
   }
+
+  void qbuild(const Vector<3> &eps)
+  {
+    const _mat_float eps2=1.0-eps*eps;
+    const _mat_float eta=eps2<=0?0:sqrt(eps2);
+    (*this)[0]=eta;
+    (*this)[1]=eps[0];
+    (*this)[2]=eps[1];
+    (*this)[3]=eps[2];
+  }
+
   void qmult(const Quat &q);
   const Vector<3> toEuler() const; //Aerospace
   void fromEuler(const Vector<3> & euler);
