@@ -25,6 +25,7 @@
 #include "MandalaCore.h"
 #include "preprocessor.h"
 //=============================================================================
+#define MANDALA_PACKED_STRUCT   __attribute__((packed))
 typedef _var_float _mandala_float;
 typedef uint32_t   _mandala_uint;
 typedef uint8_t    _mandala_byte;
@@ -32,7 +33,7 @@ typedef uint8_t    _mandala_bit;
 typedef uint8_t    _mandala_enum;
 //=============================================================================
 template <class T=_mandala_float,int tindex=-1>
-struct _mandala_field
+class _mandala_field
 {
 public:
   _mandala_field(){m_value=0;flags_all=0;}
@@ -42,10 +43,10 @@ public:
   inline const T & value() const {return m_value;}
   inline bool isChanged(){return flags.changed;}
   inline void save() {flags.changed=0;}
-  enum{index=tindex};
+  //enum{index=tindex};
 protected:
-  virtual inline const T & getValue(void) const {return m_value;}
-  virtual inline void getValue(const T &v){m_value=v;}
+  //virtual inline const T & getValue(void) const {return m_value;}
+  //virtual inline void getValue(const T &v){m_value=v;}
 private:
   T m_value;
   union{
@@ -92,7 +93,7 @@ typedef struct {
   _msg_id       id;     //1
   _data_hdr     hdr;    //2
   _data         data;   //2+4
-}__attribute__((packed)) _mandala_msg;
+}MANDALA_PACKED_STRUCT _mandala_msg;
 //=============================================================================
 class _mandala
 {
@@ -108,16 +109,17 @@ public:
 #define MFIELD_INDEX(aname) ATPASTE8(index_,MGRP0,_,MGRP1,_,MGRP2,_,aname)
 #define MFIELD_INDEX_VEC(aname,vname) ATPASTE10(index_,MGRP0,_,MGRP1,_,MGRP2,_,aname,_,vname)
 #define MFIELD(atype,aname,...) MFIELD_INDEX(aname),
-#define MFVECT(atype,aname,v1,v2,v3,...) \
-  MFIELD_INDEX_VEC(aname,v1), \
-  MFIELD_INDEX_VEC(aname,v2), \
-  MFIELD_INDEX_VEC(aname,v3),
-#define MFVEC2(atype,aname,v1,v2,...) \
-  MFIELD_INDEX_VEC(aname,v1), \
-  MFIELD_INDEX_VEC(aname,v2),
+#define MFVECT_IMPL(atype,aname,vname,...) MFIELD_INDEX_VEC(aname,vname),
 enum{
 #include "MandalaFields.h"
 };
+
+//enums
+#define MFENUM(aname,ename,descr,value) ATPASTE3(aname,_,ename)=value,
+enum{
+  #include "MandalaFields.h"
+};
+
 
 //fields typedefs
 #define MFIELD_TYPE(aname) ATPASTE8(_,MGRP0,_,MGRP1,_,MGRP2,_,aname)
@@ -143,9 +145,9 @@ enum{
 // struct
 #define MGRP0_BEGIN     class ATPASTE2(_,MGRP0) : public _mandala_grp { public:
 #define MGRP0_END       } MGRP0;
-#define MGRP1_BEGIN     class ATPASTE4(_,MGRP0,_,MGRP1) : public _mandala_grp { public:
+#define MGRP1_BEGIN     class ATPASTE2(_,MGRP1) : public _mandala_grp { public:
 #define MGRP1_END       } MGRP1;
-#define MGRP2_BEGIN     class ATPASTE6(_,MGRP0,_,MGRP1,_,MGRP2) : public _mandala_grp { public:
+#define MGRP2_BEGIN     class ATPASTE2(_,MGRP2) : public _mandala_grp { public:
 #define MGRP2_END       } MGRP2;
 #define MFIELD(atype,aname,...)           MFIELD_TYPE(aname) aname;
 #define MFVECT(atype,aname,v1,v2,v3,...)  MFIELD_TYPE(aname) aname;
@@ -158,13 +160,7 @@ public:
   _mandala_float value(const uint index) const
   {
     #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): return MFIELD_VAR(aname).value();
-    #define MFVECT(atype,aname,v1,v2,v3,...) \
-      case MFIELD_INDEX_VEC(aname,v1): return MFIELD_VAR(aname).v1.value(); \
-      case MFIELD_INDEX_VEC(aname,v2): return MFIELD_VAR(aname).v2.value(); \
-      case MFIELD_INDEX_VEC(aname,v3): return MFIELD_VAR(aname).v3.value();
-    #define MFVEC2(atype,aname,v1,v2,v3,...) \
-      case MFIELD_INDEX_VEC(aname,v1): return MFIELD_VAR(aname).v1.value(); \
-      case MFIELD_INDEX_VEC(aname,v2): return MFIELD_VAR(aname).v2.value();
+    #define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): return MFIELD_VAR(aname).vname.value();
     switch(index){
       #include "MandalaFields.h"
     }
@@ -173,13 +169,7 @@ public:
   void setValue(const uint index,const _mandala_float &v)
   {
     #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): MFIELD_VAR(aname)=v;break;
-    #define MFVECT(atype,aname,v1,v2,v3,...) \
-      case MFIELD_INDEX_VEC(aname,v1): MFIELD_VAR(aname).v1=v;break; \
-      case MFIELD_INDEX_VEC(aname,v2): MFIELD_VAR(aname).v2=v;break; \
-      case MFIELD_INDEX_VEC(aname,v3): MFIELD_VAR(aname).v3=v;break;
-    #define MFVEC2(atype,aname,v1,v2,v3,...) \
-      case MFIELD_INDEX_VEC(aname,v1): MFIELD_VAR(aname).v1=v;break; \
-      case MFIELD_INDEX_VEC(aname,v2): MFIELD_VAR(aname).v2=v;break;
+    #define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): MFIELD_VAR(aname).vname=v;break;
     switch(index){
       #include "MandalaFields.h"
     }
@@ -187,13 +177,7 @@ public:
   void setValue(const uint index,const uint &v)
   {
     #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): MFIELD_VAR(aname)=v;break;
-    #define MFVECT(atype,aname,v1,v2,v3,...) \
-      case MFIELD_INDEX_VEC(aname,v1): MFIELD_VAR(aname).v1=v;break; \
-      case MFIELD_INDEX_VEC(aname,v2): MFIELD_VAR(aname).v2=v;break; \
-      case MFIELD_INDEX_VEC(aname,v3): MFIELD_VAR(aname).v3=v;break;
-    #define MFVEC2(atype,aname,v1,v2,v3,...) \
-      case MFIELD_INDEX_VEC(aname,v1): MFIELD_VAR(aname).v1=v;break; \
-      case MFIELD_INDEX_VEC(aname,v2): MFIELD_VAR(aname).v2=v;break;
+    #define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): MFIELD_VAR(aname).vname=v;break;
     switch(index){
       #include "MandalaFields.h"
     }
@@ -201,13 +185,7 @@ public:
   const char * name(const uint index) const
   {
     #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): return ASTRINGZ(MFIELD_VAR(aname));
-    #define MFVECT(atype,aname,v1,v2,v3,...) \
-      case MFIELD_INDEX_VEC(aname,v1): return ASTRINGZ(MFIELD_VAR(aname).v1); \
-      case MFIELD_INDEX_VEC(aname,v2): return ASTRINGZ(MFIELD_VAR(aname).v2); \
-      case MFIELD_INDEX_VEC(aname,v3): return ASTRINGZ(MFIELD_VAR(aname).v3);
-    #define MFVEC2(atype,aname,v1,v2,...) \
-      case MFIELD_INDEX_VEC(aname,v1): return ASTRINGZ(MFIELD_VAR(aname).v1); \
-      case MFIELD_INDEX_VEC(aname,v2): return ASTRINGZ(MFIELD_VAR(aname).v2);
+    #define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): return ASTRINGZ(MFIELD_VAR(aname).vname);
     switch(index){
       #include "MandalaFields.h"
     }
@@ -216,13 +194,7 @@ public:
   const char * shortname(const uint index) const
   {
     #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): return #aname;
-    #define MFVECT(atype,aname,v1,v2,v3,...) \
-      case MFIELD_INDEX_VEC(aname,v1): return #aname; \
-      case MFIELD_INDEX_VEC(aname,v2): return #aname; \
-      case MFIELD_INDEX_VEC(aname,v3): return #aname;
-    #define MFVEC2(atype,aname,v1,v2,...) \
-      case MFIELD_INDEX_VEC(aname,v1): return #aname; \
-      case MFIELD_INDEX_VEC(aname,v2): return #aname;
+    #define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): return #aname;
     switch(index){
       #include "MandalaFields.h"
     }
@@ -231,13 +203,7 @@ public:
   const char * descr(const uint index) const
   {
     #define MFIELD(atype,aname,adescr,...) case MFIELD_INDEX(aname): return adescr;
-    #define MFVECT(atype,aname,v1,v2,v3,adescr,...) \
-      case MFIELD_INDEX_VEC(aname,v1): return adescr; \
-      case MFIELD_INDEX_VEC(aname,v2): return adescr; \
-      case MFIELD_INDEX_VEC(aname,v3): return adescr;
-    #define MFVEC2(atype,aname,v1,v2,adescr,...) \
-      case MFIELD_INDEX_VEC(aname,v1): return adescr; \
-      case MFIELD_INDEX_VEC(aname,v2): return adescr;
+    #define MFVECT_IMPL(atype,aname,vname,adescr,...) case MFIELD_INDEX_VEC(aname,vname): return adescr;
     switch(index){
       #include "MandalaFields.h"
     }
@@ -246,13 +212,7 @@ public:
   uint index_next(const uint index) const
   {
     #define MFIELD(atype,aname,...) return MFIELD_INDEX(aname); case MFIELD_INDEX(aname):
-    #define MFVECT(atype,aname,v1,v2,v3,...) \
-      return MFIELD_INDEX_VEC(aname,v1); case MFIELD_INDEX_VEC(aname,v1): \
-      return MFIELD_INDEX_VEC(aname,v2); case MFIELD_INDEX_VEC(aname,v2): \
-      return MFIELD_INDEX_VEC(aname,v3); case MFIELD_INDEX_VEC(aname,v3):
-    #define MFVEC2(atype,aname,v1,v2,...) \
-      return MFIELD_INDEX_VEC(aname,v1); case MFIELD_INDEX_VEC(aname,v1): \
-      return MFIELD_INDEX_VEC(aname,v2); case MFIELD_INDEX_VEC(aname,v2):
+    #define MFVECT_IMPL(atype,aname,vname,...) return MFIELD_INDEX_VEC(aname,vname); case MFIELD_INDEX_VEC(aname,vname):
     switch(index){
       case -1:
       #include "MandalaFields.h"
@@ -270,6 +230,22 @@ public:
 #undef MFIELD_INDEX
 #undef MFIELD_INDEX_VEC
 //-----------------------------------------------------------------------------
+/*extern _mandala mf;
+class _mandala_vehicle : public _mandala::_vehicle
+{
+public:
+  inline _mandala::_vehicle & operator=(const _mandala::_vehicle &v){mf.vehicle=v;return mf.vehicle;}
+  inline operator _mandala::_vehicle() const {return mf.vehicle;}
+
+};
+class _test : public _mandala_vehicle
+{
+public:
+  _test()
+  {
+    sensor.imu.temp=12.34;
+  }
+};*/
 //=============================================================================
 #endif
 //=============================================================================
@@ -297,16 +273,19 @@ public:
 #ifndef MFIELD
 #define MFIELD(...)
 #endif
+#ifndef MFVECT_IMPL
+#define MFVECT_IMPL(atype,aname,vname,...) MFIELD(atype,vname,__VA_ARGS__)
+#endif
 #ifndef MFVECT
 #define MFVECT(atype,aname,v1,v2,v3,...) \
-  MFIELD(atype,v1,__VA_ARGS__) \
-  MFIELD(atype,v2,__VA_ARGS__) \
-  MFIELD(atype,v3,__VA_ARGS__)
+  MFVECT_IMPL(atype,aname,v1,__VA_ARGS__) \
+  MFVECT_IMPL(atype,aname,v2,__VA_ARGS__) \
+  MFVECT_IMPL(atype,aname,v3,__VA_ARGS__)
 #endif
 #ifndef MFVEC2
 #define MFVEC2(atype,aname,v1,v2,...) \
-  MFIELD(atype,v1,__VA_ARGS__) \
-  MFIELD(atype,v2,__VA_ARGS__)
+  MFVECT_IMPL(atype,aname,v1,__VA_ARGS__) \
+  MFVECT_IMPL(atype,aname,v2,__VA_ARGS__)
 #endif
 #ifndef MFENUM
 #define MFENUM(...)
@@ -323,7 +302,7 @@ MGRP2_BEGIN
 MFVECT(float,  acc,x,y,z, "Acceleration [m/s2]", f2)
 MFVECT(float,  gyro,p,q,r,"Angular rate [deg/s]", f2)
 MFVECT(float,  mag,x,y,z, "Magnetic field [a.u.]", f2)
-MFIELD(float,  temp,      "IMU Temperature [C]", f2)
+MFIELD(float,  temp,      "IMU temperature [C]", f2)
 MGRP2_END
 #undef MGRP2
 
@@ -393,35 +372,35 @@ MGRP2_END
 
 #define MGRP2   power
 MGRP2_BEGIN
-MFIELD(float, Ve,    "system battery voltage [v]", f2)
-MFIELD(float, Vs,    "servo battery voltage [v]", f2)
-MFIELD(float, Vp,    "payload battery voltage [v]", f2)
-MFIELD(float, Vm,    "engine battery voltage [v]", f2)
-MFIELD(float, Ie,    "system current [A]", u001)
-MFIELD(float, Is,    "servo current [A]", u01)
-MFIELD(float, Ip,    "payload current [A]", u01)
-MFIELD(float, Im,    "engine current [A]", u1)
+MFIELD(float, Ve,    "System battery voltage [v]", f2)
+MFIELD(float, Vs,    "Servo battery voltage [v]", f2)
+MFIELD(float, Vp,    "Payload battery voltage [v]", f2)
+MFIELD(float, Vm,    "Engine battery voltage [v]", f2)
+MFIELD(float, Ie,    "System current [A]", u001)
+MFIELD(float, Is,    "Servo current [A]", u01)
+MFIELD(float, Ip,    "Payload current [A]", u01)
+MFIELD(float, Im,    "Engine current [A]", u1)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   engine
 MGRP2_BEGIN
-MFIELD(uint,  rpm,      "engine RPM [1/min]", u2)
-MFIELD(uint,  prop_rpm, "prop RPM [1/min]", u2)
-MFIELD(float, fuel,     "fuel capacity [l]", f2)
-MFIELD(float, frate,    "fuel flow rate [l/h]", f2)
-MFIELD(float, ET,       "engine temperature [C]", u1)
-MFIELD(float, EGT,      "exhaust gas temperature [C]", u10)
-MFIELD(float, OT,       "oil temperature [C]", u1)
-MFIELD(float, OP,       "oil pressure [atm]", u01)
+MFIELD(uint,  rpm,      "Engine RPM [1/min]", u2)
+MFIELD(uint,  prop_rpm, "Prop RPM [1/min]", u2)
+MFIELD(float, fuel,     "Fuel capacity [l]", f2)
+MFIELD(float, frate,    "Fuel flow rate [l/h]", f2)
+MFIELD(float, ET,       "Engine temperature [C]", u1)
+MFIELD(float, EGT,      "Exhaust gas temperature [C]", u10)
+MFIELD(float, OT,       "Oil temperature [C]", u1)
+MFIELD(float, OP,       "Oil pressure [atm]", u01)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   temp
 MGRP2_BEGIN
-MFIELD(float, AT,       "ambient temperature [C]", s1)
-MFIELD(float, RT,       "room temperature [C]", s1)
-MFIELD(float, MT,       "modem temperature [C]", s1)
+MFIELD(float, AT,       "Ambient temperature [C]", s1)
+MFIELD(float, RT,       "Room temperature [C]", s1)
+MFIELD(float, MT,       "Modem temperature [C]", s1)
 MGRP2_END
 #undef MGRP2
 
@@ -446,21 +425,21 @@ MGRP2_END
 #define MGRP2   steering
 MGRP2_BEGIN
 MFVEC2(float, vel,left,right,     "Steering velocity [m/s]", f2)
-MFIELD(float, HDG,                      "Steering heading [deg]", f2)
+MFIELD(float, HDG,                "Steering heading [deg]", f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   controls
 MGRP2_BEGIN
-MFIELD(float, s1, "Controls sensor 1", f2)
-MFIELD(float, s2, "Controls sensor 2", f2)
-MFIELD(float, s3, "Controls sensor 3", f2)
-MFIELD(float, s4, "Controls sensor 4", f2)
-MFIELD(float, s5, "Controls sensor 5", f2)
-MFIELD(float, s6, "Controls sensor 6", f2)
-MFIELD(float, s7, "Controls sensor 7", f2)
-MFIELD(float, s8, "Controls sensor 8", f2)
-MFIELD(float, s9, "Controls sensor 9", f2)
+MFIELD(float, s1,  "Controls sensor 1", f2)
+MFIELD(float, s2,  "Controls sensor 2", f2)
+MFIELD(float, s3,  "Controls sensor 3", f2)
+MFIELD(float, s4,  "Controls sensor 4", f2)
+MFIELD(float, s5,  "Controls sensor 5", f2)
+MFIELD(float, s6,  "Controls sensor 6", f2)
+MFIELD(float, s7,  "Controls sensor 7", f2)
+MFIELD(float, s8,  "Controls sensor 8", f2)
+MFIELD(float, s9,  "Controls sensor 9", f2)
 MFIELD(float, s10, "Controls sensor 10", f2)
 MFIELD(float, s11, "Controls sensor 11", f2)
 MFIELD(float, s12, "Controls sensor 12", f2)
@@ -492,41 +471,41 @@ MGRP1_BEGIN
 
 #define MGRP2   stability
 MGRP2_BEGIN
-MFIELD(float,  ail,    "ailerons [-1..0..+1]", s001)
-MFIELD(float,  elv,    "elevator [-1..0..+1]", s001)
-MFIELD(float,  rud,    "rudder [-1..0..+1]", s001)
-MFIELD(float,  collective, "collective pitch [-1..0..+1]", s001)
-MFIELD(float,  steering,   "steering [-1..0..+1]", s001)
+MFIELD(float,  ail,     "Ailerons [-1..0..+1]", s001)
+MFIELD(float,  elv,     "Elevator [-1..0..+1]", s001)
+MFIELD(float,  rud,     "Rudder [-1..0..+1]", s001)
+MFIELD(float,  collective, "Collective pitch [-1..0..+1]", s001)
+MFIELD(float,  steering,   "Steering [-1..0..+1]", s001)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   engine
 MGRP2_BEGIN
-MFIELD(float,  thr,     "throttle [0..1]", u001)
-MFIELD(float,  prop,    "prop pitch [-1..0..+1]", s001)
-MFIELD(float,  mix,     "mixture [0..1]", u001)
-MFIELD(float,  tune,    "engine tuning [0..1]", u001)
-MFIELD(float,  vector,  "thrust vector [-1..0..+1]", s001)
-MFIELD(bit,    starter, "engine starter on/off", )
-MFIELD(bit,    rev,     "engine reverse on/off", )
+MFIELD(float,  thr,     "Throttle [0..1]", u001)
+MFIELD(float,  prop,    "Prop pitch [-1..0..+1]", s001)
+MFIELD(float,  mix,     "Mixture [0..1]", u001)
+MFIELD(float,  tune,    "Engine tuning [0..1]", u001)
+MFIELD(float,  vector,  "Thrust vector [-1..0..+1]", s001)
+MFIELD(bit,    starter, "Engine starter on/off", )
+MFIELD(bit,    rev,     "Engine reverse on/off", )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   wing
 MGRP2_BEGIN
-MFIELD(float,  flaps,   "flaps [0..1]", u001)
-MFIELD(float,  airbrk,  "airbrakes [0..1]", u001)
-MFIELD(float,  slats,   "wing slats [0..1]", u001)
-MFIELD(float,  sweep,   "wing sweep [-1..0..+1]", s001)
-MFIELD(float,  buoyancy,"buoyancy [-1..0..+1]", s001)
+MFIELD(float,  flaps,   "Flaps [0..1]", u001)
+MFIELD(float,  airbrk,  "Airbrakes [0..1]", u001)
+MFIELD(float,  slats,   "Wing slats [0..1]", u001)
+MFIELD(float,  sweep,   "Wing sweep [-1..0..+1]", s001)
+MFIELD(float,  buoyancy,"Buoyancy [-1..0..+1]", s001)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   brakes
 MGRP2_BEGIN
-MFIELD(float,  brake,   "brake [0..1]", u001)
-MFIELD(float,  brakeL,  "left brake [0..1]", u001)
-MFIELD(float,  brakeR,  "right brake [0..1]", u001)
+MFIELD(float,  brake,   "Brake [0..1]", u001)
+MFIELD(float,  brakeL,  "Left brake [0..1]", u001)
+MFIELD(float,  brakeR,  "Right brake [0..1]", u001)
 MGRP2_END
 #undef MGRP2
 
@@ -583,10 +562,10 @@ MGRP2_END
 
 #define MGRP2   sw
 MGRP2_BEGIN
-MFIELD(bit,  sw1,    "switch 1 on/off", )
-MFIELD(bit,  sw2,    "switch 2 on/off", )
-MFIELD(bit,  sw3,    "switch 3 on/off", )
-MFIELD(bit,  sw4,    "switch 4 on/off", )
+MFIELD(bit,  sw1,    "Switch 1 on/off", )
+MFIELD(bit,  sw2,    "Switch 2 on/off", )
+MFIELD(bit,  sw3,    "Switch 3 on/off", )
+MFIELD(bit,  sw4,    "Switch 4 on/off", )
 MGRP2_END
 #undef MGRP2
 
@@ -598,13 +577,13 @@ MGRP1_BEGIN
 
 #define MGRP2   ahrs
 MGRP2_BEGIN
-MFVECT(float, att,roll,pitch,yaw,    "attitude [deg]", f2)
-MFIELD(float, lat,  "Latitude [deg]", f4)
-MFIELD(float, lon,  "Longitude [deg]", f4)
-MFVEC2(float, NE,N,E, "Local position [m]", f4)
-MFVEC2(float, vel,N,E, "Local velocity [m/s]", f2)
-MFIELD(float, course,  "Moving direction [deg]", f2)
-MFIELD(float, gSpeed,  "Ground speed [m/s]", f2)
+MFVECT(float, att,roll,pitch,yaw,    "Attitude [deg]", f2)
+MFIELD(float, lat,      "Latitude [deg]", f4)
+MFIELD(float, lon,      "Longitude [deg]", f4)
+MFVEC2(float, NE,N,E,   "Local position [m]", f4)
+MFVEC2(float, vel,N,E,  "Local velocity [m/s]", f2)
+MFIELD(float, course,   "Moving direction [deg]", f2)
+MFIELD(float, gSpeed,   "Ground speed [m/s]", f2)
 MGRP2_END
 #undef MGRP2
 
@@ -616,6 +595,8 @@ MFIELD(float, vspeed,   "Vertical speed [m/s]", f2)
 MFIELD(float, ldratio,  "Glide ratio [Lift/Drag]", f2)
 MFIELD(float, venergy,  "Compensated variometer [m/s]", f2)
 MFIELD(float, agl,      "Above Ground Level altitude [m]", f2)
+MFIELD(float, vcas,     "Airspeed derivative [m/s^2]", f2)
+MFIELD(float, denergy,  "Venergy derivative [m/s^2]", f2)
 MGRP2_END
 #undef MGRP2
 
@@ -626,14 +607,12 @@ MFIELD(bit,  gps,    "GPS available/lost", )
 MFIELD(bit,  agl,    "AGL available/off", )
 MFIELD(bit,  uplink, "Uplink available/lost", )
 MFIELD(bit,  touch,  "Landing gear touchdown/floating", )
-MFIELD(float,corr,   "Correlator output [K]", f2)
-MFIELD(float,stab,   "Stability [0..1]", u001)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   error
 MGRP2_BEGIN
-MFIELD(byte,  code,     "error code", u1)
+MFIELD(byte,  code,     "Error code", u1)
 MFIELD(bit,  fatal,     "Fatal error/ok", )
 MFIELD(bit,  power,     "Power supply error/ok", )
 MFIELD(bit,  cas,       "CAS error", )
@@ -676,9 +655,11 @@ MFIELD(byte,  wpidx,     "current waypoint [0..255]", u1)
 MFIELD(byte,  rwidx,     "current runway [0..255]", u1)
 MFIELD(byte,  twidx,     "current taxiway [0..255]", u1)
 MFIELD(byte,  piidx,     "current point of interest [0..255]", u1)
-MFIELD(enum,  type,      "Mission maneuver type", )
-MFENUM(type,   hdg,     "Heading navigation",      0)
-MFENUM(type,   line,    "Line navigation",         1)
+MFIELD(enum,  mtype,     "Mission maneuver type", )
+MFENUM(mtype,   hdg,     "Heading navigation",      0)
+MFENUM(mtype,   line,    "Line navigation",         1)
+MFIELD(uint,  loops,     "Number of remaining turns or loops [0..255]", u1)
+MFIELD(float, turnR,     "Current circle radius [m]", f2)
 MGRP2_END
 #undef MGRP2
 
@@ -694,14 +675,14 @@ MGRP2_END
 
 #define MGRP2   nav
 MGRP2_BEGIN
-MFIELD(float, turnR,     "Current circle radius [m]", f2)
+MFIELD(float, stab,      "Stability [0..1]", u001)
+MFIELD(float, corr,      "Correlator output [K]", f2)
 MFIELD(float, delta,     "General delta (depends on mode) [m]", f2)
-MFIELD(uint,  loops,     "Number of remaining turns or loops [0..255]", u1)
-MFIELD(float, rwAdj,     "runway displacement adjust [m]", s1)
+MFVEC2(float, dXY,x,y,   "Bodyframe delta [m]", f2)
+MFVEC2(float, vXY,x,y,   "Bodyframe velocity [m/s]", f2)
+MFIELD(float, rwAdj,     "Runway displacement adjust [m]", s1)
 MFIELD(float, rwDelta,   "Runway alignment [m]", f2)
 MFIELD(float, rwDV,      "Runway alignment velocity [m/s]", f2)
-MFVEC2(float, dXY,x,y,   "bodyframe delta [m]", f2)
-MFVEC2(float, vXY,x,y,   "bodyframe velocity [m/s]", f2)
 MGRP2_END
 #undef MGRP2
 
@@ -779,11 +760,122 @@ MGRP0_END
 MGRP0_BEGIN
 #define MGRP1   cam
 MGRP1_BEGIN
+
 #define MGRP2   imu
 MGRP2_BEGIN
-//MFIELD(float, temp,    "Airspeed [m/s]",                       f2)
+MFVECT(float,   acc,x,y,z, "Cam acceleration [m/s2]", f2)
+MFVECT(float,   gyro,p,q,r,"Cam angular rate [deg/s]", f2)
+MFVECT(float,   mag,x,y,z, "Cam magnetic field [a.u.]", f2)
+MFIELD(float,   temp,      "Cam IMU temperature [C]", f2)
 MGRP2_END
 #undef MGRP2
+
+#define MGRP2   state
+MGRP2_BEGIN
+MFVECT(float, att,roll,pitch,yaw, "Cam attitude [deg]", f2)
+MFIELD(uint,  timestamp, "Cam timestamp [ms]", u4)
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   cmd
+MGRP2_BEGIN
+MFIELD(enum,  camop,     "Cam control mode", )
+MFENUM(camop,   off,     "camera off",                   0)
+MFENUM(camop,   fixed,   "fixed position",               1)
+MFENUM(camop,   stab,    "gyro stabilization",           2)
+MFENUM(camop,   position,"attitude position",            3)
+MFENUM(camop,   speed,   "attitude speed control",       4)
+MFENUM(camop,   target,  "target position tracking",     5)
+MFVECT(float, att,roll,pitch,yaw,       "Commanded cam attitude [deg]", f4)
+MFIELD(float, zoom,     "Cam zoom level [0..1]", f2)
+MFIELD(float, focus,    "Cam focus [0..1]", f2)
+MFIELD(uint,  tperiod,  "Cam period for timestamps [ms]", u2)
+MFIELD(byte,  ch,       "Video channel [0..255]", u1)
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   tune
+MGRP2_BEGIN
+MFVECT(float, bias,roll,pitch,yaw,       "Cam stability bias [deg/s]", f4)
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   options
+MGRP2_BEGIN
+MFIELD(bit, PF,     "picture flip on/off", )
+MFIELD(bit, NIR,    "NIR filter on/off", )
+MFIELD(bit, DSP,    "display information on/off",)
+MFIELD(bit, FMI,    "focus mode infinity/auto", )
+MFIELD(bit, FM,     "focus manual/auto", )
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   control
+MGRP2_BEGIN
+MFVECT(float, servo,roll,pitch,yaw, "Cam servo [-1..0..+1]", s001)
+MFIELD(bit,   rec,      "Recording", )
+MFIELD(bit,   shot,     "Snapshot", )
+MFIELD(bit,   ashot,    "Series snapshots", )
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   tracking
+MGRP2_BEGIN
+MFVECT(float,  pos,lat,lon,hmsl,"Tracking position [deg,deg,m]", f4)
+MFIELD(float,  DME,             "Distance to tracking object [m]", u2)
+MGRP2_END
+#undef MGRP2
+
+MGRP1_END
+#undef MGRP1
+//-------------------------
+#define MGRP1   turret
+MGRP1_BEGIN
+
+#define MGRP2   state
+MGRP2_BEGIN
+MFVECT(float, att,roll,pitch,yaw, "Turret attitude [deg]", f2)
+MFVECT(float, enc,roll,pitch,yaw, "Turret encoders [deg]", f4)
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   cmd
+MGRP2_BEGIN
+MFIELD(enum,  turret,     "Turret control mode", )
+MFENUM(turret,   off,     "turret off",                   0)
+MFENUM(turret,   fixed,   "fixed position",               1)
+MFENUM(turret,   stab,    "gyro stabilization",           2)
+MFENUM(turret,   position,"attitude position",            3)
+MFENUM(turret,   speed,   "attitude speed control",       4)
+MFVECT(float, att,roll,pitch,yaw,       "Commanded turret attitude [deg]", f4)
+MFIELD(byte,  ammo,     "Turret ammunition [0..255]", u1)
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   tune
+MGRP2_BEGIN
+MFVECT(float, bias,roll,pitch,yaw,       "Turret stability bias [deg/s]", f4)
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   options
+MGRP2_BEGIN
+MFIELD(bit, armed,     "Turret armed/disarmed",        )
+MFIELD(bit, shoot,     "Turret shooting/standby",      )
+MFIELD(bit, reload,    "Turret reloading/reloaded",    )
+MFIELD(bit, sw1,       "Turret switch1 on/off",        )
+MFIELD(bit, sw2,       "Turret switch2 on/off",        )
+MFIELD(bit, sw3,       "Turret switch3 on/off",        )
+MFIELD(bit, sw4,       "Turret switch4 on/off",        )
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   control
+MGRP2_BEGIN
+MFVECT(float, servo,roll,pitch,yaw, "Turret servo [-1..0..+1]", s001)
+MGRP2_END
+#undef MGRP2
+
 MGRP1_END
 #undef MGRP1
 MGRP0_END
@@ -799,6 +891,7 @@ MGRP0_END
 #undef MGRP2_BEGIN
 #undef MGRP2_END
 #undef MFIELD
+#undef MFVECT_IMPL
 #undef MFVECT
 #undef MFVEC2
 #undef MFENUM
