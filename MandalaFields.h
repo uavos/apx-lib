@@ -32,33 +32,7 @@ typedef uint8_t    _mandala_byte;
 typedef uint8_t    _mandala_bit;
 typedef uint8_t    _mandala_enum;
 //=============================================================================
-template <class T=_mandala_float,int tindex=-1>
-class _mandala_field
-{
-public:
-  _mandala_field(){m_value=0;flags_all=0;}
-  inline T & operator=(const T &v){m_value=v;flags_all=1;return m_value;}
-  inline operator T() const {return m_value;}
-
-  inline const T & value() const {return m_value;}
-  inline bool isChanged(){return flags.changed;}
-  inline void save() {flags.changed=0;}
-  //enum{index=tindex};
-protected:
-  //virtual inline const T & getValue(void) const {return m_value;}
-  //virtual inline void getValue(const T &v){m_value=v;}
-private:
-  T m_value;
-  union{
-    struct{
-      uint8_t changed     :1;
-    }flags;
-    uint8_t flags_all;
-  };
-};
 //=============================================================================
-class _mandala_grp {};
-class _mandala_field_vect {};
 //=============================================================================
 typedef struct {
   //typedefs
@@ -121,40 +95,90 @@ enum{
 };
 
 
+  template <class T,int tindex>
+  class _field
+  {
+  public:
+    _field(){m_value=0;flags_all=0;}
+    inline T & operator=(const T &v){m_value=v;flags_all=1;return m_value;}
+    inline operator T() const {return m_value;}
+
+    inline const T & value() const {return m_value;}
+    inline bool isChanged() const {return flags.changed;}
+    inline void save() {flags.changed=0;}
+    enum{index=tindex};
+  protected:
+    //virtual inline const T & getValue(void) const {return m_value;}
+    //virtual inline void getValue(const T &v){m_value=v;}
+  private:
+    T m_value;
+    union{
+      struct{
+        uint8_t changed     :1;
+      }flags;
+      uint8_t flags_all;
+    };
+  };
+  class _group {};
+  class _vect {};
+  class c {};
+
+  template <class T,int tindex,const char *name>
+  class _field_ext : public _field<T,tindex>
+  {
+  };
+  //static const char *test="";
+
 //fields typedefs
+#define MFIELD_VAR(aname) MGRP0.MGRP1.MGRP2.aname
 #define MFIELD_TYPE(aname) ATPASTE8(_,MGRP0,_,MGRP1,_,MGRP2,_,aname)
-#define MFIELD(atype,aname,...)         typedef _mandala_field<_mandala_##atype,MFIELD_INDEX(aname)> MFIELD_TYPE(aname);
+
+#define MFIELD(atype,aname,...)         typedef _field<_mandala_##atype,MFIELD_INDEX(aname)> MFIELD_TYPE(aname);
 #define MFVECT(atype,aname,v1,v2,v3,...) \
-  class MFIELD_TYPE(aname) : public _mandala_field_vect { public: \
+  class MFIELD_TYPE(aname) : public _vect { public: \
     operator Vector<3,atype>()const{return Vector<3,atype>(v1,v2,v3);} \
     MFIELD_TYPE(aname) & operator=(const Vector<3,atype>& v){v1=v[0];v2=v[1];v3=v[2];return *this;} \
-    _mandala_field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v1)> v1; \
-    _mandala_field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v2)> v2; \
-    _mandala_field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v3)> v3; \
+    _field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v1)> v1; \
+    _field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v2)> v2; \
+    _field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v3)> v3; \
   };
 #define MFVEC2(atype,aname,v1,v2,...) \
-  class MFIELD_TYPE(aname) : public _mandala_field_vect { public: \
+  class MFIELD_TYPE(aname) : public _vect { public: \
     operator Vector<2,atype>()const{return Vector<2,atype>(v1,v2);} \
     MFIELD_TYPE(aname) & operator=(const Vector<2,atype>& v){v1=v[0];v2=v[1];return *this;} \
-    _mandala_field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v1)> v1; \
-    _mandala_field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v2)> v2; \
+    _field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v1)> v1; \
+    _field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v2)> v2; \
   };
 #include "MandalaFields.h"
 
 
 // struct
-#define MGRP0_BEGIN     class ATPASTE2(_,MGRP0) : public _mandala_grp { public:
+#define MGRP0_BEGIN     class ATPASTE2(_,MGRP0) : public _group { public:
 #define MGRP0_END       } MGRP0;
-#define MGRP1_BEGIN     class ATPASTE2(_,MGRP1) : public _mandala_grp { public:
+#define MGRP1_BEGIN     class ATPASTE2(_,MGRP1) : public _group { public:
 #define MGRP1_END       } MGRP1;
-#define MGRP2_BEGIN     class ATPASTE2(_,MGRP2) : public _mandala_grp { public:
+#define MGRP2_BEGIN     class ATPASTE2(_,MGRP2) : public _group { public:
 #define MGRP2_END       } MGRP2;
+
+
 #define MFIELD(atype,aname,...)           MFIELD_TYPE(aname) aname;
 #define MFVECT(atype,aname,v1,v2,v3,...)  MFIELD_TYPE(aname) aname;
 #define MFVEC2(atype,aname,v1,v2,...)     MFIELD_TYPE(aname) aname;
+
+/*#define MFIELD_CLASS(atype,aname,adescr,aindex,...) \
+class ATPASTE2(_,aname) : public _field_base { public: \
+  inline atype & operator=(const atype &v){m_value=v;return m_value;} \
+  inline operator atype() const {return m_value;} \
+  enum{index=aindex};
+  private: \
+    T m_value; \
+}aname;
+#define MFIELD(atype,aname,...)           MFIELD_CLASS(aname) aname;
+*/
+
+
 #include "MandalaFields.h"
 
-#define MFIELD_VAR(aname) MGRP0.MGRP1.MGRP2.aname
 // METHODS
 public:
   _mandala_float value(const uint index) const
@@ -230,22 +254,24 @@ public:
 #undef MFIELD_INDEX
 #undef MFIELD_INDEX_VEC
 //-----------------------------------------------------------------------------
-/*extern _mandala mf;
-class _mandala_vehicle : public _mandala::_vehicle
+extern _mandala mf;
+/*template<class T,T obj>
+class _mandala_imu
 {
 public:
   inline _mandala::_vehicle & operator=(const _mandala::_vehicle &v){mf.vehicle=v;return mf.vehicle;}
   inline operator _mandala::_vehicle() const {return mf.vehicle;}
 
-};
-class _test : public _mandala_vehicle
+};*/
+class _test
 {
 public:
-  _test()
+  _test() : imu(mf.vehicle.sensor.imu)
   {
-    sensor.imu.temp=12.34;
+    //sensor.imu.temp=12.34;
   }
-};*/
+  _mandala::_vehicle::_sensor::_imu &imu;
+};
 //=============================================================================
 #endif
 //=============================================================================
