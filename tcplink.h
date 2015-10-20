@@ -9,7 +9,7 @@
 class Tcplink
 {
 public:
-  Tcplink(const char *name="UDP");
+  Tcplink(const char *name="TCP");
   ~Tcplink();
   const char    *name;
 

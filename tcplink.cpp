@@ -42,19 +42,25 @@ bool Tcplink::connect(const char *host,uint port)
     const char req[]="GET /datalink HTTP/1.0\r\n";
     if(!::write(fd,(const uint8_t *)req,strlen(req)))break;
 
-    if(!readline())break;
-    if(!strstr(line_buf,"200 OK"))break;
-    //printf("[%s]hdr: %s",name,line_buf);
-    if(!readline())break;
-    if(!strstr(line_buf,"octet-stream"))break;
-    //printf("[%s]hdr: %s",name,line_buf);
+    bool bOK=false,bType=false,bErrHdr=false;
     while(readline()){
-      if(line_cnt==2){
+      bErrHdr=true;
+      if(!bOK){
+        if(strstr(line_buf,"200 OK")) bOK=true;
+        else break;
+        continue;
+      }
+      if((!bType) && strstr(line_buf,"application/octet-stream")) bType=true;
+      else if(line_cnt==2){
+        bErrHdr=false;
+        //end of header
+        if(!(bOK&&bType))break;
         packet_sz=0;
         return true;
-      }
-      printf("[%s]: %s",name,line_buf);
+      }else printf("[%s]: %s",name,line_buf);
     }
+    if(bErrHdr) printf("[%s]: %s",name,line_buf);
+    printf("[%s]: Response header error.\n",name);
     break;
   }
   close();
