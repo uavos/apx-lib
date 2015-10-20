@@ -36,6 +36,7 @@ public:
 
 private:
   int   fd;
+  uint retry;
   uint8_t tmpBuf[4096];
   //ESC reader
   uint8_t esc_rx[4096];      //data from readEscaped()

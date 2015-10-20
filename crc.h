@@ -97,4 +97,16 @@ static inline uint16_t CRC_16(uint16_t poly,const uint8_t *buf,uint size,uint16_
   return crc;
 }
 //==============================================================================
+static inline uint16_t CRC_16_CCITT_QT(const uint8_t *buf,uint size,uint16_t crc)
+{
+  while(size--) {
+    uint8_t data=*buf++;
+    data^=crc;
+    data^=data<<4;
+    crc=((((uint16_t)data << 8) |  (crc&0xFF00)) ^ (uint8_t)(data >> 4)
+    ^ ((uint16_t)data << 3));
+  }
+  return crc;
+}
+//==============================================================================
 #endif // CRC_H

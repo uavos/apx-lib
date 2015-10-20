@@ -16,7 +16,7 @@
 #include <time.h>
 #include "comm.h"
 //==============================================================================
-#define DEFAULT_PORTNAME   "/dev/ttyS0"
+#define DEFAULT_PORTNAME   "/dev/ttyUSB0"
 #define DEFAULT_BAUDRATE   B115200
 //#define dump(A,B,C)       {if(C){printf("%s: ",A);for(uint i=0;i<(C);i++)printf("%.2X ",((const uint8_t*)(B))[i]);printf("\n");}}
 #define dump(A,B,C)
@@ -24,6 +24,7 @@
 Comm::Comm()
 {
   fd=-1;
+  retry=0;
   pname=DEFAULT_PORTNAME;
   brate=DEFAULT_BAUDRATE;
   esc_state=esc_cnt=esc_pos_save=0;
@@ -41,15 +42,17 @@ bool Comm::open(const char *portname,int baudrate,const char *name,int timeout,u
   this->name=name;
 
   fd = ::open(portname, O_RDWR | O_NOCTTY );// | O_NONBLOCK | O_NDELAY);
+  retry++;
   if (fd <0) {
     fprintf(stderr,"Unable to open %s - %s\n",portname,strerror(errno));
     return false;
   }
   if(::flock(fd,LOCK_EX|LOCK_NB)!=0){
     close();
-    fprintf(stderr,"Unable to lock %s - %s\n",portname,strerror(errno));
+    if(retry<=1)fprintf(stderr,"Unable to lock %s - %s\n",portname,strerror(errno));
     return false;
   }
+  retry=0;
 
   //fcntl(fd, F_SETFL, FNDELAY);
 
