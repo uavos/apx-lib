@@ -679,10 +679,13 @@ typedef Vector<2> Point;
 class Quat: public Vector<4>
 {
 public:
-  Quat():Vector<4>(){}
-  Quat(const _mat_float &s0,const _mat_float &s1,const _mat_float &s2,const _mat_float &s3)
+  Quat():Vector<4>()
   {
-    (*this)[0] = s0;
+    reset();
+  }
+  Quat(const _mat_float &w,const _mat_float &s1,const _mat_float &s2,const _mat_float &s3)
+  {
+    (*this)[0] = w;
     (*this)[1] = s1;
     (*this)[2] = s2;
     (*this)[3] = s3;
@@ -693,7 +696,26 @@ public:
     fromEuler(euler);
   }
 
-  void qbuild(const Vector<3> &eps)
+  Quat(const Vector<3> & axis,_mat_float angle)
+  {
+    _mat_float angle2=angle/2.0;
+    _mat_float s=sin(angle2);
+    (*this)[0]=cos(angle2);
+    (*this)[1]=axis[0]*s;
+    (*this)[2]=axis[1]*s;
+    (*this)[3]=axis[2]*s;
+  }
+
+  Quat & reset()
+  {
+    (*this)[0] = 1;
+    (*this)[1] = 0;
+    (*this)[2] = 0;
+    (*this)[3] = 0;
+    return (*this);
+  }
+
+  Quat & qbuild(const Vector<3> &eps)
   {
     const _mat_float eps2=1.0-eps*eps;
     const _mat_float eta=eps2<=0?0:sqrt(eps2);
@@ -701,12 +723,14 @@ public:
     (*this)[1]=eps[0];
     (*this)[2]=eps[1];
     (*this)[3]=eps[2];
+    return (*this);
   }
 
-  void qmult(const Quat &q);
+  Quat & qmult(const Quat &q);
   const Vector<3> toEuler() const; //Aerospace
-  void fromEuler(const Vector<3> & euler);
-  void conjugate(void);
+  Quat & fromEuler(const Vector<3> & euler);
+  Quat & conjugate(void); //rotate back
+  inline Quat & normalize(void){norm_self();return (*this);}
 
 
   //euler angles conversions
