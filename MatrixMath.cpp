@@ -193,13 +193,22 @@ const Vector<3> Quat::toEuler() const
   const _mat_float & q1 = (*this)[1];
   const _mat_float & q2 = (*this)[2];
   const _mat_float & q3 = (*this)[3];
-  _mat_float theta = -asin(2*(q1*q3 - q0*q2));
   _mat_float phi = atan2(2.0*(q2*q3 + q0*q1), 1.0-2.0*(q1*q1 + q2*q2));
+  _mat_float theta = -asin(2*(q1*q3 - q0*q2));
   _mat_float psi = atan2(2.0*(q1*q2 + q0*q3), 1.0-2.0*(q2*q2 + q3*q3));
   return Vector<3>(phi, theta, psi);
+  /*const _mat_float & qw = (*this)[0];
+  const _mat_float & qx = (*this)[1];
+  const _mat_float & qy = (*this)[2];
+  const _mat_float & qz = (*this)[3];
+  Vector<3> euler;
+  euler[0]=atan2(2.0*(qx*qw+qy*qz),1.0-2.0*(qx*qx-qz*qz));
+  euler[1]=asin(2.0*(qx*qy+qz*qw));
+  euler[2]=atan2(2.0*(qy*qw-qx*qz),1.0-2.0*(qy*qy-qz*qz));
+  return euler;*/
 }
 //=============================================================================
-void Quat::qmult(const Quat &q)
+Quat & Quat::qmult(const Quat &q)
 {
   const _mat_float eta1=(*this)[0];
   const Vect eps1((*this)[1],(*this)[2],(*this)[3]);
@@ -211,9 +220,22 @@ void Quat::qmult(const Quat &q)
   (*this)[1]=eps[0];
   (*this)[2]=eps[1];
   (*this)[3]=eps[2];
+  /*const _mat_float &w1=(*this)[0];
+  const _mat_float &x1=(*this)[1];
+  const _mat_float &y1=(*this)[2];
+  const _mat_float &z1=(*this)[3];
+  const _mat_float &w2=q[0];
+  const _mat_float &x2=q[1];
+  const _mat_float &y2=q[2];
+  const _mat_float &z2=q[3];
+  (*this)[0]=w1*w2-x1*x2-y1*y2-z1*z2;
+  (*this)[1]=w1*x2+x1*w2+y1*z2-z1*y2;
+  (*this)[2]=w1*y2-x1*z2+y1*w2+z1*x2;
+  (*this)[3]=w1*z2+x1*y2-y1*x2+z1*w2;*/
+  return (*this);
 }
 //=============================================================================
-void Quat::fromEuler(const Vector<3> & euler)
+Quat & Quat::fromEuler(const Vector<3> & euler)
 {
   const _mat_float phi = euler[0] / 2.0;
   const _mat_float theta = euler[1] / 2.0;
@@ -228,14 +250,16 @@ void Quat::fromEuler(const Vector<3> & euler)
   (*this)[1]=-chphi0 * shtheta0 * shpsi0 + shphi0 * chtheta0 * chpsi0;
   (*this)[2]= chphi0 * shtheta0 * chpsi0 + shphi0 * chtheta0 * shpsi0;
   (*this)[3]= chphi0 * chtheta0 * shpsi0 - shphi0 * shtheta0 * chpsi0;
+  return (*this);
 }
 //=============================================================================
-void Quat::conjugate(void)
+Quat & Quat::conjugate(void)
 {
   //(*this)[0]=-(*this)[0];
   (*this)[1]=-(*this)[1];
   (*this)[2]=-(*this)[2];
   (*this)[3]=-(*this)[3];
+  return (*this);
 }
 //=============================================================================
 #define EulFrm(ord)  ((unsigned)(ord)&1)
