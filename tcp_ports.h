@@ -4,6 +4,7 @@
 #define TCP_PORT_SERVER         9080    //http server
 #define UDP_PORT_DISCOVER       9000    //discover service
 #define UDP_PORT_SERVICE        9002    //local udp datalink
+#define UDP_PORT_SIM            9004    //simulator: imu/servo
 
 //#define UDP_MODEM_TX            9010    //modem tx (send to UAV)
 //#define UDP_MODEM_CMD           9030    //modem command string (send to UAV)

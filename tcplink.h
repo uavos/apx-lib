@@ -16,18 +16,18 @@ public:
   bool connect(const char *host,uint port);
   void close();
 
-  bool writePacket(const uint8_t *buf,uint cnt);
-  uint readPacket(uint8_t *buf,uint sz);
-
-private:
-  int   fd;
-  bool err_mute;
-  struct  sockaddr_in bind_addr;
-  struct  sockaddr_in dest_addr;
-  struct  sockaddr_in sender_addr;
-
   bool write(const uint8_t *buf,uint cnt);
   uint read(uint8_t *buf,uint sz);
+
+protected:
+  int  fd;
+  bool err_mute;
+  struct  sockaddr_in host_addr;
+  
+  bool reconnect(bool silent=false);
+
+  bool write_raw(const uint8_t *buf,uint cnt);
+  uint read_raw(uint8_t *buf,uint sz);
 
   //line read
   uint line_cnt;
