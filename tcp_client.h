@@ -1,33 +1,44 @@
 //=============================================================
-#ifndef tcplink_H
-#define tcplink_H
+#ifndef tcp_client_H
+#define tcp_client_H
 //=============================================================
 #include <inttypes.h>
 #include <termios.h>
 #include <netinet/in.h>
 //=============================================================
-class Tcplink
+class _tcp_client
 {
 public:
-  Tcplink(const char *name="TCP");
-  ~Tcplink();
-  const char    *name;
+  _tcp_client(const char *name="tcp");
+  ~_tcp_client();
 
-  bool connect(const char *host,uint port);
+  bool connect(const char *host,uint port,bool block=false,const char *path="/datalink");
   void close();
 
   bool write(const uint8_t *buf,uint cnt);
   uint read(uint8_t *buf,uint sz);
 
+  bool is_connected(void);
+
+  bool silent;
+  bool tcpdebug;
+  
 protected:
+  const char *name;
   int  fd;
   bool err_mute;
-  struct  sockaddr_in host_addr;
-  
-  bool reconnect(bool silent=false);
+  struct{
+    sockaddr_in addr;
+    const char *path;
+    bool stream;
+    char server[256];
+  }host;
 
-  bool write_raw(const uint8_t *buf,uint cnt);
-  uint read_raw(uint8_t *buf,uint sz);
+
+  virtual bool connect_task();
+  uint init_stage;
+  time_t time_s;
+  uint bytes_available(uint8_t *buf,uint sz);
 
   //line read
   uint line_cnt;

@@ -26,26 +26,4 @@ private:
   struct  sockaddr_in sender_addr;
 };
 //=============================================================
-class Tcp
-{
-public:
-  Tcp(const char *name="UDP");
-  ~Tcp();
-  const char    *name;
-
-  bool connect(const char *host,uint port);
-  void close();
-
-  void write(const uint8_t *buf,uint cnt);
-  uint read(uint8_t *buf,uint sz);
-private:
-  int   fd;
-  bool err_mute;
-  struct  sockaddr_in bind_addr;
-  struct  sockaddr_in dest_addr;
-  struct  sockaddr_in sender_addr;
-  int readline(char ** out);
-
-};
-//=============================================================
 #endif
