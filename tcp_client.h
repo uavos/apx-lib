@@ -5,6 +5,7 @@
 #include <inttypes.h>
 #include <termios.h>
 #include <netinet/in.h>
+#include "fifo.h"
 //=============================================================
 class _tcp_client
 {
@@ -22,7 +23,7 @@ public:
 
   bool silent;
   bool tcpdebug;
-  
+
 protected:
   const char *name;
   int  fd;
@@ -31,9 +32,11 @@ protected:
     sockaddr_in addr;
     const char *path;
     bool stream;
-    char server[256];
+    char server[64];
   }host;
 
+  _fifo<4096> tx_fifo;
+  uint8_t tx_packet[1024];
 
   virtual bool connect_task();
   uint init_stage;

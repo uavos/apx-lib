@@ -10,7 +10,7 @@
 #include <sys/ioctl.h>
 #include <poll.h>
 #include <fcntl.h>
-#include <sys/epoll.h>
+#include <netinet/tcp.h>
 #include <time.h>
 #include "tcp_client.h"
 #include "crc.h"
@@ -84,18 +84,31 @@ bool _tcp_client::readline(void)
 //==============================================================================
 bool _tcp_client::write(const uint8_t *buf,uint cnt)
 {
-  if(!is_connected())return false;
+  if(!cnt)return true;
+  if(!is_connected()){
+    return tx_fifo.write_packet(buf,cnt);
+  }
   uint16_t sz=cnt;
   uint16_t crc16=CRC_16_IBM(buf,cnt,0xFFFF);
-  while(1){
+  bool bErr=true;
+  memcpy(&(tx_packet[0]),&sz,sizeof(sz));
+  memcpy(&(tx_packet[sizeof(sz)]),&crc16,sizeof(crc16));
+  memcpy(&(tx_packet[sizeof(sz)+sizeof(crc16)]),buf,cnt);
+  cnt+=sizeof(sz)+sizeof(crc16);
+  bErr=::send(fd,tx_packet,cnt,0)!=cnt;
+  /*while(1){
     if(::send(fd,(uint8_t*)&sz,sizeof(sz),0)!=sizeof(sz))break;
     if(::send(fd,(uint8_t*)&crc16,sizeof(crc16),0)!=sizeof(crc16))break;
     if(::send(fd,buf,cnt,0)!=cnt)break;
-    return true;
+    bErr=false;
+    break;
+  }*/
+  if(bErr){
+    printf("[%s]Error: Writing Packet Failed (%i/%u).\n",name,cnt,sz);
+    close();
+    return false;
   }
-  printf("[%s]Error: Writing Packet Failed (%i/%u).\n",name,cnt,sz);
-  close();
-  return false;
+  return true;
 }
 //==============================================================================
 uint _tcp_client::read(uint8_t *buf,uint sz)
@@ -103,6 +116,10 @@ uint _tcp_client::read(uint8_t *buf,uint sz)
   if(init_stage<100){
     connect_task();
     return 0;
+  }
+  if(tx_fifo.fifo_cnt()){
+    uint cnt=tx_fifo.read_packet(buf,sz);
+    write(buf,cnt);
   }
   int rcnt=bytes_available(buf,sz);
   if(!rcnt) return 0;
@@ -197,6 +214,11 @@ bool _tcp_client::connect_task()
       }
       init_stage++;
       if(tcpdebug)printf("[%s]Socket connected.\n",name);
+      //set options
+      int optval = 1;
+      setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+      optval = 1;
+      setsockopt(fd, IPPROTO_TCP, TCP_QUICKACK, &optval, sizeof(optval));
     }break;
     case 3:{ //send request
       if(host.path[0]==0){

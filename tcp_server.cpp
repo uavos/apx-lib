@@ -10,7 +10,7 @@
 #include <sys/ioctl.h>
 #include <poll.h>
 #include <fcntl.h>
-#include <sys/epoll.h>
+#include <netinet/tcp.h>
 #include <time.h>
 #include "tcp_server.h"
 #include "crc.h"
@@ -45,10 +45,8 @@ bool _tcp_server::connect_task()
         break;
       }
       //set options
-      int optval;
-      int optlen;
-      optval = 1;
-      setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+      int optval = 1;
+      setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
       //bind & listen
       if(::bind(server_fd,(const sockaddr *)&host.addr,sizeof(host.addr))<0){
         if(!err_mute)printf("[%s]Error: Bind Failed (%i).\n",name,errno);
@@ -64,12 +62,22 @@ bool _tcp_server::connect_task()
       }
       if(tcpdebug)printf("[%s]Listening on port %u\n",name,ntohs(host.addr.sin_port));
       init_stage++;
+      //set options
+      optval = 1;
+      setsockopt(server_fd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+      optval = 1;
+      setsockopt(server_fd, IPPROTO_TCP, TCP_QUICKACK, &optval, sizeof(optval));
     }break;
     case 2:{ //wait incoming connection
       //printf("[%s]errno (%i).\n",name,errno);
       fd=::accept(server_fd,(struct sockaddr*)NULL, NULL);
       if(fd>=0){
         if(tcpdebug)printf("[%s]Client socket connected.\n",name);
+        //set options
+        int optval = 1;
+        setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+        optval = 1;
+        setsockopt(fd, IPPROTO_TCP, TCP_QUICKACK, &optval, sizeof(optval));
         init_stage++;
         time_s=time(0);
         break;
