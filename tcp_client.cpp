@@ -58,6 +58,17 @@ void _tcp_client::close()
   init_stage=20; //reconnect
 }
 //==============================================================================
+uint _tcp_client::readTO(uint8_t *buf,uint sz,uint timeout_sec)
+{
+  time_t t0=time(0);
+  do{
+    uint cnt=read(buf,sz);
+    if(cnt)return cnt;
+    usleep(100000);
+  }while((time(0)-t0)<timeout_sec);
+  return 0;
+}
+//==============================================================================
 bool _tcp_client::readline(void)
 {
   char *ptr=line_buf+line_cnt;

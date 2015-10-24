@@ -18,6 +18,7 @@ public:
 
   bool write(const uint8_t *buf,uint cnt);
   uint read(uint8_t *buf,uint sz);
+  uint readTO(uint8_t *buf,uint sz,uint timeout_sec);
 
   bool is_connected(void);
 
