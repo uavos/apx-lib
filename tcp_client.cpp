@@ -238,7 +238,7 @@ bool _tcp_client::connect_task()
         return true;
       }
       if(tcpdebug)printf("[%s]Requesting...\n",name);
-      sprintf(line_buf,"GET %s HTTP/1.0\r\n",host.path);
+      sprintf(line_buf,"GET %s HTTP/1.0\r\nClient: spark\r\n\r\n",host.path);
       if(::send(fd,(const uint8_t *)line_buf,strlen(line_buf),0)<=0){
         err="send";
         break;

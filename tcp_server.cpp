@@ -93,7 +93,11 @@ bool _tcp_server::connect_task()
       }
       err="header";
       break;
-    case 4: //response header
+    case 4: //rest of header
+      if(!readline())break;
+      if(strlen(line_buf)==0)init_stage++;
+      break;
+    case 5: //response header
       err="send header";
       strcpy(line_buf,"HTTP/1.0 200 OK\r\n");
       if(::send(fd,line_buf,strlen(line_buf),0)<=0)break;
