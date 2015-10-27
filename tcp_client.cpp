@@ -121,12 +121,12 @@ uint _tcp_client::read(uint8_t *buf,uint sz)
     connect_task();
     return 0;
   }
-  while(tx_fifo.fifo_cnt()){
-    uint cnt=tx_fifo.read_packet(buf,sz);
-    write(buf,cnt);
-  }
+  uint fcnt=tx_fifo.read_packet(buf,sz);
+  if(fcnt)write(buf,fcnt);
+
   int rcnt=bytes_available(buf,sz);
   if(!rcnt) return 0;
+  //printf("rx: %u\n",rcnt);
   if(packet_sz==0){
     if(rcnt<(sizeof(packet_sz)+sizeof(packet_crc16)))return 0;
     ::read(fd,&packet_sz,sizeof(packet_sz));
@@ -152,9 +152,6 @@ uint _tcp_client::bytes_available(uint8_t *buf,uint sz)
     init_stage=20; //reconnect
     return 0;
   }
-  int rcnt=::recv(fd,buf,sz,MSG_PEEK);
-  if(rcnt>0)return rcnt;
-
   // use the poll system call to be notified about socket status changes
   struct pollfd pfd;
   pfd.fd = fd;
@@ -164,7 +161,7 @@ uint _tcp_client::bytes_available(uint8_t *buf,uint sz)
     // if result > 0, this means that there is either data available on the
     // socket, or the socket has been closed
   }else return 0;
-  rcnt=::recv(fd,buf,sz,MSG_PEEK);
+  int rcnt=::recv(fd,buf,sz,MSG_PEEK);
   if(rcnt<=0){
     printf("[%s]Connection closed.\n",name);
     close();
@@ -180,6 +177,7 @@ bool _tcp_client::connect_task()
   switch(init_stage){
     case 0: return false; //idle
     case 1:{ //connecting
+      time_s=time(0);
       fd = socket(AF_INET, SOCK_STREAM|SOCK_NONBLOCK,0);
       if(fd<=0){
         if(!err_mute)printf("[%s]Error: Open Socket Failed.\n",name);
@@ -234,7 +232,7 @@ bool _tcp_client::connect_task()
         return true;
       }
       if(tcpdebug)printf("[%s]Requesting...\n",name);
-      sprintf(line_buf,"GET %s HTTP/1.0\r\nFrom: spark\r\n\r\n",host.path);
+      sprintf(line_buf,"GET %s HTTP/1.0\r\nFrom: %s\r\n\r\n",host.path,name);
       if(::send(fd,(const uint8_t *)line_buf,strlen(line_buf),0)<=0){
         err="send";
         break;

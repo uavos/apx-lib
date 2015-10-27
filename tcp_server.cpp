@@ -33,6 +33,7 @@ bool _tcp_server::connect_task()
   switch(init_stage){
     case 0: return false; //idle
     case 1:{ //connecting
+      time_s=time(0);
       if(server_fd>=0){
         init_stage++;
         break;
@@ -69,6 +70,7 @@ bool _tcp_server::connect_task()
       setsockopt(server_fd, IPPROTO_TCP, TCP_QUICKACK, &optval, sizeof(optval));
     }break;
     case 2:{ //wait incoming connection
+      time_s=time(0);
       //printf("[%s]errno (%i).\n",name,errno);
       fd=::accept(server_fd,(struct sockaddr*)NULL, NULL);
       if(fd>=0){
@@ -119,7 +121,7 @@ bool _tcp_server::connect_task()
       ::close(server_fd);
       server_fd=-1;
       init_stage=1;
-      break;
+      return false;
   }
   if((time(0)-time_s)>5){
     err="timeout";
