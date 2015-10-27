@@ -64,7 +64,7 @@ uint _tcp_client::readTO(uint8_t *buf,uint sz,uint timeout_sec)
   do{
     uint cnt=read(buf,sz);
     if(cnt)return cnt;
-    usleep(100000);
+    usleep(1000);
   }while((time(0)-t0)<timeout_sec);
   return 0;
 }
@@ -107,13 +107,6 @@ bool _tcp_client::write(const uint8_t *buf,uint cnt)
   memcpy(&(tx_packet[sizeof(sz)+sizeof(crc16)]),buf,cnt);
   cnt+=sizeof(sz)+sizeof(crc16);
   bErr=::send(fd,tx_packet,cnt,0)!=cnt;
-  /*while(1){
-    if(::send(fd,(uint8_t*)&sz,sizeof(sz),0)!=sizeof(sz))break;
-    if(::send(fd,(uint8_t*)&crc16,sizeof(crc16),0)!=sizeof(crc16))break;
-    if(::send(fd,buf,cnt,0)!=cnt)break;
-    bErr=false;
-    break;
-  }*/
   if(bErr){
     printf("[%s]Error: Writing Packet Failed (%i/%u).\n",name,cnt,sz);
     close();
@@ -128,7 +121,7 @@ uint _tcp_client::read(uint8_t *buf,uint sz)
     connect_task();
     return 0;
   }
-  if(tx_fifo.fifo_cnt()){
+  while(tx_fifo.fifo_cnt()){
     uint cnt=tx_fifo.read_packet(buf,sz);
     write(buf,cnt);
   }
@@ -159,6 +152,9 @@ uint _tcp_client::bytes_available(uint8_t *buf,uint sz)
     init_stage=20; //reconnect
     return 0;
   }
+  int rcnt=::recv(fd,buf,sz,MSG_PEEK);
+  if(rcnt>0)return rcnt;
+
   // use the poll system call to be notified about socket status changes
   struct pollfd pfd;
   pfd.fd = fd;
@@ -168,7 +164,7 @@ uint _tcp_client::bytes_available(uint8_t *buf,uint sz)
     // if result > 0, this means that there is either data available on the
     // socket, or the socket has been closed
   }else return 0;
-  int rcnt=::recv(fd,buf,sz,MSG_PEEK);
+  rcnt=::recv(fd,buf,sz,MSG_PEEK);
   if(rcnt<=0){
     printf("[%s]Connection closed.\n",name);
     close();
