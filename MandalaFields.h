@@ -57,7 +57,7 @@ typedef struct {
   }_data_hdr;
   typedef struct{
     uint16_t field :13;   //field ID
-    uint16_t dtype :3;    //data payload type (_dtype)
+    _dtype   dtype :3;    //data payload type (_dtype)
     union{
       uint32_t data32;
       uint8_t  data[4];
@@ -81,7 +81,7 @@ public:
 #define MGRP2_END       ATPASTE7(index_,MGRP0,_,MGRP1,_,MGRP2,_end)=(ATPASTE6(index_,MGRP0,_,MGRP1,_,MGRP2) &~((1<<4)-1))+(1<<4),
 
 #define MFIELD_INDEX(aname) ATPASTE8(index_,MGRP0,_,MGRP1,_,MGRP2,_,aname)
-#define MFIELD_INDEX_VEC(aname,vname) ATPASTE10(index_,MGRP0,_,MGRP1,_,MGRP2,_,aname,_,vname)
+#define MFIELD_INDEX_VEC(aname,vname) MFIELD_INDEX(ATPASTE3(aname,_,vname))
 #define MFIELD(atype,aname,...) MFIELD_INDEX(aname),
 #define MFVECT_IMPL(atype,aname,vname,...) MFIELD_INDEX_VEC(aname,vname),
 enum{
@@ -94,62 +94,75 @@ enum{
   #include "MandalaFields.h"
 };
 
-
-  template <class T,int tindex>
   class _field
   {
   public:
-    _field(){m_value=0;flags_all=0;}
-    inline T & operator=(const T &v){m_value=v;flags_all=1;return m_value;}
+    inline virtual void changed(){}
+    inline virtual const char* name()const{return "";}
+    inline virtual const char* descr()const{return "";}
+    inline virtual const char* shortname()const{return "";}
+
+    inline virtual void getValue(void *ptr)const{}
+    inline virtual void setValue(const void *ptr){}
+  };
+
+  template <class T,int tindex>
+  class _field_t : public _field
+  {
+  public:
+    _field_t():_field(){m_value=0;}
+    inline T & operator=(const T &v){setValue(v);return m_value;}
     inline operator T() const {return m_value;}
 
     inline const T & value() const {return m_value;}
-    inline bool isChanged() const {return flags.changed;}
-    inline void save() {flags.changed=0;}
     enum{index=tindex};
   protected:
-    //virtual inline const T & getValue(void) const {return m_value;}
-    //virtual inline void getValue(const T &v){m_value=v;}
-  private:
     T m_value;
-    union{
-      struct{
-        uint8_t changed     :1;
-      }flags;
-      uint8_t flags_all;
-    };
+    inline void setValue(const T &v){if(m_value==v)return;m_value=v;changed();}
   };
+
   class _group {};
   class _vect {};
-  class c {};
 
   template <class T,int tindex,const char *name>
-  class _field_ext : public _field<T,tindex>
+  class _field_ext : public _field_t<T,tindex>
   {
+  public:
   };
-  //static const char *test="";
+  //_field_ext<float,0xfff0,"hello"> fext;
+  //extern const char test[]="hello";
 
 //fields typedefs
 #define MFIELD_VAR(aname) MGRP0.MGRP1.MGRP2.aname
 #define MFIELD_TYPE(aname) ATPASTE8(_,MGRP0,_,MGRP1,_,MGRP2,_,aname)
 
-#define MFIELD(atype,aname,...)         typedef _field<_mandala_##atype,MFIELD_INDEX(aname)> MFIELD_TYPE(aname);
-#define MFVECT(atype,aname,v1,v2,v3,...) \
+//#define MFIELD(atype,aname,...)         typedef _field_t<_mandala_##atype,MFIELD_INDEX(aname)> MFIELD_TYPE(aname);
+#define MFIELD(atype,aname,adescr,...) MFIELD_IMPL(MFIELD_INDEX(aname),atype,aname,adescr,ASTRINGZ(MFIELD_VAR(aname)));
+#define MFIELD_IMPL(aindex,atype,aname,adescr,afullname) \
+  class MFIELD_TYPE(aname) : public _field_t<_mandala_##atype,aindex> { public: \
+    inline _mandala_##atype & operator=(const _mandala_##atype &v){setValue(v);return m_value;} \
+    inline const char* name()const{return afullname;} \
+    inline const char* descr()const{return adescr;} \
+    inline const char* shortname()const{return #aname;} \
+  }
+#define MFVECT(atype,aname,v1,v2,v3,adescr,...) \
   class MFIELD_TYPE(aname) : public _vect { public: \
     operator Vector<3,atype>()const{return Vector<3,atype>(v1,v2,v3);} \
     MFIELD_TYPE(aname) & operator=(const Vector<3,atype>& v){v1=v[0];v2=v[1];v3=v[2];return *this;} \
-    _field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v1)> v1; \
-    _field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v2)> v2; \
-    _field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v3)> v3; \
-  };
-#define MFVEC2(atype,aname,v1,v2,...) \
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,ASTRINGZ(MFIELD_VAR(aname).v1)) v1;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,ASTRINGZ(MFIELD_VAR(aname).v2)) v2;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v3),atype,v3,adescr,ASTRINGZ(MFIELD_VAR(aname).v3)) v3;\
+};
+#define MFVEC2(atype,aname,v1,v2,adescr,...) \
   class MFIELD_TYPE(aname) : public _vect { public: \
     operator Vector<2,atype>()const{return Vector<2,atype>(v1,v2);} \
     MFIELD_TYPE(aname) & operator=(const Vector<2,atype>& v){v1=v[0];v2=v[1];return *this;} \
-    _field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v1)> v1; \
-    _field<_mandala_##atype,MFIELD_INDEX_VEC(aname,v2)> v2; \
-  };
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,ASTRINGZ(MFIELD_VAR(aname).v1)) v1;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,ASTRINGZ(MFIELD_VAR(aname).v2)) v2;\
+};
 #include "MandalaFields.h"
+
+//groups
 
 
 // struct
@@ -206,15 +219,6 @@ public:
       #include "MandalaFields.h"
     }
   }
-  const char * name(const uint index) const
-  {
-    #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): return ASTRINGZ(MFIELD_VAR(aname));
-    #define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): return ASTRINGZ(MFIELD_VAR(aname).vname);
-    switch(index){
-      #include "MandalaFields.h"
-    }
-    return "";
-  }
   const char * shortname(const uint index) const
   {
     #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): return #aname;
@@ -224,14 +228,14 @@ public:
     }
     return "";
   }
-  const char * descr(const uint index) const
+  _field * field(const uint index)
   {
-    #define MFIELD(atype,aname,adescr,...) case MFIELD_INDEX(aname): return adescr;
-    #define MFVECT_IMPL(atype,aname,vname,adescr,...) case MFIELD_INDEX_VEC(aname,vname): return adescr;
+    #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): return & MFIELD_VAR(aname);
+    #define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): return & (MFIELD_VAR(aname).vname);
     switch(index){
       #include "MandalaFields.h"
     }
-    return "";
+    return NULL;
   }
   uint index_next(const uint index) const
   {
@@ -247,7 +251,6 @@ public:
   static inline bool is_grp0(const uint index) {return (index&((1<<11)-1))==0;}
   static inline bool is_grp1(const uint index) {return (index&((1<<9)-1))==0;}
   static inline bool is_grp2(const uint index) {return (index&((1<<4)-1))==0;}
-
 };
 #undef MFIELD_TYPE
 #undef MFIELD_VAR
@@ -268,7 +271,7 @@ class _test
 public:
   _test() : imu(mf.vehicle.sensor.imu)
   {
-    //sensor.imu.temp=12.34;
+    imu.temp=12.34;
   }
   _mandala::_vehicle::_sensor::_imu &imu;
 };
