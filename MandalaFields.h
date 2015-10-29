@@ -26,59 +26,44 @@
 #include "preprocessor.h"
 //=============================================================================
 #define MANDALA_PACKED_STRUCT   __attribute__((packed))
+typedef uint16_t   _mandala_index;
 typedef _var_float _mandala_float;
 typedef uint32_t   _mandala_uint;
 typedef uint8_t    _mandala_byte;
 typedef uint8_t    _mandala_bit;
 typedef uint8_t    _mandala_enum;
+#define GRP0_MASK       ((1<<11)-1)
+#define GRP1_MASK       ((1<<9)-1)
+#define GRP2_MASK       ((1<<4)-1)
 //=============================================================================
 //=============================================================================
 //=============================================================================
 typedef struct {
   //typedefs
-  typedef enum{
-    dt_float=0,
-    dt_u8,
-    dt_u16,
-    dt_u32,
-    dt_s8,
-    dt_s16,
-    dt_s32,
-    dt_bit
-  }_dtype;
   typedef struct{
     uint8_t  nID;         //Node ID
-  }_msg_id;
+  }MANDALA_PACKED_STRUCT _msg_id;
   typedef struct{
     uint16_t data_type  :4; //data type
     uint16_t data_fcnt  :2; //frame cnt
     uint16_t error      :2; //error code
     uint16_t command    :8; //command byte
-  }_data_hdr;
-  typedef struct{
-    uint16_t field :13;   //field ID
-    _dtype   dtype :3;    //data payload type (_dtype)
-    union{
-      uint32_t data32;
-      uint8_t  data[4];
-    }payload;
-  }_data;
+  }MANDALA_PACKED_STRUCT _data_hdr;
   //definitions
   _msg_id       id;     //1
   _data_hdr     hdr;    //2
-  _data         data;   //2+4
 }MANDALA_PACKED_STRUCT _mandala_msg;
 //=============================================================================
 class _mandala
 {
 public:
 // index
-#define MGRP0_BEGIN     ATPASTE2(index_,MGRP0),ATPASTE3(index_,MGRP0,_next)=(ATPASTE2(index_,MGRP0) &~((1<<11)-1))-1,
-#define MGRP0_END       ATPASTE3(index_,MGRP0,_end)=(ATPASTE2(index_,MGRP0) &~((1<<11)-1))+(1<<11),
-#define MGRP1_BEGIN     ATPASTE4(index_,MGRP0,_,MGRP1),ATPASTE5(index_,MGRP0,_,MGRP1,_next)=(ATPASTE4(index_,MGRP0,_,MGRP1) &~((1<<9)-1))-1,
-#define MGRP1_END       ATPASTE5(index_,MGRP0,_,MGRP1,_end)=(ATPASTE4(index_,MGRP0,_,MGRP1) &~((1<<9)-1))+(1<<9),
-#define MGRP2_BEGIN     ATPASTE6(index_,MGRP0,_,MGRP1,_,MGRP2),ATPASTE7(index_,MGRP0,_,MGRP1,_,MGRP2,_next)=(ATPASTE6(index_,MGRP0,_,MGRP1,_,MGRP2) &~((1<<4)-1))-1,
-#define MGRP2_END       ATPASTE7(index_,MGRP0,_,MGRP1,_,MGRP2,_end)=(ATPASTE6(index_,MGRP0,_,MGRP1,_,MGRP2) &~((1<<4)-1))+(1<<4),
+#define MGRP0_BEGIN(...)        ATPASTE2(index_,MGRP0),ATPASTE3(index_,MGRP0,_next)=(ATPASTE2(index_,MGRP0) &~GRP0_MASK)-1,
+#define MGRP0_END               ATPASTE3(index_,MGRP0,_end)=(ATPASTE2(index_,MGRP0) &~GRP0_MASK)+(GRP0_MASK+1),
+#define MGRP1_BEGIN(...)        ATPASTE4(index_,MGRP0,_,MGRP1),ATPASTE5(index_,MGRP0,_,MGRP1,_next)=(ATPASTE4(index_,MGRP0,_,MGRP1) &~GRP1_MASK)-1,
+#define MGRP1_END               ATPASTE5(index_,MGRP0,_,MGRP1,_end)=(ATPASTE4(index_,MGRP0,_,MGRP1) &~GRP1_MASK)+(GRP1_MASK+1),
+#define MGRP2_BEGIN(...)        ATPASTE6(index_,MGRP0,_,MGRP1,_,MGRP2),ATPASTE7(index_,MGRP0,_,MGRP1,_,MGRP2,_next)=(ATPASTE6(index_,MGRP0,_,MGRP1,_,MGRP2) &~GRP2_MASK)-1,
+#define MGRP2_END               ATPASTE7(index_,MGRP0,_,MGRP1,_,MGRP2,_end)=(ATPASTE6(index_,MGRP0,_,MGRP1,_,MGRP2) &~GRP2_MASK)+(GRP2_MASK+1),
 
 #define MFIELD_INDEX(aname) ATPASTE8(index_,MGRP0,_,MGRP1,_,MGRP2,_,aname)
 #define MFIELD_INDEX_VEC(aname,vname) MFIELD_INDEX(ATPASTE3(aname,_,vname))
@@ -94,19 +79,56 @@ enum{
   #include "MandalaFields.h"
 };
 
+//messages
+  typedef struct{
+    uint8_t size;       //size of data bytes
+    uint16_t index :13; //field ID
+    typedef enum{
+      dt_float=0,
+      dt_uint,
+      dt_int,
+    }_dtype; //8 types total
+    _dtype   dtype :3;  //data payload type
+    union{
+      uint32_t data32;
+      uint8_t  data[4];
+    }payload;
+  }MANDALA_PACKED_STRUCT _field_msg;
+
+//interfaces
   class _field
   {
   public:
-    inline virtual void changed(){}
-    inline virtual const char* name()const{return "";}
-    inline virtual const char* descr()const{return "";}
-    inline virtual const char* shortname()const{return "";}
-
-    inline virtual void getValue(void *ptr)const{}
-    inline virtual void setValue(const void *ptr){}
+    //descr
+    virtual _mandala_index index()const =0;
+    virtual const char* name()const =0;
+    virtual const char* descr()const =0;
+    virtual const char* shortname()const =0;
+    //value
+    virtual const _mandala_float toFloat() const =0;
+    virtual void fromFloat(const _mandala_float &v) =0;
+    virtual const _mandala_uint toUInt() const =0;
+    virtual void fromUInt(const _mandala_uint &v) =0;
+    //messages
+    virtual uint unpack(const _field_msg *data) =0;
+    virtual uint pack(_field_msg *data) const =0;
   };
 
-  template <class T,int tindex>
+  class _group
+  {
+  public:
+    virtual _mandala_index index()const =0;
+    virtual const char* name()const =0;
+    virtual const char* descr()const =0;
+    virtual _group * group(const _mandala_index index) =0;
+    virtual _group * next_group(const _group *g) =0;
+    virtual _field * field(const _mandala_index index) =0;
+    virtual _field * next_field(_field *f) =0;
+    virtual uint unpack(const _field_msg *data) =0;
+  };
+
+//field template
+  template <class T,_mandala_index field_index>
   class _field_t : public _field
   {
   public:
@@ -115,142 +137,404 @@ enum{
     inline operator T() const {return m_value;}
 
     inline const T & value() const {return m_value;}
-    enum{index=tindex};
+
+    //interface
+    inline _mandala_index index()const{return field_index;}
+
+    inline const _mandala_float toFloat() const {return value();}
+    inline void fromFloat(const _mandala_float &v){setValue(v);}
+    inline const _mandala_uint toUInt() const {return value();}
+    inline void fromUInt(const _mandala_uint &v){setValue(v);}
+
+    uint unpack(const _field_msg *data)
+    {
+      const uint8_t *src=(const uint8_t *)data->payload.data;
+      const uint8_t sz=data->size;
+      switch(data->dtype){
+        case _field_msg::dt_float:{
+          if(sz!=4)break;
+          float v;
+          uint8_t *dest=(uint8_t *)&v;
+          *dest++=*src++;
+          *dest++=*src++;
+          *dest++=*src++;
+          *dest++=*src++;
+          setValue(v);
+        }return sz;
+        case _field_msg::dt_uint:{
+          if(sz==1){
+            setValue(*src);
+          }else if(sz==2){
+            uint16_t v;
+            uint8_t *dest=(uint8_t *)&v;
+            *dest++=*src++;
+            *dest++=*src++;
+            setValue(v);
+          }else if(sz==4){
+            uint32_t v;
+            uint8_t *dest=(uint8_t *)&v;
+            *dest++=*src++;
+            *dest++=*src++;
+            *dest++=*src++;
+            *dest++=*src++;
+            setValue(v);
+          }else break;
+        }return sz;
+        case _field_msg::dt_int:{
+          if(sz==1){
+            setValue((int8_t)*src);
+          }else if(sz==2){
+            int16_t v;
+            uint8_t *dest=(uint8_t *)&v;
+            *dest++=*src++;
+            *dest++=*src++;
+            setValue(v);
+          }else if(sz==2){
+            int32_t v;
+            uint8_t *dest=(uint8_t *)&v;
+            *dest++=*src++;
+            *dest++=*src++;
+            *dest++=*src++;
+            *dest++=*src++;
+            setValue(v);
+          }else break;
+        }return sz;
+        default:
+          return 0;
+      }
+      return 0;
+    }
+
   protected:
     T m_value;
-    inline void setValue(const T &v){if(m_value==v)return;m_value=v;changed();}
+    inline void setValue(const T &v){m_value=v;}
+    inline uint pack_float(_field_msg *data) const
+    {
+      data->index=index();
+      data->dtype=_field_msg::dt_float;
+      data->size=4;
+      const uint8_t *src=(const uint8_t *)&m_value;
+      uint8_t *dest=(uint8_t *)data->payload.data;
+      *dest++=*src++;
+      *dest++=*src++;
+      *dest++=*src++;
+      *dest++=*src++;
+      return data->size;
+    }
+    inline uint pack_uint(_field_msg *data) const
+    {
+      data->index=index();
+      data->dtype=_field_msg::dt_uint;
+      data->size=4;
+      const uint8_t *src=(const uint8_t *)&m_value;
+      uint8_t *dest=(uint8_t *)data->payload.data;
+      *dest++=*src++;
+      *dest++=*src++;
+      *dest++=*src++;
+      *dest++=*src++;
+      return data->size;
+    }
+    inline uint pack_byte(_field_msg *data) const
+    {
+      data->index=index();
+      data->dtype=_field_msg::dt_uint;
+      data->size=1;
+      data->payload.data[0]=m_value;
+      return data->size;
+    }
+    inline uint pack_bit(_field_msg *data) const
+    {
+      data->index=index();
+      data->dtype=_field_msg::dt_uint;
+      data->size=1;
+      data->payload.data[0]=m_value>0?1:0;
+      return data->size;
+    }
+
   };
 
-  class _group {};
   class _vect {};
 
-  template <class T,int tindex,const char *name>
-  class _field_ext : public _field_t<T,tindex>
+  //field value types
+  template <_mandala_index field_index>
+  class _field_float_t : public _field_t<_mandala_float,field_index>
   {
   public:
+    uint pack(_field_msg *data) const
+    {return _field_t<_mandala_float,field_index>::pack_float(data);}
   };
-  //_field_ext<float,0xfff0,"hello"> fext;
-  //extern const char test[]="hello";
+  template <_mandala_index field_index>
+  class _field_uint_t : public _field_t<_mandala_uint,field_index>
+  {
+  public:
+    uint pack(_field_msg *data) const
+    {return _field_t<_mandala_uint,field_index>::pack_uint(data);}
+  };
+  template <_mandala_index field_index>
+  class _field_byte_t : public _field_t<_mandala_byte,field_index>
+  {
+  public:
+    uint pack(_field_msg *data) const
+    {return _field_t<_mandala_byte,field_index>::pack_byte(data);}
+  };
+  template <_mandala_index field_index>
+  class _field_bit_t : public _field_t<_mandala_bit,field_index>
+  {
+  public:
+    uint pack(_field_msg *data) const
+    {return _field_t<_mandala_bit,field_index>::pack_bit(data);}
+  };
+  template <_mandala_index field_index>
+  class _field_enum_t : public _field_t<_mandala_enum,field_index>
+  {
+  public:
+    uint pack(_field_msg *data) const
+    {return _field_t<_mandala_enum,field_index>::pack_byte(data);}
+  };
+
 
 //fields typedefs
 #define MFIELD_VAR(aname) MGRP0.MGRP1.MGRP2.aname
 #define MFIELD_TYPE(aname) ATPASTE8(_,MGRP0,_,MGRP1,_,MGRP2,_,aname)
 
-//#define MFIELD(atype,aname,...)         typedef _field_t<_mandala_##atype,MFIELD_INDEX(aname)> MFIELD_TYPE(aname);
-#define MFIELD(atype,aname,adescr,...) MFIELD_IMPL(MFIELD_INDEX(aname),atype,aname,adescr,ASTRINGZ(MFIELD_VAR(aname)));
-#define MFIELD_IMPL(aindex,atype,aname,adescr,afullname) \
-  class MFIELD_TYPE(aname) : public _field_t<_mandala_##atype,aindex> { public: \
+#define MFIELD(atype,aname,adescr,...) MFIELD_IMPL(MFIELD_INDEX(aname),atype,aname,adescr,ASTRINGZ(MFIELD_VAR(aname)),aname);
+#define MFIELD_IMPL(aindex,atype,aname,adescr,afullname,ashortname) \
+  class MFIELD_TYPE(aname) : public _field_##atype##_t<aindex> { public: \
     inline _mandala_##atype & operator=(const _mandala_##atype &v){setValue(v);return m_value;} \
     inline const char* name()const{return afullname;} \
     inline const char* descr()const{return adescr;} \
-    inline const char* shortname()const{return #aname;} \
+    inline const char* shortname()const{return ASTRINGZ(ashortname);} \
   }
 #define MFVECT(atype,aname,v1,v2,v3,adescr,...) \
   class MFIELD_TYPE(aname) : public _vect { public: \
     operator Vector<3,atype>()const{return Vector<3,atype>(v1,v2,v3);} \
     MFIELD_TYPE(aname) & operator=(const Vector<3,atype>& v){v1=v[0];v2=v[1];v3=v[2];return *this;} \
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,ASTRINGZ(MFIELD_VAR(aname).v1)) v1;\
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,ASTRINGZ(MFIELD_VAR(aname).v2)) v2;\
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v3),atype,v3,adescr,ASTRINGZ(MFIELD_VAR(aname).v3)) v3;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,ASTRINGZ(MFIELD_VAR(aname).v1),aname.v1) v1;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,ASTRINGZ(MFIELD_VAR(aname).v2),aname.v2) v2;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v3),atype,v3,adescr,ASTRINGZ(MFIELD_VAR(aname).v3),aname.v3) v3;\
 };
 #define MFVEC2(atype,aname,v1,v2,adescr,...) \
   class MFIELD_TYPE(aname) : public _vect { public: \
     operator Vector<2,atype>()const{return Vector<2,atype>(v1,v2);} \
     MFIELD_TYPE(aname) & operator=(const Vector<2,atype>& v){v1=v[0];v2=v[1];return *this;} \
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,ASTRINGZ(MFIELD_VAR(aname).v1)) v1;\
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,ASTRINGZ(MFIELD_VAR(aname).v2)) v2;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,ASTRINGZ(MFIELD_VAR(aname).v1),aname.v1) v1;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,ASTRINGZ(MFIELD_VAR(aname).v2),aname.v2) v2;\
 };
 #include "MandalaFields.h"
 
-//groups
+//groups (_base) typedefs
+#define MGRP_IMPL(aname,adescr) \
+  class ATPASTE3(_,aname,_base) : public _group { public: \
+    inline const char* name()const{return ASTRINGZ(aname);} \
+    inline const char* descr()const{return adescr;} \
+    uint unpack(const _field_msg *data) \
+    { \
+      _field *f=field(data->index); \
+      return f?f->unpack(data):0; \
+    } \
 
-
-// struct
-#define MGRP0_BEGIN     class ATPASTE2(_,MGRP0) : public _group { public:
-#define MGRP0_END       } MGRP0;
-#define MGRP1_BEGIN     class ATPASTE2(_,MGRP1) : public _group { public:
-#define MGRP1_END       } MGRP1;
-#define MGRP2_BEGIN     class ATPASTE2(_,MGRP2) : public _group { public:
-#define MGRP2_END       } MGRP2;
-
+#define MGRP0_BEGIN(adescr,...) MGRP_IMPL(MGRP0,adescr)
+#define MGRP0_END               };
+#define MGRP1_BEGIN(adescr,...) MGRP_IMPL(MGRP1,adescr)
+#define MGRP1_END               };
+#define MGRP2_BEGIN(adescr,...) MGRP_IMPL(MGRP2,adescr)
+#define MGRP2_END               };
 
 #define MFIELD(atype,aname,...)           MFIELD_TYPE(aname) aname;
 #define MFVECT(atype,aname,v1,v2,v3,...)  MFIELD_TYPE(aname) aname;
 #define MFVEC2(atype,aname,v1,v2,...)     MFIELD_TYPE(aname) aname;
 
-/*#define MFIELD_CLASS(atype,aname,adescr,aindex,...) \
-class ATPASTE2(_,aname) : public _field_base { public: \
-  inline atype & operator=(const atype &v){m_value=v;return m_value;} \
-  inline operator atype() const {return m_value;} \
-  enum{index=aindex};
-  private: \
-    T m_value; \
-}aname;
-#define MFIELD(atype,aname,...)           MFIELD_CLASS(aname) aname;
-*/
+#include "MandalaFields.h"
 
+
+//grp2
+#define MGRP_IMPL(aname,adescr) \
+  class ATPASTE3(_,aname,_base_grp2) : public ATPASTE3(_,aname,_base) { public: \
+
+#define MGRP0_BEGIN(adescr,...) MGRP_IMPL(MGRP0,adescr)
+#define MGRP0_END               };
+#define MGRP1_BEGIN(adescr,...) MGRP_IMPL(MGRP1,adescr)
+#define MGRP1_END               };
+#define MGRP2_BEGIN(adescr,...) \
+  class ATPASTE2(_,MGRP2) : public ATPASTE3(_,MGRP2,_base) { public: \
+  _mandala_index index()const{return ATPASTE7(index_,MGRP0,_,MGRP1,_,MGRP2,_next)+1;} \
+  _group * group(const _mandala_index index) { return NULL; } \
+  _group * next_group(const _group *g) { return NULL; } \
+  _field * next_field(_field *f) { \
+    if(!f) return field(index()); \
+    _mandala_index i=f->index()+1; \
+    return field(i); \
+  } \
+  _field * field(const _mandala_index index) { \
+    switch(index){default: return NULL;
+
+#define MGRP2_END \
+    } } \
+  }MGRP2;
+
+#define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): return & (aname);
+#define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): return & ((aname).vname);
 
 #include "MandalaFields.h"
 
+//grp1
+#define MGRP_IMPL(aname,adescr) \
+  class ATPASTE3(_,aname,_base_grp1) : public ATPASTE3(_,aname,_base_grp2) { public: \
+
+#define MGRP0_BEGIN(adescr,...) MGRP_IMPL(MGRP0,adescr)
+#define MGRP0_END               };
+#define MGRP1_BEGIN(adescr,...) \
+class ATPASTE2(_,MGRP1) : public ATPASTE3(_,MGRP1,_base_grp2) { public: \
+  _mandala_index index()const{return ATPASTE5(index_,MGRP0,_,MGRP1,_next)+1;} \
+  _field * field(const _mandala_index index) { \
+    _group *g=group(index); \
+    if(!g)return NULL; \
+    return g->field(index); \
+  } \
+  _group * next_group(const _group *g) { \
+    if(!g)return group(ATPASTE5(index_,MGRP0,_,MGRP1,_next)+1); \
+    return group((g->index()&~GRP2_MASK)+(GRP2_MASK+1)); \
+  } \
+  _field * next_field(_field *f) { \
+    if(!f) return field(index()); \
+    _mandala_index i=f->index()+1; \
+    f=field(i); \
+    if(f)return f; \
+    i=(i&(~GRP2_MASK))+(GRP2_MASK+1); \
+    return field(i); \
+  } \
+  _group * group(const _mandala_index index) { \
+    switch(index&~GRP2_MASK){default: return NULL;
+
+#define MGRP1_END \
+    } } \
+  }MGRP1;
+
+#define MGRP2_BEGIN(adescr,...)     case ATPASTE7(index_,MGRP0,_,MGRP1,_,MGRP2,_next)+1: return &(MGRP2);
+
+#include "MandalaFields.h"
+
+//grp0
+#define MGRP_IMPL(aname,adescr) \
+  class ATPASTE3(_,aname,_base_grp0) : public ATPASTE3(_,aname,_base_grp1) { public: \
+
+#define MGRP0_BEGIN(adescr,...) \
+  class ATPASTE2(_,MGRP0) : public ATPASTE3(_,MGRP0,_base_grp1) { public: \
+  _mandala_index index()const{return ATPASTE3(index_,MGRP0,_next)+1;} \
+  _field * field(const _mandala_index index) { \
+    _group *g=group(index); \
+    if(!g)return NULL; \
+    g=g->group(index); \
+    if(!g)return NULL; \
+    return g->field(index); \
+  } \
+  _group * next_group(const _group *g) { \
+    if(!g)return group(ATPASTE3(index_,MGRP0,_next)+1); \
+    return group((g->index()&~GRP1_MASK)+(GRP1_MASK+1)); \
+  } \
+  _field * next_field(_field *f) { \
+    if(!f) return field(index()); \
+    _mandala_index i=f->index()+1; \
+    f=field(i); \
+    if(f)return f; \
+    i=(i&(~GRP2_MASK))+(GRP2_MASK+1); \
+    f=field(i); \
+    if(f)return f; \
+    i=(i&(~GRP1_MASK))+(GRP1_MASK+1); \
+    return field(i); \
+  } \
+  _group * group(const _mandala_index index) { \
+    switch(index&~GRP1_MASK){default: return NULL;
+
+#define MGRP0_END \
+    } } \
+  }MGRP0;
+
+#define MGRP1_BEGIN(adescr,...)     case ATPASTE5(index_,MGRP0,_,MGRP1,_next)+1: return &(MGRP1);
+
+#include "MandalaFields.h"
+
+
+//generic unnamed field types for small MCUs
+  class _value : public _field_float_t<0xFFFF>
+  {
+  public:
+    inline _mandala_float & operator=(const _mandala_float &v){setValue(v);return m_value;}
+    inline const char* name()const{return "";}
+    inline const char* descr()const{return "";}
+    inline const char* shortname()const{return "";}
+  };
+
+
+
 // METHODS
 public:
-  _mandala_float value(const uint index) const
+
+  // Iterators
+  _field * field(const _mandala_index index)
   {
-    #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): return MFIELD_VAR(aname).value();
-    #define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): return MFIELD_VAR(aname).vname.value();
-    switch(index){
-      #include "MandalaFields.h"
-    }
-    return 0;
+    _group *g=group(index);
+    if(!g)return NULL;
+    g=g->group(index);
+    if(!g)return NULL;
+    g=g->group(index);
+    if(!g)return NULL;
+    return g->field(index);
   }
-  void setValue(const uint index,const _mandala_float &v)
+  _group * group(const _mandala_index index)
   {
-    #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): MFIELD_VAR(aname)=v;break;
-    #define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): MFIELD_VAR(aname).vname=v;break;
-    switch(index){
-      #include "MandalaFields.h"
-    }
-  }
-  void setValue(const uint index,const uint &v)
-  {
-    #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): MFIELD_VAR(aname)=v;break;
-    #define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): MFIELD_VAR(aname).vname=v;break;
-    switch(index){
+    switch(index&~GRP0_MASK){
+      default: return NULL;
+      #define MGRP0_BEGIN(adescr,...)     case ATPASTE3(index_,MGRP0,_next)+1: return &MGRP0;
       #include "MandalaFields.h"
     }
   }
-  const char * shortname(const uint index) const
+  _field * next_field(_field *f)
   {
-    #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): return #aname;
-    #define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): return #aname;
-    switch(index){
-      #include "MandalaFields.h"
-    }
-    return "";
+    _mandala_index i=f?f->index()+1:0;
+    f=field(i);
+    if(f)return f;
+    //try to inc grp2
+    i=(i&(~GRP2_MASK))+(GRP2_MASK+1);
+    f=field(i);
+    if(f)return f;
+    //try to inc grp1
+    i=(i&(~GRP1_MASK))+(GRP1_MASK+1);
+    f=field(i);
+    if(f)return f;
+    //try to inc grp0
+    i=(i&(~GRP0_MASK))+(GRP0_MASK+1);
+    return field(i);
   }
-  _field * field(const uint index)
+  _group * next_group(_group *g)
   {
-    #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): return & MFIELD_VAR(aname);
-    #define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): return & (MFIELD_VAR(aname).vname);
-    switch(index){
-      #include "MandalaFields.h"
-    }
-    return NULL;
+    if(!g)return group(0);
+    return group((g->index()&~GRP0_MASK)+(GRP0_MASK+1)); \
   }
-  uint index_next(const uint index) const
+
+  //pack - unpack & messages
+  uint unpack(const _field_msg *data)
   {
-    #define MFIELD(atype,aname,...) return MFIELD_INDEX(aname); case MFIELD_INDEX(aname):
-    #define MFVECT_IMPL(atype,aname,vname,...) return MFIELD_INDEX_VEC(aname,vname); case MFIELD_INDEX_VEC(aname,vname):
-    switch(index){
-      case -1:
-      #include "MandalaFields.h"
-      return 0;
-    }
-    return 0;
+    _field *f=field(data->index);
+    return f?f->unpack(data):0;
   }
-  static inline bool is_grp0(const uint index) {return (index&((1<<11)-1))==0;}
-  static inline bool is_grp1(const uint index) {return (index&((1<<9)-1))==0;}
-  static inline bool is_grp2(const uint index) {return (index&((1<<4)-1))==0;}
+  _mandala_float value(const _mandala_index index)
+  {
+    _field *f=field(index);
+    return f?f->toFloat():0;
+  }
+  void setValue(const _mandala_index index,const _mandala_float v)
+  {
+    _field *f=field(index);
+    if(!f)return;
+    f->fromFloat(v);
+  }
+  void setValue(const _mandala_index index,const _mandala_uint v)
+  {
+    _field *f=field(index);
+    if(!f)return;
+    f->fromUInt(v);
+  }
 };
 #undef MFIELD_TYPE
 #undef MFIELD_VAR
@@ -258,23 +542,6 @@ public:
 #undef MFIELD_INDEX_VEC
 //-----------------------------------------------------------------------------
 extern _mandala mf;
-/*template<class T,T obj>
-class _mandala_imu
-{
-public:
-  inline _mandala::_vehicle & operator=(const _mandala::_vehicle &v){mf.vehicle=v;return mf.vehicle;}
-  inline operator _mandala::_vehicle() const {return mf.vehicle;}
-
-};*/
-class _test
-{
-public:
-  _test() : imu(mf.vehicle.sensor.imu)
-  {
-    imu.temp=12.34;
-  }
-  _mandala::_vehicle::_sensor::_imu &imu;
-};
 //=============================================================================
 #endif
 //=============================================================================
@@ -282,19 +549,19 @@ public:
 //=============================================================================
 //=============================================================================
 #ifndef MGRP0_BEGIN
-#define MGRP0_BEGIN
+#define MGRP0_BEGIN(...)
 #endif
 #ifndef MGRP0_END
 #define MGRP0_END
 #endif
 #ifndef MGRP1_BEGIN
-#define MGRP1_BEGIN
+#define MGRP1_BEGIN(...)
 #endif
 #ifndef MGRP1_END
 #define MGRP1_END
 #endif
 #ifndef MGRP2_BEGIN
-#define MGRP2_BEGIN
+#define MGRP2_BEGIN(...)
 #endif
 #ifndef MGRP2_END
 #define MGRP2_END
@@ -321,22 +588,22 @@ public:
 #endif
 //=============================================================================
 #define MGRP0   vehicle
-MGRP0_BEGIN
+MGRP0_BEGIN("Vehicle")
 //-------------------------
 #define MGRP1   sensor
-MGRP1_BEGIN
+MGRP1_BEGIN("Sensors")
 
 #define MGRP2   imu
-MGRP2_BEGIN
+MGRP2_BEGIN("Inertial Measurement Unit")
 MFVECT(float,  acc,x,y,z, "Acceleration [m/s2]", f2)
-MFVECT(float,  gyro,p,q,r,"Angular rate [deg/s]", f2)
+MFVECT(float,  gyro,x,y,z,"Angular rate [deg/s]", f2)
 MFVECT(float,  mag,x,y,z, "Magnetic field [a.u.]", f2)
 MFIELD(float,  temp,      "IMU temperature [C]", f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   gps
-MGRP2_BEGIN
+MGRP2_BEGIN("Global Positioning System")
 MFVECT(float,  pos,lat,lon,hmsl, "GPS position [deg,deg,m]", f4)
 MFVECT(float,  vel,N,E,D,        "GPS velocity [m/s]", f2)
 MFIELD(uint,   UTC, "GPS UTC Time from 1970 1st Jan [sec]", u4)
@@ -346,7 +613,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   air
-MGRP2_BEGIN
+MGRP2_BEGIN("Aerodynamic sensors")
 MFIELD(float, pt,    "Airspeed [m/s]", f2)
 MFIELD(float, ps,    "Barometric altitude [m]", f4)
 MFIELD(float, vario, "Barometric variometer [m/s]", f2)
@@ -357,7 +624,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   range
-MGRP2_BEGIN
+MGRP2_BEGIN("Distance to ground")
 MFIELD(float, ultrasonic, "Ultrasonic altimeter [m]", f2)
 MFIELD(float, laser,      "Laser altimeter [m]", f2)
 MFIELD(float, radio,      "Radio altimeter [m]", f4)
@@ -367,14 +634,14 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   lps
-MGRP2_BEGIN
+MGRP2_BEGIN("Local Positioning System")
 MFVECT(float, pos,x,y,z, "Local position sensor [m]", f2)
 MFVECT(float, vel,x,y,z, "Local velocity sensor [m/s]", f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   ils
-MGRP2_BEGIN
+MGRP2_BEGIN("Instrument Landing System")
 MFIELD(float, HDG,    "ILS heading to VOR1 [deg]", f2)
 MFIELD(uint,  DME,    "ILS distance to VOR1 [m]", u2)
 MFIELD(float, RSS,    "ILS signal strength [0..1]", f2)
@@ -383,7 +650,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   platform
-MGRP2_BEGIN
+MGRP2_BEGIN("Landing Platform sensors")
 MFVECT(float,  pos,lat,lon,hmsl,   "Platform position [deg,deg,m]", f4)
 MFVECT(float,  vel,N,E,D,          "Platform velocity [m/s]", f2)
 MFVECT(float,  att,roll,pitch,yaw, "Platform attitude [deg]", f2)
@@ -391,7 +658,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   radar
-MGRP2_BEGIN
+MGRP2_BEGIN("Radar target tracking")
 MFIELD(byte,  id,     "Radar target ID", u1)
 MFIELD(float, HDG,    "Radar heading to target [deg]", f2)
 MFIELD(uint,  DME,    "Radar distance to target [m]", u2)
@@ -400,7 +667,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   power
-MGRP2_BEGIN
+MGRP2_BEGIN("Power measurements")
 MFIELD(float, Ve,    "System battery voltage [v]", f2)
 MFIELD(float, Vs,    "Servo battery voltage [v]", f2)
 MFIELD(float, Vp,    "Payload battery voltage [v]", f2)
@@ -413,20 +680,20 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   engine
-MGRP2_BEGIN
+MGRP2_BEGIN("Engine sensors")
 MFIELD(uint,  rpm,      "Engine RPM [1/min]", u2)
-MFIELD(uint,  prop_rpm, "Prop RPM [1/min]", u2)
+MFIELD(uint,  rpm_prop, "Prop RPM [1/min]", u2)
 MFIELD(float, fuel,     "Fuel capacity [l]", f2)
 MFIELD(float, frate,    "Fuel flow rate [l/h]", f2)
 MFIELD(float, ET,       "Engine temperature [C]", u1)
-MFIELD(float, EGT,      "Exhaust gas temperature [C]", u10)
+MFIELD(float, EGT,      "Exhaust temperature [C]", u10)
 MFIELD(float, OT,       "Oil temperature [C]", u1)
 MFIELD(float, OP,       "Oil pressure [atm]", u01)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   temp
-MGRP2_BEGIN
+MGRP2_BEGIN("Temperature sensors")
 MFIELD(float, AT,       "Ambient temperature [C]", s1)
 MFIELD(float, RT,       "Room temperature [C]", s1)
 MFIELD(float, MT,       "Modem temperature [C]", s1)
@@ -434,7 +701,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   datalink
-MGRP2_BEGIN
+MGRP2_BEGIN("Datalink radio sensors")
 MFIELD(float, RSS,    "Modem signal strength [0..1]", f2)
 MFIELD(float, HDG,    "Modem heading to transmitter [deg]", f2)
 MFIELD(uint,  DME,    "Modem distance to transmitter [m]", u4)
@@ -442,7 +709,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   pilot
-MGRP2_BEGIN
+MGRP2_BEGIN("Pilot stick sensors")
 MFIELD(byte,  override, "RC override [0..255]", u1)
 MFIELD(float, roll,     "RC roll [-1..0..+1]", s001)
 MFIELD(float, pitch,    "RC pitch [-1..0..+1]", s001)
@@ -452,14 +719,14 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   steering
-MGRP2_BEGIN
+MGRP2_BEGIN("Steering encoders")
 MFVEC2(float, vel,left,right,     "Steering velocity [m/s]", f2)
 MFIELD(float, HDG,                "Steering heading [deg]", f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   controls
-MGRP2_BEGIN
+MGRP2_BEGIN("Controls feedback sensors")
 MFIELD(float, s1,  "Controls sensor 1", f2)
 MFIELD(float, s2,  "Controls sensor 2", f2)
 MFIELD(float, s3,  "Controls sensor 3", f2)
@@ -480,7 +747,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   user
-MGRP2_BEGIN
+MGRP2_BEGIN("User sensors")
 MFIELD(float, s1, "User sensor 1", f2)
 MFIELD(float, s2, "User sensor 2", f2)
 MFIELD(float, s3, "User sensor 3", f2)
@@ -496,10 +763,10 @@ MGRP1_END
 #undef MGRP1
 //-------------------------
 #define MGRP1   control
-MGRP1_BEGIN
+MGRP1_BEGIN("Control outputs")
 
 #define MGRP2   stability
-MGRP2_BEGIN
+MGRP2_BEGIN("Stability fast controls")
 MFIELD(float,  ail,     "Ailerons [-1..0..+1]", s001)
 MFIELD(float,  elv,     "Elevator [-1..0..+1]", s001)
 MFIELD(float,  rud,     "Rudder [-1..0..+1]", s001)
@@ -509,7 +776,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   engine
-MGRP2_BEGIN
+MGRP2_BEGIN("Engine controls")
 MFIELD(float,  thr,     "Throttle [0..1]", u001)
 MFIELD(float,  prop,    "Prop pitch [-1..0..+1]", s001)
 MFIELD(float,  mix,     "Mixture [0..1]", u001)
@@ -521,7 +788,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   wing
-MGRP2_BEGIN
+MGRP2_BEGIN("Wing mechanization")
 MFIELD(float,  flaps,   "Flaps [0..1]", u001)
 MFIELD(float,  airbrk,  "Airbrakes [0..1]", u001)
 MFIELD(float,  slats,   "Wing slats [0..1]", u001)
@@ -531,7 +798,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   brakes
-MGRP2_BEGIN
+MGRP2_BEGIN("Brakes system control")
 MFIELD(float,  brake,   "Brake [0..1]", u001)
 MFIELD(float,  brakeL,  "Left brake [0..1]", u001)
 MFIELD(float,  brakeR,  "Right brake [0..1]", u001)
@@ -539,27 +806,27 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   ers
-MGRP2_BEGIN
+MGRP2_BEGIN("Emergency Recovery System controls")
 MFIELD(bit,  launch,    "ERS on/off", )
 MFIELD(bit,  rel,       "Parachute released/locked", )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   gear
-MGRP2_BEGIN
+MGRP2_BEGIN("Landing Gear controls")
 MFIELD(bit,  retract,    "Landing gear retracted/extracted", )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   fuel
-MGRP2_BEGIN
+MGRP2_BEGIN("Fuel pumps")
 MFIELD(bit,  pump,    "Fuel pump on/off", )
 MFIELD(bit,  xfeed,   "Crossfeed on/off", )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   power
-MGRP2_BEGIN
+MGRP2_BEGIN("Power management controls")
 MFIELD(bit,  ap,        "Avionics", )
 MFIELD(bit,  servo,     "Servo on/off", )
 MFIELD(bit,  ignition,  "Engine on/off", )
@@ -573,7 +840,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   light
-MGRP2_BEGIN
+MGRP2_BEGIN("Lighting")
 MFIELD(bit,  beacon,    "Beacon light on/off", )
 MFIELD(bit,  landing,   "Landing lights on/off", )
 MFIELD(bit,  nav,       "Navigation lights on/off", )
@@ -583,14 +850,14 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   doors
-MGRP2_BEGIN
+MGRP2_BEGIN("Doors")
 MFIELD(bit,  main,    "Main door open/locked", )
 MFIELD(bit,  drop,    "Drop-off open/locked", )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   sw
-MGRP2_BEGIN
+MGRP2_BEGIN("Switches")
 MFIELD(bit,  sw1,    "Switch 1 on/off", )
 MFIELD(bit,  sw2,    "Switch 2 on/off", )
 MFIELD(bit,  sw3,    "Switch 3 on/off", )
@@ -602,24 +869,24 @@ MGRP1_END
 #undef MGRP1
 //-------------------------
 #define MGRP1   state
-MGRP1_BEGIN
+MGRP1_BEGIN("Current system state")
 
 #define MGRP2   ahrs
-MGRP2_BEGIN
+MGRP2_BEGIN("Attitude and position estimation")
 MFVECT(float, att,roll,pitch,yaw,    "Attitude [deg]", f2)
 MFIELD(float, lat,      "Latitude [deg]", f4)
 MFIELD(float, lon,      "Longitude [deg]", f4)
 MFVEC2(float, NE,N,E,   "Local position [m]", f4)
 MFVEC2(float, vel,N,E,  "Local velocity [m/s]", f2)
+MFIELD(float, altitude, "Altitude [m]", f4)
 MFIELD(float, course,   "Moving direction [deg]", f2)
 MFIELD(float, gSpeed,   "Ground speed [m/s]", f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   flight
-MGRP2_BEGIN
+MGRP2_BEGIN("Flight parameters")
 MFIELD(float, airspeed, "Airspeed [m/s]", f2)
-MFIELD(float, altitude, "Altitude [m]", f4)
 MFIELD(float, vspeed,   "Vertical speed [m/s]", f2)
 MFIELD(float, ldratio,  "Glide ratio [Lift/Drag]", f2)
 MFIELD(float, venergy,  "Compensated variometer [m/s]", f2)
@@ -630,7 +897,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   status
-MGRP2_BEGIN
+MGRP2_BEGIN("Status of subsystems")
 MFIELD(bit,  rc,     "RC on/off", )
 MFIELD(bit,  gps,    "GPS available/lost", )
 MFIELD(bit,  agl,    "AGL available/off", )
@@ -640,7 +907,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   error
-MGRP2_BEGIN
+MGRP2_BEGIN("System errors and warnings")
 MFIELD(byte,  code,     "Error code", u1)
 MFIELD(bit,  fatal,     "Fatal error/ok", )
 MFIELD(bit,  power,     "Power supply error/ok", )
@@ -654,7 +921,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   cmd
-MGRP2_BEGIN
+MGRP2_BEGIN("Commanded values")
 MFVECT(float, att,roll,pitch,yaw,       "Commanded attitude [deg]", f2)
 MFVEC2(float, NE,N,E,                   "Commanded position [m]", f4)
 MFVECT(float, pos,lat,lon,hmsl,         "Commanded global position [deg,deg,m]", f4)
@@ -668,7 +935,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   maneuver
-MGRP2_BEGIN
+MGRP2_BEGIN("Maneuver parameters")
 MFIELD(enum,  mode,      "flight mode", )
 MFENUM(mode,   EMG,     "Realtime control",       0)
 MFENUM(mode,   RPV,     "Angles control",         1)
@@ -679,11 +946,7 @@ MFENUM(mode,   STBY,    "Loiter around DNED",     5)
 MFENUM(mode,   TAXI,    "Taxi",                   6)
 MFENUM(mode,   TAKEOFF, "Takeoff",                7)
 MFENUM(mode,   LANDING, "Landing",                8)
-MFIELD(byte,  stage,     "maneuver stage", u1)
-MFIELD(byte,  wpidx,     "current waypoint [0..255]", u1)
-MFIELD(byte,  rwidx,     "current runway [0..255]", u1)
-MFIELD(byte,  twidx,     "current taxiway [0..255]", u1)
-MFIELD(byte,  piidx,     "current point of interest [0..255]", u1)
+MFIELD(byte,  stage,     "Maneuver stage", u1)
 MFIELD(enum,  mtype,     "Mission maneuver type", )
 MFENUM(mtype,   hdg,     "Heading navigation",      0)
 MFENUM(mtype,   line,    "Line navigation",         1)
@@ -693,7 +956,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   cmode
-MGRP2_BEGIN
+MGRP2_BEGIN("Control system mode")
 MFIELD(bit,  dlhd,      "High precision downstream on/off", )
 MFIELD(bit,  thrcut,    "Throttle cut on/off", )
 MFIELD(bit,  throvr,    "Throttle override on/off", )
@@ -703,29 +966,33 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   nav
-MGRP2_BEGIN
-MFIELD(float, stab,      "Stability [0..1]", u001)
-MFIELD(float, corr,      "Correlator output [K]", f2)
-MFIELD(float, delta,     "General delta (depends on mode) [m]", f2)
+MGRP2_BEGIN("Navigation parameters")
 MFVEC2(float, dXY,x,y,   "Bodyframe delta [m]", f2)
 MFVEC2(float, vXY,x,y,   "Bodyframe velocity [m/s]", f2)
+MFIELD(float, delta,     "General delta (depends on mode) [m]", f2)
+MFIELD(float, tgHDG,     "Current tangent heading [deg]", f2)
+MFIELD(float, stab,      "Stability [0..1]", u001)
+MFIELD(float, corr,      "Correlator output [K]", f2)
 MFIELD(float, rwAdj,     "Runway displacement adjust [m]", s1)
 MFIELD(float, rwDelta,   "Runway alignment [m]", f2)
 MFIELD(float, rwDV,      "Runway alignment velocity [m/s]", f2)
 MGRP2_END
 #undef MGRP2
 
-#define MGRP2   waypoint
-MGRP2_BEGIN
+#define MGRP2   mission
+MGRP2_BEGIN("Current waypoint information")
 MFIELD(float, DME,    "Distance to waypoint [m]", f2)
 MFIELD(float, HDG,    "Current waypoint heading [deg]", f2)
-MFIELD(float, tgHDG,  "Current tangent heading [deg]", f2)
 MFIELD(uint,  ETA,    "Estimated time of arrival [s]", u4)
+MFIELD(byte,  wpidx,  "Current waypoint [0..255]", u1)
+MFIELD(byte,  rwidx,  "Current runway [0..255]", u1)
+MFIELD(byte,  twidx,  "Current taxiway [0..255]", u1)
+MFIELD(byte,  piidx,  "Current point of interest [0..255]", u1)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   ils
-MGRP2_BEGIN
+MGRP2_BEGIN("Instrument Landing System status")
 MFIELD(bit, armed,    "ILS armed/off", )
 MFIELD(bit, approach, "ILS approach available/lost", )
 MFIELD(bit, offset,   "ILS offset available/lost", )
@@ -734,14 +1001,14 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   home
-MGRP2_BEGIN
+MGRP2_BEGIN("Home point")
 MFVECT(float,  pos,lat,lon,hmsl,"Home global position [deg,deg,m]", f4)
-MFIELD(float,  altps,           "barometric altitude on ground level [m]", s2)
+MFIELD(float,  altps,           "Barometric altitude on ground level [m]", s2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   wind
-MGRP2_BEGIN
+MGRP2_BEGIN("Wind estimator")
 MFIELD(float,  speed,   "wind speed [m/s]", u01)
 MFIELD(float,  HDG,     "wind direction to [deg]", f2)
 MFIELD(float,  cas2tas, "CAS to TAS multiplier [K]", u001)
@@ -749,7 +1016,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   downlink
-MGRP2_BEGIN
+MGRP2_BEGIN("Downlink parameters")
 MFIELD(uint,  period,    "downlink period [ms]", u2)
 MFIELD(uint,  timestamp, "downlink timestamp [ms]", u4)
 MGRP2_END
@@ -759,10 +1026,10 @@ MGRP1_END
 #undef MGRP1
 //-------------------------
 #define MGRP1   info
-MGRP1_BEGIN
+MGRP1_BEGIN("Information to human")
 
 #define MGRP2   ground
-MGRP2_BEGIN
+MGRP2_BEGIN("Ground Station info")
 MFIELD(float, RSS, "GCU modem signal strength [0..1]", f2)
 MFIELD(float, Ve,  "GCU system battery voltage [v]", f2)
 MFIELD(float, MT,  "GCU modem temperature [C]", s1)
@@ -770,7 +1037,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   meteo
-MGRP2_BEGIN
+MGRP2_BEGIN("Meteo base station info")
 MFIELD(float,  windSpd, "wind speed [m/s]", u01)
 MFIELD(float,  windHdg, "wind direction to [deg]", f2)
 MFIELD(float,  temp,    "Ground outside air temperature [C]", s1)
@@ -786,28 +1053,28 @@ MGRP0_END
 #undef MGRP0
 //-----------------------------------------------------------------------------
 #define MGRP0   payload
-MGRP0_BEGIN
+MGRP0_BEGIN("Payload")
 #define MGRP1   cam
-MGRP1_BEGIN
+MGRP1_BEGIN("Camera gimbal")
 
 #define MGRP2   imu
-MGRP2_BEGIN
+MGRP2_BEGIN("Camera IMU")
 MFVECT(float,   acc,x,y,z, "Cam acceleration [m/s2]", f2)
-MFVECT(float,   gyro,p,q,r,"Cam angular rate [deg/s]", f2)
+MFVECT(float,   gyro,x,y,z,"Cam angular rate [deg/s]", f2)
 MFVECT(float,   mag,x,y,z, "Cam magnetic field [a.u.]", f2)
 MFIELD(float,   temp,      "Cam IMU temperature [C]", f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   state
-MGRP2_BEGIN
+MGRP2_BEGIN("Camera control system state")
 MFVECT(float, att,roll,pitch,yaw, "Cam attitude [deg]", f2)
 MFIELD(uint,  timestamp, "Cam timestamp [ms]", u4)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   cmd
-MGRP2_BEGIN
+MGRP2_BEGIN("Camera commanded values")
 MFIELD(enum,  camop,     "Cam control mode", )
 MFENUM(camop,   off,     "camera off",                   0)
 MFENUM(camop,   fixed,   "fixed position",               1)
@@ -824,13 +1091,13 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   tune
-MGRP2_BEGIN
+MGRP2_BEGIN("Camera tuning")
 MFVECT(float, bias,roll,pitch,yaw,       "Cam stability bias [deg/s]", f4)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   options
-MGRP2_BEGIN
+MGRP2_BEGIN("Camera options")
 MFIELD(bit, PF,     "picture flip on/off", )
 MFIELD(bit, NIR,    "NIR filter on/off", )
 MFIELD(bit, DSP,    "display information on/off",)
@@ -840,7 +1107,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   control
-MGRP2_BEGIN
+MGRP2_BEGIN("Camera controls output")
 MFVECT(float, servo,roll,pitch,yaw, "Cam servo [-1..0..+1]", s001)
 MFIELD(bit,   rec,      "Recording", )
 MFIELD(bit,   shot,     "Snapshot", )
@@ -849,7 +1116,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   tracking
-MGRP2_BEGIN
+MGRP2_BEGIN("Camera tracker")
 MFVECT(float,  pos,lat,lon,hmsl,"Tracking position [deg,deg,m]", f4)
 MFIELD(float,  DME,             "Distance to tracking object [m]", u2)
 MGRP2_END
@@ -859,17 +1126,17 @@ MGRP1_END
 #undef MGRP1
 //-------------------------
 #define MGRP1   turret
-MGRP1_BEGIN
+MGRP1_BEGIN("Turret")
 
 #define MGRP2   state
-MGRP2_BEGIN
+MGRP2_BEGIN("Turret system state")
 MFVECT(float, att,roll,pitch,yaw, "Turret attitude [deg]", f2)
 MFVECT(float, enc,roll,pitch,yaw, "Turret encoders [deg]", f4)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   cmd
-MGRP2_BEGIN
+MGRP2_BEGIN("Turret commanded values")
 MFIELD(enum,  turret,     "Turret control mode", )
 MFENUM(turret,   off,     "turret off",                   0)
 MFENUM(turret,   fixed,   "fixed position",               1)
@@ -877,18 +1144,18 @@ MFENUM(turret,   stab,    "gyro stabilization",           2)
 MFENUM(turret,   position,"attitude position",            3)
 MFENUM(turret,   speed,   "attitude speed control",       4)
 MFVECT(float, att,roll,pitch,yaw,       "Commanded turret attitude [deg]", f4)
-MFIELD(byte,  ammo,     "Turret ammunition [0..255]", u1)
+MFIELD(byte,  ammo,     "Turret ammo [0..255]", u1)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   tune
-MGRP2_BEGIN
+MGRP2_BEGIN("Turret tuning")
 MFVECT(float, bias,roll,pitch,yaw,       "Turret stability bias [deg/s]", f4)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   options
-MGRP2_BEGIN
+MGRP2_BEGIN("Turret options")
 MFIELD(bit, armed,     "Turret armed/disarmed",        )
 MFIELD(bit, shoot,     "Turret shooting/standby",      )
 MFIELD(bit, reload,    "Turret reloading/reloaded",    )
@@ -900,7 +1167,7 @@ MGRP2_END
 #undef MGRP2
 
 #define MGRP2   control
-MGRP2_BEGIN
+MGRP2_BEGIN("Turret controls output")
 MFVECT(float, servo,roll,pitch,yaw, "Turret servo [-1..0..+1]", s001)
 MGRP2_END
 #undef MGRP2
@@ -919,6 +1186,7 @@ MGRP0_END
 #undef MGRP1_END
 #undef MGRP2_BEGIN
 #undef MGRP2_END
+#undef MGRP_IMPL
 #undef MFIELD
 #undef MFVECT_IMPL
 #undef MFVECT
