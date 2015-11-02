@@ -27,17 +27,14 @@
 #include <string.h>
 #include "preprocessor.h"
 //=============================================================================
-#ifndef MANDALA_FULL
-//#define MANDALA_FULL
-#endif
-//#undef MANDALA_FULL
-#define MANDALA_PACKED_STRUCT   __attribute__((packed))
+#undef MANDALA_FULL
+#define MANDALA_PACKED_STRUCT   //__attribute__((packed))
 #define MANDALA_INLINE
-#ifdef USE_FLOAT_TYPE
+//#ifdef USE_FLOAT_TYPE
 typedef float   _mandala_float;
-#else
-typedef double  _mandala_float;
-#endif
+//#else
+//typedef double  _mandala_float;
+//#endif
 typedef uint16_t   _mandala_index;
 typedef uint32_t   _mandala_uint;
 typedef uint8_t    _mandala_byte;
@@ -47,40 +44,8 @@ typedef uint8_t    _mandala_enum;
 #define GRP1_MASK       ((1<<9)-1)
 #define GRP2_MASK       ((1<<4)-1)
 //=============================================================================
-//#if !defined(USE_FLOAT_TYPE) || defined(MANDALA_FULL)
 #include "MatrixMath.h"
 using namespace matrixmath;
-/*#else
-// Simplified Vector math
-typedef float   _mandala_float;
-class Vect
-{
-public:
-  Vect();
-  Vect(const _mandala_float &s);
-  Vect(const _mandala_float &s0,const _mandala_float &s1,const _mandala_float &s2);
-  void fill(const _mandala_float &value=0);
-  _mandala_float *array();
-  const _mandala_float*array()const;
-  _mandala_float &operator[](unsigned int index);
-  const _mandala_float &operator[](unsigned int index)const;
-  Vect & operator=(const _mandala_float value);
-  bool operator==(const Vect &value)const;
-  bool operator!=(const Vect &value)const;
-  const Vect operator+(const Vect &that)const;
-  Vect &operator+=(const Vect &that);
-  const Vect operator-(const Vect &that)const;
-  Vect &operator-=(const Vect &that);
-  const Vect operator*(const _mandala_float &scale)const;
-  Vect &operator*=(const _mandala_float &scale);
-  const Vect operator/(const _mandala_float &scale)const;
-  Vect &operator/=(const _mandala_float &scale);
-protected:
-  _mandala_float v[3];
-};
-typedef _mandala_float Point[2];
-#endif*/
-//=============================================================================
 //=============================================================================
 typedef struct {
   //typedefs
@@ -143,7 +108,20 @@ enum{
   class _field
   {
   public:
-    //typedefs
+    //descr
+    //virtual _mandala_index index()const =0;
+    /*virtual const char* name()const =0;
+    virtual const char* descr()const =0;
+    virtual const char* shortname()const =0;
+    //value
+    virtual const _mandala_float toFloat() const =0;
+    virtual void fromFloat(const _mandala_float &v) =0;
+    virtual const _mandala_uint toUInt() const =0;
+    virtual void fromUInt(const _mandala_uint &v) =0;
+    //messages
+    virtual uint unpack(const _field_msg *data) =0;
+    virtual uint pack(_field_msg *data) const =0;*/
+    //type
     typedef enum{
       mf_float,
       mf_uint,
@@ -151,6 +129,9 @@ enum{
       mf_bit,
       mf_enum,
     }_mf_type;
+    //virtual _mf_type type(void) const =0;
+
+    //ext packing (telemetry)
     typedef enum{
       fmt_float_f4,
       fmt_float_f2,
@@ -169,61 +150,60 @@ enum{
       fmt_enum_,
       fmt_bit_,
     }_ext_fmt;
-    //descr
+    //virtual _ext_fmt ext_fmt(void) =0;
+  };
+
+  class _group2
+  {
+  public:
     virtual _mandala_index index()const =0;
-    //value
-    virtual const _mandala_float toFloat() const =0;
-    virtual void fromFloat(const _mandala_float &v) =0;
-    virtual const _mandala_uint toUInt() const =0;
-    virtual void fromUInt(const _mandala_uint &v) =0;
-    //messages
-    virtual uint pack(_field_msg *data) const =0;
-    virtual uint unpack(const _field_msg *data) =0;
-#ifdef MANDALA_FULL
     virtual const char* name()const =0;
     virtual const char* descr()const =0;
-    virtual const char* shortname()const =0;
-    virtual _mf_type type(void) const =0;
-    virtual _ext_fmt ext_fmt(void) =0;
-#endif
+    virtual uint unpack(const _field_msg *data) =0;
+  };
+
+  class _group1
+  {
+  public:
+    virtual _mandala_index index()const =0;
+    virtual const char* name()const =0;
+    virtual const char* descr()const =0;
+    virtual _group2 * group(const _mandala_index idx) =0;
+    virtual _group2 * next_group(const _group2 *g) =0;
+    virtual uint unpack(const _field_msg *data) =0;
+  };
+
+  class _group0
+  {
+  public:
+    virtual _mandala_index index()const =0;
+    virtual const char* name()const =0;
+    virtual const char* descr()const =0;
+    virtual _group1 * group(const _mandala_index idx) =0;
+    virtual _group1 * next_group(const _group1 *g) =0;
+    virtual uint unpack(const _field_msg *data) =0;
   };
 
   class _group
   {
   public:
-    virtual _mandala_index index()const =0;
-    virtual _group * group(const _mandala_index idx) =0;
-    virtual _field * field(const _mandala_index idx) =0;
-    virtual uint unpack(const _field_msg *data) =0;
-#ifdef MANDALA_FULL
+    /*virtual _mandala_index index()const =0;
     virtual const char* name()const =0;
     virtual const char* descr()const =0;
-    //iterators
+    virtual _group * group(const _mandala_index idx) =0;
     virtual _group * next_group(const _group *g) =0;
+    virtual _field * field(const _mandala_index idx) =0;
     virtual _field * next_field(_field *f) =0;
-#endif
+    virtual uint unpack(const _field_msg *data) =0;*/
   };
+
 
 //field template
   template <class T>
   class _field_t : public _field
   {
   public:
-#ifdef MANDALA_FULL
-    _field_t():_field(),m_value(0){flags.all=0;}
-    struct{
-      union{
-        uint8_t all;
-        struct{
-          uint8_t changed       :1;
-          uint8_t used          :1;
-        };
-      };
-    }flags;
-    MANDALA_INLINE void unchange(void) {flags.changed=0;}
-#else
     _field_t():_field(),m_value(0){}
-#endif
     MANDALA_INLINE T & operator=(const T &v){setValue(v);return m_value;}
     MANDALA_INLINE operator T() const {return m_value;}
 
@@ -299,14 +279,10 @@ enum{
     MANDALA_INLINE void setValue(const T &v)
     {
       m_value=v;
-#ifdef MANDALA_FULL
-      flags.changed=1;
-      flags.used=1;
-#endif
     }
     MANDALA_INLINE uint pack_float(_field_msg *data) const
     {
-      data->index=index();
+      //data->index=index();
       data->dtype=_field_msg::dt_float;
       data->size=4;
       const uint8_t *src=(const uint8_t *)&m_value;
@@ -319,7 +295,7 @@ enum{
     }
     MANDALA_INLINE uint pack_uint(_field_msg *data) const
     {
-      data->index=index();
+      //data->index=index();
       data->dtype=_field_msg::dt_uint;
       data->size=4;
       const uint8_t *src=(const uint8_t *)&m_value;
@@ -332,7 +308,7 @@ enum{
     }
     MANDALA_INLINE uint pack_byte(_field_msg *data) const
     {
-      data->index=index();
+      //data->index=index();
       data->dtype=_field_msg::dt_uint;
       data->size=1;
       data->payload.data[0]=m_value;
@@ -340,13 +316,16 @@ enum{
     }
     MANDALA_INLINE uint pack_bit(_field_msg *data) const
     {
-      data->index=index();
+      //data->index=index();
       data->dtype=_field_msg::dt_uint;
       data->size=1;
       data->payload.data[0]=m_value>0?1:0;
       return data->size;
     }
-
+    MANDALA_INLINE uint pack_enum(_field_msg *data) const
+    {
+      return pack_byte(data);
+    }
   };
 
   //field value types
@@ -381,26 +360,26 @@ enum{
     {return _field_t<_mandala_enum>::pack_byte(data);}
   };
 
+  typedef _field_float_t _field_float_test;
+  class _test : public _field_float_test
+  {
+  public:
+    uint v;
+
+  };
 
 //fields typedefs
 #define MFIELD_VAR(aname) MGRP0.MGRP1.MGRP2.aname
 #define MFIELD_TYPE(aname) ATPASTE2(_,aname)
 
+#define MFIELD_IMPL(aindex,atype,aname,adescr,afullname,ashortname,afmt) \
+  typedef _mandala_##atype MFIELD_TYPE(aname); MFIELD_TYPE(aname)
+
 #define MFIELD(atype,aname,adescr,afmt,...) \
   MFIELD_IMPL(MFIELD_INDEX(aname),atype,aname,adescr,ASTRINGZ(MFIELD_VAR(aname)),aname,afmt) aname;
-#define MFIELD_IMPL(aindex,atype,aname,adescr,afullname,ashortname,afmt) \
-  class MFIELD_TYPE(aname) : public _field_##atype##_t { public: \
-    MANDALA_INLINE _mandala_index index()const{return aindex;} \
-    MANDALA_INLINE const char* name()const{return afullname;} \
-    MANDALA_INLINE const char* descr()const{return adescr;} \
-    MANDALA_INLINE const char* shortname()const{return ASTRINGZ(ashortname);} \
-    MANDALA_INLINE _mf_type type(void)const{return mf_##atype;} \
-    MANDALA_INLINE _ext_fmt ext_fmt(void) {return fmt_##atype##_##afmt;} \
-    MANDALA_INLINE _mandala_##atype & operator=(const _mandala_##atype &v){setValue(v);return m_value;} \
-    enum {idx=aindex}; \
-  }
+
 #define MFVECT(atype,aname,v1,v2,v3,adescr,afmt,...) \
-  class MFIELD_TYPE(aname) { public: \
+  struct MFIELD_TYPE(aname) { public: \
     operator Vector<3,atype>()const{return Vector<3,atype>(v1,v2,v3);} \
     MFIELD_TYPE(aname) & operator=(const Vector<3,atype>& v){v1=v[0];v2=v[1];v3=v[2];return *this;} \
     MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,ASTRINGZ(MFIELD_VAR(aname).v1),aname.v1,afmt) v1;\
@@ -408,22 +387,19 @@ enum{
     MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v3),atype,v3,adescr,ASTRINGZ(MFIELD_VAR(aname).v3),aname.v3,afmt) v3;\
   }aname;
 #define MFVEC2(atype,aname,v1,v2,adescr,afmt,...) \
-  class MFIELD_TYPE(aname) { public: \
+  struct MFIELD_TYPE(aname) { public: \
     operator Vector<2,atype>()const{return Vector<2,atype>(v1,v2);} \
     MFIELD_TYPE(aname) & operator=(const Vector<2,atype>& v){v1=v[0];v2=v[1];return *this;} \
     MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,ASTRINGZ(MFIELD_VAR(aname).v1),aname.v1,afmt) v1;\
     MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,ASTRINGZ(MFIELD_VAR(aname).v2),aname.v2,afmt) v2;\
   }aname;
 
+
+//groups (_base) typedefs
 #define MGRP_IMPL(aname,adescr) \
-  class ATPASTE3(_,aname,_base) : public _group { public: \
+  struct ATPASTE3(_,aname,_base) : public _group { public: \
     MANDALA_INLINE const char* name()const{return ASTRINGZ(aname);} \
     MANDALA_INLINE const char* descr()const{return adescr;} \
-    uint unpack(const _field_msg *data) \
-    { \
-      _field *f=field(data->index); \
-      return f?f->unpack(data):0; \
-    } \
 
 #define MGRP0_BEGIN(adescr,...) MGRP_IMPL(MGRP0,adescr)
 #define MGRP0_END               };
@@ -437,24 +413,19 @@ enum{
 
 //grp2
 #define MGRP_IMPL(aname,adescr) \
-  class ATPASTE3(_,aname,_base_grp2) : public ATPASTE3(_,aname,_base) { public: \
+  struct ATPASTE3(_,aname,_base_grp2) : public ATPASTE3(_,aname,_base) { public: \
 
 #define MGRP0_BEGIN(adescr,...) MGRP_IMPL(MGRP0,adescr)
 #define MGRP0_END               };
 #define MGRP1_BEGIN(adescr,...) MGRP_IMPL(MGRP1,adescr)
 #define MGRP1_END               };
 #define MGRP2_BEGIN(adescr,...) \
-  class ATPASTE2(_,MGRP2) : public ATPASTE3(_,MGRP2,_base) { public: \
-  MANDALA_INLINE _mandala_index index()const{return ATPASTE7(index_,MGRP0,_,MGRP1,_,MGRP2,_next)+1;} \
-  MANDALA_INLINE _group * group(const _mandala_index idx) { return NULL; } \
-  MANDALA_INLINE _group * next_group(const _group *g) { return NULL; } \
-  _field * next_field(_field *f) { \
-    if(!f) return field(index()); \
-    _mandala_index i=f->index()+1; \
-    return field(i); \
-  } \
-  _field * field(const _mandala_index idx) { \
-    switch(idx){default: return NULL;
+  struct ATPASTE2(_,MGRP2) : public ATPASTE3(_,MGRP2,_base) { public: \
+    MANDALA_INLINE _mandala_index index()const{return ATPASTE7(index_,MGRP0,_,MGRP1,_,MGRP2,_next)+1;} \
+    MANDALA_INLINE _group * group(const _mandala_index idx) { return NULL; } \
+    MANDALA_INLINE _group * next_group(const _group *g) { return NULL; } \
+    void * ptr(const _mandala_index idx) { \
+      switch(idx){ default: return NULL;
 
 #define MGRP2_END \
     } } \
@@ -473,32 +444,10 @@ enum{
 #define MGRP0_END               };
 #define MGRP1_BEGIN(adescr,...) \
 class ATPASTE2(_,MGRP1) : public ATPASTE3(_,MGRP1,_base_grp2) { public: \
-  MANDALA_INLINE _mandala_index index()const{return ATPASTE5(index_,MGRP0,_,MGRP1,_next)+1;} \
-  _field * field(const _mandala_index idx) { \
-    _group *g=group(idx); \
-    if(!g)return NULL; \
-    return g->field(idx); \
-  } \
-  _group * next_group(const _group *g) { \
-    if(!g)return group(ATPASTE5(index_,MGRP0,_,MGRP1,_next)+1); \
-    return group((g->index()&~GRP2_MASK)+(GRP2_MASK+1)); \
-  } \
-  _field * next_field(_field *f) { \
-    if(!f) return field(index()); \
-    _mandala_index i=f->index()+1; \
-    f=field(i); \
-    if(f)return f; \
-    i=(i&(~GRP2_MASK))+(GRP2_MASK+1); \
-    return field(i); \
-  } \
-  _group * group(const _mandala_index idx) { \
-    switch(idx&~GRP2_MASK){default: return NULL;
-
+  MANDALA_INLINE _mandala_index index()const{return ATPASTE5(index_,MGRP0,_,MGRP1,_next)+1;}
 #define MGRP1_END \
-    } } \
   }MGRP1;
 
-#define MGRP2_BEGIN(adescr,...)     case ATPASTE7(index_,MGRP0,_,MGRP1,_,MGRP2,_next)+1: return &(MGRP2);
 
 #include "MandalaFields.h"
 
@@ -508,43 +457,15 @@ class ATPASTE2(_,MGRP1) : public ATPASTE3(_,MGRP1,_base_grp2) { public: \
 
 #define MGRP0_BEGIN(adescr,...) \
   class ATPASTE2(_,MGRP0) : public ATPASTE3(_,MGRP0,_base_grp1) { public: \
-  MANDALA_INLINE _mandala_index index()const{return ATPASTE3(index_,MGRP0,_next)+1;} \
-  _field * field(const _mandala_index idx) { \
-    _group *g=group(idx); \
-    if(!g)return NULL; \
-    g=g->group(idx); \
-    if(!g)return NULL; \
-    return g->field(idx); \
-  } \
-  _group * next_group(const _group *g) { \
-    if(!g)return group(ATPASTE3(index_,MGRP0,_next)+1); \
-    return group((g->index()&~GRP1_MASK)+(GRP1_MASK+1)); \
-  } \
-  _field * next_field(_field *f) { \
-    if(!f) return field(index()); \
-    _mandala_index i=f->index()+1; \
-    f=field(i); \
-    if(f)return f; \
-    i=(i&(~GRP2_MASK))+(GRP2_MASK+1); \
-    f=field(i); \
-    if(f)return f; \
-    i=(i&(~GRP1_MASK))+(GRP1_MASK+1); \
-    return field(i); \
-  } \
-  _group * group(const _mandala_index idx) { \
-    switch(idx&~GRP1_MASK){default: return NULL;
-
+  MANDALA_INLINE _mandala_index index()const{return ATPASTE3(index_,MGRP0,_next)+1;}
 #define MGRP0_END \
-    } } \
   }MGRP0;
-
-#define MGRP1_BEGIN(adescr,...)     case ATPASTE5(index_,MGRP0,_,MGRP1,_next)+1: return &(MGRP1);
 
 #include "MandalaFields.h"
 
 
 //generic unnamed field types for small MCUs
-  class _value : public _field_float_t
+  /*class _value : public _field_float_t
   {
   public:
     MANDALA_INLINE _mandala_float & operator=(const _mandala_float &v){setValue(v);return m_value;}
@@ -554,78 +475,13 @@ class ATPASTE2(_,MGRP1) : public ATPASTE3(_,MGRP1,_base_grp2) { public: \
     MANDALA_INLINE const char* shortname()const{return "";}
     MANDALA_INLINE _mf_type type(void)const{return mf_float;}
     MANDALA_INLINE _ext_fmt ext_fmt(void) {return fmt_float_f4;}
-  };
+  };*/
 
 
 
 // METHODS
 public:
 
-  // Iterators
-  _field * field(const _mandala_index index)
-  {
-    _group *g=group(index);
-    if(!g)return NULL;
-    g=g->group(index);
-    if(!g)return NULL;
-    g=g->group(index);
-    if(!g)return NULL;
-    return g->field(index);
-  }
-  _group * group(const _mandala_index index)
-  {
-    switch(index&~GRP0_MASK){
-      default: return NULL;
-      #define MGRP0_BEGIN(adescr,...)     case ATPASTE3(index_,MGRP0,_next)+1: return &MGRP0;
-      #include "MandalaFields.h"
-    }
-  }
-  _field * next_field(_field *f)
-  {
-    _mandala_index i=f?f->index()+1:0;
-    f=field(i);
-    if(f)return f;
-    //try to inc grp2
-    i=(i&(~GRP2_MASK))+(GRP2_MASK+1);
-    f=field(i);
-    if(f)return f;
-    //try to inc grp1
-    i=(i&(~GRP1_MASK))+(GRP1_MASK+1);
-    f=field(i);
-    if(f)return f;
-    //try to inc grp0
-    i=(i&(~GRP0_MASK))+(GRP0_MASK+1);
-    return field(i);
-  }
-  _group * next_group(_group *g)
-  {
-    if(!g)return group(0);
-    return group((g->index()&~GRP0_MASK)+(GRP0_MASK+1)); \
-  }
-
-  //pack - unpack & messages
-  uint unpack(const _field_msg *data)
-  {
-    _field *f=field(data->index);
-    return f?f->unpack(data):0;
-  }
-  _mandala_float value(const _mandala_index index)
-  {
-    _field *f=field(index);
-    return f?f->toFloat():0;
-  }
-  void setValue(const _mandala_index index,const _mandala_float v)
-  {
-    _field *f=field(index);
-    if(!f)return;
-    f->fromFloat(v);
-  }
-  void setValue(const _mandala_index index,const _mandala_uint v)
-  {
-    _field *f=field(index);
-    if(!f)return;
-    f->fromUInt(v);
-  }
 };
 #undef MFIELD_TYPE
 #undef MFIELD_VAR
