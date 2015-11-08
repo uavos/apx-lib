@@ -52,6 +52,7 @@ typedef struct{
 #define bus_packet_size_hdr             (1)
 #define bus_packet_size_hdr_srv         (bus_packet_size_hdr+sizeof(_node_sn)+1)
 #define bus_packet_size_hdr_tagged      (bus_packet_size_hdr+2)
+#define bus_packet_size_hdr_uav         (bus_packet_size_hdr+2+1)
 typedef struct{
   uint8_t       id;   //<var_idx>
   union {
@@ -66,6 +67,11 @@ typedef struct{
       uint8_t   id;     //<var_idx>
       uint8_t   data[BUS_MAX_PACKET-bus_packet_size_hdr_tagged];
     }tagged;
+    struct{
+      uint16_t  squawk;
+      uint8_t   id;     //<var_idx>
+      uint8_t   data[BUS_MAX_PACKET-bus_packet_size_hdr_tagged];
+    }uav;
   };
 }__attribute__((packed)) _bus_packet;
 //=============================================================================

@@ -38,18 +38,30 @@
 #define SIM_FREQ        10      // Simulator servo send rate [Hz]
 #define MAX_TELEMETRY   80      // max telemetry packet size [bytes]
 //=============================================================================
-// UAV identification
-typedef struct {
-  uint8_t       id;             //dynamically assigned ID
-  uint8_t       sn[12];         //serial number
-  uint8_t       name[16];       //text name
-  uint8_t       nodes_cnt;      //number of nodes in the system
-}_uav_id;
-//=============================================================================
 class Mandala : public MandalaCore
 {
 public:
-  _uav_id  id;
+  // UAV identification
+  typedef uint16_t      _squawk;
+  typedef char          _callsign[16];
+  typedef uint8_t       _uid[12];
+  // UAV transponder data
+  typedef struct {
+    _squawk   squawk;
+    float     lat;
+    float     lon;
+    int16_t   hmsl;
+    uint16_t  gSpeed;       // [m/s]*100
+    int16_t   crs;          // [deg]*32768/180
+    uint8_t   mode;         // flight mode
+  }__attribute__((packed)) _xpdr;
+  typedef struct {
+    _squawk   squawk;       //dynamically assigned ID
+    _callsign callsign;     //text name
+    _uid      uid;          //unique number
+  }__attribute__((packed)) _ident;
+  _ident ident;
+  _xpdr  xpdr;
 
   bool get_text_names(uint16_t varmsk,const char **name,const char **descr);
   const char *var_name(uint8_t var_idx);
@@ -58,7 +70,6 @@ public:
   //---- Internal use -----
   bool blockDownstream;
   // telemetry framework
-  uint8_t dl_id;                // received uav_id
   bool    dl_reset;             // set true to send everything next time
   uint8_t dl_snapshot[1024];    // all archived variables snapshot
   uint8_t dl_reset_mask[(idx_vars_top-idxPAD)/8+(((idx_vars_top-idxPAD)&3)?1:0)]; // bitmask 1=send var, auto clear after sent
@@ -96,15 +107,15 @@ public:
   void dump(uint8_t var_idx);
 
   // math operations
-  _var_float boundAngle(_var_float v,_var_float span=180.0) const;
-  _var_float boundAngle360(_var_float v) const;
-  _var_vect  boundAngle(const _var_vect &v,_var_float span=180.0) const;
+  static _var_float boundAngle(_var_float v,_var_float span=180.0);
+  static _var_float boundAngle360(_var_float v);
+  static _var_vect  boundAngle(const _var_vect &v,_var_float span=180.0);
   _var_float smoothAngle(_var_float v,_var_float v_prev,_var_float speed);
   void filter_a(const _var_float &v,_var_float *var_p,const _var_float &f);
   uint snap(uint v, uint snapv=10);
-  _var_float hyst(_var_float err,_var_float hyst);
-  _var_float limit(const _var_float v,const _var_float vL=1.0);
-  _var_float limit(const _var_float v,const _var_float vMin,const _var_float vMax);
+  static _var_float hyst(_var_float err,_var_float hyst);
+  static _var_float limit(const _var_float v,const _var_float vL=1.0);
+  static _var_float limit(const _var_float v,const _var_float vMin,const _var_float vMax);
 
   void calc(void); // calculate vars dependent on current and desired UAV position
 

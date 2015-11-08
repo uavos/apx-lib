@@ -80,8 +80,11 @@ MIDX(vmexec,    "Execute VM script <@function>")
 //other & temporary
 MIDX(sim,       "Simulator wrapped packet <var_idx>,<data..>")
 MIDX(video,     "Video stream <data>")
-//MIDX(uav,       "UAV datalink <id 4 bytes>,<var_idx>,<data..>")
-//MIDX(uav_id,    "UAV identification <_uav_id>")
+
+MIDX(dlink,     "Datalink <squawk>,<var_idx>,<data..>")
+MIDX(xpdr,      "Transponder data <xpdr>")
+MIDX(ident,     "Identification <squawk>,<ident>")
+
 MIDX(formation, "Formation flight data <packed data>")
 MIDX(vor,       "VOR beacon <packed data>")
 //------------------------------
