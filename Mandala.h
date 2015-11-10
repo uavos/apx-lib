@@ -60,8 +60,6 @@ public:
     _callsign callsign;     //text name
     _uid      uid;          //unique number
   }__attribute__((packed)) _ident;
-  _ident ident;
-  _xpdr  xpdr;
 
   bool get_text_names(uint16_t varmsk,const char **name,const char **descr);
   const char *var_name(uint8_t var_idx);

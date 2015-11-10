@@ -43,8 +43,6 @@ void Mandala::init(void)
   dl_reset=true;
   blockDownstream=false;
 
-  memset(&ident,0,sizeof(ident));
-
   //------------------------
   //init all vars
 #define MVAR(atype,aname,...) \
@@ -258,7 +256,7 @@ _var_vect Mandala::boundAngle(const _var_vect &v,_var_float span)
   return _var_vect(boundAngle(v[0],span),boundAngle(v[1],span),boundAngle(v[2],span));
 }
 //===========================================================================
-_var_float Mandala::boundAngle360(_var_float v) 
+_var_float Mandala::boundAngle360(_var_float v)
 {
   while(v<0) v+=360.0;
   while(v>=360.0) v-=360.0;
