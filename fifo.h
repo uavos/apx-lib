@@ -49,7 +49,7 @@ public:
   bool write(const T *buf,uint cnt) //copy buffer to fifo
   {
     //check if FIFO available.
-    if((size()-fifo_cnt())<cnt) return false;
+    if((size()-fifo_cnt())<(int)cnt) return false;
     //copy buf to FIFO
     if(cnt==1 && sizeof(T)==1){ //speedup
       pool[pos_write]=buf[0];
