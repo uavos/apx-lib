@@ -50,7 +50,7 @@ public:
     _squawk   squawk;
     float     lat;
     float     lon;
-    int16_t   hmsl;
+    int16_t   alt;
     uint16_t  gSpeed;       // [m/s]*100
     int16_t   crs;          // [deg]*32768/180
     uint8_t   mode;         // flight mode
