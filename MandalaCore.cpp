@@ -103,7 +103,7 @@ void MandalaCore::set_data(uint16_t var_m,uint type,void *value_ptr,_var_float v
 bool MandalaCore::get_ptr(uint8_t var_idx,void **var_ptr,uint*type)
 {
   switch (var_idx) {
-  #define MIDX(aname,adescr,...) \
+  #define MIDX(aname,...) \
     case idx_##aname: *type=vt_idx;*var_ptr=NULL;return true;
   #define MVAR(atype,aname,adescr, ...) \
     case idx_##aname: *type=vt_##atype;*var_ptr=(void*)&(aname);return true;

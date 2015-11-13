@@ -65,25 +65,26 @@ enum {vt_void=0,vt_idx,vt_byte,vt_uint,vt_flag,vt_enum,vt_float,vt_vect,vt_point
 //------------------------------
 // special protocols/indexes
 //service packet, must be the first, i.e. var_idx = 0
-MIDX(service,   "Service packet <node_sn>,<cmd>,<data..>")
+MIDX(service,   "Service packet <node_sn>,<cmd>,<data..>", =0)
 //special protocols
-MIDX(downstream,"Downlink stream <stream>")
+MIDX(xpdr,      "Transponder data <xpdr>")
+MIDX(ident,     "Identification <ident>")
+MIDX(dlink,     "Datalink <squawk>,<var_idx>,<data..>")
+MIDX(ping,      "Ping packet, no reply expected")
+MIDX(gcu,       "Ground data <var_idx>,<data..>")
+//mandala
+MIDX(downstream,"Downlink stream <stream>", =8)
 MIDX(uplink,    "Uplink wrapped packet <var_idx>,<data..>")
 MIDX(mission,   "Mission data <packed mission>")
 MIDX(set,       "Set component <var_idx>,<msk>,<float/byte>")
-MIDX(ping,      "Ping packet, no reply expected")
-MIDX(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
 MIDX(data,      "Port serial data <port_id>,<data..>")
 MIDX(ldata,     "Port data local <port_id>,<data..>")
 MIDX(can,       "Auxilary CAN data <hdr>,<data..>")
 MIDX(vmexec,    "Execute VM script <@function>")
 //other & temporary
-MIDX(sim,       "Simulator wrapped packet <var_idx>,<data..>")
+MIDX(sim,       "Simulator data <var_idx>,<data..>", =16)
 MIDX(video,     "Video stream <data>")
-
-MIDX(xpdr,      "Transponder data <xpdr>")
-MIDX(ident,     "Identification <ident>")
-MIDX(dlink,     "Datalink <squawk>,<var_idx>,<data..>")
+MIDX(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
 
 MIDX(formation, "Formation flight data <packed data>")
 MIDX(vor,       "VOR beacon <packed data>")

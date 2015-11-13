@@ -83,7 +83,7 @@ typedef uint8_t         _var_enum;
 #include "MandalaVars.h" //get constants
 //-----------------------------------------------------------------------------
 // enum indexes idx_VARNAME
-#define MIDX(aname, ... ) idx_##aname,
+#define MIDX(aname,adescr, ... ) idx_##aname __VA_ARGS__,
 enum {
   #include "MandalaVars.h"
 };
