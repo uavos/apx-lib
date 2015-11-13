@@ -41,7 +41,7 @@ protected:
 
   virtual bool connect_task();
   uint init_stage;
-  time_t time_s;
+  time_t time_tcp_s;
   uint bytes_available(uint8_t *buf,uint sz);
 
   //line read

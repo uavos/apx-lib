@@ -177,7 +177,7 @@ bool _tcp_client::connect_task()
   switch(init_stage){
     case 0: return false; //idle
     case 1:{ //connecting
-      time_s=time(0);
+      time_tcp_s=time(0);
       fd = socket(AF_INET, SOCK_STREAM|SOCK_NONBLOCK,0);
       if(fd<=0){
         if(!err_mute)printf("[%s]Error: Open Socket Failed.\n",name);
@@ -240,7 +240,7 @@ bool _tcp_client::connect_task()
       line_cnt=0;
       init_stage++;
       if(tcpdebug)printf("[%s]Request sent.\n",name);
-      time_s=time(0);
+      time_tcp_s=time(0);
     }break;
     case 4:{ //check response
       if(!readline())break;
@@ -277,11 +277,11 @@ bool _tcp_client::connect_task()
     break;
     case 20:
       //error - reconnect
-      if((time(0)-time_s)<1)break;
+      if((time(0)-time_tcp_s)<1)break;
       init_stage=1;
     break;
   }
-  if((time(0)-time_s)>5){
+  if((time(0)-time_tcp_s)>5){
     err="timeout";
   }
   if(err){
@@ -289,7 +289,7 @@ bool _tcp_client::connect_task()
     ::close(fd);
     fd=-1;
     init_stage=20;
-    time_s=time(0);
+    time_tcp_s=time(0);
   }
   return false;
 }

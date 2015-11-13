@@ -70,10 +70,12 @@ MIDX(service,   "Service packet <node_sn>,<cmd>,<data..>", =0)
 MIDX(xpdr,      "Transponder data <xpdr>")
 MIDX(ident,     "Identification <ident>")
 MIDX(dlink,     "Datalink <squawk>,<var_idx>,<data..>")
-MIDX(ping,      "Ping packet, no reply expected")
+
+MIDX(ping,      "Ping packet, no reply expected", =8)
+MIDX(sim,       "Simulator data <var_idx>,<data..>")
 MIDX(gcu,       "Ground data <var_idx>,<data..>")
 //mandala
-MIDX(downstream,"Downlink stream <stream>", =8)
+MIDX(downstream,"Downlink stream <stream>", =16)
 MIDX(uplink,    "Uplink wrapped packet <var_idx>,<data..>")
 MIDX(mission,   "Mission data <packed mission>")
 MIDX(set,       "Set component <var_idx>,<msk>,<float/byte>")
@@ -82,7 +84,6 @@ MIDX(ldata,     "Port data local <port_id>,<data..>")
 MIDX(can,       "Auxilary CAN data <hdr>,<data..>")
 MIDX(vmexec,    "Execute VM script <@function>")
 //other & temporary
-MIDX(sim,       "Simulator data <var_idx>,<data..>", =16)
 MIDX(video,     "Video stream <data>")
 MIDX(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
 
