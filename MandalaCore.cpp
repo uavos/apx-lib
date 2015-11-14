@@ -28,7 +28,7 @@
 #include "MandalaCore.h"
 #include "math.h"
 //===========================================================================
-const MandalaCore::_vars_list MandalaCore::vars_gcu = { MANDALA_LIST_GCU,0};
+const MandalaCore::_vars_list MandalaCore::vars_dlink = { MANDALA_LIST_DLINK,0};
 const MandalaCore::_vars_list MandalaCore::vars_ctr = { MANDALA_LIST_CTR,0};
 //===========================================================================
 /*uint32_t MandalaCore::hash32()

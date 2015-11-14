@@ -97,7 +97,8 @@ MIDX(vor,       "VOR beacon <packed data>")
   idx_power,idx_sw, \
   idx_cam_ch,idx_cam_mode,idx_cam_opt,idx_cam_ctrb
 // send to GCU
-#define MANDALA_LIST_GCU \
+#define MANDALA_LIST_DLINK \
+  idx_xpdr, idx_ident, idx_dlink, \
   idx_downstream, idx_ping, idx_mission, idx_data
 //------------------------------
 #undef MIDX
