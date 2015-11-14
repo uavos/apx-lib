@@ -40,15 +40,23 @@ bool Mission::update(uint8_t *buf,uint cnt)
     return false;
   }
   //default home_pos from mission
-  if(var.home_pos.mag()==0){
+  if(!(var.status&status_home)){
+    bool bSet=false;
     _item_rw *rw0=rw(0);
     if(rw0){
       var.home_pos=Vect(rw0->lat,rw0->lon,rw0->hmsl);
+      bSet=true;
     }else{
       _item_wp *wp0=wp(0);
       if(wp0){
         var.home_pos=Vect(wp0->lat,wp0->lon,wp0->alt);
+        bSet=true;
       }
+    }
+    if(bSet){
+      if(var.gps_pos.isNull())
+        var.gps_pos=var.home_pos;
+      //dmsg("Home set from mission.\n");
     }
   }
   return true;
