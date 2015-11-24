@@ -100,6 +100,9 @@ MIDX(vor,       "VOR beacon <packed data>")
 #define MANDALA_LIST_DLINK \
   idx_xpdr, idx_ident, idx_dlink, \
   idx_downstream, idx_ping, idx_mission, idx_data
+// local to GCU
+#define MANDALA_LIST_GCU \
+  idx_gcu_RSS, idx_gcu_Ve, idx_gcu_MT
 //------------------------------
 #undef MIDX
 #ifndef MVAR
