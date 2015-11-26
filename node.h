@@ -80,7 +80,9 @@ enum{
   apc_ack=0,    //acknowledge - sent back in response to commands
   //------------------
   //system commands
-  apc_info,     //return _node_info
+  apc_search,   //return just sn (broadcast)
+
+  apc_info=8,   //return _node_info
   apc_nstat,    //return _node_name + _node_status
   apc_reboot,   //reset/reboot node
   apc_mute,     //stop sending data (sensors)
