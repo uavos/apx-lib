@@ -73,7 +73,7 @@ MIDX(dlink,     "Datalink <squawk>,<var_idx>,<data..>")
 
 MIDX(ping,      "Ping packet, no reply expected", =8)
 MIDX(sim,       "Simulator data <var_idx>,<data..>")
-MIDX(gcu,       "Ground data <var_idx>,<data..>")
+MIDX(jsw,       "HID data <var_idx>,<data..>")
 //mandala
 MIDX(downstream,"Downlink stream <stream>", =16)
 MIDX(uplink,    "Uplink wrapped packet <var_idx>,<data..>")
