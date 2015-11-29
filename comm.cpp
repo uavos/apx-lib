@@ -90,6 +90,19 @@ bool Comm::open(const char *portname,int baudrate,const char *name,int timeout,u
   return true;
 }
 //==============================================================================
+bool Comm::isAvailable(const char *portname)
+{
+  int fdx = ::open(portname, O_RDWR | O_NOCTTY );
+  if(fdx<0) return false;
+  if(::flock(fdx,LOCK_EX|LOCK_NB)!=0){
+    ::close(fdx);
+    return false;
+  }
+  ::flock(fdx,LOCK_UN);
+  ::close(fdx);
+  return true;
+}
+//==============================================================================
 void Comm::close()
 {
   ::flock(fd,LOCK_UN);

@@ -15,6 +15,7 @@ public:
   void close();
   bool isOpen(void);
   int handle(void);
+  bool isAvailable(const char *portname);
 
   void write(const uint8_t v);
   void write(const uint8_t *buf,uint cnt);
