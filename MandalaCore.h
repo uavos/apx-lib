@@ -133,7 +133,6 @@ public:
   typedef const uint8_t _vars_list [];
   static _vars_list vars_dlink;
   static _vars_list vars_ctr;
-  static _vars_list vars_gcu;
 
 
   //math calculations
