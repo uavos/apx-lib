@@ -85,9 +85,9 @@ MIDX(ldata,     "Port data local <port_id>,<data..>")
 MIDX(can,       "Auxilary CAN data <hdr>,<data..>")
 MIDX(vmexec,    "Execute VM script <@function>")
 //other & temporary
+MIDX(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
 MIDX(active,    "Autopilot active flag")
 MIDX(video,     "Video stream <data>")
-MIDX(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
 
 MIDX(formation, "Formation flight data <packed data>")
 MIDX(vor,       "VOR beacon <packed data>")
