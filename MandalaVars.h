@@ -85,6 +85,7 @@ MIDX(ldata,     "Port data local <port_id>,<data..>")
 MIDX(can,       "Auxilary CAN data <hdr>,<data..>")
 MIDX(vmexec,    "Execute VM script <@function>")
 //other & temporary
+MIDX(active,    "Autopilot active flag")
 MIDX(video,     "Video stream <data>")
 MIDX(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
 
@@ -441,6 +442,14 @@ MVAR(enum,  turret_mode,  "turret mode",,)
 MBIT(turret_mode, gyro,     "gyro stabilized",                 0)
 MBIT(turret_mode, fixed,    "relative encoded attitude",       1)
 MVAR(point, turretenc_att, "turret encoders: pitch,yaw [deg]", f4,f4)
+
+//--------- ATS CONTROL --------------
+MVAR(point, atscmd_att,   "commanded ATS orientation: pitch,yaw [deg]", f4,f4)
+MVAR(point, atsctr_att,   "ATS servo: pitch,yaw [-1..0..+1]", f4,f4)
+MVAR(point, atsenc_att,   "ATS encoders: pitch,yaw [deg]", f4,f4)
+MVAR(enum,  ats_mode,  "ATS mode",,)
+MBIT(ats_mode, track,    "track UAV",    0)
+MBIT(ats_mode, manual,   "manual",       1)
 
 
 //--------- GCU use only --------------

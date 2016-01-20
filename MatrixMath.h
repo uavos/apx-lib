@@ -153,6 +153,29 @@ public:
   inline const Vector norm() const {T m=this->mag();if(m==0)return (*this)*m;return (*this)/m;}
   inline Vector & norm_self() {T m=this->mag();if(m==0)return (*this)*=m;return (*this)/=m;}
 
+
+  //limits & angles
+  Vector & limit(const float &min,const float &max)
+  {
+    for (index_t i=0 ; i < n ; i++){
+      if((*this)[i]<min)(*this)[i]=min;
+      else if((*this)[i]>max)(*this)[i]=max;
+    }
+    return (*this);
+  }
+  Vector & limit(const float &lim=1)
+  {
+    return limit(-lim,lim);
+  }
+  Vector & bound(const float &span=180.0)
+  {
+    const _mat_float dspan=span*2.0;
+    for (index_t i=0 ; i < n ; i++){
+      (*this)[i]=(*this)[i]-floor((*this)[i]/dspan+0.5)*dspan;
+    }
+    return (*this);
+  }
+
 }; //Vector class
 //------------------------------------------------------------------------------
 //Multiplication is commutative.
