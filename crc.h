@@ -63,6 +63,19 @@ static inline uint8_t CRC_8_8C(const uint8_t *buf,uint size,uint8_t crc)
   return crc;
 }
 //==============================================================================
+static inline uint8_t CRC_8(uint8_t poly,const uint8_t *buf,uint size,uint8_t crc)
+{
+  while(size--){
+    uint8_t v=*buf++;
+    for(uint i=0;i<8;i++){
+      if((crc^v)&1)crc=(crc>>1)^poly;
+      else crc>>=1;
+      v>>=1;
+    }
+  }
+  return crc;
+}
+//==============================================================================
 static inline uint32_t CRC_SUM(const uint8_t *buf,uint size,uint32_t crc)
 {
   while(size--) crc += *buf++;
