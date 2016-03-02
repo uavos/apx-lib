@@ -114,6 +114,10 @@ bool MandalaCore::get_ptr(uint8_t var_idx,void **var_ptr,uint*type)
 //=============================================================================
 uint MandalaCore::pack(uint8_t *buf,uint var_idx)
 {
+  if(var_idx>255){
+    //pack as idx_set
+    return pack_set(buf,var_idx);
+  }
   switch (var_idx) {
   #define MVAR(atype,aname,adescr,abytes,atbytes) \
     case idx_##aname: return pack_##atype##_##abytes (buf,(void*)&(aname));
