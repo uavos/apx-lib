@@ -64,6 +64,7 @@
 # include <tchar.h>
 #elif !defined __T
 #include "ch.h"
+#include "hal.h"
 #include "chprintf.h"
 #include "memstreams.h"
 #define _stprintf(s,...)      chsnprintf(s,256,__VA_ARGS__)
