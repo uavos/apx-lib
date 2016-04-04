@@ -738,6 +738,11 @@ public:
     return (*this);
   }
 
+  bool isReset()
+  {
+    return (*this)[0]==1 && (*this)[1]==0 &&(*this)[2]==0 &&(*this)[3]==0;
+  }
+
   Quat & qbuild(const Vector<3> &eps)
   {
     const _mat_float eps2=1.0-eps*eps;
@@ -749,7 +754,7 @@ public:
     return (*this);
   }
 
-  Quat & qmult(const Quat &q);
+  Quat & qmult(const Quat &q); //rotate arg by this quaternion
   const Vector<3> toEuler() const; //Aerospace
   Quat & fromEuler(const Vector<3> & euler);
   Quat & conjugate(void); //rotate back
