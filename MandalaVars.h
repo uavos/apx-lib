@@ -283,6 +283,7 @@ MBIT(power,  servo,   "Servo on/off",           2)
 MBIT(power,  ignition,"Engine on/off",          4)
 MBIT(power,  payload, "Payload activated/off",  8)
 MBIT(power,  agl,     "AGL sensor on/off",      16)
+MBIT(power,  xpdr,    "XPDR on/off",            32)
 
 MVAR(flag,  sw,       "switch controls",,)
 MBIT(sw,     starter, "Starter on/off",         1)
