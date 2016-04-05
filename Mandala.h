@@ -31,9 +31,9 @@
 //=============================================================================
 // AP constants
 //=============================================================================
-#ifndef AHRS_FREQ
-#define AHRS_FREQ       200     // AHRS Update (main loop freq) [Hz]
-#endif
+//#ifndef DEFAULT_LOOP_FREQ
+//#define DEFAULT_LOOP_FREQ       200     // AHRS Update (main loop freq) [Hz]
+//#endif
 #define GPS_FREQ        5       // GPS Update rate (for derivatives) [Hz]
 #define SIM_FREQ        10      // Simulator servo send rate [Hz]
 #define MAX_TELEMETRY   80      // max telemetry packet size [bytes]
