@@ -214,6 +214,7 @@ public:
 
 
   //data
+  __attribute__((aligned (32)))
   T pool[fifo_size];
 private:
   uint16_t pos_write,pos_read,load_cnt;
