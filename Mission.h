@@ -32,19 +32,29 @@ public:
   Mission();
 
   //---- Mission (typedefs only) ----
-  typedef enum{
-    mi_stop=0,mi_wp,mi_rw,mi_tw,mi_pi,mi_action
+  typedef enum{ //4bits
+    mi_stop=0,
+    mi_wp,
+    mi_rw,
+    mi_tw,
+    mi_pi,
+    mi_action,
+    mi_restricted,
+    mi_emergency
   } _item_type;
+
   typedef struct{
     uint8_t type        :4;     //wp,rw,scr, ..
     uint8_t option      :4;     //left,right,line,hdg, ..
   }__attribute__((packed)) _item_hdr;
+
   typedef struct{
     _item_hdr hdr;
     float           lat;
     float           lon;
     int16_t         alt;
   }__attribute__((packed)) _item_wp;
+
   typedef enum {mo_hdg,mo_line} _item_wp_option;
   typedef struct{
     _item_hdr hdr;
@@ -55,12 +65,14 @@ public:
     int16_t         dE;
     uint16_t        approach;
   }__attribute__((packed)) _item_rw;
+
   typedef enum {mo_left,mo_right} _item_rw_option;
   typedef struct{
     _item_hdr hdr;
     float           lat;
     float           lon;
   }__attribute__((packed)) _item_tw;
+
   typedef struct{
     _item_hdr hdr;
     float           lat;
@@ -70,6 +82,7 @@ public:
     uint8_t         loops;
     uint16_t        timeS;
   }__attribute__((packed)) _item_pi;
+
   typedef struct{
     _item_hdr hdr;
     union{
@@ -85,6 +98,15 @@ public:
   }__attribute__((packed)) _item_action;
   typedef enum {mo_speed,mo_poi,mo_scr,mo_loiter,mo_shot} _item_action_option;
 
+  typedef struct{
+    _item_hdr hdr;
+    uint8_t   pointsCnt;
+  }__attribute__((packed)) _item_area;
+  typedef struct{
+    float   lat;
+    float   lon;
+  }__attribute__((packed)) _item_area_point;
+
   void clear(void);
   bool update(uint8_t *buf,uint cnt);
   int next(int pos,_item_type type);
@@ -94,6 +116,9 @@ public:
   _item_tw *tw(int idx);
 
   _item_action *action(int idx); //current wp appended action
+
+  _item_area *restricted(int idx);
+  _item_area_point *area_point(_item_area *area,int idx);
 
   struct{
     _item_wp *wp;
@@ -117,6 +142,12 @@ public:
     }
     return sz;
   }
+
+  static inline int area_size(uint8_t pointsCnt)
+  {
+    return sizeof(_item_area)+sizeof(_item_area_point)*pointsCnt;
+  }
+
   uint8_t data[4096];
   uint size;
 };

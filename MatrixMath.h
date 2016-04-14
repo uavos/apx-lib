@@ -122,7 +122,7 @@ public:
     return V;
   }
 
-//multiply vectors
+//multiply vectors (dot product)
   inline const T operator *(const Vector &that) const {
     T dot = T();
     for (index_t i = 0 ; i<n ; i++)
@@ -186,9 +186,9 @@ Vector<n,T1> operator * (const T2 & s,const Vector<n,T1> & v) {return v*s;}
 template<class T>
 const Vector<3,T> cross(const Vector<3,T> &a,const Vector<3,T> &b) {
   return Vector<3,T>(
-           a[1]*b[2] - a[2]*b[1],
-           a[2]*b[0] - a[0]*b[2],
-           a[0]*b[1] - a[1]*b[0]);
+    a[1]*b[2] - a[2]*b[1],
+    a[2]*b[0] - a[0]*b[2],
+    a[0]*b[1] - a[1]*b[0]);
 }
 
 //Splice extracts a portion of a vector

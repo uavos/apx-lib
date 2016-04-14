@@ -322,6 +322,21 @@ _var_float Mandala::distance(const _var_float N,const _var_float E) const
   return sqrt(sqr(N)+sqr(E));
 }
 //=============================================================================
+const _var_point Mandala::lineDistance(const _var_point p1,const _var_point p2) const
+{
+  //calc distance to line p1-p2 from 0,0
+  const _var_float A=-p1[0];
+  const _var_float B=-p1[1];
+  const _var_float C=p2[0]-p1[0];
+  const _var_float D=p2[1]-p1[1];
+  const _var_float len_sq=C*C+D*D;
+  if(len_sq==0)return p1;
+  const _var_float r=(A*C+B*D)/len_sq;
+  if(r<0) return p1;
+  else if(r>1)return p2;
+  else return p1+Point(C,D)*r;
+}
+//=============================================================================
 const _var_point Mandala::rotate(const _var_point &v_in,const _var_float psi) const
 {
   return rotate(v_in[0],v_in[1],psi);

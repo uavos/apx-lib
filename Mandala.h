@@ -104,6 +104,7 @@ public:
   _var_float heading(const _var_float N,const _var_float E,bool back=false) const;
   _var_float distance(const _var_point &ne) const; //return distance to to NED frm (0,0,0)
   _var_float distance(const _var_float N,const _var_float E) const;
+  const _var_point lineDistance(const _var_point p1,const _var_point p2) const;
   const _var_point rotate(const _var_point &v_in,const _var_float psi) const;
   const _var_point rotate(const _var_float N,const _var_float E,const _var_float psi) const;
   const _var_vect rotate(const _var_vect &v_in,const _var_float psi);

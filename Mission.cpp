@@ -88,6 +88,10 @@ int Mission::next(int pos,_item_type type)
         case Mission::mi_action:
           pos+=action_size(hdr->option);
           break;
+        case Mission::mi_restricted:
+        case Mission::mi_emergency:
+          pos+=area_size(((_item_area*)hdr)->pointsCnt);
+          break;
         default:
           return -1;
       }
@@ -168,6 +172,26 @@ Mission::_item_action * Mission::action(int idx)
     return a;
   }
   return NULL;
+}
+//==============================================================================
+Mission::_item_area * Mission::restricted(int idx)
+{
+  //find restricted area by idx
+  int pos=-1,oidx=0;
+  while(1){
+    pos=next(pos,Mission::mi_restricted);
+    if(pos<0)break;
+    if(idx!=oidx++)continue;
+    return (_item_area*)(data+pos);
+  }
+  return NULL;
+}
+//==============================================================================
+Mission::_item_area_point * Mission::area_point(_item_area *area,int idx)
+{
+  if(idx>=area->pointsCnt)return NULL;
+  _item_area_point *p=(_item_area_point*)((uint8_t*)area+sizeof(_item_area));
+  return &(p[idx]);
 }
 //==============================================================================
 
