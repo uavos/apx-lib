@@ -274,7 +274,8 @@ MBIT(cmode,  dlhd,    "High precision downstream on/off",       1)
 MBIT(cmode,  thrcut,  "Throttle cut on/off",                    2)
 MBIT(cmode,  throvr,  "Throttle override on/off",               4)
 MBIT(cmode,  hover,   "Stabilization mode hover/run",           8)
-MBIT(cmode,  ahrs,    "AHRS mode inertial/gps",                 16)
+MBIT(cmode,  hyaw,    "Hover yaw compensated/fixed",            16)
+MBIT(cmode,  ahrs,    "AHRS mode inertial/gps",                 32)
 
 //--------- POWER CONTROL --------------
 MVAR(flag,  power,    "power controls",,)
