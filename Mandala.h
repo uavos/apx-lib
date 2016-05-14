@@ -36,7 +36,7 @@
 //#endif
 #define GPS_FREQ        5       // GPS Update rate (for derivatives) [Hz]
 #define SIM_FREQ        10      // Simulator servo send rate [Hz]
-#define MAX_TELEMETRY   80      // max telemetry packet size [bytes]
+#define MAX_TELEMETRY   128      // max telemetry packet size [bytes]
 //=============================================================================
 class Mandala : public MandalaCore
 {
