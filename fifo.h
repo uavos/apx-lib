@@ -26,6 +26,8 @@ public:
   inline void clear()
   {
     pos_write=pos_read=load_cnt=load_cnt_save=0;
+    memset(pool,0,sizeof(T));
+    memset(pool+1,0,sizeof(T));
   }
   //============================================================================
   inline bool is_empty()
@@ -211,7 +213,6 @@ public:
     return cnt;
   }
   //============================================================================
-
 
   //data
   __attribute__((aligned (32)))
