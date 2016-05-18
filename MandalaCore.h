@@ -144,7 +144,7 @@ public:
   #ifdef __arm__
   return isnan(value);
   #else
-  return ::isnan(value);
+  return isnan(value);
   #endif
   #endif
   }
@@ -156,7 +156,7 @@ public:
   #ifdef __arm__
   return isinf(value);
   #else
-  return ::isinf(value);
+  return isinf(value);
   #endif
   #endif
   }
