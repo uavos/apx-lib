@@ -27,6 +27,7 @@
 #include <string.h>
 #include <inttypes.h>
 #include <sys/types.h>
+#include <math.h>
 //=============================================================================
 #ifndef assert
 #define assert(...)
@@ -134,6 +135,31 @@ public:
   static _vars_list vars_dlink;
   static _vars_list vars_ctr;
 
+  //std lib fixes
+  static inline bool f_isnan(const _var_float value)
+  {
+  #ifndef isnan
+  return std::isnan(value);
+  #else
+  #ifdef __arm__
+  return isnan(value);
+  #else
+  return ::isnan(value);
+  #endif
+  #endif
+  }
+  static inline bool f_isinf(const _var_float value)
+  {
+  #ifndef isinf
+  return std::isinf(value);
+  #else
+  #ifdef __arm__
+  return isinf(value);
+  #else
+  return ::isinf(value);
+  #endif
+  #endif
+  }
 
   //math calculations
   _var_float inHgToAltitude(_var_float inHg,_var_float inHg_gnd);

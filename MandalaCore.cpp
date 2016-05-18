@@ -489,7 +489,7 @@ uint MandalaCore::unpack_float_f2(const void *buf,void *value_ptr)
       *xp++ = (xs | xe | xm); // Combine sign bit, exponent bits, and mantissa bits
     }
   }
-  if(isnan(f))f=0;
+  if(f_isnan(f))f=0;
   *((_var_float*)value_ptr)=f;
   return 2;
 }
@@ -503,7 +503,7 @@ uint MandalaCore::unpack_float_f4(const void *buf,void *value_ptr)
   *dest++=*src++;
   *dest++=*src++;
   *dest=*src;
-  if(isnan(f))f=0;
+  if(f_isnan(f))f=0;
   *((_var_float*)value_ptr)=f;
   return 4;
 }
