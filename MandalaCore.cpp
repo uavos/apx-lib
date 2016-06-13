@@ -627,13 +627,13 @@ uint MandalaCore::unpack_point_u001(const void *buf,void *value_ptr)
 //------------------------------------------------------------------------------
 uint MandalaCore::unpack_stream(const uint8_t *buf,uint cnt,bool hd)
 {
-  uint mask=1;
+  uint8_t mask=1;
   const uint8_t *mask_ptr=buf;
   const uint8_t *ptr=mask_ptr+1;
   int tcnt=cnt-1;
   uint idx=idxPAD;
   do{
-    for(uint i=0;i<8;i++){
+    while(mask){
       if((*mask_ptr)&mask){
         if(tcnt<=0)break;
         uint sz=hd?unpack(ptr,tcnt,idx):unpack_ext(ptr,idx);

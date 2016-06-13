@@ -50,7 +50,7 @@ public:
   // telemetry framework
   bool    dl_reset;             // set true to send everything next time
   uint8_t dl_snapshot[1024];    // all archived variables snapshot
-  uint8_t dl_reset_mask[(idx_vars_top-idxPAD)/8+(((idx_vars_top-idxPAD)&3)?1:0)]; // bitmask 1=send var, auto clear after sent
+  uint8_t dl_reset_mask[(idx_local-idxPAD)/8+(((idx_local-idxPAD)&3)?1:0)]; // bitmask 1=send var, auto clear after sent
   uint8_t dl_var[3*4];          // one var max size (tmp buf)
   //filled by extract_downstream
   uint          dl_frcnt;       // downlink frame cnt (inc by extract_downlink)

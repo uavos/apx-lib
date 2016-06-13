@@ -120,9 +120,9 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
   // skip vars in sig 'dl_filter' as they are calculated by 'extractTelemety'
 
   //limit maxSize
-  if(maxSize){
+  /*if(maxSize){
     if(maxSize>MAX_TELEMETRY)maxSize=MAX_TELEMETRY;
-  }else maxSize=sizeof(dl_snapshot);
+  }else maxSize=sizeof(dl_snapshot);*/
 
   bool hd=cmode&cmode_dlhd;
 
@@ -145,7 +145,7 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
   uint8_t *reset_mask_ptr=dl_reset_mask;
   uint cnt=0,mask_cnt=0,mask_cnt_zero=1;
   uint8_t *snapshot=dl_snapshot;
-  uint mask=1;
+  uint8_t mask=1;
   uint8_t *mask_ptr=buf;      //start of data
   uint8_t *ptr=mask_ptr+1;
   *mask_ptr=0;
@@ -158,7 +158,7 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
     //pack if not filtered
     if(!filtered){
       //check buf overflow
-      if((cnt+mask_cnt+mask_cnt_zero+sz+2)>=maxSize){
+      if((cnt+mask_cnt+2+sz+mask_cnt_zero)>=maxSize){
         (*reset_mask_ptr)|=mask; //recover reset flag (send later)
         break;
       }
@@ -173,7 +173,7 @@ uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
     }
     snapshot+=sz;
     mask<<=1;
-    if(mask&0x0100){
+    if(mask==0){
       mask=1;
       mask_cnt_zero++;
       mask_ptr=ptr;
