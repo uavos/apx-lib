@@ -33,6 +33,7 @@ enum {vt_void=0,vt_idx,vt_byte,vt_uint,vt_flag,vt_enum,vt_float,vt_vect,vt_point
 // Physical constants
 #define EARTH_RATE   0.00007292115              // rotation rate of earth (rad/sec)
 #define EARTH_RADIUS 6378137                    // earth semi-major axis radius (m)
+#define EARTH_MRADIUS 6371000.0                  // earth mean radius (m)
 #define ECCENTRICITY 0.0818191908426            // major eccentricity of earth ellipsoid
 #define FLATTENING   0.0033528106650            // flattening of the ellipsoid
 #define GRAVITY_0    9.7803730                  // zeroth coefficient for gravity model

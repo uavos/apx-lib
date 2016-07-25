@@ -312,6 +312,46 @@ _var_float Mandala::heading(const _var_float N,const _var_float E,bool back) con
   else return atan2(E,N)*R2D;
 }
 //=============================================================================
+//=============================================================================
+_var_float Mandala::bearing(const _var_point &ll1,const _var_point &ll2) const
+{
+  const _var_float latA=ll1[0]*D2R;
+  const _var_float lonA=ll1[1]*D2R;
+  const _var_float latB=ll2[0]*D2R;
+  const _var_float lonB=ll2[1]*D2R;
+  const _var_float dLon=lonB-lonA;
+  const _var_float clatB=cos(latB);
+  return R2D*atan2(clatB*sin(dLon),cos(latA)*sin(latB)-sin(latA)*clatB*cos(dLon));
+}
+//=============================================================================
+_var_float Mandala::distance(const _var_point &ll1,const _var_point &ll2) const
+{
+  const _var_float latA=ll1[0]*D2R;
+  const _var_float lonA=ll1[1]*D2R;
+  const _var_float latB=ll2[0]*D2R;
+  const _var_float lonB=ll2[1]*D2R;
+  const _var_float dLat=(latB-latA)/2.0;
+  const _var_float dLon=(lonB-lonA)/2.0;
+  const _var_float a=pow(sin(dLat),2)+cos(latA)*cos(latB)*pow(sin(dLon),2);
+  const _var_float c=2.0*atan2(sqrt(a),sqrt(1-a));
+  return EARTH_MRADIUS*c; //mean earth radius
+}
+//=============================================================================
+const _var_point Mandala::destination(const _var_point &ll,const _var_float &bearing,const _var_float &distance) const
+{
+  const _var_float latA=ll[0]*D2R;
+  const _var_float brng=bearing*D2R;
+  const _var_float dR=distance/EARTH_MRADIUS;
+  const _var_float slatA=sin(latA);
+  const _var_float clatA=cos(latA);
+  const _var_float sdR=sin(dR);
+  const _var_float cdR=cos(dR);
+  const _var_float latB=asin(slatA*cdR+clatA*sdR*cos(brng));
+  const _var_float lonB=ll[1]+R2D*atan2(sin(brng)*sdR*clatA,cdR-slatA*sin(latB));
+  return _var_point(latB*R2D,boundAngle(lonB));
+}
+//=============================================================================
+//=============================================================================
 _var_float Mandala::distance(const _var_point &ne) const
 {
   return distance(ne[0],ne[1]);

@@ -100,10 +100,18 @@ public:
   const _var_point lla2ne(const _var_vect &lla) const;  // return NED from Lat Lon AGL
   const _var_point llh2ne(const _var_vect llh) const;
   const _var_point llh2ne(const _var_vect llh,const _var_vect home_llh) const;
+
   _var_float heading(const _var_point &ne,bool back=false) const; //return heading to NED frm (0,0,0)
   _var_float heading(const _var_float N,const _var_float E,bool back=false) const;
   _var_float distance(const _var_point &ne) const; //return distance to to NED frm (0,0,0)
   _var_float distance(const _var_float N,const _var_float E) const;
+
+  //LLH Earth navigation
+  _var_float bearing(const _var_point &ll1,const _var_point &ll2) const;
+  _var_float distance(const _var_point &ll1,const _var_point &ll2) const;
+  const _var_point destination(const _var_point &ll,const _var_float &bearing,const _var_float &distance) const;
+
+  //helper nav
   const _var_point lineDistance(const _var_point p1,const _var_point p2) const;
   const _var_point rotate(const _var_point &v_in,const _var_float psi) const;
   const _var_point rotate(const _var_float N,const _var_float E,const _var_float psi) const;
