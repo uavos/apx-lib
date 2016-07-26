@@ -106,10 +106,15 @@ public:
   _var_float distance(const _var_point &ne) const; //return distance to to NED frm (0,0,0)
   _var_float distance(const _var_float N,const _var_float E) const;
 
-  //LLH Earth navigation
-  _var_float bearing(const _var_point &ll1,const _var_point &ll2) const;
-  _var_float distance(const _var_point &ll1,const _var_point &ll2) const;
-  const _var_point destination(const _var_point &ll,const _var_float &bearing,const _var_float &distance) const;
+  //LLH Earth navigation (great circle path)
+  static _var_float bearing(const _var_point &ll1,const _var_point &ll2);
+  static _var_float distance(const _var_point &ll1,const _var_point &ll2);
+  static _var_float distance(const _var_point &ll1,const _var_point &ll2,const _var_point &ll); //crosstrack
+  static const _var_point destination(const _var_point &ll,const _var_float &bearing,const _var_float &distance);
+  //rhumb LLH nav (straight line on mercator)
+  static _var_float bearing_rhumb(const _var_point &ll1,const _var_point &ll2);
+  static _var_float distance_rhumb(const _var_point &ll1,const _var_point &ll2);
+  static const _var_point destination_rhumb(const _var_point &ll,const _var_float &bearing,const _var_float &distance);
 
   //helper nav
   const _var_point lineDistance(const _var_point p1,const _var_point p2) const;

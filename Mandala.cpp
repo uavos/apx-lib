@@ -312,8 +312,9 @@ _var_float Mandala::heading(const _var_float N,const _var_float E,bool back) con
   else return atan2(E,N)*R2D;
 }
 //=============================================================================
+// http://www.movable-type.co.uk/scripts/latlong.html
 //=============================================================================
-_var_float Mandala::bearing(const _var_point &ll1,const _var_point &ll2) const
+_var_float Mandala::bearing(const _var_point &ll1,const _var_point &ll2)
 {
   const _var_float latA=ll1[0]*D2R;
   const _var_float lonA=ll1[1]*D2R;
@@ -324,7 +325,7 @@ _var_float Mandala::bearing(const _var_point &ll1,const _var_point &ll2) const
   return R2D*atan2(clatB*sin(dLon),cos(latA)*sin(latB)-sin(latA)*clatB*cos(dLon));
 }
 //=============================================================================
-_var_float Mandala::distance(const _var_point &ll1,const _var_point &ll2) const
+_var_float Mandala::distance(const _var_point &ll1,const _var_point &ll2)
 {
   const _var_float latA=ll1[0]*D2R;
   const _var_float lonA=ll1[1]*D2R;
@@ -337,7 +338,15 @@ _var_float Mandala::distance(const _var_point &ll1,const _var_point &ll2) const
   return EARTH_MRADIUS*c; //mean earth radius
 }
 //=============================================================================
-const _var_point Mandala::destination(const _var_point &ll,const _var_float &bearing,const _var_float &distance) const
+_var_float Mandala::distance(const _var_point &ll1,const _var_point &ll2,const _var_point &ll)
+{
+  const _var_float d13=distance(ll1,ll)/EARTH_MRADIUS;
+  const _var_float b13=bearing(ll1,ll);
+  const _var_float b12=bearing(ll1,ll2);
+  return EARTH_MRADIUS*asin(sin(d13)*sin(b13-b12));
+}
+//=============================================================================
+const _var_point Mandala::destination(const _var_point &ll,const _var_float &bearing,const _var_float &distance)
 {
   const _var_float latA=ll[0]*D2R;
   const _var_float brng=bearing*D2R;
@@ -349,6 +358,43 @@ const _var_point Mandala::destination(const _var_point &ll,const _var_float &bea
   const _var_float latB=asin(slatA*cdR+clatA*sdR*cos(brng));
   const _var_float lonB=ll[1]+R2D*atan2(sin(brng)*sdR*clatA,cdR-slatA*sin(latB));
   return _var_point(latB*R2D,boundAngle(lonB));
+}
+//=============================================================================
+//=============================================================================
+_var_float Mandala::bearing_rhumb(const _var_point &ll1,const _var_point &ll2)
+{
+  const _var_float latA=ll1[0]*D2R;
+  const _var_float latB=ll2[0]*D2R;
+  const _var_float dF=log(tan(PI/4.0+latB/2.0)/tan(PI/4.0+latA/2.0));
+  const _var_float dLon=D2R*boundAngle(ll2[1]-ll1[1]);
+  return R2D*atan2(dLon,dF);
+}
+//=============================================================================
+_var_float Mandala::distance_rhumb(const _var_point &ll1,const _var_point &ll2)
+{
+  const _var_float latA=ll1[0]*D2R;
+  const _var_float latB=ll2[0]*D2R;
+  const _var_float dLat=D2R*boundAngle(ll2[0]-ll1[0]);
+  const _var_float dLon=D2R*boundAngle(ll2[1]-ll1[1]);
+  const _var_float dF=log(tan(PI/4.0+latB/2.0)/tan(PI/4.0+latA/2.0));
+  const _var_float q=fabs(dF)>10e-12?dLat/dF:cos(latA);
+  return EARTH_MRADIUS*sqrt(pow(dLat,2)+pow(dLon*q,2));
+}
+//=============================================================================
+const _var_point Mandala::destination_rhumb(const _var_point &ll,const _var_float &bearing,const _var_float &distance)
+{
+  const _var_float latA=ll[0]*D2R;
+  const _var_float lonA=ll[1]*D2R;
+  const _var_float brng=bearing*D2R;
+  const _var_float dR=distance/EARTH_MRADIUS;
+  const _var_float dLat=dR*cos(brng);
+  _var_float latB=latA+dLat;
+  if(fabs(latB)>PI/2.0)latB=latB>0?PI-latB:-PI-latB;
+  const _var_float dF=log(tan(PI/4.0+latB/2.0)/tan(PI/4.0+latA/2.0));
+  const _var_float q=fabs(dF)>10e-12?dLat/dF:cos(latA);
+  const _var_float dLon=dR*sin(brng)/q;
+  const _var_float lonB=lonA+dLon;
+  return _var_point(latB*D2R,boundAngle(lonB*D2R));
 }
 //=============================================================================
 //=============================================================================
