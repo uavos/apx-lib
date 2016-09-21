@@ -167,7 +167,7 @@ Mission::_item_action * Mission::action(int idx)
     pos=next(pos,Mission::mi_stop);
     if(pos<0)break;
     _item_action *a=(_item_action*)(data+pos);
-    if(a->hdr.type!=mi_action)return NULL;
+    if(a->hdr.type!=mi_action)break;
     if(idx!=aidx++)continue;
     return a;
   }
