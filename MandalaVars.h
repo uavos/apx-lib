@@ -83,7 +83,7 @@ MIDX(mission,   "Mission data <packed mission>")
 MIDX(set,       "Set component <var_idx>,<msk>,<float/byte>")
 MIDX(data,      "Port serial data <port_id>,<data..>")
 MIDX(ldata,     "Port data local <port_id>,<data..>")
-MIDX(can,       "Auxilary CAN data <hdr>,<data..>")
+MIDX(can,       "Auxilary CAN data <ID32 b31=IDE>,<data..>")
 MIDX(vmexec,    "Execute VM script <@function>")
 //other & temporary
 MIDX(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
