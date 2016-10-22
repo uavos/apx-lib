@@ -85,7 +85,7 @@ public:
       if((*this)[i]!=0.0)return false;
     return true;
   }
-//compare
+  //compare
   bool operator==(const Vector &cmp) const {
     for (index_t i=0 ; i < n ; i++)
       if((*this)[i] != cmp[i])return false;
@@ -94,11 +94,11 @@ public:
   bool operator!=(const Vector &cmp) const {
     return !((*this)==cmp);
   }
-//Magnitude
+  //Magnitude
   inline const T mag2() const {return (*this)*(*this);}
   inline const T mag() const {return sqrt(this->mag2());}
 
-//add vectors
+  //add vectors
   inline const Vector operator+(const Vector &that) const {return Vector(*this)+=that;}
   Vector & operator+=(const Vector &that) {
     for (index_t i=0 ; i < n ; i++)
@@ -106,7 +106,7 @@ public:
     return (*this);
   }
 
-//substract vectors
+  //substract vectors
   inline const Vector operator-(const Vector &that) const {return Vector(*this)-=that;}
   Vector & operator-=(const Vector &that) {
     for (index_t i=0 ; i < n ; i++)
@@ -114,7 +114,7 @@ public:
     return (*this);
   }
 
-//Negate a vector
+  //Negate a vector
   inline const Vector operator-() const {
     Vector V;
     for (index_t i=0 ; i<n ; i++)
@@ -122,7 +122,7 @@ public:
     return V;
   }
 
-//multiply vectors (dot product)
+  //multiply vectors (dot product)
   inline const T operator *(const Vector &that) const {
     T dot = T();
     for (index_t i = 0 ; i<n ; i++)
@@ -130,11 +130,11 @@ public:
     return dot;
   }
 
-//acess by index
+  //acess by index
   T & operator[](index_t index) {return this->v[index];}
   const T & operator[](index_t index) const {return this->v[index];}
 
-//multiply to scalar
+  //multiply to scalar
   inline const Vector operator*(const T &scale) const {return Vector(*this)*=scale;}
   inline const Vector operator/(const T &scale) const {if(scale==0)return Vector(*this)*=scale;return Vector(*this)/=scale;}
   inline Vector & operator*=(const T &scale) {
@@ -149,7 +149,7 @@ public:
     return (*this);
   }
 
-//Normalize a vector
+  //Normalize a vector
   inline const Vector norm() const {T m=this->mag();if(m==0)return (*this)*m;return (*this)/m;}
   inline Vector & norm_self() {T m=this->mag();if(m==0)return (*this)*=m;return (*this)/=m;}
 
@@ -186,9 +186,9 @@ Vector<n,T1> operator * (const T2 & s,const Vector<n,T1> & v) {return v*s;}
 template<class T>
 const Vector<3,T> cross(const Vector<3,T> &a,const Vector<3,T> &b) {
   return Vector<3,T>(
-    a[1]*b[2] - a[2]*b[1],
-    a[2]*b[0] - a[0]*b[2],
-    a[0]*b[1] - a[1]*b[0]);
+        a[1]*b[2] - a[2]*b[1],
+      a[2]*b[0] - a[0]*b[2],
+      a[0]*b[1] - a[1]*b[0]);
 }
 
 //Splice extracts a portion of a vector
@@ -258,13 +258,13 @@ public:
   }
 
 
-//row
+  //row
   Vector<m,T> & operator[](index_t row_i) { return this->row(row_i); }
   const Vector<m,T> & operator[](index_t row_i) const { return this->row(row_i); }
   const Vector<m,T> & row(index_t row_i) const { return this->M[row_i]; }
   Vector<m,T> & row(index_t row_i) { return this->M[row_i]; }
 
-//column
+  //column
   const Vector<n,T> col(index_t col_i) const {
     Vector<n,T> v;
     for (index_t i=0 ; i < n ; i++)
@@ -274,18 +274,18 @@ public:
 
 
 
-//Negate a matrix
+  //Negate a matrix
   void negate() {
     for (index_t i=0 ; i<n ; i++)
       for (index_t j=0 ; j<m ; j++)
         (*this)[i][j] = -(*this)[i][j];
   }
 
-//Add two matrixes, returning the sum of the two
+  //Add two matrixes, returning the sum of the two
   //const Matrix operator+ (const Matrix & that) const { Matrix sr(*this); sr+= that; return  sr; }
   //const Matrix operator- (const Matrix & that) const { Matrix sr(*this); sr-= that; return  sr; }
 
-//Update the matrix in place
+  //Update the matrix in place
   Matrix & operator+= (const Matrix & that) {
     for (index_t i=0 ; i < n ; i++)
       (*this)[i] += that[i];
@@ -297,7 +297,7 @@ public:
     return (*this);
   }
 
-//multiplication
+  //multiplication
   /*template<index_t p>
   const Matrix<n,p,T> operator*(const Matrix<m,p,T> & B) const {
     Matrix<n,p,T> C;
@@ -480,9 +480,9 @@ public:
     for (index_t i=0 ; i<n ; i++)
       A[i][i]+=value;
   }
-// construct a direction cosine matrix from quaternions in the standard
-// rotation sequence [phi][theta][psi] from NED to body frame
-// body = tBL(3,3)*NED q(4,1)
+  // construct a direction cosine matrix from quaternions in the standard
+  // rotation sequence [phi][theta][psi] from NED to body frame
+  // body = tBL(3,3)*NED q(4,1)
   void quatDC(const Vector<4> & q){
     const _mat_float & q0 = q[0];
     const _mat_float & q1 = q[1];
@@ -538,10 +538,10 @@ public:
     for ( index_t j=0 ; j<n-1 ; j++ )
       for ( index_t i=j+1 ; i<n ; i++ )
         L[i][j] = A[i][j]; // Separate the M matrix
-        U.fill();
-      for ( index_t i=0 ; i<n ; i++ )
-        for ( index_t j=i ; j<n ; j++ )
-          U[i][j] = A[i][j];
+    U.fill();
+    for ( index_t i=0 ; i<n ; i++ )
+      for ( index_t j=i ; j<n ; j++ )
+        U[i][j] = A[i][j];
   }
 
 }; //Matrix
@@ -769,7 +769,7 @@ public:
   const Vector<3> HMatrix2euler(int order) const;
 
   static _mat_float HMatrix[4][4];
-  #define EulOrd(i,p,r,f)    (((((((i)<<1)+(p))<<1)+(r))<<1)+(f))
+#define EulOrd(i,p,r,f)    (((((((i)<<1)+(p))<<1)+(r))<<1)+(f))
   enum{
     EulFrmS=0,
     EulFrmR=1,
