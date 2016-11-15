@@ -13,12 +13,12 @@ uint Datalink::pack_downstream(uint8_t *buf,uint sz)
 }
 //==============================================================================
 //==============================================================================
-uint Datalink::pack_float_s(void *buf,const _var_float &v)
+uint Datalink::pack_float_s(void *buf,const _mandala_float &v)
 {
   *((int8_t*)buf)=(v>127)?127:((v<-128)?-128:v);
   return sizeof(int8_t);
 }
-uint Datalink::pack_float_u(void *buf,const _var_float &v)
+uint Datalink::pack_float_u(void *buf,const _mandala_float &v)
 {
   *((uint8_t*)buf)=(v>255)?255:v;
   return sizeof(uint8_t);
@@ -26,52 +26,52 @@ uint Datalink::pack_float_u(void *buf,const _var_float &v)
 //------------------------------------------------------------------------------
 uint Datalink::pack_float_s1(void *buf,void *value_ptr)
 {
-  return pack_float_s(buf,*((_var_float*)value_ptr));
+  return pack_float_s(buf,*((_mandala_float*)value_ptr));
 }
 //------------------------------------------------------------------------------
 uint Datalink::pack_float_s01(void *buf,void *value_ptr)
 {
-  return pack_float_s(buf,*((_var_float*)value_ptr)*10.0);
+  return pack_float_s(buf,*((_mandala_float*)value_ptr)*10.0);
 }
 //------------------------------------------------------------------------------
 uint Datalink::pack_float_s001(void *buf,void *value_ptr)
 {
-  return pack_float_s(buf,*((_var_float*)value_ptr)*100.0);
+  return pack_float_s(buf,*((_mandala_float*)value_ptr)*100.0);
 }
 //------------------------------------------------------------------------------
 uint Datalink::pack_float_s10(void *buf,void *value_ptr)
 {
-  return pack_float_s(buf,*((_var_float*)value_ptr)/10.0);
+  return pack_float_s(buf,*((_mandala_float*)value_ptr)/10.0);
 }
 //------------------------------------------------------------------------------
 uint Datalink::pack_float_u1(void *buf,void *value_ptr)
 {
-  return pack_float_u(buf,*((_var_float*)value_ptr));
+  return pack_float_u(buf,*((_mandala_float*)value_ptr));
 }
 //------------------------------------------------------------------------------
 uint Datalink::pack_float_u01(void *buf,void *value_ptr)
 {
-  return pack_float_u(buf,*((_var_float*)value_ptr)*10.0);
+  return pack_float_u(buf,*((_mandala_float*)value_ptr)*10.0);
 }
 //------------------------------------------------------------------------------
 uint Datalink::pack_float_u001(void *buf,void *value_ptr)
 {
-  return pack_float_u(buf,*((_var_float*)value_ptr)*100.0);
+  return pack_float_u(buf,*((_mandala_float*)value_ptr)*100.0);
 }
 //------------------------------------------------------------------------------
 uint Datalink::pack_float_u10(void *buf,void *value_ptr)
 {
-  return pack_float_u(buf,*((_var_float*)value_ptr)/10.0);
+  return pack_float_u(buf,*((_mandala_float*)value_ptr)/10.0);
 }
 //------------------------------------------------------------------------------
 uint Datalink::pack_float_u100(void *buf,void *value_ptr)
 {
-  return pack_float_u(buf,*((_var_float*)value_ptr)/100.0);
+  return pack_float_u(buf,*((_mandala_float*)value_ptr)/100.0);
 }
 //------------------------------------------------------------------------------
 uint Datalink::pack_float_f2(void *buf,void *value_ptr)
 { //IEEE 754r
-  float f=*((_var_float*)value_ptr);
+  float f=*((_mandala_float*)value_ptr);
   uint8_t *ptr=(uint8_t*)&f;
   uint32_t x = ptr[0]|ptr[1]<<8|ptr[2]<<16|ptr[3]<<24,xs,xe,xm;
   uint16_t hs,he,hm;
@@ -121,7 +121,7 @@ uint Datalink::pack_float_f2(void *buf,void *value_ptr)
 //------------------------------------------------------------------------------
 uint Datalink::pack_float_f4(void *buf,void *value_ptr)
 {
-  float f=*(_var_float*)value_ptr;
+  float f=*(_mandala_float*)value_ptr;
   uint8_t *src=(uint8_t*)&f;
   uint8_t *dest=(uint8_t*)buf;
   *dest++=*src++;
@@ -174,55 +174,55 @@ uint Datalink::pack_uint_u2(void *buf,void *value_ptr)
 //=============================================================================
 uint Datalink::unpack_float_s1(const void *buf, void *value_ptr)
 {
-  *((_var_float*)value_ptr)=(_var_float)(*((const int8_t*)buf));
+  *((_mandala_float*)value_ptr)=(_mandala_float)(*((const int8_t*)buf));
   return 1;
 }
 //------------------------------------------------------------------------------
 uint Datalink::unpack_float_s01(const void *buf,void *value_ptr)
 {
-  *((_var_float*)value_ptr)=(_var_float)(*((const int8_t*)buf))/10.0;
+  *((_mandala_float*)value_ptr)=(_mandala_float)(*((const int8_t*)buf))/10.0;
   return 1;
 }
 //------------------------------------------------------------------------------
 uint Datalink::unpack_float_s001(const void *buf,void *value_ptr)
 {
-  *((_var_float*)value_ptr)=(_var_float)(*((const int8_t*)buf))/100.0;
+  *((_mandala_float*)value_ptr)=(_mandala_float)(*((const int8_t*)buf))/100.0;
   return 1;
 }
 //------------------------------------------------------------------------------
 uint Datalink::unpack_float_s10(const void *buf,void *value_ptr)
 {
-  *((_var_float*)value_ptr)=(_var_float)((const int32_t)*((const int8_t*)buf)*10);
+  *((_mandala_float*)value_ptr)=(_mandala_float)((const int32_t)*((const int8_t*)buf)*10);
   return 1;
 }
 //------------------------------------------------------------------------------
 uint Datalink::unpack_float_u1(const void *buf,void *value_ptr)
 {
-  *((_var_float*)value_ptr)=(_var_float)(*((const uint8_t*)buf));
+  *((_mandala_float*)value_ptr)=(_mandala_float)(*((const uint8_t*)buf));
   return 1;
 }
 //------------------------------------------------------------------------------
 uint Datalink::unpack_float_u01(const void *buf,void *value_ptr)
 {
-  *((_var_float*)value_ptr)=(_var_float)(*((const uint8_t*)buf))/10.0;
+  *((_mandala_float*)value_ptr)=(_mandala_float)(*((const uint8_t*)buf))/10.0;
   return 1;
 }
 //------------------------------------------------------------------------------
 uint Datalink::unpack_float_u001(const void *buf,void *value_ptr)
 {
-  *((_var_float*)value_ptr)=(_var_float)(*((const uint8_t*)buf))/100.0;
+  *((_mandala_float*)value_ptr)=(_mandala_float)(*((const uint8_t*)buf))/100.0;
   return 1;
 }
 //------------------------------------------------------------------------------
 uint Datalink::unpack_float_u10(const void *buf,void *value_ptr)
 {
-  *((_var_float*)value_ptr)=(_var_float)((const uint32_t)*((const uint8_t*)buf)*10);
+  *((_mandala_float*)value_ptr)=(_mandala_float)((const uint32_t)*((const uint8_t*)buf)*10);
   return 1;
 }
 //------------------------------------------------------------------------------
 uint Datalink::unpack_float_u100(const void *buf,void *value_ptr)
 {
-  *((_var_float*)value_ptr)=(_var_float)((const uint32_t)*((const uint8_t*)buf)*100);
+  *((_mandala_float*)value_ptr)=(_mandala_float)((const uint32_t)*((const uint8_t*)buf)*100);
   return 1;
 }
 //------------------------------------------------------------------------------
@@ -266,7 +266,7 @@ uint Datalink::unpack_float_f2(const void *buf,void *value_ptr)
     }
   }
   if(isnan(f))f=0;
-  *((_var_float*)value_ptr)=f;
+  *((_mandala_float*)value_ptr)=f;
   return 2;
 }
 //------------------------------------------------------------------------------
@@ -280,7 +280,7 @@ uint Datalink::unpack_float_f4(const void *buf,void *value_ptr)
   *dest++=*src++;
   *dest=*src;
   if(isnan(f))f=0;
-  *((_var_float*)value_ptr)=f;
+  *((_mandala_float*)value_ptr)=f;
   return 4;
 }
 //------------------------------------------------------------------------------

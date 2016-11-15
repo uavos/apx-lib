@@ -26,26 +26,91 @@
 #include <sys/types.h>
 #include <string.h>
 #include "preprocessor.h"
+#include <dmsg.h>
 //=============================================================================
-#ifndef MANDALA_FULL
+// peferences
+//#define MANDALA_MAX_MSG 1024
 //#define MANDALA_FULL
-#endif
 //#undef MANDALA_FULL
 #define MANDALA_PACKED_STRUCT   __attribute__((packed))
-#define MANDALA_INLINE
-#ifdef USE_FLOAT_TYPE
-typedef float   _mandala_float;
-#else
-typedef double  _mandala_float;
-#endif
-typedef uint16_t   _mandala_index;
-typedef uint32_t   _mandala_uint;
-typedef uint8_t    _mandala_byte;
-typedef uint8_t    _mandala_bit;
-typedef uint8_t    _mandala_enum;
-#define GRP0_MASK       ((1<<11)-1)
-#define GRP1_MASK       ((1<<9)-1)
-#define GRP2_MASK       ((1<<4)-1)
+#define MANDALA_TEXT
+//#define MANDALA_FLAGS
+//#define MANDALA_DOUBLE
+#define MANDALA_ITERATORS
+//=============================================================================
+
+/*
+############################
+# HEADER
+############################
+32bit (29bit CAN)
+------------------ < CAN EID START
+## 7 bits source node address (127 nodes, 0=reserved=<no addr yet>):
+0-6:    can_adr
+7:      toggle  (toggle bit each frame to detect errors)
+------------------
+## 8 bits specifier for dictionary SDO/PDO:
+8:     dtype    (16 data types) [float,uint,int,vec180,vec3000,vec10,ll,...]
+9:     dtype
+10:    dtype
+11:    dtype
+12:    prio     (4 redundancies) [0=highest priority]
+13:    prio
+14:    cmd      (4 commands) [data,sync,...]
+15:    cmd
+------------------
+## 13 bits dictionary:
+16:     field   (16 fields)     [field name]
+17:     field
+18:     field
+19:     field
+20:     group1  (32 groups)     [subsytem name]
+21:     group1
+22:     group1
+23:     group1
+24:     group1
+25:     group0  (4 groups)      [sensor,control,state,info]
+26:     group0
+27:     object  (4 types)       [vehicle,payload,reserved,aux=3]
+28:     object
+------------------ < CAN EID END
+## 3 bits node local stats (NO CAN TX):
+29:     iface   (8 ifaces)      [registered iface index to trace loops]
+30:     iface
+31:     iface
+############################
+# AUX HEADER
+############################
+32bit (29bit CAN)
+------------------ < CAN EID START
+0-6:    can_adr
+7:      toggle  (toggle bit each frame to detect errors)
+------------------
+## 8 bits specifier
+8-15:   fcnt    (256 frames counter = 2048 bytes)
+------------------
+## 11 bits command & flags (dictionary space):
+16:     cmd     (256 commands/indexes)
+17:     cmd
+18:     cmd
+19:     cmd
+20:     cmd
+21:     cmd
+22:     cmd
+23:     cmd
+24:     more?           [1=more to come,0=end of frame mark]
+25:     expedited?      [1=yes,0=multiframe]
+26:     request?        [1=request,0=response]
+------------------
+## 2 bits object=aux=3 mark
+27:     object=1
+28:     object=1
+------------------ < CAN EID END
+## 3 bits node local stats (NO CAN TX):
+29:     iface   (8 ifaces)      [registered index to trace loops]
+30:     iface
+31:     iface
+*/
 //=============================================================================
 //#if !defined(USE_FLOAT_TYPE) || defined(MANDALA_FULL)
 #include "MatrixMath.h"
@@ -82,26 +147,62 @@ typedef _mandala_float Point[2];
 #endif*/
 //=============================================================================
 //=============================================================================
-typedef struct {
-  //typedefs
-  typedef struct{
-    uint8_t  nID;         //Node ID
-  }MANDALA_PACKED_STRUCT _msg_id;
-  typedef struct{
-    uint16_t data_type  :4; //data type
-    uint16_t data_fcnt  :2; //frame cnt
-    uint16_t error      :2; //error code
-    uint16_t command    :8; //command byte
-  }MANDALA_PACKED_STRUCT _data_hdr;
-  //definitions
-  _msg_id       id;     //1
-  _data_hdr     hdr;    //2
-}MANDALA_PACKED_STRUCT _mandala_msg;
+struct _mandala_test
+{
+  _mandala_test & operator =(const float & a)
+  {
+    m_value = a;
+    return *this;
+  }
+  operator float() const {return m_value;}
+
+  const char *name(){return "test struct";}
+
+  float m_value;
+};
+class _mandala_test_class_base
+{
+protected:
+  virtual const char *name()=0;
+};
+class _mandala_test_class : virtual public _mandala_test_class_base
+{
+public:
+  _mandala_test_class & operator = (const float & a)
+  {
+    m_value = a;
+    return *this;
+  }
+  operator float() const {return m_value;}
+  const char *name(){return "test class";}
+  float m_value;
+  //uint8_t buf[5];
+  uint32_t ptr;
+}__attribute__((packed));
+//=============================================================================
+//-----------------------------------------------------------------------------
+// basic types
+//-----------------------------------------------------------------------------
+#ifdef MANDALA_DOUBLE
+typedef double  _mandala_float;
+#else
+typedef float   _mandala_float;
+#endif
+typedef uint16_t   _mandala_index;
+typedef uint32_t   _mandala_uint;
+typedef uint8_t    _mandala_byte;
+typedef uint8_t    _mandala_bit;
+typedef uint8_t    _mandala_enum;
 //=============================================================================
 class _mandala
 {
 public:
-// index
+//-----------------------------------------------------------------------------
+// indexes _mandala::index_vehicle_sensor_imu_gyro_x
+//-----------------------------------------------------------------------------
+#define GRP0_MASK       ((1<<11)-1)     //11-9= 2bit (4 objects)
+#define GRP1_MASK       ((1<<9)-1)      //9-4=  5bit (32 groups)
+#define GRP2_MASK       ((1<<4)-1)      //      4bit (16 fields)
 #define MGRP0_BEGIN(...)        ATPASTE2(index_,MGRP0),ATPASTE3(index_,MGRP0,_next)=(ATPASTE2(index_,MGRP0) &~GRP0_MASK)-1,
 #define MGRP0_END               ATPASTE3(index_,MGRP0,_end)=(ATPASTE2(index_,MGRP0) &~GRP0_MASK)+(GRP0_MASK+1),
 #define MGRP1_BEGIN(...)        ATPASTE4(index_,MGRP0,_,MGRP1),ATPASTE5(index_,MGRP0,_,MGRP1,_next)=(ATPASTE4(index_,MGRP0,_,MGRP1) &~GRP1_MASK)-1,
@@ -123,27 +224,77 @@ enum{
   #include "MandalaFields.h"
 };
 
-//messages
-  typedef struct{
-    uint8_t size;       //size of data bytes
-    uint16_t index :13; //field ID
+//-----------------------------------------------------------------------------
+// messages
+//-----------------------------------------------------------------------------
+//universal message packet after unpacking from CAN or UART
+  typedef struct {
+    uint16_t size;      //size of data bytes
+    _mandala_index index  :13;//dict ID
+    uint8_t  iface  :3; //interface index
     typedef enum{
       dt_float=0,
       dt_uint,
       dt_int,
-    }_dtype; //8 types total
-    _dtype   dtype :3;  //data payload type
-    union{
+      dt_vect,
+      dt_vec2,
+    }_dtype; //16 types total
+    typedef enum{
+      vs_180=0, //attitude,acc
+      vs_1,     //controls
+      vs_10,    //mag
+      vs_5000,  //gyro
+    }_vscale; //16 types total
+    union {
+      uint8_t specifier;        //general byte mask (8bit)
+      struct {                  //dict data
+        _dtype   dtype  :4;
+        uint8_t  prio   :2;
+        uint8_t  cmd    :2;
+      }MANDALA_PACKED_STRUCT;
+      uint8_t fcnt;             //aux data
+    }MANDALA_PACKED_STRUCT;
+    union{                      //payload data
       uint32_t data32;
       uint8_t  data[4];
-    }payload;
-  }MANDALA_PACKED_STRUCT _field_msg;
+      struct{
+        uint32_t d20_1    :20;
+        uint32_t d20_2    :20;
+        uint32_t d20_3    :20;
+        _vscale scale     :4;
+      }MANDALA_PACKED_STRUCT vect;
+    }MANDALA_PACKED_STRUCT payload;
+  }MANDALA_PACKED_STRUCT _message;
 
-//interfaces
-  class _field
+  #define MANDALA_MSGHDR_SIZE     (sizeof(_mandala::_message)-sizeof(_mandala::_message::payload))
+
+  static _mandala_float vscale2float(const uint8_t vscale)
+  {
+    switch(vscale){
+      case _message::vs_180:    return 180.0;
+      case _message::vs_1:      return 1.0;
+      case _message::vs_10:     return 10.0;
+      case _message::vs_5000:   return 5000.0;
+      default: return 1;
+    }
+  }
+
+//-----------------------------------------------------------------------------
+// interfaces
+//-----------------------------------------------------------------------------
+  class _field;
+  class _group;
+
+  //configurable base classes
+  class _field_base
   {
   public:
-    //typedefs
+    #ifdef MANDALA_TEXT
+    virtual const char* name()const =0;
+    virtual const char* descr()const =0;
+    virtual const char* shortname()const =0;
+    #endif
+    #ifdef MANDALA_ITERATORS
     typedef enum{
       mf_float,
       mf_uint,
@@ -169,47 +320,103 @@ enum{
       fmt_enum_,
       fmt_bit_,
     }_ext_fmt;
-    //descr
-    virtual _mandala_index index()const =0;
-    //value
-    virtual const _mandala_float toFloat() const =0;
-    virtual void fromFloat(const _mandala_float &v) =0;
-    virtual const _mandala_uint toUInt() const =0;
-    virtual void fromUInt(const _mandala_uint &v) =0;
-    //messages
-    virtual uint pack(_field_msg *data) const =0;
-    virtual uint unpack(const _field_msg *data) =0;
-#ifdef MANDALA_FULL
-    virtual const char* name()const =0;
-    virtual const char* descr()const =0;
-    virtual const char* shortname()const =0;
     virtual _mf_type type(void) const =0;
     virtual _ext_fmt ext_fmt(void) =0;
-#endif
+    #endif
+  };
+  class _group_base
+  {
+  public:
+    #ifdef MANDALA_TEXT
+    virtual const char* name()const =0;
+    virtual const char* descr()const =0;
+    #endif
+    #ifdef MANDALA_ITERATORS
+    //iterators
+    virtual _group * next_group(const _group *g) =0;
+    virtual _field * next_field(_field *f) =0;
+    #endif
   };
 
-  class _group
+
+  //implementation
+  class _field : public _field_base
+  {
+  public:
+    virtual _mandala_index index()const =0;
+    //value
+    virtual _mandala_float toFloat() const =0;
+    virtual void fromFloat(const _mandala_float &v) =0;
+    virtual _mandala_uint toUInt() const =0;
+    virtual void fromUInt(const _mandala_uint &v) =0;
+    //messages
+    virtual uint pack(_message *data) const =0;
+    virtual uint unpack(const _message *data) =0;
+  };
+
+  class _group : public _group_base
   {
   public:
     virtual _mandala_index index()const =0;
     virtual _group * group(const _mandala_index idx) =0;
     virtual _field * field(const _mandala_index idx) =0;
-    virtual uint unpack(const _field_msg *data) =0;
-#ifdef MANDALA_FULL
-    virtual const char* name()const =0;
-    virtual const char* descr()const =0;
-    //iterators
-    virtual _group * next_group(const _group *g) =0;
-    virtual _field * next_field(_field *f) =0;
-#endif
+    virtual uint unpack(const _message *data) =0;
   };
 
-//field template
+  class _field_vect
+  {
+  public:
+    uint pack(_message *data,const _field *f1,const _field *f2,const _field *f3,_message::_vscale vscale) const
+    { //pack vector bundle
+      data->index=f1->index();
+      data->size=8;
+      data->dtype=_mandala::_message::dt_vect;
+      data->payload.vect.scale=vscale;
+      int32_t vmult=((1<<19)-1);
+      float vdiv=vscale2float(data->payload.vect.scale);
+      float v=f1->toFloat();
+      if(v>vdiv)v=vdiv;
+      else if(v<-vdiv)v=-vdiv;
+      data->payload.vect.d20_1=(v/vdiv)*vmult;
+      v=f2->toFloat();
+      if(v>vdiv)v=vdiv;
+      else if(v<-vdiv)v=-vdiv;
+      data->payload.vect.d20_2=(v/vdiv)*vmult;
+      v=f3->toFloat();
+      if(v>vdiv)v=vdiv;
+      else if(v<-vdiv)v=-vdiv;
+      data->payload.vect.d20_3=(v/vdiv)*vmult;
+      return data->size;
+    }
+    uint pack(_message *data,const _field *f1,const _field *f2) const
+    { //pack two floats
+      data->index=f1->index();
+      data->size=8;
+      data->dtype=_mandala::_message::dt_vec2;
+      float v=f1->toFloat();
+      const uint8_t *src=(const uint8_t *)&v;
+      uint8_t *dest=(uint8_t *)data->payload.data;
+      *dest++=*src++;
+      *dest++=*src++;
+      *dest++=*src++;
+      *dest++=*src++;
+      v=f2->toFloat();
+      src=(const uint8_t *)&v;
+      *dest++=*src++;
+      *dest++=*src++;
+      *dest++=*src++;
+      *dest++=*src++;
+      return data->size;
+    }
+  };
+
+
+//field template by value type
   template <class T>
   class _field_t : public _field
   {
   public:
-#ifdef MANDALA_FULL
+#ifdef MANDALA_FLAGS
     _field_t():_field(),m_value(0){flags.all=0;}
     struct{
       union{
@@ -217,31 +424,32 @@ enum{
         struct{
           uint8_t changed       :1;
           uint8_t used          :1;
+          uint8_t unpacked      :1;
         };
       };
-    }flags;
-    MANDALA_INLINE void unchange(void) {flags.changed=0;}
+    }MANDALA_PACKED_STRUCT flags;
+    void unchange(void) {flags.changed=0;}
 #else
     _field_t():_field(),m_value(0){}
 #endif
-    MANDALA_INLINE T & operator=(const T &v){setValue(v);return m_value;}
-    MANDALA_INLINE operator T() const {return m_value;}
+    T & operator=(const T &v){setValue(v);return m_value;}
+    operator T() const {return m_value;}
 
-    MANDALA_INLINE const T & value() const {return m_value;}
+    const T & value() const {return m_value;}
 
     //interface
-    MANDALA_INLINE const _mandala_float toFloat() const {return value();}
-    MANDALA_INLINE void fromFloat(const _mandala_float &v){setValue(v);}
-    MANDALA_INLINE const _mandala_uint toUInt() const {return value();}
-    MANDALA_INLINE void fromUInt(const _mandala_uint &v){setValue(v);}
+    _mandala_float toFloat() const {return value();}
+    void fromFloat(const _mandala_float &v){setValue(v);}
+    _mandala_uint toUInt() const {return value();}
+    void fromUInt(const _mandala_uint &v){setValue(v);}
 
-    uint unpack(const _field_msg *data)
+    uint unpack(const _message *data)
     {
       const uint8_t *src=(const uint8_t *)data->payload.data;
       const uint8_t sz=data->size;
       switch(data->dtype){
-        case _field_msg::dt_float:{
-          if(sz!=4)break;
+        case _message::dt_float:{
+          if(sz!=4)return 0;
           float v;
           uint8_t *dest=(uint8_t *)&v;
           *dest++=*src++;
@@ -249,8 +457,8 @@ enum{
           *dest++=*src++;
           *dest++=*src++;
           setValue(v);
-        }return sz;
-        case _field_msg::dt_uint:{
+        }break;
+        case _message::dt_uint:{
           if(sz==1){
             setValue(*src);
           }else if(sz==2){
@@ -267,9 +475,9 @@ enum{
             *dest++=*src++;
             *dest++=*src++;
             setValue(v);
-          }else break;
-        }return sz;
-        case _field_msg::dt_int:{
+          }else return 0;
+        }break;
+        case _message::dt_int:{
           if(sz==1){
             setValue((int8_t)*src);
           }else if(sz==2){
@@ -286,28 +494,63 @@ enum{
             *dest++=*src++;
             *dest++=*src++;
             setValue(v);
-          }else break;
-        }return sz;
+          }else return 0;
+        }break;
+        case _message::dt_vect:{
+          if(sz!=8)return 0;
+          uint subidx=index()-data->index;
+          if(subidx>2)return 0;
+          _mandala_float vmult=_mandala::vscale2float(data->payload.vect.scale);
+          vmult/=((1<<19)-1);
+          int32_t v;
+          switch(subidx){
+            case 0: v=data->payload.vect.d20_1;break;
+            case 1: v=data->payload.vect.d20_2;break;
+            case 2: v=data->payload.vect.d20_3;break;
+            default: v=0;
+          }
+          if(v&(1<<19))v|=~((1<<20)-1);
+          setValue(v*vmult);
+        }break;
+        case _message::dt_vec2:{
+          if(sz!=8)return 0;
+          uint subidx=index()-data->index;
+          if(subidx>1)return 0;
+          const uint8_t *src=(const uint8_t *)data->payload.data;
+          if(subidx==1)src+=4;
+          float v;
+          uint8_t *dest=(uint8_t *)&v;
+          *dest++=*src++;
+          *dest++=*src++;
+          *dest++=*src++;
+          *dest++=*src++;
+          setValue(v);
+          dmsg("unpack: %s\n",name());
+        }break;
         default:
           return 0;
       }
-      return 0;
+#ifdef MANDALA_FLAGS
+      flags.unpacked=1;
+#endif
+      return sz;
     }
 
   protected:
     T m_value;
-    MANDALA_INLINE void setValue(const T &v)
+    void setValue(const T &v)
     {
-      m_value=v;
-#ifdef MANDALA_FULL
-      flags.changed=1;
+#ifdef MANDALA_FLAGS
       flags.used=1;
+      if(m_value==v)return;
+      flags.changed=1;
 #endif
+      m_value=v;
     }
-    MANDALA_INLINE uint pack_float(_field_msg *data) const
+    uint pack_float(_message *data) const
     {
       data->index=index();
-      data->dtype=_field_msg::dt_float;
+      data->dtype=_message::dt_float;
       data->size=4;
       const uint8_t *src=(const uint8_t *)&m_value;
       uint8_t *dest=(uint8_t *)data->payload.data;
@@ -317,10 +560,10 @@ enum{
       *dest++=*src++;
       return data->size;
     }
-    MANDALA_INLINE uint pack_uint(_field_msg *data) const
+    uint pack_uint(_message *data) const
     {
       data->index=index();
-      data->dtype=_field_msg::dt_uint;
+      data->dtype=_message::dt_uint;
       data->size=4;
       const uint8_t *src=(const uint8_t *)&m_value;
       uint8_t *dest=(uint8_t *)data->payload.data;
@@ -330,18 +573,18 @@ enum{
       *dest++=*src++;
       return data->size;
     }
-    MANDALA_INLINE uint pack_byte(_field_msg *data) const
+    uint pack_byte(_message *data) const
     {
       data->index=index();
-      data->dtype=_field_msg::dt_uint;
+      data->dtype=_message::dt_uint;
       data->size=1;
       data->payload.data[0]=m_value;
       return data->size;
     }
-    MANDALA_INLINE uint pack_bit(_field_msg *data) const
+    uint pack_bit(_message *data) const
     {
       data->index=index();
-      data->dtype=_field_msg::dt_uint;
+      data->dtype=_message::dt_uint;
       data->size=1;
       data->payload.data[0]=m_value>0?1:0;
       return data->size;
@@ -353,32 +596,49 @@ enum{
   class _field_float_t : public _field_t<_mandala_float>
   {
   public:
-    uint pack(_field_msg *data) const
+    uint pack(_message *data) const
     {return _field_t<_mandala_float>::pack_float(data);}
   };
   class _field_uint_t : public _field_t<_mandala_uint>
   {
   public:
-    uint pack(_field_msg *data) const
+    uint pack(_message *data) const
     {return _field_t<_mandala_uint>::pack_uint(data);}
   };
   class _field_byte_t : public _field_t<_mandala_byte>
   {
   public:
-    uint pack(_field_msg *data) const
+    uint pack(_message *data) const
     {return _field_t<_mandala_byte>::pack_byte(data);}
   };
   class _field_bit_t : public _field_t<_mandala_bit>
   {
   public:
-    uint pack(_field_msg *data) const
+    uint pack(_message *data) const
     {return _field_t<_mandala_bit>::pack_bit(data);}
   };
   class _field_enum_t : public _field_t<_mandala_enum>
   {
   public:
-    uint pack(_field_msg *data) const
+    uint pack(_message *data) const
     {return _field_t<_mandala_enum>::pack_byte(data);}
+  };
+
+  //generic unnamed field type (for small MCUs)
+  class _value : public _field_float_t
+  {
+  public:
+    _mandala_float & operator=(const _mandala_float &v){setValue(v);return m_value;}
+    _mandala_index index()const{return 0xFFFF;}
+    #ifdef MANDALA_TEXT
+    const char* name()const{return "";}
+    const char* descr()const{return "";}
+    const char* shortname()const{return "";}
+    #endif
+    #ifdef MANDALA_ITERATORS
+    _mf_type type(void)const{return mf_float;}
+    _ext_fmt ext_fmt(void) {return fmt_float_f4;}
+    #endif
   };
 
 
@@ -390,39 +650,70 @@ enum{
   MFIELD_IMPL(MFIELD_INDEX(aname),atype,aname,adescr,ASTRINGZ(MFIELD_VAR(aname)),aname,afmt) aname;
 #define MFIELD_IMPL(aindex,atype,aname,adescr,afullname,ashortname,afmt) \
   class MFIELD_TYPE(aname) : public _field_##atype##_t { public: \
-    MANDALA_INLINE _mandala_index index()const{return aindex;} \
-    MANDALA_INLINE const char* name()const{return afullname;} \
-    MANDALA_INLINE const char* descr()const{return adescr;} \
-    MANDALA_INLINE const char* shortname()const{return ASTRINGZ(ashortname);} \
-    MANDALA_INLINE _mf_type type(void)const{return mf_##atype;} \
-    MANDALA_INLINE _ext_fmt ext_fmt(void) {return fmt_##atype##_##afmt;} \
-    MANDALA_INLINE _mandala_##atype & operator=(const _mandala_##atype &v){setValue(v);return m_value;} \
+    _mandala_index index()const{return aindex;} \
+    const char* name()const{return afullname;} \
+    const char* descr()const{return adescr;} \
+    const char* shortname()const{return ASTRINGZ(ashortname);} \
+    _mf_type type(void)const{return mf_##atype;} \
+    _ext_fmt ext_fmt(void) {return fmt_##atype##_##afmt;} \
+    _mandala_##atype & operator=(const _mandala_##atype &v){setValue(v);return m_value;} \
     enum {idx=aindex}; \
   }
 #define MFVECT(atype,aname,v1,v2,v3,adescr,afmt,...) \
-  class MFIELD_TYPE(aname) { public: \
+  class MFIELD_TYPE(aname) : public _field_vect { public: \
     operator Vector<3,atype>()const{return Vector<3,atype>(v1,v2,v3);} \
     MFIELD_TYPE(aname) & operator=(const Vector<3,atype>& v){v1=v[0];v2=v[1];v3=v[2];return *this;} \
     MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,ASTRINGZ(MFIELD_VAR(aname).v1),aname.v1,afmt) v1;\
     MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,ASTRINGZ(MFIELD_VAR(aname).v2),aname.v2,afmt) v2;\
     MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v3),atype,v3,adescr,ASTRINGZ(MFIELD_VAR(aname).v3),aname.v3,afmt) v3;\
+    uint pack(_message *data,_message::_vscale vscale) const {return _field_vect::pack(data,&v1,&v2,&v3,vscale);} \
+    uint pack2(_message *data) const {return _field_vect::pack(data,&v1,&v2);} \
+    uint unpack(const _message *data) { \
+      if(data->index!=v1.index())return 0; \
+      if(data->dtype==_message::dt_vect)return (v1.unpack(data)&&v2.unpack(data)&&v3.unpack(data))?data->size:0; \
+      if(data->dtype==_message::dt_vec2)return (v1.unpack(data)&&v2.unpack(data))?data->size:0; \
+      return 0; \
+    } \
   }aname;
+
+
 #define MFVEC2(atype,aname,v1,v2,adescr,afmt,...) \
-  class MFIELD_TYPE(aname) { public: \
+  class MFIELD_TYPE(aname) : public _field_vect { public: \
     operator Vector<2,atype>()const{return Vector<2,atype>(v1,v2);} \
     MFIELD_TYPE(aname) & operator=(const Vector<2,atype>& v){v1=v[0];v2=v[1];return *this;} \
     MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,ASTRINGZ(MFIELD_VAR(aname).v1),aname.v1,afmt) v1;\
     MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,ASTRINGZ(MFIELD_VAR(aname).v2),aname.v2,afmt) v2;\
+    uint pack(_message *data) const {return _field_vect::pack(data,&v1,&v2);} \
+    uint unpack(const _message *data) { \
+      if(data->index!=v1.index())return 0; \
+      if(data->dtype==_message::dt_vec2)return (v1.unpack(data)&&v2.unpack(data))?data->size:0; \
+      return 0; \
+    } \
   }aname;
 
 #define MGRP_IMPL(aname,adescr) \
   class ATPASTE3(_,aname,_base) : public _group { public: \
-    MANDALA_INLINE const char* name()const{return ASTRINGZ(aname);} \
-    MANDALA_INLINE const char* descr()const{return adescr;} \
-    uint unpack(const _field_msg *data) \
+    const char* name()const{return ASTRINGZ(aname);} \
+    const char* descr()const{return adescr;} \
+    uint unpack(const _message *data) \
     { \
       _field *f=field(data->index); \
-      return f?f->unpack(data):0; \
+      if(!f)return 0; \
+      if(data->dtype==_message::dt_vect){ \
+        for(uint i=0;i<3;i++){ \
+          _field *f=field(data->index+i); \
+          if(!f)return 0; \
+          f->unpack(data); \
+        } \
+        return data->size; \
+      }else if(data->dtype==_message::dt_vec2){ \
+        for(uint i=0;i<2;i++){ \
+          _field *f=field(data->index+i); \
+          if(!f)return 0; \
+          f->unpack(data); \
+        } \
+        return data->size; \
+      }else return f->unpack(data); \
     } \
 
 #define MGRP0_BEGIN(adescr,...) MGRP_IMPL(MGRP0,adescr)
@@ -445,9 +736,9 @@ enum{
 #define MGRP1_END               };
 #define MGRP2_BEGIN(adescr,...) \
   class ATPASTE2(_,MGRP2) : public ATPASTE3(_,MGRP2,_base) { public: \
-  MANDALA_INLINE _mandala_index index()const{return ATPASTE7(index_,MGRP0,_,MGRP1,_,MGRP2,_next)+1;} \
-  MANDALA_INLINE _group * group(const _mandala_index idx) { return NULL; } \
-  MANDALA_INLINE _group * next_group(const _group *g) { return NULL; } \
+  _mandala_index index()const{return ATPASTE7(index_,MGRP0,_,MGRP1,_,MGRP2,_next)+1;} \
+  _group * group(const _mandala_index idx) { (void)idx; return NULL; } \
+  _group * next_group(const _group *g) { (void)g; return NULL; } \
   _field * next_field(_field *f) { \
     if(!f) return field(index()); \
     _mandala_index i=f->index()+1; \
@@ -455,7 +746,6 @@ enum{
   } \
   _field * field(const _mandala_index idx) { \
     switch(idx){default: return NULL;
-
 #define MGRP2_END \
     } } \
   }MGRP2;
@@ -473,7 +763,7 @@ enum{
 #define MGRP0_END               };
 #define MGRP1_BEGIN(adescr,...) \
 class ATPASTE2(_,MGRP1) : public ATPASTE3(_,MGRP1,_base_grp2) { public: \
-  MANDALA_INLINE _mandala_index index()const{return ATPASTE5(index_,MGRP0,_,MGRP1,_next)+1;} \
+  _mandala_index index()const{return ATPASTE5(index_,MGRP0,_,MGRP1,_next)+1;} \
   _field * field(const _mandala_index idx) { \
     _group *g=group(idx); \
     if(!g)return NULL; \
@@ -508,7 +798,7 @@ class ATPASTE2(_,MGRP1) : public ATPASTE3(_,MGRP1,_base_grp2) { public: \
 
 #define MGRP0_BEGIN(adescr,...) \
   class ATPASTE2(_,MGRP0) : public ATPASTE3(_,MGRP0,_base_grp1) { public: \
-  MANDALA_INLINE _mandala_index index()const{return ATPASTE3(index_,MGRP0,_next)+1;} \
+  _mandala_index index()const{return ATPASTE3(index_,MGRP0,_next)+1;} \
   _field * field(const _mandala_index idx) { \
     _group *g=group(idx); \
     if(!g)return NULL; \
@@ -543,22 +833,11 @@ class ATPASTE2(_,MGRP1) : public ATPASTE3(_,MGRP1,_base_grp2) { public: \
 #include "MandalaFields.h"
 
 
-//generic unnamed field types for small MCUs
-  class _value : public _field_float_t
-  {
-  public:
-    MANDALA_INLINE _mandala_float & operator=(const _mandala_float &v){setValue(v);return m_value;}
-    MANDALA_INLINE _mandala_index index()const{return 0xFFFF;}
-    MANDALA_INLINE const char* name()const{return "";}
-    MANDALA_INLINE const char* descr()const{return "";}
-    MANDALA_INLINE const char* shortname()const{return "";}
-    MANDALA_INLINE _mf_type type(void)const{return mf_float;}
-    MANDALA_INLINE _ext_fmt ext_fmt(void) {return fmt_float_f4;}
-  };
 
 
-
+//-----------------------------------------------------------------------------
 // METHODS
+//-----------------------------------------------------------------------------
 public:
 
   // Iterators
@@ -604,10 +883,10 @@ public:
   }
 
   //pack - unpack & messages
-  uint unpack(const _field_msg *data)
+  uint unpack(const _message *data)
   {
-    _field *f=field(data->index);
-    return f?f->unpack(data):0;
+    _group *g=group(data->index);
+    return g?g->unpack(data):0;
   }
   _mandala_float value(const _mandala_index index)
   {
@@ -632,7 +911,7 @@ public:
 #undef MFIELD_INDEX
 #undef MFIELD_INDEX_VEC
 //-----------------------------------------------------------------------------
-extern _mandala mf;
+//extern _mandala mf;
 //=============================================================================
 #endif
 //=============================================================================
