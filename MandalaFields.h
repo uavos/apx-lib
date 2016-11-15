@@ -47,20 +47,20 @@
 ------------------ < CAN EID START
 ## 7 bits source node address (127 nodes, 0=reserved=<no addr yet>):
 0-6:    can_adr
-7:      toggle  (toggle bit each frame to detect errors)
 ------------------
 ## 8 bits specifier for dictionary SDO/PDO:
-8:     dtype    (16 data types) [float,uint,int,vec180,vec3000,vec10,ll,...]
-9:     dtype
-10:    dtype
-11:    dtype
-12:    prio     (4 redundancies) [0=highest priority]
-13:    prio
-14:    cmd      (4 commands) [data,sync,...]
-15:    cmd
+7:      dtype   (8 data types) [float,uint,int,vect,vec2,...]
+8:      dtype
+9:      dtype
+10:     toggle  (toggle bit each frame to detect errors)
+11:     cmd     (4 commands) [data,...]
+12:     cmd
+13:     prio    (4 redundancies) [0=highest priority]
+14:     prio
 ------------------
-## 13 bits dictionary:
-16:     field   (16 fields)     [field name]
+## 14 bits dictionary:
+15:     field   (32 fields)     [field name]
+16:     field
 17:     field
 18:     field
 19:     field
@@ -71,7 +71,7 @@
 24:     group1
 25:     group0  (4 groups)      [sensor,control,state,info]
 26:     group0
-27:     object  (4 types)       [vehicle,payload,reserved,aux=3]
+27:     object  (4 types)       [vehicle,payload,user,aux-stream=3]
 28:     object
 ------------------ < CAN EID END
 ## 3 bits node local stats (NO CAN TX):
@@ -200,9 +200,9 @@ public:
 //-----------------------------------------------------------------------------
 // indexes _mandala::index_vehicle_sensor_imu_gyro_x
 //-----------------------------------------------------------------------------
-#define GRP0_MASK       ((1<<11)-1)     //11-9= 2bit (4 objects)
-#define GRP1_MASK       ((1<<9)-1)      //9-4=  5bit (32 groups)
-#define GRP2_MASK       ((1<<4)-1)      //      4bit (16 fields)
+#define GRP0_MASK       ((1<<12)-1)     //11-9= 2bit (subsystems)
+#define GRP1_MASK       ((1<<10)-1)     //9-4=  5bit (32 groups)
+#define GRP2_MASK       ((1<<5)-1)      //      5bit (32 fields)
 #define MGRP0_BEGIN(...)        ATPASTE2(index_,MGRP0),ATPASTE3(index_,MGRP0,_next)=(ATPASTE2(index_,MGRP0) &~GRP0_MASK)-1,
 #define MGRP0_END               ATPASTE3(index_,MGRP0,_end)=(ATPASTE2(index_,MGRP0) &~GRP0_MASK)+(GRP0_MASK+1),
 #define MGRP1_BEGIN(...)        ATPASTE4(index_,MGRP0,_,MGRP1),ATPASTE5(index_,MGRP0,_,MGRP1,_next)=(ATPASTE4(index_,MGRP0,_,MGRP1) &~GRP1_MASK)-1,
@@ -229,16 +229,16 @@ enum{
 //-----------------------------------------------------------------------------
 //universal message packet after unpacking from CAN or UART
   typedef struct {
-    uint16_t size;      //size of data bytes
-    _mandala_index index  :13;//dict ID
-    uint8_t  iface  :3; //interface index
+    uint8_t size;               //size of data bytes
+    _mandala_index index;       //dict ID
+    //uint8_t  iface  :3; //interface index
     typedef enum{
       dt_float=0,
       dt_uint,
       dt_int,
       dt_vect,
       dt_vec2,
-    }_dtype; //16 types total
+    }_dtype; //8 types total
     typedef enum{
       vs_180=0, //attitude,acc
       vs_1,     //controls
@@ -248,15 +248,14 @@ enum{
     union {
       uint8_t specifier;        //general byte mask (8bit)
       struct {                  //dict data
-        _dtype   dtype  :4;
-        uint8_t  prio   :2;
+        _dtype   dtype  :3;
+        uint8_t  toggle :1;
         uint8_t  cmd    :2;
+        uint8_t  prio   :2;
       }MANDALA_PACKED_STRUCT;
-      uint8_t fcnt;             //aux data
     }MANDALA_PACKED_STRUCT;
     union{                      //payload data
-      uint32_t data32;
-      uint8_t  data[4];
+      uint8_t  data[8];
       struct{
         uint32_t d20_1    :20;
         uint32_t d20_2    :20;
@@ -425,6 +424,9 @@ enum{
           uint8_t changed       :1;
           uint8_t used          :1;
           uint8_t unpacked      :1;
+          //unpacking
+          uint8_t toggle        :1;
+          uint8_t prio          :2;
         };
       };
     }MANDALA_PACKED_STRUCT flags;
