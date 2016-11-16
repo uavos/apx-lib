@@ -1572,6 +1572,16 @@ MGRP1_END
 #define MGRP1   shared
 MGRP1_BEGIN("Network shared fields")
 
+#define MGRP2   vm
+MGRP2_BEGIN("Virtual Machine accessible fields")
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   tmp
+MGRP2_BEGIN("Temporary data")
+MGRP2_END
+#undef MGRP2
+
 MGRP1_END
 #undef MGRP1
 //-------------------------
