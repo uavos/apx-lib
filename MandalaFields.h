@@ -37,6 +37,10 @@
 //#define MANDALA_FLAGS
 //#define MANDALA_DOUBLE
 #define MANDALA_ITERATORS
+
+#ifndef USE_FLOAT_TYPE
+#define MANDALA_DOUBLE
+#endif
 //=============================================================================
 
 /*
@@ -71,7 +75,7 @@
 24:     group1
 25:     group0  (4 groups)      [sensor,control,state,info]
 26:     group0
-27:     object  (4 types)       [vehicle,payload,user,aux-stream=3]
+27:     object  (4 types)       [vehicle,payload,aux,stream=3]
 28:     object
 ------------------ < CAN EID END
 ## 3 bits node local stats (NO CAN TX):
@@ -79,7 +83,7 @@
 30:     iface
 31:     iface
 ############################
-# AUX HEADER
+# STREAM HEADER
 ############################
 32bit (29bit CAN)
 ------------------ < CAN EID START
@@ -102,7 +106,7 @@
 25:     expedited?      [1=yes,0=multiframe]
 26:     request?        [1=request,0=response]
 ------------------
-## 2 bits object=aux=3 mark
+## 2 bits object=stream=3 mark
 27:     object=1
 28:     object=1
 ------------------ < CAN EID END
@@ -988,6 +992,7 @@ MGRP2_END
 MGRP2_BEGIN("Aerodynamic sensors")
 MFIELD(float, pt,    "Airspeed [m/s]", f2)
 MFIELD(float, ps,    "Barometric altitude [m]", f4)
+MFIELD(float, PT,    "Pitot probe temperature [C]", s1)
 MFIELD(float, vario, "Barometric variometer [m/s]", f2)
 MFIELD(float, slip,  "Slip [deg]", f2)
 MFIELD(float, aoa,   "Angle of attack [deg]", f2)
@@ -1038,19 +1043,6 @@ MFIELD(float, vel,    "Radar target velocity [m/s]", f2)
 MGRP2_END
 #undef MGRP2
 
-#define MGRP2   power
-MGRP2_BEGIN("Power measurements")
-MFIELD(float, Ve,    "System battery voltage [v]", f2)
-MFIELD(float, Vs,    "Servo battery voltage [v]", f2)
-MFIELD(float, Vp,    "Payload battery voltage [v]", f2)
-MFIELD(float, Vm,    "Engine battery voltage [v]", f2)
-MFIELD(float, Ie,    "System current [A]", u001)
-MFIELD(float, Is,    "Servo current [A]", u01)
-MFIELD(float, Ip,    "Payload current [A]", u01)
-MFIELD(float, Im,    "Engine current [A]", u1)
-MGRP2_END
-#undef MGRP2
-
 #define MGRP2   engine
 MGRP2_BEGIN("Engine sensors")
 MFIELD(uint,  rpm,      "Engine RPM [1/min]", u2)
@@ -1058,9 +1050,46 @@ MFIELD(uint,  rpm_prop, "Prop RPM [1/min]", u2)
 MFIELD(float, fuel,     "Fuel capacity [l]", f2)
 MFIELD(float, frate,    "Fuel flow rate [l/h]", f2)
 MFIELD(float, ET,       "Engine temperature [C]", u1)
-MFIELD(float, EGT,      "Exhaust temperature [C]", u10)
 MFIELD(float, OT,       "Oil temperature [C]", u1)
 MFIELD(float, OP,       "Oil pressure [atm]", u01)
+MFIELD(float, EGT1,     "Exhaust 1 temperature [C]", u10)
+MFIELD(float, EGT2,     "Exhaust 2 temperature [C]", u10)
+MFIELD(float, EGT3,     "Exhaust 3 temperature [C]", u10)
+MFIELD(float, EGT4,     "Exhaust 4 temperature [C]", u10)
+MFIELD(float, MAP,      "MAP pressure [Pa]", f2)
+MFIELD(float, IAP,      "Intake air box pressure [kPa]", f2)
+MFIELD(bit,   error,    "Engine error/ok", )
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   power
+MGRP2_BEGIN("System power")
+MFIELD(float, Ve,    "System battery voltage [v]", f2)
+MFIELD(float, Ie,    "System current [A]", u001)
+MFIELD(float, Vs,    "Servo battery voltage [v]", f2)
+MFIELD(float, Is,    "Servo current [A]", u01)
+MFIELD(float, Vp,    "Payload battery voltage [v]", f2)
+MFIELD(float, Ip,    "Payload current [A]", u01)
+MFIELD(float, Vm,    "ECU battery voltage [v]", f2)
+MFIELD(float, Im,    "ECU current [A]", u1)
+MFIELD(bit, shutdown,"System trigger shutdown/on", )
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   battery
+MGRP2_BEGIN("Battery management")
+MFIELD(float, Vbat1,    "Battery 1 voltage [v]", f2)
+MFIELD(float, Ib1,      "Battery 1 current [A]", u01)
+MFIELD(float, BT1,      "Battery 1 temperature [C]", s1)
+MFIELD(bit,   err_b1,   "Battery 1 error/ok", )
+MFIELD(float, Vbat2,    "Battery 2 voltage [v]", f2)
+MFIELD(float, Ib2,      "Battery 2 current [A]", u01)
+MFIELD(float, BT2,      "Battery 2 temperature [C]", s1)
+MFIELD(bit,   err_b2,   "Battery 2 error/ok", )
+MFIELD(float, Vgen,     "Power generator voltage [v]",f2)
+MFIELD(float, Igen,     "Charging current [A]", u01)
+MFIELD(float, Ichg,     "Charging current [A]", u01)
+MFIELD(bit,   err_gen,  "Power generator error/ok", )
 MGRP2_END
 #undef MGRP2
 
@@ -1068,13 +1097,13 @@ MGRP2_END
 MGRP2_BEGIN("Temperature sensors")
 MFIELD(float, AT,       "Ambient temperature [C]", s1)
 MFIELD(float, RT,       "Room temperature [C]", s1)
-MFIELD(float, MT,       "Modem temperature [C]", s1)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   datalink
 MGRP2_BEGIN("Datalink radio sensors")
 MFIELD(float, RSS,    "Modem signal strength [0..1]", f2)
+MFIELD(float, MT,     "Modem temperature [C]", s1)
 MFIELD(float, HDG,    "Modem heading to transmitter [deg]", f2)
 MFIELD(uint,  DME,    "Modem distance to transmitter [m]", u4)
 MGRP2_END
@@ -1097,37 +1126,10 @@ MFIELD(float, HDG,                "Steering heading [deg]", f2)
 MGRP2_END
 #undef MGRP2
 
-#define MGRP2   controls
-MGRP2_BEGIN("Controls feedback sensors")
-MFIELD(float, s1,  "Controls sensor 1", f2)
-MFIELD(float, s2,  "Controls sensor 2", f2)
-MFIELD(float, s3,  "Controls sensor 3", f2)
-MFIELD(float, s4,  "Controls sensor 4", f2)
-MFIELD(float, s5,  "Controls sensor 5", f2)
-MFIELD(float, s6,  "Controls sensor 6", f2)
-MFIELD(float, s7,  "Controls sensor 7", f2)
-MFIELD(float, s8,  "Controls sensor 8", f2)
-MFIELD(float, s9,  "Controls sensor 9", f2)
-MFIELD(float, s10, "Controls sensor 10", f2)
-MFIELD(float, s11, "Controls sensor 11", f2)
-MFIELD(float, s12, "Controls sensor 12", f2)
-MFIELD(float, s13, "Controls sensor 13", f2)
-MFIELD(float, s14, "Controls sensor 14", f2)
-MFIELD(float, s15, "Controls sensor 15", f2)
-MFIELD(float, s16, "Controls sensor 16", f2)
-MGRP2_END
-#undef MGRP2
-
-#define MGRP2   user
-MGRP2_BEGIN("User sensors")
-MFIELD(float, s1, "User sensor 1", f2)
-MFIELD(float, s2, "User sensor 2", f2)
-MFIELD(float, s3, "User sensor 3", f2)
-MFIELD(float, s4, "User sensor 4", f2)
-MFIELD(float, s5, "User sensor 5", f2)
-MFIELD(float, s6, "User sensor 6", f2)
-MFIELD(float, s7, "User sensor 7", f2)
-MFIELD(float, s8, "User sensor 8", f2)
+#define MGRP2   ers
+MGRP2_BEGIN("ERS sensors")
+MFIELD(bit, error,   "ERS error/ok", )
+MFIELD(bit, disarm,  "ERS disarmed/armed", )
 MGRP2_END
 #undef MGRP2
 
@@ -1152,10 +1154,10 @@ MGRP2_BEGIN("Engine controls")
 MFIELD(float,  thr,     "Throttle [0..1]", u001)
 MFIELD(float,  prop,    "Prop pitch [-1..0..+1]", s001)
 MFIELD(float,  mix,     "Mixture [0..1]", u001)
-MFIELD(float,  tune,    "Engine tuning [0..1]", u001)
+MFIELD(float,  tune,    "Engine tuning [-1..0..1]", s001)
 MFIELD(float,  vector,  "Thrust vector [-1..0..+1]", s001)
 MFIELD(bit,    starter, "Engine starter on/off", )
-MFIELD(bit,    rev,     "Engine reverse on/off", )
+MFIELD(bit,    rev,     "Thrust reverse on/off", )
 MGRP2_END
 #undef MGRP2
 
@@ -1204,6 +1206,7 @@ MFIELD(bit,  servo,     "Servo on/off", )
 MFIELD(bit,  ignition,  "Engine on/off", )
 MFIELD(bit,  payload,   "Payload on/off", )
 MFIELD(bit,  agl,       "AGL sensor", )
+MFIELD(bit,  xpdr,      "XPDR on/off", )
 MFIELD(bit,  satcom,    "Satcom on/off", )
 MFIELD(bit,  rfamp,     "RF amplifier on/off", )
 MFIELD(bit,  ils,       "Instrument Landing System on/off", )
@@ -1225,15 +1228,6 @@ MGRP2_END
 MGRP2_BEGIN("Doors")
 MFIELD(bit,  main,    "Main door open/locked", )
 MFIELD(bit,  drop,    "Drop-off open/locked", )
-MGRP2_END
-#undef MGRP2
-
-#define MGRP2   sw
-MGRP2_BEGIN("Switches")
-MFIELD(bit,  sw1,    "Switch 1 on/off", )
-MFIELD(bit,  sw2,    "Switch 2 on/off", )
-MFIELD(bit,  sw3,    "Switch 3 on/off", )
-MFIELD(bit,  sw4,    "Switch 4 on/off", )
 MGRP2_END
 #undef MGRP2
 
@@ -1280,14 +1274,13 @@ MGRP2_END
 
 #define MGRP2   error
 MGRP2_BEGIN("System errors and warnings")
-MFIELD(byte,  code,     "Error code", )
 MFIELD(bit,  fatal,     "Fatal error/ok", )
 MFIELD(bit,  power,     "Power supply error/ok", )
+MFIELD(bit,  engine,    "Engine error/ok", )
+MFIELD(bit,  rpm,       "RPM sensor error/ok", )
 MFIELD(bit,  cas,       "CAS error", )
 MFIELD(bit,  pstatic,   "Static pressure error/ok", )
 MFIELD(bit,  gyro,      "IMU gyros bias", )
-MFIELD(bit,  engine,    "Engine error/ok", )
-MFIELD(bit,  rpm,       "RPM sensor error/ok", )
 MFIELD(bit,  ers,       "ERS error/ok", )
 MGRP2_END
 #undef MGRP2
@@ -1360,6 +1353,9 @@ MFIELD(byte,  wpidx,  "Current waypoint [0..255]", )
 MFIELD(byte,  rwidx,  "Current runway [0..255]", )
 MFIELD(byte,  twidx,  "Current taxiway [0..255]", )
 MFIELD(byte,  piidx,  "Current point of interest [0..255]", )
+MFIELD(enum,  midx,   "Mission index action", )
+MFENUM(midx,   inc,   "Increment mission index", 0)
+MFENUM(midx,   dec,   "Decrement mission index", 1)
 MGRP2_END
 #undef MGRP2
 
@@ -1531,10 +1527,6 @@ MGRP2_BEGIN("Turret options")
 MFIELD(bit, armed,     "Turret armed/disarmed",        )
 MFIELD(bit, shoot,     "Turret shooting/standby",      )
 MFIELD(bit, reload,    "Turret reloading/reloaded",    )
-MFIELD(bit, sw1,       "Turret switch1 on/off",        )
-MFIELD(bit, sw2,       "Turret switch2 on/off",        )
-MFIELD(bit, sw3,       "Turret switch3 on/off",        )
-MFIELD(bit, sw4,       "Turret switch4 on/off",        )
 MGRP2_END
 #undef MGRP2
 
@@ -1546,6 +1538,97 @@ MGRP2_END
 
 MGRP1_END
 #undef MGRP1
+MGRP0_END
+#undef MGRP0
+//-----------------------------------------------------------------------------
+#define MGRP0   aux
+MGRP0_BEGIN("Auxilary data")
+#define MGRP1   local
+MGRP1_BEGIN("Node local data fields")
+
+#define MGRP2   vm
+MGRP2_BEGIN("Virtual Machine accessible fields")
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   tmp
+MGRP2_BEGIN("Temporary data")
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   storage
+MGRP2_BEGIN("Persistent data")
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   config
+MGRP2_BEGIN("Configuration data")
+MGRP2_END
+#undef MGRP2
+
+MGRP1_END
+#undef MGRP1
+//-------------------------
+#define MGRP1   shared
+MGRP1_BEGIN("Network shared fields")
+
+MGRP1_END
+#undef MGRP1
+//-------------------------
+#define MGRP1   telemetry
+MGRP1_BEGIN("Auxilary telemetry fields")
+
+#define MGRP2   usr
+MGRP2_BEGIN("User values")
+MFIELD(float, u1,  "User value 1", f2)
+MFIELD(float, u2,  "User value 2", f2)
+MFIELD(float, u3,  "User value 3", f2)
+MFIELD(float, u4,  "User value 4", f2)
+MFIELD(float, u5,  "User value 5", f2)
+MFIELD(float, u6,  "User value 6", f2)
+MFIELD(float, u7,  "User value 7", f2)
+MFIELD(float, u8,  "User value 8", f2)
+MFIELD(float, u9,  "User value 9", f2)
+MFIELD(float, u10, "User value 10", f2)
+MFIELD(float, u11, "User value 11", f2)
+MFIELD(float, u12, "User value 12", f2)
+MFIELD(float, u13, "User value 13", f2)
+MFIELD(float, u14, "User value 14", f2)
+MFIELD(float, u15, "User value 15", f2)
+MFIELD(float, u16, "User value 16", f2)
+MGRP2_END
+#undef MGRP2
+
+#define MGRP2   trg
+MGRP2_BEGIN("Binary user values")
+MFIELD(bit, b1,  "User bit 1", )
+MFIELD(bit, b2,  "User bit 2", )
+MFIELD(bit, b3,  "User bit 3", )
+MFIELD(bit, b4,  "User bit 4", )
+MFIELD(bit, b5,  "User bit 5", )
+MFIELD(bit, b6,  "User bit 6", )
+MFIELD(bit, b7,  "User bit 7", )
+MFIELD(bit, b8,  "User bit 8", )
+MFIELD(bit, b9,  "User bit 9", )
+MFIELD(bit, b10, "User bit 10", )
+MFIELD(bit, b11, "User bit 11", )
+MFIELD(bit, b12, "User bit 12", )
+MFIELD(bit, b13, "User bit 13", )
+MFIELD(bit, b14, "User bit 14", )
+MFIELD(bit, b15, "User bit 15", )
+MFIELD(bit, b16, "User bit 16", )
+MGRP2_END
+#undef MGRP2
+
+
+MGRP1_END
+#undef MGRP1
+MGRP0_END
+#undef MGRP0
+
+//-----------------------------------------------------------------------------
+#define MGRP0   stream
+MGRP0_BEGIN("Streamed data")
 MGRP0_END
 #undef MGRP0
 
