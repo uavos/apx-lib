@@ -217,13 +217,14 @@ public:
 #define MFIELD_INDEX(aname) ATPASTE8(index_,MGRP0,_,MGRP1,_,MGRP2,_,aname)
 #define MFIELD_INDEX_VEC(aname,vname) MFIELD_INDEX(ATPASTE3(aname,_,vname))
 #define MFIELD(atype,aname,...) MFIELD_INDEX(aname),
+#define MFENUM(atype,aname,...) MFIELD_INDEX(aname),
 #define MFVECT_IMPL(atype,aname,vname,...) MFIELD_INDEX_VEC(aname,vname),
 enum{
 #include "MandalaFields.h"
 };
 
 //enums
-#define MFENUM(aname,ename,descr,value) ATPASTE3(aname,_,ename)=value,
+#define MFENUMV(aname,ename,descr,value) ATPASTE3(aname,_,ename)=value,
 enum{
   #include "MandalaFields.h"
 };
@@ -295,6 +296,7 @@ enum{
     #ifdef MANDALA_TEXT
     virtual const char* name()const =0;
     virtual const char* descr()const =0;
+    virtual const char* opt(uint8_t n)const =0;
     virtual const char* shortname()const =0;
     #endif
     #ifdef MANDALA_ITERATORS
@@ -639,6 +641,7 @@ enum{
     #ifdef MANDALA_TEXT
     const char* name()const{return "";}
     const char* descr()const{return "";}
+    const char* opt(uint8_t n)const{(void)n;return "";}
     const char* shortname()const{return "";}
     #endif
     #ifdef MANDALA_ITERATORS
@@ -647,14 +650,14 @@ enum{
     #endif
   };
 
-
 //fields typedefs
 #define MFIELD_VAR(aname) MGRP0.MGRP1.MGRP2.aname
 #define MFIELD_TYPE(aname) ATPASTE2(_,aname)
 
 #define MFIELD(atype,aname,adescr,afmt,...) \
   MFIELD_IMPL(MFIELD_INDEX(aname),atype,aname,adescr,ASTRINGZ(MFIELD_VAR(aname)),aname,afmt) aname;
-#define MFIELD_IMPL(aindex,atype,aname,adescr,afullname,ashortname,afmt) \
+
+#define MFIELD_IMPL_BEGIN(aindex,atype,aname,adescr,afullname,ashortname,afmt) \
   class MFIELD_TYPE(aname) : public _field_##atype##_t { public: \
     _mandala_index index()const{return aindex;} \
     const char* name()const{return afullname;} \
@@ -664,7 +667,23 @@ enum{
     _ext_fmt ext_fmt(void) {return fmt_##atype##_##afmt;} \
     _mandala_##atype & operator=(const _mandala_##atype &v){setValue(v);return m_value;} \
     enum {idx=aindex}; \
+
+#define MFIELD_IMPL(aindex,atype,aname,adescr,afullname,ashortname,afmt) \
+  MFIELD_IMPL_BEGIN(aindex,atype,aname,adescr,afullname,ashortname,afmt) \
+    const char* opt(uint8_t n)const{(void)n;return "";} \
   }
+
+#define MFENUM(atype,aname,adescr,afmt,...) \
+  MFIELD_IMPL_BEGIN(MFIELD_INDEX(aname),atype,aname,adescr,ASTRINGZ(MFIELD_VAR(aname)),aname,afmt) \
+    const char* opt(uint8_t n)const{ switch(n&0x7F){default: return ""; \
+
+#define MFENUMV(avname,aname,adescr,anum) \
+  case anum: return (n&0x80)?adescr:ASTRINGZ(aname);
+
+#define MFENUM_END(aname) } } } aname;
+
+
+
 #define MFVECT(atype,aname,v1,v2,v3,adescr,afmt,...) \
   class MFIELD_TYPE(aname) : public _field_vect { public: \
     operator Vector<3,atype>()const{return Vector<3,atype>(v1,v2,v3);} \
@@ -757,6 +776,7 @@ enum{
   }MGRP2;
 
 #define MFIELD(atype,aname,...) case MFIELD_INDEX(aname): return & (aname);
+#define MFENUM(atype,aname,...) case MFIELD_INDEX(aname): return & (aname);
 #define MFVECT_IMPL(atype,aname,vname,...) case MFIELD_INDEX_VEC(aname,vname): return & ((aname).vname);
 
 #include "MandalaFields.h"
@@ -837,7 +857,6 @@ class ATPASTE2(_,MGRP1) : public ATPASTE3(_,MGRP1,_base_grp2) { public: \
 #define MGRP1_BEGIN(adescr,...)     case ATPASTE5(index_,MGRP0,_,MGRP1,_next)+1: return &(MGRP1);
 
 #include "MandalaFields.h"
-
 
 
 
@@ -961,6 +980,12 @@ public:
 #endif
 #ifndef MFENUM
 #define MFENUM(...)
+#endif
+#ifndef MFENUMV
+#define MFENUMV(...)
+#endif
+#ifndef MFENUM_END
+#define MFENUM_END(...)
 #endif
 //=============================================================================
 #define MGRP0   vehicle
@@ -1301,20 +1326,22 @@ MGRP2_END
 
 #define MGRP2   maneuver
 MGRP2_BEGIN("Maneuver parameters")
-MFIELD(enum,  mode,      "flight mode", )
-MFENUM(mode,   EMG,     "Realtime control",       0)
-MFENUM(mode,   RPV,     "Angles control",         1)
-MFENUM(mode,   UAV,     "Heading control",        2)
-MFENUM(mode,   WPT,     "Waypoints navigation",   3)
-MFENUM(mode,   HOME,    "Go back home",           4)
-MFENUM(mode,   STBY,    "Loiter around DNED",     5)
-MFENUM(mode,   TAXI,    "Taxi",                   6)
-MFENUM(mode,   TAKEOFF, "Takeoff",                7)
-MFENUM(mode,   LANDING, "Landing",                8)
+MFENUM(enum,  mode,      "flight mode", )
+MFENUMV(mode,   EMG,     "Realtime control",       0)
+MFENUMV(mode,   RPV,     "Angles control",         1)
+MFENUMV(mode,   UAV,     "Heading control",        2)
+MFENUMV(mode,   WPT,     "Waypoints navigation",   3)
+MFENUMV(mode,   HOME,    "Go back home",           4)
+MFENUMV(mode,   STBY,    "Loiter around DNED",     5)
+MFENUMV(mode,   TAXI,    "Taxi",                   6)
+MFENUMV(mode,   TAKEOFF, "Takeoff",                7)
+MFENUMV(mode,   LANDING, "Landing",                8)
+MFENUM_END(mode)
 MFIELD(byte,  stage,     "Maneuver stage", )
-MFIELD(enum,  mtype,     "Mission maneuver type", )
-MFENUM(mtype,   hdg,     "Heading navigation",      0)
-MFENUM(mtype,   line,    "Line navigation",         1)
+MFENUM(enum,  mtype,     "Mission maneuver type", )
+MFENUMV(mtype,   hdg,     "Heading navigation",      0)
+MFENUMV(mtype,   line,    "Line navigation",         1)
+MFENUM_END(mtype)
 MFIELD(byte,  loops,     "Number of remaining turns or loops [0..255]", )
 MFIELD(float, turnR,     "Current circle radius [m]", f2)
 MGRP2_END
@@ -1353,9 +1380,8 @@ MFIELD(byte,  wpidx,  "Current waypoint [0..255]", )
 MFIELD(byte,  rwidx,  "Current runway [0..255]", )
 MFIELD(byte,  twidx,  "Current taxiway [0..255]", )
 MFIELD(byte,  piidx,  "Current point of interest [0..255]", )
-MFIELD(enum,  midx,   "Mission index action", )
-MFENUM(midx,   inc,   "Increment mission index", 0)
-MFENUM(midx,   dec,   "Decrement mission index", 1)
+MFIELD(bit,   inc,    "Increment mission index", )
+MFIELD(bit,   dec,    "Decrement mission index", )
 MGRP2_END
 #undef MGRP2
 
@@ -1443,13 +1469,14 @@ MGRP2_END
 
 #define MGRP2   cmd
 MGRP2_BEGIN("Camera commanded values")
-MFIELD(enum,  camop,     "Cam control mode", )
-MFENUM(camop,   off,     "camera off",                   0)
-MFENUM(camop,   fixed,   "fixed position",               1)
-MFENUM(camop,   stab,    "gyro stabilization",           2)
-MFENUM(camop,   position,"attitude position",            3)
-MFENUM(camop,   speed,   "attitude speed control",       4)
-MFENUM(camop,   target,  "target position tracking",     5)
+MFENUM(enum,  camop,     "Cam control mode", )
+MFENUMV(camop,   off,     "camera off",                   0)
+MFENUMV(camop,   fixed,   "fixed position",               1)
+MFENUMV(camop,   stab,    "gyro stabilization",           2)
+MFENUMV(camop,   position,"attitude position",            3)
+MFENUMV(camop,   speed,   "attitude speed control",       4)
+MFENUMV(camop,   target,  "target position tracking",     5)
+MFENUM_END(camop)
 MFVECT(float, att,roll,pitch,yaw,       "Commanded cam attitude [deg]", f4)
 MFIELD(float, zoom,     "Cam zoom level [0..1]", f2)
 MFIELD(float, focus,    "Cam focus [0..1]", f2)
@@ -1505,12 +1532,13 @@ MGRP2_END
 
 #define MGRP2   cmd
 MGRP2_BEGIN("Turret commanded values")
-MFIELD(enum,  turret,     "Turret control mode", )
-MFENUM(turret,   off,     "turret off",                   0)
-MFENUM(turret,   fixed,   "fixed position",               1)
-MFENUM(turret,   stab,    "gyro stabilization",           2)
-MFENUM(turret,   position,"attitude position",            3)
-MFENUM(turret,   speed,   "attitude speed control",       4)
+MFENUM(enum,  turret,     "Turret control mode", )
+MFENUMV(turret,   off,     "turret off",                   0)
+MFENUMV(turret,   fixed,   "fixed position",               1)
+MFENUMV(turret,   stab,    "gyro stabilization",           2)
+MFENUMV(turret,   position,"attitude position",            3)
+MFENUMV(turret,   speed,   "attitude speed control",       4)
+MFENUM_END(turret)
 MFVECT(float, att,roll,pitch,yaw,       "Commanded turret attitude [deg]", f4)
 MFIELD(byte,  ammo,     "Turret ammo [0..255]", )
 MGRP2_END
@@ -1657,3 +1685,5 @@ MGRP0_END
 #undef MFVECT
 #undef MFVEC2
 #undef MFENUM
+#undef MFENUMV
+#undef MFENUM_END
