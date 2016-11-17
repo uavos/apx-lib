@@ -1083,6 +1083,7 @@ MFIELD(float, EGT3,     "Exhaust 3 temperature [C]", u10)
 MFIELD(float, EGT4,     "Exhaust 4 temperature [C]", u10)
 MFIELD(float, MAP,      "MAP pressure [Pa]", f2)
 MFIELD(float, IAP,      "Intake air box pressure [kPa]", f2)
+MFIELD(bit,   start,    "Engine start procedure trigger", )
 MFIELD(bit,   error,    "Engine error/ok", )
 MGRP2_END
 #undef MGRP2
