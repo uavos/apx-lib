@@ -75,7 +75,7 @@
 24:     group1
 25:     group0  (4 groups)      [sensor,control,state,info]
 26:     group0
-27:     object  (4 types)       [vehicle,payload,aux,stream=3]
+27:     object  (4 types)       [ap,payload,aux,stream=3]
 28:     object
 ------------------ < CAN EID END
 ## 3 bits node local stats (NO CAN TX):
@@ -202,7 +202,7 @@ class _mandala
 {
 public:
 //-----------------------------------------------------------------------------
-// indexes _mandala::index_vehicle_sensor_imu_gyro_x
+// indexes _mandala::index_ap_sensor_imu_gyro_x
 //-----------------------------------------------------------------------------
 #define GRP0_MASK       ((1<<12)-1)     //11-9= 2bit (subsystems)
 #define GRP1_MASK       ((1<<10)-1)     //9-4=  5bit (32 groups)
@@ -988,8 +988,8 @@ public:
 #define MFENUM_END(...)
 #endif
 //=============================================================================
-#define MGRP0   vehicle
-MGRP0_BEGIN("Vehicle")
+#define MGRP0   ap
+MGRP0_BEGIN("Autopilot")
 //-------------------------
 #define MGRP1   sensor
 MGRP1_BEGIN("Sensors")
@@ -1249,8 +1249,8 @@ MFIELD(bit,  taxi,      "Taxi lights on/off", )
 MGRP2_END
 #undef MGRP2
 
-#define MGRP2   doors
-MGRP2_BEGIN("Doors")
+#define MGRP2   door
+MGRP2_BEGIN("Doors and latches")
 MFIELD(bit,  main,    "Main door open/locked", )
 MFIELD(bit,  drop,    "Drop-off open/locked", )
 MGRP2_END
@@ -1446,7 +1446,7 @@ MGRP1_END
 MGRP0_END
 #undef MGRP0
 //-----------------------------------------------------------------------------
-#define MGRP0   payload
+#define MGRP0   pld
 MGRP0_BEGIN("Payload")
 #define MGRP1   cam
 MGRP1_BEGIN("Camera gimbal")
