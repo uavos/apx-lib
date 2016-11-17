@@ -150,40 +150,6 @@ protected:
 typedef _mandala_float Point[2];
 #endif*/
 //=============================================================================
-//=============================================================================
-struct _mandala_test
-{
-  _mandala_test & operator =(const float & a)
-  {
-    m_value = a;
-    return *this;
-  }
-  operator float() const {return m_value;}
-
-  const char *name(){return "test struct";}
-
-  float m_value;
-};
-class _mandala_test_class_base
-{
-protected:
-  virtual const char *name()=0;
-};
-class _mandala_test_class : virtual public _mandala_test_class_base
-{
-public:
-  _mandala_test_class & operator = (const float & a)
-  {
-    m_value = a;
-    return *this;
-  }
-  operator float() const {return m_value;}
-  const char *name(){return "test class";}
-  float m_value;
-  //uint8_t buf[5];
-  uint32_t ptr;
-}__attribute__((packed));
-//=============================================================================
 //-----------------------------------------------------------------------------
 // basic types
 //-----------------------------------------------------------------------------
@@ -297,7 +263,7 @@ enum{
     virtual const char* name()const =0;
     virtual const char* descr()const =0;
     virtual const char* opt(uint8_t n)const =0;
-    virtual const char* shortname()const =0;
+    virtual const char* path()const =0;
     #endif
     #ifdef MANDALA_ITERATORS
     typedef enum{
@@ -642,7 +608,7 @@ enum{
     const char* name()const{return "";}
     const char* descr()const{return "";}
     const char* opt(uint8_t n)const{(void)n;return "";}
-    const char* shortname()const{return "";}
+    const char* path()const{return "";}
     #endif
     #ifdef MANDALA_ITERATORS
     _mf_type type(void)const{return mf_float;}
@@ -655,26 +621,26 @@ enum{
 #define MFIELD_TYPE(aname) ATPASTE2(_,aname)
 
 #define MFIELD(atype,aname,adescr,afmt,...) \
-  MFIELD_IMPL(MFIELD_INDEX(aname),atype,aname,adescr,ASTRINGZ(MFIELD_VAR(aname)),aname,afmt) aname;
+  MFIELD_IMPL(MFIELD_INDEX(aname),atype,aname,adescr,aname,ASTRINGZ(MFIELD_VAR(aname)),afmt) aname;
 
-#define MFIELD_IMPL_BEGIN(aindex,atype,aname,adescr,afullname,ashortname,afmt) \
+#define MFIELD_IMPL_BEGIN(aindex,atype,aname,adescr,atextname,apath,afmt) \
   class MFIELD_TYPE(aname) : public _field_##atype##_t { public: \
     _mandala_index index()const{return aindex;} \
-    const char* name()const{return afullname;} \
+    const char* name()const{return ASTRINGZ(atextname);} \
     const char* descr()const{return adescr;} \
-    const char* shortname()const{return ASTRINGZ(ashortname);} \
+    const char* path()const{return apath;} \
     _mf_type type(void)const{return mf_##atype;} \
     _ext_fmt ext_fmt(void) {return fmt_##atype##_##afmt;} \
     _mandala_##atype & operator=(const _mandala_##atype &v){setValue(v);return m_value;} \
     enum {idx=aindex}; \
 
-#define MFIELD_IMPL(aindex,atype,aname,adescr,afullname,ashortname,afmt) \
-  MFIELD_IMPL_BEGIN(aindex,atype,aname,adescr,afullname,ashortname,afmt) \
+#define MFIELD_IMPL(aindex,atype,aname,adescr,atextname,apath,afmt) \
+  MFIELD_IMPL_BEGIN(aindex,atype,aname,adescr,atextname,apath,afmt) \
     const char* opt(uint8_t n)const{(void)n;return "";} \
   }
 
 #define MFENUM(atype,aname,adescr,afmt,...) \
-  MFIELD_IMPL_BEGIN(MFIELD_INDEX(aname),atype,aname,adescr,ASTRINGZ(MFIELD_VAR(aname)),aname,afmt) \
+  MFIELD_IMPL_BEGIN(MFIELD_INDEX(aname),atype,aname,adescr,aname,ASTRINGZ(MFIELD_VAR(aname)),afmt) \
     const char* opt(uint8_t n)const{ switch(n&0x7F){default: return ""; \
 
 #define MFENUMV(avname,aname,adescr,anum) \
@@ -688,9 +654,9 @@ enum{
   class MFIELD_TYPE(aname) : public _field_vect { public: \
     operator Vector<3,atype>()const{return Vector<3,atype>(v1,v2,v3);} \
     MFIELD_TYPE(aname) & operator=(const Vector<3,atype>& v){v1=v[0];v2=v[1];v3=v[2];return *this;} \
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,ASTRINGZ(MFIELD_VAR(aname).v1),aname.v1,afmt) v1;\
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,ASTRINGZ(MFIELD_VAR(aname).v2),aname.v2,afmt) v2;\
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v3),atype,v3,adescr,ASTRINGZ(MFIELD_VAR(aname).v3),aname.v3,afmt) v3;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,aname.v1,ASTRINGZ(MFIELD_VAR(aname).v1),afmt) v1;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,aname.v2,ASTRINGZ(MFIELD_VAR(aname).v2),afmt) v2;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v3),atype,v3,adescr,aname.v3,ASTRINGZ(MFIELD_VAR(aname).v3),afmt) v3;\
     uint pack(_message *data,_message::_vscale vscale) const {return _field_vect::pack(data,&v1,&v2,&v3,vscale);} \
     uint pack2(_message *data) const {return _field_vect::pack(data,&v1,&v2);} \
     uint unpack(const _message *data) { \
@@ -706,8 +672,8 @@ enum{
   class MFIELD_TYPE(aname) : public _field_vect { public: \
     operator Vector<2,atype>()const{return Vector<2,atype>(v1,v2);} \
     MFIELD_TYPE(aname) & operator=(const Vector<2,atype>& v){v1=v[0];v2=v[1];return *this;} \
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,ASTRINGZ(MFIELD_VAR(aname).v1),aname.v1,afmt) v1;\
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,ASTRINGZ(MFIELD_VAR(aname).v2),aname.v2,afmt) v2;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,aname.v1,ASTRINGZ(MFIELD_VAR(aname).v1),afmt) v1;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,aname.v2,ASTRINGZ(MFIELD_VAR(aname).v2),afmt) v2;\
     uint pack(_message *data) const {return _field_vect::pack(data,&v1,&v2);} \
     uint unpack(const _message *data) { \
       if(data->index!=v1.index())return 0; \
@@ -1047,7 +1013,8 @@ MGRP2_BEGIN("Instrument Landing System")
 MFIELD(float, HDG,    "ILS heading to VOR1 [deg]", f2)
 MFIELD(uint,  DME,    "ILS distance to VOR1 [m]", u2)
 MFIELD(float, RSS,    "ILS signal strength [0..1]", f2)
-MFVEC2(float, offset,HDG,altitude, "ILS offset [deg,m]", f2)
+MFIELD(float, dHDG,   "ILS error heading [deg]", f2)
+MFIELD(float, alt,    "ILS error altitude [m]", f2)
 MGRP2_END
 #undef MGRP2
 
