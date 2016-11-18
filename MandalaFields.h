@@ -264,6 +264,7 @@ enum{
     virtual const char* descr()const =0;
     virtual const char* opt(uint8_t n)const =0;
     virtual const char* path()const =0;
+    virtual const char* alias()const =0;
     #endif
     #ifdef MANDALA_ITERATORS
     typedef enum{
@@ -609,6 +610,7 @@ enum{
     const char* descr()const{return "";}
     const char* opt(uint8_t n)const{(void)n;return "";}
     const char* path()const{return "";}
+    const char* alias()const{return "";}
     #endif
     #ifdef MANDALA_ITERATORS
     _mf_type type(void)const{return mf_float;}
@@ -620,27 +622,28 @@ enum{
 #define MFIELD_VAR(aname) MGRP0.MGRP1.MGRP2.aname
 #define MFIELD_TYPE(aname) ATPASTE2(_,aname)
 
-#define MFIELD(atype,aname,adescr,afmt,...) \
-  MFIELD_IMPL(MFIELD_INDEX(aname),atype,aname,adescr,aname,ASTRINGZ(MFIELD_VAR(aname)),afmt) aname;
+#define MFIELD(atype,aname,adescr,aalias,afmt,...) \
+  MFIELD_IMPL(MFIELD_INDEX(aname),atype,aname,adescr,aname,ASTRINGZ(MFIELD_VAR(aname)),aalias,afmt) aname;
 
-#define MFIELD_IMPL_BEGIN(aindex,atype,aname,adescr,atextname,apath,afmt) \
+#define MFIELD_IMPL_BEGIN(aindex,atype,aname,adescr,atextname,apath,aalias,afmt) \
   class MFIELD_TYPE(aname) : public _field_##atype##_t { public: \
     _mandala_index index()const{return aindex;} \
     const char* name()const{return ASTRINGZ(atextname);} \
     const char* descr()const{return adescr;} \
     const char* path()const{return apath;} \
+    const char* alias()const{return ASTRINGZ(aalias);} \
     _mf_type type(void)const{return mf_##atype;} \
     _ext_fmt ext_fmt(void) {return fmt_##atype##_##afmt;} \
     _mandala_##atype & operator=(const _mandala_##atype &v){setValue(v);return m_value;} \
     enum {idx=aindex}; \
 
-#define MFIELD_IMPL(aindex,atype,aname,adescr,atextname,apath,afmt) \
-  MFIELD_IMPL_BEGIN(aindex,atype,aname,adescr,atextname,apath,afmt) \
+#define MFIELD_IMPL(aindex,atype,aname,adescr,atextname,apath,aalias,afmt) \
+  MFIELD_IMPL_BEGIN(aindex,atype,aname,adescr,atextname,apath,aalias,afmt) \
     const char* opt(uint8_t n)const{(void)n;return "";} \
   }
 
-#define MFENUM(atype,aname,adescr,afmt,...) \
-  MFIELD_IMPL_BEGIN(MFIELD_INDEX(aname),atype,aname,adescr,aname,ASTRINGZ(MFIELD_VAR(aname)),afmt) \
+#define MFENUM(atype,aname,adescr,aalias,afmt,...) \
+  MFIELD_IMPL_BEGIN(MFIELD_INDEX(aname),atype,aname,adescr,aname,ASTRINGZ(MFIELD_VAR(aname)),aalias,afmt) \
     const char* opt(uint8_t n)const{ switch(n&0x7F){default: return ""; \
 
 #define MFENUMV(avname,aname,adescr,anum) \
@@ -650,13 +653,13 @@ enum{
 
 
 
-#define MFVECT(atype,aname,v1,v2,v3,adescr,afmt,...) \
+#define MFVECT(atype,aname,v1,v2,v3,adescr,aalias1,aalias2,aalias3,afmt,...) \
   class MFIELD_TYPE(aname) : public _field_vect { public: \
     operator Vector<3,atype>()const{return Vector<3,atype>(v1,v2,v3);} \
     MFIELD_TYPE(aname) & operator=(const Vector<3,atype>& v){v1=v[0];v2=v[1];v3=v[2];return *this;} \
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,aname.v1,ASTRINGZ(MFIELD_VAR(aname).v1),afmt) v1;\
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,aname.v2,ASTRINGZ(MFIELD_VAR(aname).v2),afmt) v2;\
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v3),atype,v3,adescr,aname.v3,ASTRINGZ(MFIELD_VAR(aname).v3),afmt) v3;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,aname.v1,ASTRINGZ(MFIELD_VAR(aname).v1),aalias1,afmt) v1;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,aname.v2,ASTRINGZ(MFIELD_VAR(aname).v2),aalias2,afmt) v2;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v3),atype,v3,adescr,aname.v3,ASTRINGZ(MFIELD_VAR(aname).v3),aalias3,afmt) v3;\
     uint pack(_message *data,_message::_vscale vscale) const {return _field_vect::pack(data,&v1,&v2,&v3,vscale);} \
     uint pack2(_message *data) const {return _field_vect::pack(data,&v1,&v2);} \
     uint unpack(const _message *data) { \
@@ -668,12 +671,12 @@ enum{
   }aname;
 
 
-#define MFVEC2(atype,aname,v1,v2,adescr,afmt,...) \
+#define MFVEC2(atype,aname,v1,v2,adescr,aalias1,aalias2,afmt,...) \
   class MFIELD_TYPE(aname) : public _field_vect { public: \
     operator Vector<2,atype>()const{return Vector<2,atype>(v1,v2);} \
     MFIELD_TYPE(aname) & operator=(const Vector<2,atype>& v){v1=v[0];v2=v[1];return *this;} \
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,aname.v1,ASTRINGZ(MFIELD_VAR(aname).v1),afmt) v1;\
-    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,aname.v2,ASTRINGZ(MFIELD_VAR(aname).v2),afmt) v2;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v1),atype,v1,adescr,aname.v1,ASTRINGZ(MFIELD_VAR(aname).v1),aalias1,afmt) v1;\
+    MFIELD_IMPL(MFIELD_INDEX_VEC(aname,v2),atype,v2,adescr,aname.v2,ASTRINGZ(MFIELD_VAR(aname).v2),aalias2,afmt) v2;\
     uint pack(_message *data) const {return _field_vect::pack(data,&v1,&v2);} \
     uint unpack(const _message *data) { \
       if(data->index!=v1.index())return 0; \
@@ -961,168 +964,175 @@ MGRP0_BEGIN("Autopilot")
 MGRP1_BEGIN("Sensors")
 
 #define MGRP2   imu
-MGRP2_BEGIN("Inertial Measurement Unit")
-MFVECT(float,  acc,x,y,z, "Acceleration [m/s2]", f2)
-MFVECT(float,  gyro,x,y,z,"Angular rate [deg/s]", f2)
-MFVECT(float,  mag,x,y,z, "Magnetic field [a.u.]", f2)
-MFIELD(float,  temp,      "IMU temperature [C]", f2)
+MGRP2_BEGIN("Inertial Measurement Unit",                                        imu )
+MFVECT(float,  acc,x,y,z, "Acceleration [m/s2]",                                Ax,Ay,Az, f2)
+MFVECT(float,  gyro,x,y,z,"Angular rate [deg/s]",                               p,q,r, f2)
+MFVECT(float,  mag,x,y,z, "Magnetic field [a.u.]",                              Hx,Hy,Hz, f2)
+MFIELD(float,  temp,      "IMU temperature [C]",                                , f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   gps
-MGRP2_BEGIN("Global Positioning System")
-MFVECT(float,  pos,lat,lon,hmsl, "GPS position [deg,deg,m]", f4)
-MFVECT(float,  vel,N,E,D,        "GPS velocity [m/s]", f2)
-MFIELD(uint,   UTC, "GPS UTC Time from 1970 1st Jan [sec]", u4)
-MFIELD(byte,   SV,  "GPS Satellites visible [number]", )
-MFIELD(byte,   SU,  "GPS Satellites used [number]", )
+MGRP2_BEGIN("Global Positioning System",                                        gps )
+MFVECT(float,  pos,lat,lon,hmsl, "GPS position [deg,deg,m]",                    gps_lat,gps_lon,gps_hmsl, f4)
+MFVECT(float,  vel,N,E,D,        "GPS velocity [m/s]",                          gps_Vnorth,gps_Veast,gps_Vdown, f2)
+MFIELD(uint,   UTC, "GPS UTC Time from 1970 1st Jan [sec]",                     gps_time, u4)
+MFIELD(byte,   SV,  "GPS Satellites visible [number]",                          gps_SV, )
+MFIELD(byte,   SU,  "GPS Satellites used [number]",                             gps_SU, )
+MFIELD(byte,   jcw, "GPS CW Jamming level [0..255]",                            gps_jcw, )
+MFENUM(enum,   jstate,  "GPS Jamming",                                          gps_jstate, )
+MFENUMV(jstate, off,            "disabled",             0)
+MFENUMV(jstate, ok,             "ok",                   1)
+MFENUMV(jstate, warn,           "warning",              2)
+MFENUMV(jstate, critical,       "critical warning",     3)
+MFENUM_END(jstate)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   air
-MGRP2_BEGIN("Aerodynamic sensors")
-MFIELD(float, pt,    "Airspeed [m/s]", f2)
-MFIELD(float, ps,    "Barometric altitude [m]", f4)
-MFIELD(float, PT,    "Pitot probe temperature [C]", s1)
-MFIELD(float, vario, "Barometric variometer [m/s]", f2)
-MFIELD(float, slip,  "Slip [deg]", f2)
-MFIELD(float, aoa,   "Angle of attack [deg]", f2)
-MFIELD(float, buo,   "Blimp ballonet pressure [kPa]", f2)
+MGRP2_BEGIN("Aerodynamic sensors",                                              air )
+MFIELD(float, pt,    "Airspeed [m/s]",                                          , f2)
+MFIELD(float, ps,    "Barometric altitude [m]",                                 , f4)
+MFIELD(float, PT,    "Pitot probe temperature [C]",                             , s1)
+MFIELD(float, vario, "Barometric variometer [m/s]",                             , f2)
+MFIELD(float, slip,  "Slip [deg]",                                              slip, f2)
+MFIELD(float, aoa,   "Angle of attack [deg]",                                   attack, f2)
+MFIELD(float, buo,   "Blimp ballonet pressure [kPa]",                           buoyancy, f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   range
 MGRP2_BEGIN("Distance to ground")
-MFIELD(float, ultrasonic, "Ultrasonic altimeter [m]", f2)
-MFIELD(float, laser,      "Laser altimeter [m]", f2)
-MFIELD(float, radio,      "Radio altimeter [m]", f4)
-MFIELD(float, proximity,  "Proximity sensor [m]", f2)
-MFIELD(float, touch,      "Gear force sensor [N]", f2)
+MFIELD(float, ultrasonic, "Ultrasonic altimeter [m]",                           , f2)
+MFIELD(float, laser,      "Laser altimeter [m]",                                , f2)
+MFIELD(float, radio,      "Radio altimeter [m]",                                , f4)
+MFIELD(float, proximity,  "Proximity sensor [m]",                               , f2)
+MFIELD(float, touch,      "Gear force sensor [N]",                              , f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   lps
 MGRP2_BEGIN("Local Positioning System")
-MFVECT(float, pos,x,y,z, "Local position sensor [m]", f2)
-MFVECT(float, vel,x,y,z, "Local velocity sensor [m/s]", f2)
+MFVECT(float, pos,x,y,z, "Local position sensor [m]",                           ,,, f2)
+MFVECT(float, vel,x,y,z, "Local velocity sensor [m/s]",                         ,,, f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   ils
 MGRP2_BEGIN("Instrument Landing System")
-MFIELD(float, HDG,    "ILS heading to VOR1 [deg]", f2)
-MFIELD(uint,  DME,    "ILS distance to VOR1 [m]", u2)
-MFIELD(float, RSS,    "ILS signal strength [0..1]", f2)
-MFIELD(float, dHDG,   "ILS error heading [deg]", f2)
-MFIELD(float, alt,    "ILS error altitude [m]", f2)
+MFIELD(float, HDG,    "ILS heading to VOR1 [deg]",                              , f2)
+MFIELD(uint,  DME,    "ILS distance to VOR1 [m]",                               , u2)
+MFIELD(float, RSS,    "ILS signal strength [0..1]",                             , f2)
+MFIELD(float, dHDG,   "ILS error heading [deg]",                                , f2)
+MFIELD(float, alt,    "ILS error altitude [m]",                                 , f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   platform
 MGRP2_BEGIN("Landing Platform sensors")
-MFVECT(float,  pos,lat,lon,hmsl,   "Platform position [deg,deg,m]", f4)
-MFVECT(float,  vel,N,E,D,          "Platform velocity [m/s]", f2)
-MFVECT(float,  att,roll,pitch,yaw, "Platform attitude [deg]", f2)
+MFVECT(float,  pos,lat,lon,hmsl,   "Platform position [deg,deg,m]",             ,,, f4)
+MFVECT(float,  vel,N,E,D,          "Platform velocity [m/s]",                   ,,, f2)
+MFVECT(float,  att,roll,pitch,yaw, "Platform attitude [deg]",                   ,,, f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   radar
 MGRP2_BEGIN("Radar target tracking")
-MFIELD(byte,  id,     "Radar target ID", )
-MFIELD(float, HDG,    "Radar heading to target [deg]", f2)
-MFIELD(uint,  DME,    "Radar distance to target [m]", u2)
-MFIELD(float, vel,    "Radar target velocity [m/s]", f2)
+MFIELD(byte,  id,     "Radar target ID",                                        , )
+MFIELD(float, HDG,    "Radar heading to target [deg]",                          , f2)
+MFIELD(uint,  DME,    "Radar distance to target [m]",                           , u2)
+MFIELD(float, vel,    "Radar target velocity [m/s]",                            , f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   engine
-MGRP2_BEGIN("Engine sensors")
-MFIELD(uint,  rpm,      "Engine RPM [1/min]", u2)
-MFIELD(uint,  rpm_prop, "Prop RPM [1/min]", u2)
-MFIELD(float, fuel,     "Fuel capacity [l]", f2)
-MFIELD(float, frate,    "Fuel flow rate [l/h]", f2)
-MFIELD(float, ET,       "Engine temperature [C]", u1)
-MFIELD(float, OT,       "Oil temperature [C]", u1)
-MFIELD(float, OP,       "Oil pressure [atm]", u01)
-MFIELD(float, EGT1,     "Exhaust 1 temperature [C]", u10)
-MFIELD(float, EGT2,     "Exhaust 2 temperature [C]", u10)
-MFIELD(float, EGT3,     "Exhaust 3 temperature [C]", u10)
-MFIELD(float, EGT4,     "Exhaust 4 temperature [C]", u10)
-MFIELD(float, MAP,      "MAP pressure [Pa]", f2)
-MFIELD(float, IAP,      "Intake air box pressure [kPa]", f2)
-MFIELD(bit,   start,    "Engine start procedure trigger", )
-MFIELD(bit,   error,    "Engine error/ok", )
+MGRP2_BEGIN("Engine sensors",                                                   engine )
+MFIELD(uint,  rpm,      "Engine RPM [1/min]",                                   rpm, u2)
+MFIELD(uint,  rpm_prop, "Prop RPM [1/min]",                                     , u2)
+MFIELD(float, fuel,     "Fuel capacity [l]",                                    fuel, f2)
+MFIELD(float, frate,    "Fuel flow rate [l/h]",                                 frate, f2)
+MFIELD(float, ET,       "Engine temperature [C]",                               ET, u1)
+MFIELD(float, OT,       "Oil temperature [C]",                                  OT, u1)
+MFIELD(float, OP,       "Oil pressure [atm]",                                   OP, u01)
+MFIELD(float, EGT1,     "Exhaust 1 temperature [C]",                            EGT, u10)
+MFIELD(float, EGT2,     "Exhaust 2 temperature [C]",                            , u10)
+MFIELD(float, EGT3,     "Exhaust 3 temperature [C]",                            , u10)
+MFIELD(float, EGT4,     "Exhaust 4 temperature [C]",                            , u10)
+MFIELD(float, MAP,      "MAP pressure [Pa]",                                    , f2)
+MFIELD(float, IAP,      "Intake air box pressure [kPa]",                        , f2)
+MFIELD(bit,   start,    "Engine start procedure trigger",                       ctrb_starter, )
+MFIELD(bit,   error,    "Engine error/ok",                                      sb_eng_err, )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   power
-MGRP2_BEGIN("System power")
-MFIELD(float, Ve,    "System battery voltage [v]", f2)
-MFIELD(float, Ie,    "System current [A]", u001)
-MFIELD(float, Vs,    "Servo battery voltage [v]", f2)
-MFIELD(float, Is,    "Servo current [A]", u01)
-MFIELD(float, Vp,    "Payload battery voltage [v]", f2)
-MFIELD(float, Ip,    "Payload current [A]", u01)
-MFIELD(float, Vm,    "ECU battery voltage [v]", f2)
-MFIELD(float, Im,    "ECU current [A]", u1)
-MFIELD(bit, shutdown,"System trigger shutdown/on", )
+MGRP2_BEGIN("System power",                                                     vsense )
+MFIELD(float, Ve,    "System battery voltage [v]",                              Ve, f2)
+MFIELD(float, Ie,    "System current [A]",                                      Ie, u001)
+MFIELD(float, Vs,    "Servo battery voltage [v]",                               Vs, f2)
+MFIELD(float, Is,    "Servo current [A]",                                       Is, u01)
+MFIELD(float, Vp,    "Payload battery voltage [v]",                             Vp, f2)
+MFIELD(float, Ip,    "Payload current [A]",                                     Ip, u01)
+MFIELD(float, Vm,    "ECU battery voltage [v]",                                 Vm, f2)
+MFIELD(float, Im,    "ECU current [A]",                                         Im, u1)
+MFIELD(bit, shutdown,"System trigger shutdown/on",                              sb_shutdown, )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   battery
-MGRP2_BEGIN("Battery management")
-MFIELD(float, Vbat1,    "Battery 1 voltage [v]", f2)
-MFIELD(float, Ib1,      "Battery 1 current [A]", u01)
-MFIELD(float, BT1,      "Battery 1 temperature [C]", s1)
-MFIELD(bit,   err_b1,   "Battery 1 error/ok", )
-MFIELD(float, Vbat2,    "Battery 2 voltage [v]", f2)
-MFIELD(float, Ib2,      "Battery 2 current [A]", u01)
-MFIELD(float, BT2,      "Battery 2 temperature [C]", s1)
-MFIELD(bit,   err_b2,   "Battery 2 error/ok", )
-MFIELD(float, Vgen,     "Power generator voltage [v]",f2)
-MFIELD(float, Igen,     "Charging current [A]", u01)
-MFIELD(float, Ichg,     "Charging current [A]", u01)
-MFIELD(bit,   err_gen,  "Power generator error/ok", )
+MGRP2_BEGIN("Battery management",                                               bat )
+MFIELD(float, Vbat1,    "Battery 1 voltage [v]",                                , f2)
+MFIELD(float, Ib1,      "Battery 1 current [A]",                                , u01)
+MFIELD(float, BT1,      "Battery 1 temperature [C]",                            , s1)
+MFIELD(bit,   err_b1,   "Battery 1 error/ok",                                   , )
+MFIELD(float, Vbat2,    "Battery 2 voltage [v]",                                , f2)
+MFIELD(float, Ib2,      "Battery 2 current [A]",                                , u01)
+MFIELD(float, BT2,      "Battery 2 temperature [C]",                            , s1)
+MFIELD(bit,   err_b2,   "Battery 2 error/ok", , )
+MFIELD(float, Vgen,     "Power generator voltage [v]",                          ,f2)
+MFIELD(float, Igen,     "Charging current [A]",                                 , u01)
+MFIELD(float, Ichg,     "Charging current [A]",                                 , u01)
+MFIELD(bit,   err_gen,  "Power generator error/ok",                             sb_gen_err, )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   temp
-MGRP2_BEGIN("Temperature sensors")
-MFIELD(float, AT,       "Ambient temperature [C]", s1)
-MFIELD(float, RT,       "Room temperature [C]", s1)
+MGRP2_BEGIN("Temperature sensors",                                              temp )
+MFIELD(float, AT,       "Ambient temperature [C]",                              AT, s1)
+MFIELD(float, RT,       "Room temperature [C]",                                 RT, s1)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   datalink
-MGRP2_BEGIN("Datalink radio sensors")
-MFIELD(float, RSS,    "Modem signal strength [0..1]", f2)
-MFIELD(float, MT,     "Modem temperature [C]", s1)
-MFIELD(float, HDG,    "Modem heading to transmitter [deg]", f2)
-MFIELD(uint,  DME,    "Modem distance to transmitter [m]", u4)
+MGRP2_BEGIN("Datalink radio sensors",                                           dlink )
+MFIELD(float, RSS,    "Modem signal strength [0..1]",                           RSS, f2)
+MFIELD(float, MT,     "Modem temperature [C]",                                  MT, s1)
+MFIELD(float, HDG,    "Modem heading to transmitter [deg]",                     , f2)
+MFIELD(uint,  DME,    "Modem distance to transmitter [m]",                      , u4)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   pilot
 MGRP2_BEGIN("Pilot stick sensors")
-MFIELD(byte,  override, "RC override [0..255]", )
-MFIELD(float, roll,     "RC roll [-1..0..+1]", s001)
-MFIELD(float, pitch,    "RC pitch [-1..0..+1]", s001)
-MFIELD(float, throttle, "RC throttle [0..1]", s001)
-MFIELD(float, yaw,      "RC yaw [-1..0..+1]", s001)
+MFIELD(byte,  override, "RC override [0..255]",                                 , )
+MFIELD(float, roll,     "RC roll [-1..0..+1]",                                  , s001)
+MFIELD(float, pitch,    "RC pitch [-1..0..+1]",                                 , s001)
+MFIELD(float, throttle, "RC throttle [0..1]",                                   , s001)
+MFIELD(float, yaw,      "RC yaw [-1..0..+1]",                                   , s001)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   steering
 MGRP2_BEGIN("Steering encoders")
-MFVEC2(float, vel,left,right,     "Steering velocity [m/s]", f2)
-MFIELD(float, HDG,                "Steering heading [deg]", f2)
+MFVEC2(float, vel,left,right,     "Steering velocity [m/s]",                    ,, f2)
+MFIELD(float, HDG,                "Steering heading [deg]",                     , f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   ers
-MGRP2_BEGIN("ERS sensors")
-MFIELD(bit, error,   "ERS error/ok", )
-MFIELD(bit, disarm,  "ERS disarmed/armed", )
+MGRP2_BEGIN("ERS sensors",                                                      ers )
+MFIELD(bit, error,   "ERS error/ok",                                            sb_ers_err, )
+MFIELD(bit, disarm,  "ERS disarmed/armed",                                      sb_ers_disarm, )
 MGRP2_END
 #undef MGRP2
 
@@ -1134,93 +1144,94 @@ MGRP1_BEGIN("Control outputs")
 
 #define MGRP2   stability
 MGRP2_BEGIN("Stability fast controls")
-MFIELD(float,  ail,     "Ailerons [-1..0..+1]", s001)
-MFIELD(float,  elv,     "Elevator [-1..0..+1]", s001)
-MFIELD(float,  rud,     "Rudder [-1..0..+1]", s001)
-MFIELD(float,  collective, "Collective pitch [-1..0..+1]", s001)
-MFIELD(float,  steering,   "Steering [-1..0..+1]", s001)
+MFIELD(float,  ail,     "Ailerons [-1..0..+1]",                                 ctr_ailerons, s001)
+MFIELD(float,  elv,     "Elevator [-1..0..+1]",                                 ctr_elevator, s001)
+MFIELD(float,  rud,     "Rudder [-1..0..+1]",                                   ctr_rudder, s001)
+MFIELD(float,  collective, "Collective pitch [-1..0..+1]",                      ctr_collective, s001)
+MFIELD(float,  steering,   "Steering [-1..0..+1]",                              ctr_steering, s001)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   engine
 MGRP2_BEGIN("Engine controls")
-MFIELD(float,  thr,     "Throttle [0..1]", u001)
-MFIELD(float,  prop,    "Prop pitch [-1..0..+1]", s001)
-MFIELD(float,  mix,     "Mixture [0..1]", u001)
-MFIELD(float,  tune,    "Engine tuning [-1..0..1]", s001)
-MFIELD(float,  vector,  "Thrust vector [-1..0..+1]", s001)
-MFIELD(bit,    starter, "Engine starter on/off", )
-MFIELD(bit,    rev,     "Thrust reverse on/off", )
+MFIELD(float,  thr,     "Throttle [0..1]",                                      ctr_throttle, u001)
+MFIELD(float,  prop,    "Prop pitch [-1..0..+1]",                               , s001)
+MFIELD(float,  mix,     "Mixture [0..1]",                                       ctr_mixture, u001)
+MFIELD(float,  tune,    "Engine tuning [-1..0..1]",                             ctr_engine, s001)
+MFIELD(float,  vector,  "Thrust vector [-1..0..+1]",                            , s001)
+MFIELD(bit,    starter, "Engine starter on/off",                                sw_starter, )
+MFIELD(bit,    horn,    "Engine horn signal",                                   ctrb_horn, )
+MFIELD(bit,    rev,     "Thrust reverse on/off",                                ctrb_rev, )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   wing
 MGRP2_BEGIN("Wing mechanization")
-MFIELD(float,  flaps,   "Flaps [0..1]", u001)
-MFIELD(float,  airbrk,  "Airbrakes [0..1]", u001)
-MFIELD(float,  slats,   "Wing slats [0..1]", u001)
-MFIELD(float,  sweep,   "Wing sweep [-1..0..+1]", s001)
-MFIELD(float,  buoyancy,"Buoyancy [-1..0..+1]", s001)
+MFIELD(float,  flaps,   "Flaps [0..1]",                                         ctr_flaps, u001)
+MFIELD(float,  airbrk,  "Airbrakes [0..1]",                                     ctr_airbrk, u001)
+MFIELD(float,  slats,   "Wing slats [0..1]",                                    , u001)
+MFIELD(float,  sweep,   "Wing sweep [-1..0..+1]",                               ctr_sweep, s001)
+MFIELD(float,  buoyancy,"Buoyancy [-1..0..+1]",                                 ctr_buoyancy, s001)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   brakes
 MGRP2_BEGIN("Brakes system control")
-MFIELD(float,  brake,   "Brake [0..1]", u001)
-MFIELD(float,  brakeL,  "Left brake [0..1]", u001)
-MFIELD(float,  brakeR,  "Right brake [0..1]", u001)
+MFIELD(float,  brake,   "Brake [0..1]",                                         ctr_brake, u001)
+MFIELD(float,  brakeL,  "Left brake [0..1]",                                    ctr_brakeL, u001)
+MFIELD(float,  brakeR,  "Right brake [0..1]",                                   ctr_brakeR, u001)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   ers
 MGRP2_BEGIN("Emergency Recovery System controls")
-MFIELD(bit,  launch,    "ERS on/off", )
-MFIELD(bit,  rel,       "Parachute released/locked", )
+MFIELD(bit,  launch,    "ERS on/off",                                           ctrb_ers, )
+MFIELD(bit,  rel,       "Parachute released/locked",                            ctrb_rel, )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   gear
 MGRP2_BEGIN("Landing Gear controls")
-MFIELD(bit,  retract,    "Landing gear retracted/extracted", )
+MFIELD(bit,  retract,    "Landing gear retracted/extracted",                    ctrb_gear, )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   fuel
 MGRP2_BEGIN("Fuel pumps")
-MFIELD(bit,  pump,    "Fuel pump on/off", )
-MFIELD(bit,  xfeed,   "Crossfeed on/off", )
+MFIELD(bit,  pump,    "Fuel pump on/off",                                       ctrb_pump, )
+MFIELD(bit,  xfeed,   "Crossfeed on/off",                                       , )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   power
 MGRP2_BEGIN("Power management controls")
-MFIELD(bit,  ap,        "Avionics", )
-MFIELD(bit,  servo,     "Servo on/off", )
-MFIELD(bit,  ignition,  "Engine on/off", )
-MFIELD(bit,  payload,   "Payload on/off", )
-MFIELD(bit,  agl,       "AGL sensor", )
-MFIELD(bit,  xpdr,      "XPDR on/off", )
-MFIELD(bit,  satcom,    "Satcom on/off", )
-MFIELD(bit,  rfamp,     "RF amplifier on/off", )
-MFIELD(bit,  ils,       "Instrument Landing System on/off", )
-MFIELD(bit,  ice,       "Anti-ice on/off", )
+MFIELD(bit,  ap,        "Avionics",                                             power_ap, )
+MFIELD(bit,  servo,     "Servo on/off",                                         power_servo, )
+MFIELD(bit,  ignition,  "Engine on/off",                                        power_ignition, )
+MFIELD(bit,  payload,   "Payload on/off",                                       power_payload, )
+MFIELD(bit,  agl,       "AGL sensor",                                           power_agl, )
+MFIELD(bit,  xpdr,      "XPDR on/off",                                          power_xpdr, )
+MFIELD(bit,  satcom,    "Satcom on/off",                                        , )
+MFIELD(bit,  rfamp,     "RF amplifier on/off",                                  , )
+MFIELD(bit,  ils,       "Instrument Landing System on/off",                     , )
+MFIELD(bit,  ice,       "Anti-ice on/off",                                      sw_ice, )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   light
 MGRP2_BEGIN("Lighting")
-MFIELD(bit,  beacon,    "Beacon light on/off", )
-MFIELD(bit,  landing,   "Landing lights on/off", )
-MFIELD(bit,  nav,       "Navigation lights on/off", )
-MFIELD(bit,  strobe,    "Strobe light on/off", )
-MFIELD(bit,  taxi,      "Taxi lights on/off", )
+MFIELD(bit,  beacon,    "Beacon light on/off",                                  , )
+MFIELD(bit,  landing,   "Landing lights on/off",                                sw_lights, )
+MFIELD(bit,  nav,       "Navigation lights on/off",                             , )
+MFIELD(bit,  strobe,    "Strobe light on/off",                                  , )
+MFIELD(bit,  taxi,      "Taxi lights on/off",                                   sw_taxi, )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   door
 MGRP2_BEGIN("Doors and latches")
-MFIELD(bit,  main,    "Main door open/locked", )
-MFIELD(bit,  drop,    "Drop-off open/locked", )
+MFIELD(bit,  main,    "Main door open/locked",                                  , )
+MFIELD(bit,  drop,    "Drop-off open/locked",                                   ctrb_drp, )
 MGRP2_END
 #undef MGRP2
 
@@ -1232,69 +1243,69 @@ MGRP1_BEGIN("Current system state")
 
 #define MGRP2   ahrs
 MGRP2_BEGIN("Attitude and position estimation")
-MFVECT(float, att,roll,pitch,yaw,    "Attitude [deg]", f2)
-MFIELD(float, lat,      "Latitude [deg]", f4)
-MFIELD(float, lon,      "Longitude [deg]", f4)
-MFVEC2(float, NE,N,E,   "Local position [m]", f4)
-MFVEC2(float, vel,N,E,  "Local velocity [m/s]", f2)
-MFIELD(float, altitude, "Altitude [m]", f4)
-MFIELD(float, course,   "Moving direction [deg]", f2)
-MFIELD(float, gSpeed,   "Ground speed [m/s]", f2)
+MFVECT(float, att,roll,pitch,yaw,    "Attitude [deg]",                          roll,pitch,yaw, f2)
+MFIELD(float, lat,      "Latitude [deg]",                                       , f4)
+MFIELD(float, lon,      "Longitude [deg]",                                      , f4)
+MFVEC2(float, NE,N,E,   "Local position [m]",                                   ,, f4)
+MFVEC2(float, vel,N,E,  "Local velocity [m/s]",                                 ,, f2)
+MFIELD(float, altitude, "Altitude [m]",                                         altitude, f4)
+MFIELD(float, course,   "Moving direction [deg]",                               course, f2)
+MFIELD(float, gSpeed,   "Ground speed [m/s]",                                   , f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   flight
 MGRP2_BEGIN("Flight parameters")
-MFIELD(float, airspeed, "Airspeed [m/s]", f2)
-MFIELD(float, vspeed,   "Vertical speed [m/s]", f2)
-MFIELD(float, ldratio,  "Glide ratio [Lift/Drag]", f2)
-MFIELD(float, venergy,  "Compensated variometer [m/s]", f2)
-MFIELD(float, agl,      "Above Ground Level altitude [m]", f2)
-MFIELD(float, vcas,     "Airspeed derivative [m/s^2]", f2)
-MFIELD(float, denergy,  "Venergy derivative [m/s^2]", f2)
+MFIELD(float, airspeed, "Airspeed [m/s]",                                       airspeed, f2)
+MFIELD(float, vspeed,   "Vertical speed [m/s]",                                 vspeed, f2)
+MFIELD(float, ldratio,  "Glide ratio [Lift/Drag]",                              ldratio, f2)
+MFIELD(float, venergy,  "Compensated variometer [m/s]",                         venergy, f2)
+MFIELD(float, agl,      "Above Ground Level altitude [m]",                      agl, f2)
+MFIELD(float, vcas,     "Airspeed derivative [m/s^2]",                          , f2)
+MFIELD(float, denergy,  "Venergy derivative [m/s^2]",                           , f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   status
 MGRP2_BEGIN("Status of subsystems")
-MFIELD(bit,  rc,     "RC on/off", )
-MFIELD(bit,  gps,    "GPS available/lost", )
-MFIELD(bit,  agl,    "AGL available/off", )
-MFIELD(bit,  uplink, "Uplink available/lost", )
-MFIELD(bit,  touch,  "Landing gear touchdown/floating", )
+MFIELD(bit,  rc,     "RC on/off",                                               status_rc, )
+MFIELD(bit,  gps,    "GPS available/lost",                                      status_gps, )
+MFIELD(bit,  agl,    "AGL available/off",                                       status_agl, )
+MFIELD(bit,  uplink, "Uplink available/lost",                                   status_modem, )
+MFIELD(bit,  touch,  "Landing gear touchdown/floating",                         status_touch, )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   error
 MGRP2_BEGIN("System errors and warnings")
-MFIELD(bit,  fatal,     "Fatal error/ok", )
-MFIELD(bit,  power,     "Power supply error/ok", )
-MFIELD(bit,  engine,    "Engine error/ok", )
-MFIELD(bit,  rpm,       "RPM sensor error/ok", )
-MFIELD(bit,  cas,       "CAS error", )
-MFIELD(bit,  pstatic,   "Static pressure error/ok", )
-MFIELD(bit,  gyro,      "IMU gyros bias", )
-MFIELD(bit,  ers,       "ERS error/ok", )
+MFIELD(bit,  fatal,     "Fatal error/ok",                                       , )
+MFIELD(bit,  power,     "Power supply error/ok",                                error_power, )
+MFIELD(bit,  engine,    "Engine error/ok",                                      , )
+MFIELD(bit,  rpm,       "RPM sensor error/ok",                                  error_rpm, )
+MFIELD(bit,  cas,       "CAS error",                                            error_cas, )
+MFIELD(bit,  pstatic,   "Static pressure error/ok",                             error_pstatic, )
+MFIELD(bit,  gyro,      "IMU gyros bias",                                       error_gyro, )
+MFIELD(bit,  ers,       "ERS error/ok",                                         , )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   cmd
 MGRP2_BEGIN("Commanded values")
-MFVECT(float, att,roll,pitch,yaw,       "Commanded attitude [deg]", f2)
-MFVEC2(float, NE,N,E,                   "Commanded position [m]", f4)
-MFVECT(float, pos,lat,lon,hmsl,         "Commanded global position [deg,deg,m]", f4)
-MFIELD(float, course,   "Commanded course [deg]", f2)
-MFIELD(float, altitude, "Commanded altitude [m]", f4)
-MFIELD(float, airspeed, "Commanded airspeed [m/s]", f2)
-MFIELD(float, vspeed,   "Commanded vspeed [m/s]", f2)
-MFIELD(float, slip,     "Commanded slip [deg]", f2)
-MFIELD(uint,  rpm,      "Commanded RPM [1/m]", u2)
+MFVECT(float, att,roll,pitch,yaw, "Commanded attitude [deg]",                   cmd_roll,cmd_pitch,cmd_yaw, f2)
+MFVEC2(float, NE,N,E,             "Commanded position [m]",                     cmd_north,cmd_east, f4)
+MFVECT(float, pos,lat,lon,hmsl,   "Commanded global position [deg,deg,m]",      ,,, f4)
+MFIELD(float, course,   "Commanded course [deg]",                               cmd_course, f2)
+MFIELD(float, altitude, "Commanded altitude [m]",                               cmd_altitude, f4)
+MFIELD(float, airspeed, "Commanded airspeed [m/s]",                             cmd_airspeed, f2)
+MFIELD(float, vspeed,   "Commanded vspeed [m/s]",                               cmd_vspeed, f2)
+MFIELD(float, slip,     "Commanded slip [deg]",                                 cmd_slip, f2)
+MFIELD(uint,  rpm,      "Commanded RPM [1/m]",                                  cmd_rpm, u2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   maneuver
 MGRP2_BEGIN("Maneuver parameters")
-MFENUM(enum,  mode,      "flight mode", )
+MFENUM(enum,  mode,      "flight mode",                                         mode, )
 MFENUMV(mode,   EMG,     "Realtime control",       0)
 MFENUMV(mode,   RPV,     "Angles control",         1)
 MFENUMV(mode,   UAV,     "Heading control",        2)
@@ -1305,82 +1316,85 @@ MFENUMV(mode,   TAXI,    "Taxi",                   6)
 MFENUMV(mode,   TAKEOFF, "Takeoff",                7)
 MFENUMV(mode,   LANDING, "Landing",                8)
 MFENUM_END(mode)
-MFIELD(byte,  stage,     "Maneuver stage", )
-MFENUM(enum,  mtype,     "Mission maneuver type", )
+MFIELD(byte,  stage,     "Maneuver stage",                                      stage, )
+MFENUM(enum,  mtype,     "Mission maneuver type",                               mtype, )
 MFENUMV(mtype,   hdg,     "Heading navigation",      0)
 MFENUMV(mtype,   line,    "Line navigation",         1)
 MFENUM_END(mtype)
-MFIELD(byte,  loops,     "Number of remaining turns or loops [0..255]", )
-MFIELD(float, turnR,     "Current circle radius [m]", f2)
+MFIELD(byte,  loops,     "Number of remaining turns or loops [0..255]",         loops, )
+MFIELD(float, turnR,     "Current circle radius [m]",                           turnR, f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   cmode
 MGRP2_BEGIN("Control system mode")
-MFIELD(bit,  dlhd,      "High precision downstream on/off", )
-MFIELD(bit,  thrcut,    "Throttle cut on/off", )
-MFIELD(bit,  throvr,    "Throttle override on/off", )
-MFIELD(bit,  hover,     "Stabilization mode hover/run", )
-MFIELD(bit,  ahrs,      "AHRS mode inertial/gps", )
+MFIELD(bit,  dlhd,      "High precision downstream on/off",                     cmode_dlhd, )
+MFIELD(bit,  thrcut,    "Throttle cut on/off",                                  cmode_thrcut, )
+MFIELD(bit,  throvr,    "Throttle override on/off",                             cmode_throvr, )
+MFIELD(bit,  hover,     "Stabilization mode hover/run",                         cmode_hover, )
+MFIELD(bit,  hyaw,      "Hover yaw compensated/fixed",                          cmode_hyaw, )
+MFIELD(bit,  ahrs,      "AHRS mode inertial/gps",                               cmode_ahrs, )
+MFIELD(bit,  nomag,     "Magnetometer blocked/on",                              cmode_nomag, )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   nav
 MGRP2_BEGIN("Navigation parameters")
-MFVEC2(float, dXY,x,y,   "Bodyframe delta [m]", f2)
-MFVEC2(float, vXY,x,y,   "Bodyframe velocity [m/s]", f2)
-MFIELD(float, delta,     "General delta (depends on mode) [m]", f2)
-MFIELD(float, tgHDG,     "Current tangent heading [deg]", f2)
-MFIELD(float, stab,      "Stability [0..1]", u001)
-MFIELD(float, corr,      "Correlator output [K]", f2)
-MFIELD(float, rwAdj,     "Runway displacement adjust [m]", s1)
-MFIELD(float, rwDelta,   "Runway alignment [m]", f2)
-MFIELD(float, rwDV,      "Runway alignment velocity [m/s]", f2)
+MFVEC2(float, dXY,x,y,   "Bodyframe delta [m]",                                 ,, f2)
+MFVEC2(float, vXY,x,y,   "Bodyframe velocity [m/s]",                            ,, f2)
+MFIELD(float, delta,     "General delta (depends on mode) [m]",                 delta, f2)
+MFIELD(float, tgHDG,     "Current tangent heading [deg]",                       tgHDG, f2)
+MFIELD(float, stab,      "Stability [0..1]",                                    stab, u001)
+MFIELD(float, corr,      "Correlator output [K]",                               , f2)
+MFIELD(float, rwAdj,     "Runway displacement adjust [m]",                      rwAdj, s1)
+MFIELD(float, rwDelta,   "Runway alignment [m]",                                , f2)
+MFIELD(float, rwDV,      "Runway alignment velocity [m/s]",                     , f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   mission
 MGRP2_BEGIN("Current waypoint information")
-MFIELD(float, DME,    "Distance to waypoint [m]", f2)
-MFIELD(float, HDG,    "Current waypoint heading [deg]", f2)
-MFIELD(uint,  ETA,    "Estimated time of arrival [s]", u4)
-MFIELD(byte,  wpidx,  "Current waypoint [0..255]", )
-MFIELD(byte,  rwidx,  "Current runway [0..255]", )
-MFIELD(byte,  twidx,  "Current taxiway [0..255]", )
-MFIELD(byte,  piidx,  "Current point of interest [0..255]", )
-MFIELD(bit,   inc,    "Increment mission index", )
-MFIELD(bit,   dec,    "Decrement mission index", )
+MFIELD(float, DME,    "Distance to waypoint [m]",                               , f2)
+MFIELD(float, HDG,    "Current waypoint heading [deg]",                         , f2)
+MFIELD(uint,  ETA,    "Estimated time of arrival [s]",                          ETA, u4)
+MFIELD(byte,  wpidx,  "Current waypoint [0..255]",                              wpidx, )
+MFIELD(byte,  rwidx,  "Current runway [0..255]",                                rwidx, )
+MFIELD(byte,  twidx,  "Current taxiway [0..255]",                               twidx, )
+MFIELD(byte,  piidx,  "Current point of interest [0..255]",                     piidx, )
+MFIELD(bit,   inc,    "Increment mission index",                                , )
+MFIELD(bit,   dec,    "Decrement mission index",                                , )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   ils
 MGRP2_BEGIN("Instrument Landing System status")
-MFIELD(bit, armed,    "ILS armed/off", )
-MFIELD(bit, approach, "ILS approach available/lost", )
-MFIELD(bit, offset,   "ILS offset available/lost", )
-MFIELD(bit, platform, "ILS platform available/lost", )
+MFIELD(bit, armed,    "ILS armed/off",                                          , )
+MFIELD(bit, approach, "ILS approach available/lost",                            , )
+MFIELD(bit, offset,   "ILS offset available/lost",                              , )
+MFIELD(bit, platform, "ILS platform available/lost",                            , )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   home
 MGRP2_BEGIN("Home point")
-MFVECT(float,  pos,lat,lon,hmsl,"Home global position [deg,deg,m]", f4)
-MFIELD(float,  altps,           "Barometric altitude on ground level [m]", f2)
+MFVECT(float,  pos,lat,lon,hmsl,"Home global position [deg,deg,m]",             home_lat,home_lon,home_hmsl, f4)
+MFIELD(float,  altps,           "Barometric altitude on ground level [m]",      altps_gnd, f2)
+MFIELD(bit,    set,             "GPS initialized",                              status_home, )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   wind
 MGRP2_BEGIN("Wind estimator")
-MFIELD(float,  speed,   "wind speed [m/s]", u01)
-MFIELD(float,  HDG,     "wind direction to [deg]", f2)
-MFIELD(float,  cas2tas, "CAS to TAS multiplier [K]", u001)
+MFIELD(float,  speed,   "wind speed [m/s]",                                     windSpd, u01)
+MFIELD(float,  HDG,     "wind direction to [deg]",                              windHdg, f2)
+MFIELD(float,  cas2tas, "CAS to TAS multiplier [K]",                            cas2tas, u001)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   downlink
 MGRP2_BEGIN("Downlink parameters")
-MFIELD(uint,  period,    "downlink period [ms]", u2)
-MFIELD(uint,  timestamp, "downlink timestamp [ms]", u4)
+MFIELD(uint,  period,    "downlink period [ms]",                                , u2)
+MFIELD(uint,  timestamp, "downlink timestamp [ms]",                             , u4)
 MGRP2_END
 #undef MGRP2
 
@@ -1392,18 +1406,18 @@ MGRP1_BEGIN("Information to human")
 
 #define MGRP2   ground
 MGRP2_BEGIN("Ground Station info")
-MFIELD(float, RSS, "GCU modem signal strength [0..1]", f2)
-MFIELD(float, Ve,  "GCU system battery voltage [v]", f2)
-MFIELD(float, MT,  "GCU modem temperature [C]", s1)
+MFIELD(float, RSS, "GCU modem signal strength [0..1]",                          , f2)
+MFIELD(float, Ve,  "GCU system battery voltage [v]",                            , f2)
+MFIELD(float, MT,  "GCU modem temperature [C]",                                 , s1)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   meteo
 MGRP2_BEGIN("Meteo base station info")
-MFIELD(float,  windSpd, "wind speed [m/s]", u01)
-MFIELD(float,  windHdg, "wind direction to [deg]", f2)
-MFIELD(float,  temp,    "Ground outside air temperature [C]", s1)
-MFIELD(float,  altps,   "barometric altitude on ground level [m]", f2)
+MFIELD(float,  windSpd, "wind speed [m/s]",                                     , u01)
+MFIELD(float,  windHdg, "wind direction to [deg]",                              , f2)
+MFIELD(float,  temp,    "Ground outside air temperature [C]",                   , s1)
+MFIELD(float,  altps,   "barometric altitude on ground level [m]",              , f2)
 MGRP2_END
 #undef MGRP2
 
@@ -1421,23 +1435,23 @@ MGRP1_BEGIN("Camera gimbal")
 
 #define MGRP2   imu
 MGRP2_BEGIN("Camera IMU")
-MFVECT(float,   acc,x,y,z, "Cam acceleration [m/s2]", f2)
-MFVECT(float,   gyro,x,y,z,"Cam angular rate [deg/s]", f2)
-MFVECT(float,   mag,x,y,z, "Cam magnetic field [a.u.]", f2)
-MFIELD(float,   temp,      "Cam IMU temperature [C]", f2)
+MFVECT(float,   acc,x,y,z, "Cam acceleration [m/s2]",                           ,,, f2)
+MFVECT(float,   gyro,x,y,z,"Cam angular rate [deg/s]",                          ,,, f2)
+MFVECT(float,   mag,x,y,z, "Cam magnetic field [a.u.]",                         ,,, f2)
+MFIELD(float,   temp,      "Cam IMU temperature [C]",                           , f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   state
 MGRP2_BEGIN("Camera control system state")
-MFVECT(float, att,roll,pitch,yaw, "Cam attitude [deg]", f2)
-MFIELD(uint,  timestamp, "Cam timestamp [ms]", u4)
+MFVECT(float, att,roll,pitch,yaw, "Cam attitude [deg]",                         cam_roll,cam_pitch,cam_yaw, f2)
+MFIELD(uint,  timestamp, "Cam timestamp [ms]",                                  , u4)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   cmd
 MGRP2_BEGIN("Camera commanded values")
-MFENUM(enum,  camop,     "Cam control mode", )
+MFENUM(enum,  camop,     "Cam control mode",                                    , )
 MFENUMV(camop,   off,     "camera off",                   0)
 MFENUMV(camop,   fixed,   "fixed position",               1)
 MFENUMV(camop,   stab,    "gyro stabilization",           2)
@@ -1445,43 +1459,43 @@ MFENUMV(camop,   position,"attitude position",            3)
 MFENUMV(camop,   speed,   "attitude speed control",       4)
 MFENUMV(camop,   target,  "target position tracking",     5)
 MFENUM_END(camop)
-MFVECT(float, att,roll,pitch,yaw,       "Commanded cam attitude [deg]", f4)
-MFIELD(float, zoom,     "Cam zoom level [0..1]", f2)
-MFIELD(float, focus,    "Cam focus [0..1]", f2)
-MFIELD(uint,  tperiod,  "Cam period for timestamps [ms]", u2)
-MFIELD(byte,  ch,       "Video channel [0..255]", )
+MFVECT(float, att,roll,pitch,yaw,       "Commanded cam attitude [deg]",         ,,, f4)
+MFIELD(float, zoom,     "Cam zoom level [0..1]",                                , f2)
+MFIELD(float, focus,    "Cam focus [0..1]",                                     , f2)
+MFIELD(uint,  tperiod,  "Cam period for timestamps [ms]",                       , u2)
+MFIELD(byte,  ch,       "Video channel [0..255]",                               , )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   tune
 MGRP2_BEGIN("Camera tuning")
-MFVECT(float, bias,roll,pitch,yaw,       "Cam stability bias [deg/s]", f4)
+MFVECT(float, bias,roll,pitch,yaw,       "Cam stability bias [deg/s]",          ,,, f4)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   options
 MGRP2_BEGIN("Camera options")
-MFIELD(bit, PF,     "picture flip on/off", )
-MFIELD(bit, NIR,    "NIR filter on/off", )
-MFIELD(bit, DSP,    "display information on/off",)
-MFIELD(bit, FMI,    "focus mode infinity/auto", )
-MFIELD(bit, FM,     "focus manual/auto", )
+MFIELD(bit, PF,     "picture flip on/off",                                      , )
+MFIELD(bit, NIR,    "NIR filter on/off",                                        , )
+MFIELD(bit, DSP,    "display information on/off",                               , )
+MFIELD(bit, FMI,    "focus mode infinity/auto",                                 , )
+MFIELD(bit, FM,     "focus manual/auto",                                        , )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   control
 MGRP2_BEGIN("Camera controls output")
-MFVECT(float, servo,roll,pitch,yaw, "Cam servo [-1..0..+1]", s001)
-MFIELD(bit,   rec,      "Recording", )
-MFIELD(bit,   shot,     "Snapshot", )
-MFIELD(bit,   ashot,    "Series snapshots", )
+MFVECT(float, servo,roll,pitch,yaw, "Cam servo [-1..0..+1]",                    ,,, s001)
+MFIELD(bit,   rec,      "Recording",                                            , )
+MFIELD(bit,   shot,     "Snapshot",                                             , )
+MFIELD(bit,   ashot,    "Series snapshots",                                     , )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   tracking
 MGRP2_BEGIN("Camera tracker")
-MFVECT(float,  pos,lat,lon,hmsl,"Tracking position [deg,deg,m]", f4)
-MFIELD(float,  DME,             "Distance to tracking object [m]", f2)
+MFVECT(float,  pos,lat,lon,hmsl,"Tracking position [deg,deg,m]",                ,,, f4)
+MFIELD(float,  DME,             "Distance to tracking object [m]",              , f2)
 MGRP2_END
 #undef MGRP2
 
@@ -1493,42 +1507,42 @@ MGRP1_BEGIN("Turret")
 
 #define MGRP2   state
 MGRP2_BEGIN("Turret system state")
-MFVECT(float, att,roll,pitch,yaw, "Turret attitude [deg]", f2)
-MFVECT(float, enc,roll,pitch,yaw, "Turret encoders [deg]", f4)
+MFVECT(float, att,roll,pitch,yaw, "Turret attitude [deg]",                      ,,, f2)
+MFVECT(float, enc,roll,pitch,yaw, "Turret encoders [deg]",                      ,,, f4)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   cmd
 MGRP2_BEGIN("Turret commanded values")
-MFENUM(enum,  turret,     "Turret control mode", )
+MFENUM(enum,  turret,     "Turret control mode",                                , )
 MFENUMV(turret,   off,     "turret off",                   0)
 MFENUMV(turret,   fixed,   "fixed position",               1)
 MFENUMV(turret,   stab,    "gyro stabilization",           2)
 MFENUMV(turret,   position,"attitude position",            3)
 MFENUMV(turret,   speed,   "attitude speed control",       4)
 MFENUM_END(turret)
-MFVECT(float, att,roll,pitch,yaw,       "Commanded turret attitude [deg]", f4)
-MFIELD(byte,  ammo,     "Turret ammo [0..255]", )
+MFVECT(float, att,roll,pitch,yaw,       "Commanded turret attitude [deg]",      ,,, f4)
+MFIELD(byte,  ammo,     "Turret ammo [0..255]",                                 , )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   tune
 MGRP2_BEGIN("Turret tuning")
-MFVECT(float, bias,roll,pitch,yaw,       "Turret stability bias [deg/s]", f4)
+MFVECT(float, bias,roll,pitch,yaw,       "Turret stability bias [deg/s]",       ,,, f4)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   options
 MGRP2_BEGIN("Turret options")
-MFIELD(bit, armed,     "Turret armed/disarmed",        )
-MFIELD(bit, shoot,     "Turret shooting/standby",      )
-MFIELD(bit, reload,    "Turret reloading/reloaded",    )
+MFIELD(bit, armed,     "Turret armed/disarmed",                                 , )
+MFIELD(bit, shoot,     "Turret shooting/standby",                               , )
+MFIELD(bit, reload,    "Turret reloading/reloaded",                             , )
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   control
 MGRP2_BEGIN("Turret controls output")
-MFVECT(float, servo,roll,pitch,yaw, "Turret servo [-1..0..+1]", s001)
+MFVECT(float, servo,roll,pitch,yaw, "Turret servo [-1..0..+1]",                 ,,, s001)
 MGRP2_END
 #undef MGRP2
 
@@ -1586,43 +1600,43 @@ MGRP1_BEGIN("Auxilary telemetry fields")
 
 #define MGRP2   usr
 MGRP2_BEGIN("User values")
-MFIELD(float, u1,  "User value 1", f2)
-MFIELD(float, u2,  "User value 2", f2)
-MFIELD(float, u3,  "User value 3", f2)
-MFIELD(float, u4,  "User value 4", f2)
-MFIELD(float, u5,  "User value 5", f2)
-MFIELD(float, u6,  "User value 6", f2)
-MFIELD(float, u7,  "User value 7", f2)
-MFIELD(float, u8,  "User value 8", f2)
-MFIELD(float, u9,  "User value 9", f2)
-MFIELD(float, u10, "User value 10", f2)
-MFIELD(float, u11, "User value 11", f2)
-MFIELD(float, u12, "User value 12", f2)
-MFIELD(float, u13, "User value 13", f2)
-MFIELD(float, u14, "User value 14", f2)
-MFIELD(float, u15, "User value 15", f2)
-MFIELD(float, u16, "User value 16", f2)
+MFIELD(float, u1,  "User value 1",                      user1, f2)
+MFIELD(float, u2,  "User value 2",                      user2, f2)
+MFIELD(float, u3,  "User value 3",                      user3, f2)
+MFIELD(float, u4,  "User value 4",                      user4, f2)
+MFIELD(float, u5,  "User value 5",                      user5, f2)
+MFIELD(float, u6,  "User value 6",                      user6, f2)
+MFIELD(float, u7,  "User value 7",                      user7, f2)
+MFIELD(float, u8,  "User value 8",                      user8, f2)
+MFIELD(float, u9,  "User value 9",                      , f2)
+MFIELD(float, u10, "User value 10",                     , f2)
+MFIELD(float, u11, "User value 11",                     , f2)
+MFIELD(float, u12, "User value 12",                     , f2)
+MFIELD(float, u13, "User value 13",                     , f2)
+MFIELD(float, u14, "User value 14",                     , f2)
+MFIELD(float, u15, "User value 15",                     , f2)
+MFIELD(float, u16, "User value 16",                     , f2)
 MGRP2_END
 #undef MGRP2
 
 #define MGRP2   trg
 MGRP2_BEGIN("Binary user values")
-MFIELD(bit, b1,  "User bit 1", )
-MFIELD(bit, b2,  "User bit 2", )
-MFIELD(bit, b3,  "User bit 3", )
-MFIELD(bit, b4,  "User bit 4", )
-MFIELD(bit, b5,  "User bit 5", )
-MFIELD(bit, b6,  "User bit 6", )
-MFIELD(bit, b7,  "User bit 7", )
-MFIELD(bit, b8,  "User bit 8", )
-MFIELD(bit, b9,  "User bit 9", )
-MFIELD(bit, b10, "User bit 10", )
-MFIELD(bit, b11, "User bit 11", )
-MFIELD(bit, b12, "User bit 12", )
-MFIELD(bit, b13, "User bit 13", )
-MFIELD(bit, b14, "User bit 14", )
-MFIELD(bit, b15, "User bit 15", )
-MFIELD(bit, b16, "User bit 16", )
+MFIELD(bit, b1,  "User bit 1",                          userb_1, )
+MFIELD(bit, b2,  "User bit 2",                          userb_2, )
+MFIELD(bit, b3,  "User bit 3",                          userb_3, )
+MFIELD(bit, b4,  "User bit 4",                          userb_4, )
+MFIELD(bit, b5,  "User bit 5",                          userb_5, )
+MFIELD(bit, b6,  "User bit 6",                          userb_6, )
+MFIELD(bit, b7,  "User bit 7",                          userb_7, )
+MFIELD(bit, b8,  "User bit 8",                          userb_8, )
+MFIELD(bit, b9,  "User bit 9",                          , )
+MFIELD(bit, b10, "User bit 10",                         , )
+MFIELD(bit, b11, "User bit 11",                         , )
+MFIELD(bit, b12, "User bit 12",                         , )
+MFIELD(bit, b13, "User bit 13",                         , )
+MFIELD(bit, b14, "User bit 14",                         , )
+MFIELD(bit, b15, "User bit 15",                         , )
+MFIELD(bit, b16, "User bit 16",                         , )
 MGRP2_END
 #undef MGRP2
 
