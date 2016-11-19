@@ -43,6 +43,73 @@ typedef double  _mat_float;
 #endif
 typedef int index_t;
 //=============================================================================
+//std lib fixes
+//#define MATH_CHECK_NAN
+static inline bool f_isnan(const _mat_float &value)
+{
+  #ifndef isnan
+  return std::isnan(value);
+  #else
+  #ifdef __arm__
+  return isnan(value);
+  #else
+  return isnan(value);
+  #endif
+  #endif
+}
+static inline bool f_isinf(const _mat_float &value)
+{
+  #ifndef isinf
+  return std::isinf(value);
+  #else
+  #ifdef __arm__
+  return isinf(value);
+  #else
+  return isinf(value);
+  #endif
+  #endif
+}
+static inline bool f_isvalid(const _mat_float value)
+{
+  return !(f_isnan(value)||f_isinf(value));
+}
+static inline bool f_fixNAN(_mat_float *value)
+{
+  if(f_isvalid(*value))return false;
+  (*value)=0;
+  return true;
+}
+//=============================================================================
+#if defined(USE_FLOAT_TYPE) && ( ! defined(MANDALA_FULL) )
+// Simplified Vector math
+typedef float   _mat_float;
+class Vect
+{
+public:
+  Vect();
+  Vect(const _mat_float &s);
+  Vect(const _mat_float &s0,const _mat_float &s1,const _mat_float &s2);
+  void fill(const _mat_float &value=0);
+  _mat_float *array();
+  const _mat_float*array()const;
+  _mat_float &operator[](unsigned int index);
+  const _mat_float &operator[](unsigned int index)const;
+  Vect & operator=(const _mat_float value);
+  bool operator==(const Vect &value)const;
+  bool operator!=(const Vect &value)const;
+  const Vect operator+(const Vect &that)const;
+  Vect &operator+=(const Vect &that);
+  const Vect operator-(const Vect &that)const;
+  Vect &operator-=(const Vect &that);
+  const Vect operator*(const _mat_float &scale)const;
+  Vect &operator*=(const _mat_float &scale);
+  const Vect operator/(const _mat_float &scale)const;
+  Vect &operator/=(const _mat_float &scale);
+protected:
+  _mat_float v[3];
+};
+typedef _mat_float Point[2];
+#else
 //=============================================================================
 // VECTOR
 //=============================================================================
@@ -52,22 +119,38 @@ public:
   typedef T _array[n];
   _array v;
 
+  #ifdef MATH_CHECK_NAN
+  void fixNAN(Vector *value) const {
+    for (index_t i=0 ; i < n ; i++)
+      fixNAN(&(*value)[i]);
+  }
+  void fixNAN(T *value) const {
+    if(!f_isvalid(*value))(*value)=0;
+  }
+  #else
+  #define fixNAN(...)
+  #endif
+
+
   Vector() {this->fill();}
   Vector(const T &s) { this->fill(s); }
   Vector(const T &s0,const T &s1) {
     (*this)[0] = s0;
     (*this)[1] = s1;
+    fixNAN(this);
   }
   Vector(const T &s0,const T &s1,const T &s2) {
     (*this)[0] = s0;
     (*this)[1] = s1;
     (*this)[2] = s2;
+    fixNAN(this);
   }
   Vector(const T &s0,const T &s1,const T &s2,const T &s3) {
     (*this)[0] = s0;
     (*this)[1] = s1;
     (*this)[2] = s2;
     (*this)[3] = s3;
+    fixNAN(this);
   }
 
   inline T *array() {return this->v;}
@@ -76,6 +159,7 @@ public:
   void fill(const T &value=T()) {
     for (index_t i=0 ; i<n ; i++)
       this->v[i] = value;
+    fixNAN(this);
   }
 
   size_t size() const {return n;}
@@ -85,6 +169,18 @@ public:
       if((*this)[i]!=0.0)return false;
     return true;
   }
+  /*bool isWithin(const T &value){
+    for (index_t i=0 ; i < n ; i++)
+      if(fabs((*this)[i])>value)return false;
+    return true;
+  }
+  bool isWithin(const Vector &cmp){
+    for (index_t i=0 ; i < n ; i++)
+      if(fabs((*this)[i])>cmp[i])return false;
+    return true;
+  }*/
+
+
   //compare
   bool operator==(const Vector &cmp) const {
     for (index_t i=0 ; i < n ; i++)
@@ -103,6 +199,7 @@ public:
   Vector & operator+=(const Vector &that) {
     for (index_t i=0 ; i < n ; i++)
       (*this)[i]+=that[i];
+    fixNAN(this);
     return (*this);
   }
 
@@ -111,6 +208,7 @@ public:
   Vector & operator-=(const Vector &that) {
     for (index_t i=0 ; i < n ; i++)
       (*this)[i]-=that[i];
+    fixNAN(this);
     return (*this);
   }
 
@@ -119,6 +217,7 @@ public:
     Vector V;
     for (index_t i=0 ; i<n ; i++)
       V[i] = -(*this)[i];
+    fixNAN(&V);
     return V;
   }
 
@@ -127,6 +226,7 @@ public:
     T dot = T();
     for (index_t i = 0 ; i<n ; i++)
       dot+=(*this)[i]*that[i];
+    fixNAN(&dot);
     return dot;
   }
 
@@ -140,12 +240,14 @@ public:
   inline Vector & operator*=(const T &scale) {
     for (index_t i=0 ; i < n ; i++)
       (*this)[i] *= scale;
+    fixNAN(this);
     return (*this);
   }
   inline Vector & operator/=(const T &scale) {
     if(scale==0)(*this).fill(0);
     else for (index_t i=0 ; i < n ; i++)
       (*this)[i] /= scale;
+    fixNAN(this);
     return (*this);
   }
 
@@ -173,6 +275,7 @@ public:
     for (index_t i=0 ; i < n ; i++){
       (*this)[i]=(*this)[i]-floor((*this)[i]/dspan+0.5)*dspan;
     }
+    fixNAN(this);
     return (*this);
   }
 
@@ -888,6 +991,7 @@ public:
 
 
 
+#endif //simplified vector
 //=============================================================================
 };//namespace
 //=============================================================================

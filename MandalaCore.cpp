@@ -219,6 +219,7 @@ uint MandalaCore::pack_float_u100(void *buf,void *value_ptr)
 uint MandalaCore::pack_float_f2(void *buf,void *value_ptr)
 { //IEEE 754r
   float f=*((_var_float*)value_ptr);
+  if(!matrixmath::f_isvalid(*((_var_float*)value_ptr)))*((_var_float*)value_ptr)=0;
   uint8_t *ptr=(uint8_t*)&f;
   uint32_t x = ptr[0]|ptr[1]<<8|ptr[2]<<16|ptr[3]<<24,xs,xe,xm;
   uint16_t hs,he,hm;
@@ -269,6 +270,7 @@ uint MandalaCore::pack_float_f2(void *buf,void *value_ptr)
 uint MandalaCore::pack_float_f4(void *buf,void *value_ptr)
 {
   float f=*(_var_float*)value_ptr;
+  if(!matrixmath::f_isvalid(*(_var_float*)value_ptr))*(_var_float*)value_ptr=0;
   uint8_t *src=(uint8_t*)&f;
   uint8_t *dest=(uint8_t*)buf;
   *dest++=*src++;
@@ -489,7 +491,7 @@ uint MandalaCore::unpack_float_f2(const void *buf,void *value_ptr)
       *xp++ = (xs | xe | xm); // Combine sign bit, exponent bits, and mantissa bits
     }
   }
-  if(f_isnan(f))f=0;
+  if(!matrixmath::f_isvalid(f))f=0;
   *((_var_float*)value_ptr)=f;
   return 2;
 }
@@ -503,7 +505,7 @@ uint MandalaCore::unpack_float_f4(const void *buf,void *value_ptr)
   *dest++=*src++;
   *dest++=*src++;
   *dest=*src;
-  if(f_isnan(f))f=0;
+  if(!matrixmath::f_isvalid(f))f=0;
   *((_var_float*)value_ptr)=f;
   return 4;
 }
@@ -677,6 +679,8 @@ void MandalaCore::filter(const _var_float &fv,_var_float *var_p,const _var_float
   if (fG>1.0)fG=1.0;
   else if (fG<fS)fG=fS;
   *var_p+=fD*fG;
+  if(f_isvalid(*var_p))return;
+  *var_p=0;
 }
 void MandalaCore::filter(const _var_vect &v,_var_vect *var_p,const _var_float &S,const _var_float &L)
 {
@@ -686,6 +690,8 @@ void MandalaCore::filter_m(const _var_float &v,_var_float *var_p,const _var_floa
 {
   if(f<=0 || f>=1)  *var_p=v;
   else *var_p=(*var_p)*(1.0-f)+v*f;
+  if(f_isvalid(*var_p))return;
+  *var_p=0;
 }
 void MandalaCore::filter_m(const _var_vect &v,_var_vect *var_p,const _var_float &f)
 {

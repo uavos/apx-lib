@@ -28,6 +28,8 @@
 #include <inttypes.h>
 #include <sys/types.h>
 #include <math.h>
+#include "MatrixMath.h"
+using namespace matrixmath;
 //=============================================================================
 #ifndef assert
 #define assert(...)
@@ -38,41 +40,6 @@ typedef float   _var_float;
 #else
 typedef double  _var_float;
 #endif
-
-#if !defined(USE_FLOAT_TYPE) || defined(MANDALA_FULL)
-#include "MatrixMath.h"
-using namespace matrixmath;
-#else
-// Simplified Vector math
-typedef float   _var_float;
-class Vect
-{
-public:
-  Vect();
-  Vect(const _var_float &s);
-  Vect(const _var_float &s0,const _var_float &s1,const _var_float &s2);
-  void fill(const _var_float &value=0);
-  _var_float *array();
-  const _var_float*array()const;
-  _var_float &operator[](unsigned int index);
-  const _var_float &operator[](unsigned int index)const;
-  Vect & operator=(const _var_float value);
-  bool operator==(const Vect &value)const;
-  bool operator!=(const Vect &value)const;
-  const Vect operator+(const Vect &that)const;
-  Vect &operator+=(const Vect &that);
-  const Vect operator-(const Vect &that)const;
-  Vect &operator-=(const Vect &that);
-  const Vect operator*(const _var_float &scale)const;
-  Vect &operator*=(const _var_float &scale);
-  const Vect operator/(const _var_float &scale)const;
-  Vect &operator/=(const _var_float &scale);
-protected:
-  _var_float v[3];
-};
-typedef _var_float Point[2];
-#endif
-//=============================================================================
 //=============================================================================
 typedef Vect            _var_vect;
 typedef Point           _var_point;
@@ -134,32 +101,6 @@ public:
   typedef const uint8_t _vars_list [];
   static _vars_list vars_dlink;
   static _vars_list vars_ctr;
-
-  //std lib fixes
-  static inline bool f_isnan(const _var_float value)
-  {
-  #ifndef isnan
-  return std::isnan(value);
-  #else
-  #ifdef __arm__
-  return isnan(value);
-  #else
-  return isnan(value);
-  #endif
-  #endif
-  }
-  static inline bool f_isinf(const _var_float value)
-  {
-  #ifndef isinf
-  return std::isinf(value);
-  #else
-  #ifdef __arm__
-  return isinf(value);
-  #else
-  return isinf(value);
-  #endif
-  #endif
-  }
 
   //math calculations
   _var_float inHgToAltitude(_var_float inHg,_var_float inHg_gnd);
