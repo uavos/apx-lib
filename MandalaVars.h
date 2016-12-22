@@ -86,7 +86,7 @@ MIDX(ldata,     "Port data local <port_id>,<data..>")
 MIDX(can,       "Auxilary CAN data <ID32 b31=IDE>,<data..>")
 MIDX(vmexec,    "Execute VM script <@function>")
 //other & temporary
-MIDX(tagged,    "Tagged var <tag>,<var_idx>,<data..>")
+MIDX(prio,      "Priority assigned var <nodeID>,<prio>,<var_idx>,<data..>")
 MIDX(active,    "Autopilot active flag")
 MIDX(video,     "Video stream <data>")
 

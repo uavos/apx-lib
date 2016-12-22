@@ -51,7 +51,7 @@ typedef struct{
 // service packets filtered by _node_sn, or 0x00000 for broadcast
 #define bus_packet_size_hdr             (1)
 #define bus_packet_size_hdr_srv         (bus_packet_size_hdr+sizeof(_node_sn)+1)
-#define bus_packet_size_hdr_tagged      (bus_packet_size_hdr+2)
+#define bus_packet_size_hdr_tagged      (bus_packet_size_hdr+3)
 #define bus_packet_size_hdr_uav         (bus_packet_size_hdr+2+1)
 typedef struct{
   uint8_t       id;   //<var_idx>
@@ -63,10 +63,11 @@ typedef struct{
       uint8_t   data[BUS_MAX_PACKET-bus_packet_size_hdr_srv];   //service data
     }srv;
     struct{
-      uint8_t   tag;    //user tag
+      uint8_t   nodeID;    //address
+      uint8_t   prio;      //priority
       uint8_t   id;     //<var_idx>
       uint8_t   data[BUS_MAX_PACKET-bus_packet_size_hdr_tagged];
-    }tagged;
+    }prio;
     struct{
       uint16_t  squawk;
       uint8_t   id;     //<var_idx>
