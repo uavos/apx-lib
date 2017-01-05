@@ -374,15 +374,16 @@ MVAR(float, user6,    "User value 6",f4,f2)
 //--------- FORMATION --------------
 MVAR(vect,  ls_att,      "left: roll,pitch,cp [deg]",      f2,f2)
 MVAR(float, ls_spd,      "left: airspeed [m/s]",        f2,f2)
+MVAR(float, ls_ail,      "left: ail to center [deg]", f2,f2)
 
 MVAR(vect,  rs_att,      "right: roll,pitch,cp [deg]",     f2,f2)
 MVAR(float, rs_spd,      "right: airspeed [m/s]",       f2,f2)
+MVAR(float, rs_ail,      "right: ail to center [deg]", f2,f2)
 
 MVAR(float, vshape,      "wing V shape [deg]",              f2,f2)
 MVAR(float, cmd_vshape,  "commanded wing V shape [deg]",    f2,f2)
 
 MVAR(float, lrs_croll,   "console roll central [deg]", f2,f2)
-MVAR(point, lrs_cmdp,    "console cmd pitch: cmdpL,cmdpR [deg]", f2,f2)
 
 //------------------------------------------------------------------------------
 // Never sent by downstream
