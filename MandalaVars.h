@@ -98,7 +98,7 @@ MIDX(vor,       "VOR beacon <packed data>")
 #define MANDALA_LIST_CTR \
   idx_mode,idx_status,idx_error,idx_cmode, \
   idx_power,idx_sw, \
-  idx_cam_ch,idx_cam_mode,idx_cam_opt,idx_cam_ctrb
+  idx_cam_ch,idx_cam_mode,idx_cam_opt,idx_cam_ctrb,idx_cams
 // send to GCU
 #define MANDALA_LIST_DLINK \
   idx_xpdr, idx_ident, idx_dlink, \
@@ -445,10 +445,18 @@ MBIT(cam_opt, laser,  "rangefinder on/off",             32)
 MVAR(byte,  cam_src,  "camera source",u1,u1)
 MVAR(vect,  cam_tpos, "camera tracking position: lat,lon,hmsl [deg,deg,m]",f4,f4)
 MVAR(vect,  camctr_theta, "camera servo: roll,pitch,yaw [-1..0..+1]", f4,f4)
+MVAR(enum,  cams, "camera shooting mode",,)
+MBIT(cams, idle,  "no shooting",                        0)
+MBIT(cams, shot,  "single snapshot",                    1)
+MBIT(cams, dshot, "distance triggered snapshots",       2)
 MVAR(flag,  cam_ctrb, "camera controls bitfield [on/off]",,)
-MBIT(cam_ctrb, shot,  "snapshot",               1)
-MBIT(cam_ctrb, ashot, "series snapshots",       2)
-MVAR(uint,  cam_tperiod,"period for timestamps [ms]",   u2,u2)
+MBIT(cam_ctrb, shtr,  "shutter trigger",        1)
+MBIT(cam_ctrb, arm,   "arm auto focus",         2)
+MBIT(cam_ctrb, rec,   "rec button",             4)
+MBIT(cam_ctrb, zin,   "zoom in button",         8)
+MBIT(cam_ctrb, zout,  "zoom out button",        16)
+MBIT(cam_ctrb, aux,   "auxilary button",        32)
+MVAR(uint,  cam_tperiod,"period/distance for shooting", u2,u2)
 MVAR(uint,  cam_timestamp,"timestamp [ms]",             u4,u4) //must be last for gimbal
 
 //--------- TURRET CONTROL --------------

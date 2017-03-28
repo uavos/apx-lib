@@ -94,6 +94,10 @@ public:
         uint8_t       loops;      //loops to loiter
         uint16_t      timeS;      //time to loiter
       }__attribute__((packed)) loiter;
+      struct{
+        int16_t       dist      :12;      //distance for series
+        int16_t       opt       :4;       //0=single,1=start,2=stop
+      }__attribute__((packed)) shot;
     }__attribute__((packed));
   }__attribute__((packed)) _item_action;
   typedef enum {mo_speed,mo_poi,mo_scr,mo_loiter,mo_shot} _item_action_option;
@@ -139,6 +143,7 @@ public:
       case mo_poi:   sz+=sizeof(_item_action::poi);break;
       case mo_scr:   sz+=sizeof(_item_action::scr);break;
       case mo_loiter:sz+=sizeof(_item_action::loiter);break;
+      case mo_shot:  sz+=sizeof(_item_action::shot);break;
     }
     return sz;
   }
