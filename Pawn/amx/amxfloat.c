@@ -342,3 +342,25 @@ cell AMX_NATIVE_CALL n_floatint(AMX *amx,const cell *params)
     (void)amx;
     return (cell)fA;
 }
+
+
+
+
+//==============================================================================
+// UPDATED/APPENDED
+//==============================================================================
+cell AMX_NATIVE_CALL n_floatatan(AMX *amx,const cell *params)
+{
+  REAL fA = amx_ctof(params[1]);
+  fA = ToRadians(fA, params[2]);
+  fA = (REAL)atan(fA);
+  (void)amx;
+  return amx_ftoc(fA);
+}
+
+cell AMX_NATIVE_CALL n_floatatan2(AMX *amx,const cell *params)
+{
+  REAL fRes = (REAL)atan2(amx_ctof(params[1]),amx_ctof(params[2]));
+  (void)amx;
+  return amx_ftoc(fRes);
+}
