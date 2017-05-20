@@ -350,7 +350,7 @@ const _var_point Mandala::destination(const _var_point &ll,const _var_float &bea
 {
   const _var_float latA=ll[0]*D2R;
   const _var_float brng=bearing*D2R;
-  const _var_float dR=distance/EARTH_MRADIUS;
+  const _var_float dR=distance/EARTH_MRADIUS; //6371000.0 mean radius
   const _var_float slatA=sin(latA);
   const _var_float clatA=cos(latA);
   const _var_float sdR=sin(dR);
