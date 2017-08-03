@@ -271,5 +271,18 @@ typedef struct {
 }
 #endif
 //=============================================================================
+//blackbox reader
+typedef struct{
+  uint32_t magic;
+  uint32_t uptime;
+  uint32_t oncnt;
+  uint32_t evtcnt[3];
+  uint32_t rec_size; //blocks
+  uint8_t  padding[32-20-4];
+  uint32_t crc;
+}__attribute__((packed)) _bb_hdr;
+
+typedef enum {bbr_hdr,bbr_data} _bb_req_type;
+//=============================================================================
 #endif
 

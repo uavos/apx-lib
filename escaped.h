@@ -71,7 +71,6 @@ protected:
   uint16_t esc_cnt,esc_pos_save,esc_cnt_save;
   uint8_t esc_rx[UART_esc_size];      //data from readEscaped()
 
-private:
   uint readEscaped(void) //to local buf esc_rx
   {
     uint rcnt=esc_pos_save?esc_cnt_save:read(esc_tmp,sizeof(esc_tmp));
