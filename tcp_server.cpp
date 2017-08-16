@@ -66,8 +66,10 @@ bool _tcp_server::connect_task()
       //set options
       optval = 1;
       setsockopt(server_fd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+      #ifndef __APPLE__
       optval = 1;
       setsockopt(server_fd, IPPROTO_TCP, TCP_QUICKACK, &optval, sizeof(optval));
+      #endif
     }break;
     case 2:{ //wait incoming connection
       time_tcp_s=time(0);
@@ -78,8 +80,10 @@ bool _tcp_server::connect_task()
         //set options
         int optval = 1;
         setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+        #ifndef __APPLE__
         optval = 1;
         setsockopt(fd, IPPROTO_TCP, TCP_QUICKACK, &optval, sizeof(optval));
+        #endif
         init_stage++;
         time_tcp_s=time(0);
         break;

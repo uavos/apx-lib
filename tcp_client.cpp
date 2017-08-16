@@ -128,7 +128,7 @@ uint _tcp_client::read(uint8_t *buf,uint sz)
   if(!rcnt) return 0;
   //printf("rx: %u\n",rcnt);
   if(packet_sz==0){
-    if(rcnt<(sizeof(packet_sz)+sizeof(packet_crc16)))return 0;
+    if((int)rcnt<(sizeof(packet_sz)+sizeof(packet_crc16)))return 0;
     ::read(fd,&packet_sz,sizeof(packet_sz));
     ::read(fd,&packet_crc16,sizeof(packet_crc16));
     rcnt-=(sizeof(packet_sz)+sizeof(packet_crc16));
@@ -170,7 +170,6 @@ uint _tcp_client::bytes_available(uint8_t *buf,uint sz)
   return rcnt;
 }
 //==============================================================================
-//==============================================================================
 bool _tcp_client::connect_task()
 {
   const char *err=NULL;
@@ -178,7 +177,11 @@ bool _tcp_client::connect_task()
     case 0: return false; //idle
     case 1:{ //connecting
       time_tcp_s=time(0);
+      #ifdef __APPLE__
+      fd = socket(AF_INET, SOCK_STREAM,0);
+      #else
       fd = socket(AF_INET, SOCK_STREAM|SOCK_NONBLOCK,0);
+      #endif
       if(fd<=0){
         if(!err_mute)printf("[%s]Error: Open Socket Failed.\n",name);
         err_mute=true;
@@ -223,7 +226,9 @@ bool _tcp_client::connect_task()
       int optval = 1;
       setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
       optval = 1;
+      #ifndef __APPLE__
       setsockopt(fd, IPPROTO_TCP, TCP_QUICKACK, &optval, sizeof(optval));
+      #endif
     }break;
     case 3:{ //send request
       if(host.path[0]==0){

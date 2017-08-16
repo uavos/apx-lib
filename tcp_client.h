@@ -6,6 +6,9 @@
 #include <termios.h>
 #include <netinet/in.h>
 #include "fifo.h"
+#ifndef SOCK_NONBLOCK
+# define SOCK_NONBLOCK O_NONBLOCK
+#endif
 //=============================================================
 class _tcp_client
 {
