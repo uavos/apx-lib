@@ -38,7 +38,11 @@ bool _tcp_server::connect_task()
         init_stage++;
         break;
       }
+      #ifdef __APPLE__
+      server_fd = socket(AF_INET, SOCK_STREAM,0);
+      #else
       server_fd = socket(AF_INET, SOCK_STREAM|SOCK_NONBLOCK,0);
+      #endif
       if(server_fd<0){
         if(!err_mute)printf("[%s]Error: Open Socket Failed.\n",name);
         err_mute=true;
