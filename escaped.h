@@ -19,8 +19,8 @@ public:
   {
   }
 protected:
-  virtual uint read(uint8_t *buf,uint sz)=0;
-  virtual bool write_byte(const uint8_t v)=0; //write to fifo but don't send
+  virtual uint esc_read(uint8_t *buf,uint sz)=0;
+  virtual bool esc_write_byte(const uint8_t v)=0; //write to fifo but don't send
 
   virtual void escError(void){};
   virtual void escWriteDone(void){};
@@ -41,21 +41,21 @@ protected:
   {
     while(1){
       uint v,crc=0;
-      if(!write_byte(0x55))break;
-      if(!write_byte(0x01))break;
+      if(!esc_write_byte(0x55))break;
+      if(!esc_write_byte(0x01))break;
       while(cnt){
         v=*buf++;
         crc+=v;
-        if(!write_byte(v))break;
-        if ((v==0x55)&&(!write_byte(0x02)))break;
+        if(!esc_write_byte(v))break;
+        if ((v==0x55)&&(!esc_write_byte(0x02)))break;
         cnt--;
       }
       if(cnt)break;
       v=crc&0xFF;
-      if(!write_byte(v))break;
-      if ((v==0x55)&&(!write_byte(0x02)))break;
-      if(!write_byte(0x55))break;
-      if(!write_byte(0x03))break;
+      if(!esc_write_byte(v))break;
+      if ((v==0x55)&&(!esc_write_byte(0x02)))break;
+      if(!esc_write_byte(0x55))break;
+      if(!esc_write_byte(0x03))break;
       escWriteDone();
       return true;
     }
@@ -73,7 +73,7 @@ protected:
 
   uint readEscaped(void) //to local buf esc_rx
   {
-    uint rcnt=esc_pos_save?esc_cnt_save:read(esc_tmp,sizeof(esc_tmp));
+    uint rcnt=esc_pos_save?esc_cnt_save:esc_read(esc_tmp,sizeof(esc_tmp));
     if(!rcnt)return 0;
     return readEscaped(rcnt);
   }
