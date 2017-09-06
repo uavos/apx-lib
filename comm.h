@@ -41,8 +41,9 @@ private:
   uint8_t tmpBuf[4096];
   //ESC reader
   uint8_t esc_rx[4096];      //data from readEscaped()
-  uint8_t esc_tmp[16],esc_tmp_cnt;
-  uint esc_state,esc_cnt,esc_crc,esc_pos_save,esc_cnt_save;
+  //uint8_t esc_tmp[16],esc_tmp_cnt;
+  uint esc_state,esc_cnt,esc_crc,esc_pos_save;
+  //uint esc_cnt_save;
 };
 //=============================================================
 #endif
