@@ -47,26 +47,34 @@ typedef int index_t;
 //#define MATH_CHECK_NAN
 static inline bool f_isnan(const _mat_float &value)
 {
-  #ifndef isnan
-  return std::isnan(value);
+  #ifdef __APPLE__
+    return isnan(value);
   #else
-  #ifdef __arm__
-  return isnan(value);
-  #else
-  return isnan(value);
-  #endif
+    #ifndef isnan
+      return std::isnan(value);
+    #else
+      #ifdef __arm__
+        return isnan(value);
+      #else
+        return isnan(value);
+      #endif
+    #endif
   #endif
 }
 static inline bool f_isinf(const _mat_float &value)
 {
-  #ifndef isinf
-  return std::isinf(value);
+  #ifdef __APPLE__
+    return isnan(value);
   #else
-  #ifdef __arm__
-  return isinf(value);
-  #else
-  return isinf(value);
-  #endif
+    #ifndef isinf
+      return std::isinf(value);
+    #else
+      #ifdef __arm__
+        return isinf(value);
+      #else
+        return isinf(value);
+      #endif
+    #endif
   #endif
 }
 static inline bool f_isvalid(const _mat_float value)

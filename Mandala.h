@@ -133,11 +133,12 @@ public:
   _var_float sqr(const _var_float x) const;
   _var_float wind_triangle(_var_float crs) const; //return TAS to gSpeed multiplier for given course
   _var_float wind_circle(_var_float crs,_var_float span,_var_float r) const; //return air path length for ground circle flight
-private:
+
   // some special protocols
   uint archive_downstream(uint8_t *buf,uint maxSize);
   uint extract_downstream(const uint8_t *buf,uint cnt);
 
+private:
   //math optimizations
   _var_vect rotate_s;
   _var_vect rotate_DC[3];
