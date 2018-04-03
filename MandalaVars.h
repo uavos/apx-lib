@@ -278,6 +278,7 @@ MBIT(cmode,  hover,   "Stabilization mode hover/run",           8)
 MBIT(cmode,  hyaw,    "Hover yaw compensated/fixed",            16)
 MBIT(cmode,  ahrs,    "AHRS mode inertial/gps",                 32)
 MBIT(cmode,  nomag,   "Magnetometer blocked/on",                64)
+//MBIT(cmode,  glide,   "Glide mode on/off",                      128)
 
 //--------- POWER CONTROL --------------
 MVAR(flag,  power,    "power controls",,)
