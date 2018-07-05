@@ -454,7 +454,7 @@ uint MandalaCore::unpack_float_u100(const void *buf,void *value_ptr)
 //------------------------------------------------------------------------------
 uint MandalaCore::unpack_float_f2(const void *buf,void *value_ptr)
 {
-  float f;
+  float f=0;
   uint16_t h=*((const uint16_t*)buf),hs,he,hm;
   uint32_t *xp=(uint32_t*)&f;//(uint32_t*)value_ptr;
   uint32_t xs,xe,xm;
