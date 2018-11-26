@@ -25,20 +25,19 @@ bool Mission::update(uint8_t *buf,uint cnt)
     dmsg("Error in mission, buffer overflow.\n");
     return false;
   }
-  size=cnt;
-  if(buf!=data)memcpy(data,buf,cnt);
   //check consistency
   int pos=0;
   while(pos<(int)cnt){
-    int npos=next(pos,Mission::mi_stop);
+    int npos=next(pos,Mission::mi_stop,buf,cnt);
     if(npos<0)break;
     pos=npos;
   }
-  if(data[size-1] || (pos+1)!=(int)size){
+  if(buf[size-1] || (pos+1)!=(int)cnt){
     dmsg("Error in mission (%u/%u).\n",pos,cnt);
-    clear();
     return false;
   }
+  size=cnt;
+  if(buf!=data)memcpy(data,buf,cnt);
   //default home_pos from mission
   if(!(var.status&status_home)){
     bool bSet=false;
@@ -62,16 +61,20 @@ bool Mission::update(uint8_t *buf,uint cnt)
   return true;
 }
 //==============================================================================
-int Mission::next(int pos,_item_type type)
+int Mission::next(int pos, _item_type type)
+{
+  return next(pos,type,data,size);
+}
+int Mission::next(int pos, _item_type type, const uint8_t *data_ptr, const uint data_size)
 {
   bool bFirst;
   if(pos<0){
     pos=0;
     bFirst=true;
   }else bFirst=false;
-  while(pos<(int)size){
+  while(pos<(int)data_size){
     if(!bFirst){
-      _item_hdr *hdr=(_item_hdr*)(data+pos);
+      const _item_hdr *hdr=(const _item_hdr*)(data_ptr+pos);
       switch(hdr->type){
         case Mission::mi_wp:
           pos+=sizeof(_item_wp);
@@ -90,13 +93,13 @@ int Mission::next(int pos,_item_type type)
           break;
         case Mission::mi_restricted:
         case Mission::mi_emergency:
-          pos+=area_size(((_item_area*)hdr)->pointsCnt);
+          pos+=area_size(((const _item_area*)hdr)->pointsCnt);
           break;
         default:
           return -1;
       }
     }else bFirst=false;
-    _item_hdr *hdr=(_item_hdr*)(data+pos);
+    const _item_hdr *hdr=(const _item_hdr*)(data_ptr+pos);
     if(type==Mission::mi_stop || type==hdr->type)
       return pos;
   }

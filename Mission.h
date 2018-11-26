@@ -113,7 +113,8 @@ public:
 
   void clear(void);
   bool update(uint8_t *buf,uint cnt);
-  int next(int pos,_item_type type);
+  int next(int pos, _item_type type);
+  int next(int pos, _item_type type, const uint8_t *data_ptr, const uint data_size);
   _item_wp *wp(int idx);
   _item_pi *pi(int idx);
   _item_rw *rw(int idx);
