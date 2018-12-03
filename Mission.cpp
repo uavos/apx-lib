@@ -32,7 +32,7 @@ bool Mission::update(uint8_t *buf,uint cnt)
     if(npos<0)break;
     pos=npos;
   }
-  if(buf[size-1] || (pos+1)!=(int)cnt){
+  if(buf[cnt-1] || (pos+1)!=(int)cnt){
     dmsg("Error in mission (%u/%u).\n",pos,cnt);
     return false;
   }
