@@ -1,7 +1,6 @@
-#ifndef CRC_CALC_H
-#define CRC_CALC_H
 #include <inttypes.h>
 #include <sys/types.h>
+
 //==============================================================================
 static const uint16_t crc16_table[256] =
 {
@@ -39,19 +38,19 @@ static const uint16_t crc16_table[256] =
   0x8201, 0x42C0, 0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040
 };
 //==============================================================================
-static inline uint16_t CRC_16_IBM(const uint8_t *buf,uint size,uint16_t crc)
+uint16_t CRC_16_IBM(const uint8_t *buf,uint size,uint16_t crc)
 {
   while(size--) crc = ((crc >> 8) ^ crc16_table[(crc ^ (*buf++)) & 0xff]);
   return crc;
 }
 //==============================================================================
-static inline uint8_t CRC_8XOR(const uint8_t *buf,uint size,uint8_t crc)
+uint8_t CRC_8XOR(const uint8_t *buf,uint size,uint8_t crc)
 {
   while(size--) crc ^= *buf++;
   return crc;
 }
 //==============================================================================
-static inline uint8_t CRC_8_8C(const uint8_t *buf,uint size,uint8_t crc)
+uint8_t CRC_8_8C(const uint8_t *buf,uint size,uint8_t crc)
 {
   while(size--){
     crc ^= *buf++;
@@ -63,7 +62,7 @@ static inline uint8_t CRC_8_8C(const uint8_t *buf,uint size,uint8_t crc)
   return crc;
 }
 //==============================================================================
-static inline uint8_t CRC_8(uint8_t poly,const uint8_t *buf,uint size,uint8_t crc)
+uint8_t CRC_8(uint8_t poly,const uint8_t *buf,uint size,uint8_t crc)
 {
   while(size--){
     uint8_t v=*buf++;
@@ -76,13 +75,13 @@ static inline uint8_t CRC_8(uint8_t poly,const uint8_t *buf,uint size,uint8_t cr
   return crc;
 }
 //==============================================================================
-static inline uint32_t CRC_SUM(const uint8_t *buf,uint size,uint32_t crc)
+uint32_t CRC_SUM(const uint8_t *buf,uint size,uint32_t crc)
 {
   while(size--) crc += *buf++;
   return crc;
 }
 //==============================================================================
-static inline uint16_t CRC_16_CCITT(const uint8_t *buf,uint size,uint16_t crc)
+uint16_t CRC_16_CCITT(const uint8_t *buf,uint size,uint16_t crc)
 {
   while(size--) {
     crc=(uint8_t)(crc>>8)|(crc<<8);
@@ -94,7 +93,7 @@ static inline uint16_t CRC_16_CCITT(const uint8_t *buf,uint size,uint16_t crc)
   return crc;
 }
 //==============================================================================
-static inline uint16_t CRC_16(uint16_t poly,const uint8_t *buf,uint size,uint16_t crc)
+uint16_t CRC_16(uint16_t poly,const uint8_t *buf,uint size,uint16_t crc)
 {
   while(size--){
     crc^=(*buf++)<<8;
@@ -110,7 +109,7 @@ static inline uint16_t CRC_16(uint16_t poly,const uint8_t *buf,uint size,uint16_
   return crc;
 }
 //==============================================================================
-static inline uint16_t CRC_16_CCITT_QT(const uint8_t *buf,uint size,uint16_t crc)
+uint16_t CRC_16_CCITT_QT(const uint8_t *buf,uint size,uint16_t crc)
 {
   while(size--) {
     uint8_t data=*buf++;
@@ -122,4 +121,3 @@ static inline uint16_t CRC_16_CCITT_QT(const uint8_t *buf,uint size,uint16_t crc
   return crc;
 }
 //==============================================================================
-#endif // CRC_H

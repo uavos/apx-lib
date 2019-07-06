@@ -21,10 +21,10 @@
  *
  */
 #include "MandalaCore.h"
-#include "crc.h"
+//#include "crc.h"
 #include "math.h"
 #include "preprocessor.h"
-#include <dmsg.h>
+//#include <dmsg.h>
 #include <stdlib.h>
 #include <string.h>
 //===========================================================================

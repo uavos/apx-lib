@@ -21,7 +21,7 @@
  *
  */
 #include "Mandala.h"
-#include "time_ms.h"
+//#include "time_ms.h"
 #include <ctype.h>
 #include <math.h>
 #include <stdlib.h>
@@ -36,7 +36,7 @@ void Mandala::init(void)
   dl_frcnt=0;
   dl_errcnt=0;
   dl_timestamp=0;
-  dl_time_s=time;
+  dl_time_s=0;
   dl_ts=0;
   dl_Pdt=0;
   dl_size=0;
@@ -91,7 +91,7 @@ bool Mandala::get_text_names(uint16_t varmsk,const char **name,const char **desc
 uint Mandala::archive(uint8_t *buf,uint size,uint var_idx)
 {
   //check for special protocol archiveSize
-  if(var_idx==idx_downstream)return archive_downstream(buf,size);
+  //if(var_idx==idx_downstream)return archive_downstream(buf,size);
   if(var_idx<idxPAD)return 0;
   //basic vars
   return pack(buf,var_idx);
@@ -110,7 +110,7 @@ uint Mandala::extract(const uint8_t *buf,uint size,uint var_idx)
   return unpack(buf,size,var_idx);
 }
 //=============================================================================
-uint Mandala::archive_downstream(uint8_t *buf,uint maxSize)
+uint Mandala::archive_downstream(uint8_t *buf,uint maxSize, uint time)
 {
   // telemetry stream format:
   // <timestampL>,<timestampH>,<bitsig>,<archived data>,[<bitsig>,<data>...]
@@ -693,6 +693,9 @@ uint8_t Mandala::var_index(const char *name)
   return 0xFF;
 }
 //=============================================================================
+#ifndef dmsg
+#define dmsg(...)
+#endif
 void Mandala::dump(const uint8_t *ptr,uint cnt,bool hex)
 {
   for (uint i=0;i<cnt;i++)dmsg(hex?"%.2X ":"%u ",*ptr++);

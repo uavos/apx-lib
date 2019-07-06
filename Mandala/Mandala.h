@@ -23,7 +23,7 @@
 #ifndef MANDALA_H
 #define MANDALA_H
 //=============================================================================
-#include <dmsg.h>
+//#include <dmsg.h>
 #include <math.h>
 #include <string.h>
 //-----------------------------------------------------------------------------
@@ -135,7 +135,7 @@ public:
   _var_float wind_circle(_var_float crs,_var_float span,_var_float r) const; //return air path length for ground circle flight
 
   // some special protocols
-  uint archive_downstream(uint8_t *buf,uint maxSize);
+  uint archive_downstream(uint8_t *buf, uint maxSize, uint time);
   uint extract_downstream(const uint8_t *buf,uint cnt);
 
 private:
