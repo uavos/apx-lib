@@ -20,8 +20,8 @@
  * Floor, Boston, MA 02110-1301, USA.
  *
  */
-#ifndef MISSION_H
-#define MISSION_H
+#ifndef __MISSION_H
+#define __MISSION_H
 //=============================================================================
 #include <inttypes.h>
 #include <sys/types.h>

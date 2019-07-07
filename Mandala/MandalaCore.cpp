@@ -43,7 +43,7 @@ const MandalaCore::_vars_list MandalaCore::vars_ctr = { MANDALA_LIST_CTR,0};
   v=hash32_calc(adescr,v); \
   v+=idx_##avarname |( avarname##_##abitname <<8);
 
-  #include "MandalaVars.h"
+  #include "MandalaTemplate.h"
   return v;
 }
 uint32_t MandalaCore::hash32_calc(const char *str,uint32_t v)
@@ -107,7 +107,7 @@ bool MandalaCore::get_ptr(uint8_t var_idx,void **var_ptr,uint*type)
     case idx_##aname: *type=vt_idx;*var_ptr=NULL;return true;
   #define MVAR(atype,aname,adescr, ...) \
     case idx_##aname: *type=vt_##atype;*var_ptr=(void*)&(aname);return true;
-  #include "MandalaVars.h"
+  #include "MandalaTemplate.h"
   }
   return false;
 }
@@ -121,7 +121,7 @@ uint MandalaCore::pack(uint8_t *buf,uint var_idx)
   switch (var_idx) {
   #define MVAR(atype,aname,adescr,abytes,atbytes) \
     case idx_##aname: return pack_##atype##_##abytes (buf,(void*)&(aname));
-  #include "MandalaVars.h"
+  #include "MandalaTemplate.h"
   }
   return 0;
 }
@@ -131,7 +131,7 @@ uint MandalaCore::pack_ext(uint8_t *buf,uint var_idx)
   switch (var_idx) {
   #define MVAR(atype,aname,adescr,abytes,atbytes) \
     case idx_##aname: return pack_##atype##_##atbytes (buf,(void*)&(aname));
-  #include "MandalaVars.h"
+  #include "MandalaTemplate.h"
   }
   return 0;
 }
@@ -145,7 +145,7 @@ uint MandalaCore::unpack(const uint8_t *buf,uint cnt,uint var_idx)
   switch (var_idx) {
   #define MVAR(atype,aname,adescr,abytes,atbytes) \
     case idx_##aname: return unpack_##atype##_##abytes (buf,(void*)&(aname));
-  #include "MandalaVars.h"
+  #include "MandalaTemplate.h"
   }
   return 0;
 }
@@ -155,7 +155,7 @@ uint MandalaCore::unpack_ext(const uint8_t *buf,uint var_idx)
   switch (var_idx) {
   #define MVAR(atype,aname,adescr,abytes,atbytes) \
     case idx_##aname: return unpack_##atype##_##atbytes (buf,(void*)&(aname));
-  #include "MandalaVars.h"
+  #include "MandalaTemplate.h"
   }
   return 0;
 }

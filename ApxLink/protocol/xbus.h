@@ -4,49 +4,9 @@
 #include <sys/types.h>
 //=============================================================================
 #define BUS_MAX_PACKET          1024    //2k MAX
-//=============================================================================
-// node information, dynamically assigned values
+
 typedef uint8_t _node_sn[12];           //chip serial number
-typedef uint8_t _node_name[16];         //device name string
-typedef uint8_t _node_hardware[16];     //device hardware string
-typedef uint8_t _node_version[16];      //fw version string
-//-------------------------------------------------
-// hard coded firmware information
-typedef struct {
-  _node_name    name;
-  _node_version version;
-  _node_version hardware;
-  struct{
-    uint32_t    conf_reset:     1;      //set when conf was reset
-    uint32_t    loader_support: 1;      //set if loader available
-    uint32_t    in_loader:      1;      //set in loader
-    uint32_t    addressing:     1;      //set while CAN addressing
-    uint32_t    reboot:         1;      //set when reboot requested
-    uint32_t    busy:           1;      //set when flash write sequence
-  }flags;
-}__attribute__((packed)) _node_info;
-// node power, returned by request
-typedef struct {
-  uint16_t    VBAT;           // supply voltage [mV]
-  uint16_t    IBAT;           // supply current [mA]
-}__attribute__((packed)) _node_power;
-// node status, returned by request
-typedef struct{
-  _node_power power;
-  uint8_t     err_cnt;        // errors counter
-  uint8_t     can_rxc;        // CAN received packets counter
-  uint8_t     can_adr;        // CAN address
-  uint8_t     can_err;        // CAN errors counter
-  uint8_t     load;           // MCU load
-  uint8_t     dump[16];       // error dump or information dump
-}_node_status;
-// local node description struct (hardware.h)
-typedef struct{
-  _node_sn      sn;     //serial number
-  _node_info    info;   //firmware/hardware info
-  _node_status  status; //dynamic status
-}__attribute__((packed)) _node;
-//=============================================================================
+
 // bus packet structure:
 // service packets filtered by _node_sn, or 0x00000 for broadcast
 #define bus_packet_size_hdr             (1)
@@ -254,4 +214,3 @@ typedef struct{
 
 typedef enum {bbr_hdr,bbr_data} _bb_req_type;
 //=============================================================================
-

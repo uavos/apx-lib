@@ -20,8 +20,8 @@
  * Floor, Boston, MA 02110-1301, USA.
  *
  */
-#ifndef MANDALA_CONSTANTS
-#define MANDALA_CONSTANTS
+#ifndef __MANDALA_VARIABLES_H
+#define __MANDALA_VARIABLES_H
 //=============================================================================
 // Mandala constants
 //=============================================================================

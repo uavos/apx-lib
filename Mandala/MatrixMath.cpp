@@ -24,7 +24,7 @@
 #include <string.h>
 //#include <iostream>
 #include "MatrixMath.h"
-#include <dmsg.h>
+//#include <dmsg.h>
 #include <float.h>
 //=============================================================================
 namespace matrixmath {

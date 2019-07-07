@@ -23,12 +23,13 @@
 #ifndef MANDALA_CORE_H
 #define MANDALA_CORE_H
 //=============================================================================
-//=============================================================================
-#include "MatrixMath.h"
 #include <inttypes.h>
 #include <math.h>
 #include <string.h>
 #include <sys/types.h>
+
+#include "MatrixMath.h"
+
 using namespace matrixmath;
 //=============================================================================
 #ifndef assert
@@ -48,25 +49,13 @@ typedef uint32_t        _var_uint;
 typedef uint8_t         _var_flag;
 typedef uint8_t         _var_enum;
 //=============================================================================
-#include "MandalaVars.h" //get constants
-//-----------------------------------------------------------------------------
-// enum indexes idx_VARNAME
-#define MIDX(aname,adescr, ... ) idx_##aname __VA_ARGS__,
-enum {
-  #include "MandalaVars.h"
-};
-#define MVAR(atype,aname,adescr, ...) idx_##aname,
-enum {
-  idx_vars_start=idxPAD-1,
-  #include "MandalaVars.h"
-  idx_vars_top,
-  varsCnt=(idx_vars_top-idx_vars_start+1)
-};
+//get constants
+#include "MandalaConstants.h"
+#include "MandalaIndexes.h"
 //-----------------------------------------------------------------------------
 // typedefs and consts
 #define MVAR(atype,aname,adescr, ...)   typedef _var_##atype var_typedef_##aname;
-#define MBIT(avarname,abitname,adescr,amask)   enum{ avarname##_##abitname=amask };
-#include "MandalaVars.h"
+#include "MandalaTemplate.h"
 //=============================================================================
 class MandalaCore
 {
@@ -96,7 +85,7 @@ public:
   void set_data(uint16_t var_m,uint type,void *value_ptr,_var_float value);
   //-----------------------------------------------------------------------------
   #define MVAR(atype,aname, ...)        var_typedef_##aname aname;
-  #include "MandalaVars.h"
+  #include "MandalaTemplate.h"
 
   typedef const uint8_t _vars_list [];
   static _vars_list vars_dlink;
