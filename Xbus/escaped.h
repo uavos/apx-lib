@@ -2,13 +2,13 @@
 #ifndef escaped_H
 #define escaped_H
 //==============================================================================
-#include "node.h"
+//#include "node.h"
 #include <inttypes.h>
 #include <string.h>
 #include <sys/types.h>
 //==============================================================================
 #ifndef UART_esc_size
-#define UART_esc_size        BUS_MAX_PACKET
+#define UART_esc_size        1024
 #endif
 //==============================================================================
 class _escaped
