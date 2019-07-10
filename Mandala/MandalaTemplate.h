@@ -482,8 +482,10 @@ MVAR(float, gcu_RSS,  "GCU modem signal strength [0..1]",       u001,u001)
 MVAR(float, gcu_Ve,   "GCU battery voltage [v]",                u01,u01)
 MVAR(float, gcu_MT,   "GCU modem temperature [C]",              s1,s1)
 
-#if defined PAWN || defined QT_CORE_LIB
+#if defined(PAWN) || defined(QT_CORE_LIB) || defined(MANDALA_VMVARS)
+#ifndef MANDALA_VMVARS
 #define MANDALA_VMVARS
+#endif
 MVAR(float, VM1,  "script value 1",  f4,f4)
 MVAR(float, VM2,  "script value 2",  f4,f4)
 MVAR(float, VM3,  "script value 3",  f4,f4)
