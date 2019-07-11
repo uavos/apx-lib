@@ -1,16 +1,15 @@
-//==============================================================================
-#ifndef fifo_H
-#define fifo_H
-//==============================================================================
+#pragma once
+
 #include <inttypes.h>
 #include <string.h>
-#include <sys/types.h>
+
+
 //==============================================================================
 template<const uint16_t fifo_size,class T=uint8_t>
-class _fifo
+class ApxSimpleFifoBuffer
 {
 public:
-  _fifo(): pos_write(0),pos_read(0),load_cnt(0),load_cnt_save(0)
+  ApxSimpleFifoBuffer(): pos_write(0),pos_read(0),load_cnt(0),load_cnt_save(0)
   {
   }
   //============================================================================
@@ -48,7 +47,7 @@ public:
     load_cnt+=load_cnt_save;
   }
   //============================================================================
-  bool write(const T *buf,uint cnt) //copy buffer to fifo
+  bool write(const T *buf,uint32_t cnt) //copy buffer to fifo
   {
     //check if FIFO available.
     if((size()-fifo_cnt())<(int)cnt) return false;
@@ -56,7 +55,7 @@ public:
     if(cnt==1 && sizeof(T)==1){ //speedup
       pool[pos_write]=buf[0];
     }else{
-      uint cnt_left=fifo_size-pos_write;
+      uint32_t cnt_left=fifo_size-pos_write;
       if(cnt_left>cnt)cnt_left=cnt;
       memcpy(pool+pos_write,buf,cnt_left*sizeof(T));
       memcpy(pool,buf+cnt_left,(cnt-cnt_left)*sizeof(T));
@@ -79,7 +78,7 @@ public:
   //read pointer from fifo
   //don't release elements until next read
   //return number of elements
-  uint read(T **ptr)
+  uint32_t read(T **ptr)
   {
     //release fifo from previous read
     //pos_read=pos_read_save;
@@ -104,7 +103,7 @@ public:
   {
     T *p;
     uint16_t pos_s=pos_read;
-    uint cnt=read(&p);
+    uint32_t cnt=read(&p);
     if(!cnt)return false;
     if(sizeof(T)==1) *buf=*p;
     else memcpy(buf,p,sizeof(T));
@@ -117,12 +116,12 @@ public:
   }
   //============================================================================
   //read elements to buffer, release elements
-  uint read(T *buf,uint sz)
+  uint32_t read(T *buf,uint32_t sz)
   {
-    uint rcnt=0;
+    uint32_t rcnt=0;
     while(sz){
       T *p;
-      uint cnt=read(&p);
+      uint32_t cnt=read(&p);
       if(!cnt)break;
       if(cnt>sz){
         uint16_t d=cnt-sz;
@@ -145,19 +144,19 @@ public:
   // VARIABLE LENGTH PACKETS FIFO
   //============================================================================
   //copy packet to fifo, return true on success
-  bool write_packet(const uint8_t *buf,uint cnt)
+  bool write_packet(const uint8_t *buf,uint32_t cnt)
   {
     if(!write_packet_start(cnt))return false;
     write_packet_data(buf,cnt);
     write_packet_done(cnt);
     return true;
   }
-  inline bool write_packet_start(uint cnt)
+  inline bool write_packet_start(uint32_t cnt)
   {
     if(!cnt)return false;
     // check overflow
-    uint pos_top=pos_write+cnt+2;
-    uint pos_rt=pos_read;
+    uint32_t pos_top=pos_write+cnt+2;
+    uint32_t pos_rt=pos_read;
     if (pool[pos_rt]) { //check only if tx not empty
       if (pos_write>pos_rt) pos_rt+=fifo_size;
       if (pos_top>=pos_rt) {
@@ -175,16 +174,16 @@ public:
     pos_write=(pos_write+1)%fifo_size;
     return true;
   }
-  inline void write_packet_data(const uint8_t *buf,uint cnt)
+  inline void write_packet_data(const uint8_t *buf,uint32_t cnt)
   {
-    uint xcnt=fifo_size-pos_write;
+    uint32_t xcnt=fifo_size-pos_write;
     if (xcnt>cnt)xcnt=cnt;
     memcpy(&(pool[pos_write]),buf,xcnt*sizeof(T));
-    uint tcnt=cnt-xcnt;
+    uint32_t tcnt=cnt-xcnt;
     if(tcnt) memcpy(&(pool[0]),&(buf[xcnt]),tcnt*sizeof(T));
     pos_write=(pos_write+cnt)%fifo_size;
   }
-  inline void write_packet_done(uint cnt)
+  inline void write_packet_done(uint32_t cnt)
   {
     pool[pos_write]=0;     // stop byte for reader
     //fix first byte, allow write by INT
@@ -193,19 +192,19 @@ public:
   }
   //============================================================================
   //read packet from fifo to buffer, return packet fifo_size
-  uint read_packet(uint8_t *buf,uint sz)
+  uint32_t read_packet(uint8_t *buf,uint32_t sz)
   {
     (void)sz;
     //check for new tx packet from fifo
     if(pool[pos_read]==0)return 0; //fifo empty
     //fifo contains data
-    uint tx_p=pos_read;
-    uint cnt=pool[tx_p++]<<8;
+    uint32_t tx_p=pos_read;
+    uint32_t cnt=pool[tx_p++]<<8;
     tx_p%=fifo_size;
     cnt|=pool[tx_p++];
     tx_p%=fifo_size;
     cnt&=0x7FFF; //clear MSB (fifo flag)
-    uint xcnt=fifo_size-tx_p;
+    uint32_t xcnt=fifo_size-tx_p;
     if (xcnt>cnt)xcnt=cnt;
     memcpy(buf,&(pool[tx_p]),xcnt*sizeof(T));
     memcpy(&(buf[xcnt]),pool,(cnt-xcnt)*sizeof(T));
@@ -223,5 +222,4 @@ private:
   uint16_t pos_write_save; //used for packet write
   uint16_t load_cnt_save;
 };
-//==============================================================================
-#endif
+

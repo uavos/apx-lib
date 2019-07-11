@@ -1,6 +1,6 @@
 //==============================================================================
 #include "tcp_client.h"
-#include "crc.h"
+#include <Math/crc.h>
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
