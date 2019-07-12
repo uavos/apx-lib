@@ -1,6 +1,5 @@
 //==============================================================================
 #include "tcp_client.h"
-#include <Math/crc.h>
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -14,6 +13,8 @@
 #include <sys/msg.h>
 #include <time.h>
 #include <unistd.h>
+
+#include <Math/crc.h>
 //==============================================================================
 _tcp_client::_tcp_client(const char *name)
 : silent(false),tcpdebug(false),name(name),err_mute(false),init_stage(0)
