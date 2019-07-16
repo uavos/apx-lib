@@ -24,7 +24,6 @@ Module {
             "*.*",
         ]
         excludeFiles: [
-            "*NodeConf*",
             "_*",
         ]
     }

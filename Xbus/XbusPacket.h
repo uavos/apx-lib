@@ -1,7 +1,7 @@
 #pragma once
 #include "XbusBase.h"
 
-class XbusPacket: protected XbusBase
+class XbusPacket: public XbusBase
 {
 public:
     XbusPacket(uint8_t *packet_ptr);

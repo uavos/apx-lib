@@ -7,7 +7,7 @@ XbusNode::XbusNode(uint8_t *packet_ptr)
     : XbusPacket(packet_ptr)
     , _hdr(XbusPacket::payload())
 {
-    offset_payload=
+    offset_payload +=
             std::tuple_size<guid_t>()
             + sizeof(uint8_t);
 }

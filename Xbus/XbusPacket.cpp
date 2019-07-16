@@ -7,7 +7,7 @@
 XbusPacket::XbusPacket(uint8_t *packet_ptr)
     : XbusBase(packet_ptr)
 {
-    offset_payload=sizeof(XbusPacket::pid_t);
+    offset_payload += sizeof(XbusPacket::pid_t);
 }
 
 XbusPacket::pid_t XbusPacket::pid() const

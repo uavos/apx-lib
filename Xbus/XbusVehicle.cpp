@@ -7,7 +7,7 @@ XbusVehicle::XbusVehicle(uint8_t *packet_ptr)
     : XbusPacket(packet_ptr)
     , _hdr(XbusPacket::payload())
 {
-    offset_payload=sizeof(squawk_t);
+    offset_payload += sizeof(squawk_t);
 }
 
 XbusVehicle::squawk_t XbusVehicle::squawk() const

@@ -3,7 +3,7 @@
 
 #include <array>
 
-class XbusNode: protected XbusPacket
+class XbusNode: public XbusPacket
 {
 public:
     XbusNode(uint8_t *packet_ptr);

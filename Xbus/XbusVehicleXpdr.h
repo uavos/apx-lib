@@ -1,7 +1,7 @@
 #pragma once
 #include "XbusVehicle.h"
 
-class XbusVehicleXpdr: private XbusVehicle
+class XbusVehicleXpdr: public XbusVehicle
 {
 public:
     XbusVehicleXpdr(uint8_t *packet_ptr);

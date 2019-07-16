@@ -3,7 +3,7 @@
 
 #include <array>
 
-class XbusVehicleIdent: private XbusVehicle
+class XbusVehicleIdent: public XbusVehicle
 {
 public:
     XbusVehicleIdent(uint8_t *packet_ptr);
