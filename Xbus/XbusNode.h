@@ -55,13 +55,13 @@ public:
     } comands_loader_t;
 
 
-    struct Request {
+    struct Header {
         guid_t      guid;
         cmd_t       cmd;
     };
 
-    void read(Request &d);
-    void write(const Request &d);
+    void read(Header &d);
+    void write(const Header &d);
 
 private:
     uint8_t *_hdr;

@@ -8,15 +8,15 @@
 #include "endian.h"
 
 
-class XbusWriter
+class XbusStreamWriter
 {
 public:
-    explicit XbusWriter(uint8_t *p)
+    explicit XbusStreamWriter(uint8_t *p)
         : msg(p)
         , pos(0)
 
     {}
-    explicit XbusWriter(uint8_t &p)
+    explicit XbusStreamWriter(uint8_t &p)
         : msg(&p)
         , pos(0)
 
@@ -25,6 +25,10 @@ public:
     inline void reset()
     {
         pos = 0;
+    }
+    inline uint16_t position() const
+    {
+        return pos;
     }
 
 
@@ -60,7 +64,7 @@ private:
 // implementation
 
 template<typename _T, typename _Tin>
-void XbusWriter::set_data(_T &buf, _Tin data)
+void XbusStreamWriter::set_data(_T &buf, _Tin data)
 {
     if (std::is_floating_point<_Tin>::value) {
         buf = *static_cast<const _T *>(static_cast<const void *>(&data));
@@ -91,7 +95,7 @@ void XbusWriter::set_data(_T &buf, _Tin data)
 }
 
 template<typename _T>
-void XbusWriter::write(const _T data)
+void XbusStreamWriter::write(const _T data)
 {
     switch (sizeof(_T)) {
     case 1:
@@ -120,7 +124,7 @@ void XbusWriter::write(const _T data)
 }
 
 template<class _T, size_t _Size>
-void XbusWriter::write(const std::array<_T, _Size> &data)
+void XbusStreamWriter::write(const std::array<_T, _Size> &data)
 {
     for (auto &v : data) {
         *this << v;

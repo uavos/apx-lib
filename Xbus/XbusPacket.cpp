@@ -1,7 +1,7 @@
 #include "XbusPacket.h"
 
-#include "XbusReader.h"
-#include "XbusWriter.h"
+#include "XbusStreamReader.h"
+#include "XbusStreamWriter.h"
 
 
 XbusPacket::XbusPacket(uint8_t *packet_ptr)
@@ -13,11 +13,11 @@ XbusPacket::XbusPacket(uint8_t *packet_ptr)
 XbusPacket::pid_t XbusPacket::pid() const
 {
     pid_t v;
-    XbusReader(_ptr) >> v;
+    XbusStreamReader(_ptr) >> v;
     return v;
 }
 
 void XbusPacket::setPid(const pid_t v)
 {
-    XbusWriter(_ptr) << v;
+    XbusStreamWriter(_ptr) << v;
 }

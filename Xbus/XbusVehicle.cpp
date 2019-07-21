@@ -1,7 +1,7 @@
 #include "XbusVehicle.h"
 
-#include "XbusReader.h"
-#include "XbusWriter.h"
+#include "XbusStreamReader.h"
+#include "XbusStreamWriter.h"
 
 XbusVehicle::XbusVehicle(uint8_t *packet_ptr)
     : XbusPacket(packet_ptr)
@@ -13,12 +13,12 @@ XbusVehicle::XbusVehicle(uint8_t *packet_ptr)
 XbusVehicle::squawk_t XbusVehicle::squawk() const
 {
     squawk_t v;
-    XbusReader s(_hdr);
+    XbusStreamReader s(_hdr);
     s >> v;
     return v;
 }
 
 void XbusVehicle::setSquawk(const squawk_t v)
 {
-    XbusWriter(_hdr)<<v;
+    XbusStreamWriter(_hdr)<<v;
 }

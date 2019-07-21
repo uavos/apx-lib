@@ -7,25 +7,33 @@
 
 #include "endian.h"
 
-class XbusReader
+class XbusStreamReader
 {
 public:
-    explicit XbusReader(const uint8_t *p, uint16_t size=0)
+    explicit XbusStreamReader(const uint8_t *p, uint16_t size=0)
         : msg(p)
         , pos(0)
         , len(size)
 
     {}
-    explicit XbusReader(const uint8_t &p, uint16_t size=0)
+    explicit XbusStreamReader(const uint8_t &p, uint16_t size=0)
         : msg(&p)
         , pos(0)
         , len(size)
 
     {}
 
-    inline void reset()
+    inline void reset(uint16_t new_pos=0)
     {
-        pos = 0;
+        pos = new_pos;
+    }
+    inline uint16_t position() const
+    {
+        return pos;
+    }
+    inline uint16_t tailSize() const
+    {
+        return len>pos?len-pos:0;
     }
 
 
@@ -41,6 +49,13 @@ public:
         _T v;
         read(v);
         return static_cast<_Tout>(v);
+    }
+    template<typename _Tout>
+    inline _Tout read()
+    {
+        _Tout v;
+        read(v);
+        return v;
     }
 
 
@@ -66,7 +81,7 @@ private:
 // implementation
 
 template<typename _T, typename _Tout>
-void XbusReader::get_data(_T &buf, _Tout &data)
+void XbusStreamReader::get_data(_T &buf, _Tout &data)
 {
     memcpy(&buf, &msg[pos], sizeof(_T));
 
@@ -110,7 +125,7 @@ void XbusReader::get_data(_T &buf, _Tout &data)
 }
 
 template<typename _T>
-void XbusReader::read(_T &data)
+void XbusStreamReader::read(_T &data)
 {
     // message is trimmed - fill with zeroes
     if (len>0 && pos >= len) {
@@ -146,7 +161,7 @@ void XbusReader::read(_T &data)
 }
 
 template<class _T, size_t _Size>
-void XbusReader::read(std::array<_T, _Size> &data)
+void XbusStreamReader::read(std::array<_T, _Size> &data)
 {
     for (auto &v : data) {
         *this >> v;

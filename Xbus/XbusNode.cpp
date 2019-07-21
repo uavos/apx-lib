@@ -1,7 +1,7 @@
 #include "XbusNode.h"
 
-#include "XbusReader.h"
-#include "XbusWriter.h"
+#include "XbusStreamReader.h"
+#include "XbusStreamWriter.h"
 
 XbusNode::XbusNode(uint8_t *packet_ptr)
     : XbusPacket(packet_ptr)
@@ -12,15 +12,15 @@ XbusNode::XbusNode(uint8_t *packet_ptr)
             + sizeof(uint8_t);
 }
 
-void XbusNode::read(Request &d)
+void XbusNode::read(Header &d)
 {
-    XbusReader s(_hdr);
+    XbusStreamReader s(_hdr);
     s >> d.guid;
     s >> d.cmd;
 }
-void XbusNode::write(const Request &d)
+void XbusNode::write(const Header &d)
 {
-    XbusWriter s(_hdr);
+    XbusStreamWriter s(_hdr);
     s << d.guid;
     s << d.cmd;
 }

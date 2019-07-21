@@ -1,7 +1,7 @@
 #include "XbusVehicleXpdr.h"
 
-#include "XbusReader.h"
-#include "XbusWriter.h"
+#include "XbusStreamReader.h"
+#include "XbusStreamWriter.h"
 
 XbusVehicleXpdr::XbusVehicleXpdr(uint8_t *packet_ptr)
     : XbusVehicle(packet_ptr)
@@ -23,7 +23,7 @@ bool XbusVehicleXpdr::isValid(const uint16_t packet_size) const
 
 void XbusVehicleXpdr::read(Xpdr &d)
 {
-    XbusReader s(payload());
+    XbusStreamReader s(payload());
     s >> d.lat;
     s >> d.lon;
     d.alt=s.read<alt_t,float>();
@@ -33,7 +33,7 @@ void XbusVehicleXpdr::read(Xpdr &d)
 }
 void XbusVehicleXpdr::write(const Xpdr &d)
 {
-    XbusWriter s(payload());
+    XbusStreamWriter s(payload());
     s << d.lat;
     s << d.lon;
     s.write<alt_t>(d.alt);

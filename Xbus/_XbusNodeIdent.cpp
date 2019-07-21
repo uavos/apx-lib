@@ -1,7 +1,7 @@
 #include "XbusNodeIdent.h"
 
-#include "XbusReader.h"
-#include "XbusWriter.h"
+#include "XbusStreamReader.h"
+#include "XbusStreamWriter.h"
 
 
 XbusNodeIdent::XbusNodeIdent(uint8_t *packet_ptr)
@@ -20,7 +20,7 @@ bool XbusNodeIdent::isValid(const uint16_t packet_size) const
 
 void XbusNodeIdent::read(Ident &d)
 {
-    XbusReader s(payload());
+    XbusStreamReader s(payload());
     s >> d.name;
     s >> d.version;
     s >> d.hardware;
@@ -28,7 +28,7 @@ void XbusNodeIdent::read(Ident &d)
 }
 void XbusNodeIdent::write(const Ident &d)
 {
-    XbusWriter s(payload());
+    XbusStreamWriter s(payload());
     s << d.name;
     s << d.version;
     s << d.hardware;

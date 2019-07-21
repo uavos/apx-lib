@@ -1,7 +1,7 @@
 #include "XbusVehicleIdent.h"
 
-#include "XbusReader.h"
-#include "XbusWriter.h"
+#include "XbusStreamReader.h"
+#include "XbusStreamWriter.h"
 
 XbusVehicleIdent::XbusVehicleIdent(uint8_t *packet_ptr)
     : XbusVehicle(packet_ptr)
@@ -20,14 +20,14 @@ bool XbusVehicleIdent::isValid(const uint16_t packet_size) const
 
 void XbusVehicleIdent::read(Ident &d)
 {
-    XbusReader s(payload());
+    XbusStreamReader s(payload());
     s >> d.callsign;
     s >> d.vuid;
     s >> d.vclass;
 }
 void XbusVehicleIdent::write(const Ident &d)
 {
-    XbusWriter s(payload());
+    XbusStreamWriter s(payload());
     s << d.callsign;
     s << d.vuid;
     s << d.vclass;
