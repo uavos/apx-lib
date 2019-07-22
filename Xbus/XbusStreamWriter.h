@@ -32,26 +32,24 @@ public:
     }
 
 
-    template<typename _T>
-    void write(const _T data);
+    //template<typename _T>
+    //void write(const _T data);
+
+    template<typename _T, typename _Tin>
+    void write(const _Tin data);
 
     template<class _T, size_t _Size>
     void write(const std::array<_T, _Size> &data);
 
-    template<typename _T, typename _Tin>
-    inline void write(const _Tin data)
-    {
-        write(static_cast<_T>(data));
-    }
 
 
     template<typename _T>
     inline void operator<< (const _T data)
-    {write(data);}
+    {write<_T>(data);}
 
     template<class _T, size_t _Size>
     inline void operator<< (const std::array<_T, _Size> &data)
-    {write(data);}
+    {write<_T>(data);}
 
 private:
     uint8_t *msg;
@@ -94,27 +92,27 @@ void XbusStreamWriter::set_data(_T &buf, _Tin data)
     memcpy(&msg[pos], &buf, sizeof(buf));
 }
 
-template<typename _T>
-void XbusStreamWriter::write(const _T data)
+template<typename _T, typename _Tin>
+void XbusStreamWriter::write(const _Tin data)
 {
     switch (sizeof(_T)) {
     case 1:
-        msg[pos] = data;
+        msg[pos] = static_cast<_T>(data);
         break;
 
     case 2:
         uint16_t data_le16;
-        set_data(data_le16, data);
+        set_data(data_le16, static_cast<_T>(data));
         break;
 
     case 4:
         uint32_t data_le32;
-        set_data(data_le32, data);
+        set_data(data_le32, static_cast<_T>(data));
         break;
 
     case 8:
         uint64_t data_le64;
-        set_data(data_le64, data);
+        set_data(data_le64, static_cast<_T>(data));
         break;
 
     default:

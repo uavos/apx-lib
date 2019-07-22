@@ -2,13 +2,14 @@
 #include "XbusStreamReader.h"
 #include "XbusStreamWriter.h"
 
-class XbusNodeFilePayload
-{
-public:
+namespace xbus {
+namespace node {
+namespace file {
+
 
     // Node file read-write
     enum {
-        size_file_block = 256,
+        size_block = 256,
     };
 
     typedef struct{
@@ -78,5 +79,7 @@ public:
       }
     } file_data_t;*/
 
-};
+} // namespace
+} // namespace
+} // namespace
 

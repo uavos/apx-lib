@@ -2,9 +2,9 @@
 #include "XbusStreamReader.h"
 #include "XbusStreamWriter.h"
 
-class XbusMissionPayload
-{
-public:
+namespace xbus {
+namespace mission {
+
 
     struct Header {
         uint8_t type;     //wp,rw,scr, ..
@@ -318,5 +318,5 @@ public:
         }
     };
 
-};
-
+} // namespace
+} // namespace

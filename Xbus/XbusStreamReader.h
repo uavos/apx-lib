@@ -31,7 +31,7 @@ public:
     {
         return pos;
     }
-    inline uint16_t tailSize() const
+    inline uint16_t tail() const
     {
         return len>pos?len-pos:0;
     }
