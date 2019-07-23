@@ -25,14 +25,14 @@ namespace mission {
         {
             return sizeof(uint8_t);
         }
-        void read(XbusStreamReader *s)
+        inline void read(XbusStreamReader *s)
         {
             uint8_t v;
             *s >> v;
             type=v&0x0F;
             option=v>>4;
         }
-        void write(XbusStreamWriter *s) const
+        inline void write(XbusStreamWriter *s) const
         {
             uint8_t v=(type&0x0F)|((option<<4)&0xF0);
             *s << v;
@@ -54,13 +54,13 @@ namespace mission {
             return sizeof(float)*2
                     + sizeof(int16_t);
         }
-        void read(XbusStreamReader *s)
+        inline void read(XbusStreamReader *s)
         {
             *s >> lat;
             *s >> lon;
             *s >> alt;
         }
-        void write(XbusStreamWriter *s) const
+        inline void write(XbusStreamWriter *s) const
         {
             *s << lat;
             *s << lon;
@@ -90,7 +90,7 @@ namespace mission {
                     + sizeof(int16_t)
                     + sizeof(uint16_t);
         }
-        void read(XbusStreamReader *s)
+        inline void read(XbusStreamReader *s)
         {
             *s >> lat;
             *s >> lon;
@@ -99,7 +99,7 @@ namespace mission {
             *s >> dE;
             *s >> approach;
         }
-        void write(XbusStreamWriter *s) const
+        inline void write(XbusStreamWriter *s) const
         {
             *s << lat;
             *s << lon;
@@ -119,12 +119,12 @@ namespace mission {
         {
             return sizeof(float)*2;
         }
-        void read(XbusStreamReader *s)
+        inline void read(XbusStreamReader *s)
         {
             *s >> lat;
             *s >> lon;
         }
-        void write(XbusStreamWriter *s) const
+        inline void write(XbusStreamWriter *s) const
         {
             *s << lat;
             *s << lon;
@@ -147,7 +147,7 @@ namespace mission {
                     + sizeof(uint8_t)
                     + sizeof(uint16_t);
         }
-        void read(XbusStreamReader *s)
+        inline void read(XbusStreamReader *s)
         {
             *s >> lat;
             *s >> lon;
@@ -156,7 +156,7 @@ namespace mission {
             *s >> loops;
             *s >> timeS;
         }
-        void write(XbusStreamWriter *s) const
+        inline void write(XbusStreamWriter *s) const
         {
             *s << lat;
             *s << lon;
@@ -179,12 +179,12 @@ namespace mission {
             {
                 return sizeof(float)*2;
             }
-            void read(XbusStreamReader *s)
+            inline void read(XbusStreamReader *s)
             {
                 *s >> lat;
                 *s >> lon;
             }
-            void write(XbusStreamWriter *s) const
+            inline void write(XbusStreamWriter *s) const
             {
                 *s << lat;
                 *s << lon;
@@ -195,11 +195,11 @@ namespace mission {
         {
             return sizeof(uint8_t)+Point::psize()*pointsCnt;
         }
-        void read(XbusStreamReader *s)
+        inline void read(XbusStreamReader *s)
         {
             *s >> pointsCnt;
         }
-        void write(XbusStreamWriter *s) const
+        inline void write(XbusStreamWriter *s) const
         {
             *s << pointsCnt;
         }
@@ -228,11 +228,11 @@ namespace mission {
         {
             return sizeof(uint8_t);
         }
-        void read(XbusStreamReader *s)
+        inline void read(XbusStreamReader *s)
         {
             *s >> speed;
         }
-        void write(XbusStreamWriter *s) const
+        inline void write(XbusStreamWriter *s) const
         {
             *s << speed;
         }
@@ -245,11 +245,11 @@ namespace mission {
         {
             return sizeof(uint8_t);
         }
-        void read(XbusStreamReader *s)
+        inline void read(XbusStreamReader *s)
         {
             *s >> poi;
         }
-        void write(XbusStreamWriter *s) const
+        inline void write(XbusStreamWriter *s) const
         {
             *s << poi;
         }
@@ -263,11 +263,11 @@ namespace mission {
         {
             return sizeof(scr_t);
         }
-        void read(XbusStreamReader *s)
+        inline void read(XbusStreamReader *s)
         {
             *s >> scr;
         }
-        void write(XbusStreamWriter *s) const
+        inline void write(XbusStreamWriter *s) const
         {
             *s << scr;
         }
@@ -282,13 +282,13 @@ namespace mission {
         {
             return sizeof(int16_t)+sizeof(uint8_t)+sizeof(uint16_t);
         }
-        void read(XbusStreamReader *s)
+        inline void read(XbusStreamReader *s)
         {
             *s >> turnR;
             *s >> loops;
             *s >> timeS;
         }
-        void write(XbusStreamWriter *s) const
+        inline void write(XbusStreamWriter *s) const
         {
             *s << turnR;
             *s << loops;
@@ -304,14 +304,14 @@ namespace mission {
         {
             return sizeof(uint16_t);
         }
-        void read(XbusStreamReader *s)
+        inline void read(XbusStreamReader *s)
         {
             uint16_t v;
             *s >> v;
             dist=v&0x0FFF;
             opt=v>>12;
         }
-        void write(XbusStreamWriter *s) const
+        inline void write(XbusStreamWriter *s) const
         {
             uint16_t v=(dist&0x0FFF)|((opt<<12)&0xF000);
             *s << v;

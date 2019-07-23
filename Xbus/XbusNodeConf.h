@@ -27,14 +27,14 @@ namespace conf {
         uint32_t                crc;
         std::array<char,32>     name;
 
-        void read(XbusStreamReader *s)
+        inline void read(XbusStreamReader *s)
         {
             *s >> size;
             *s >> code_size;
             *s >> crc;
             *s >> name;
         }
-        void write(XbusStreamWriter *s) const
+        inline void write(XbusStreamWriter *s) const
         {
             *s << size;
             *s << code_size;
