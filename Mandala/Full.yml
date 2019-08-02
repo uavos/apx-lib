@@ -1,0 +1,5 @@
+depends:
+- Mandala/Full
+files:
+- Mandala.*
+- MatrixMath.*

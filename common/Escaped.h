@@ -11,24 +11,24 @@
 #define UART_esc_size        1024
 #endif
 //==============================================================================
-class _escaped
+class Escaped
 {
 public:
-  _escaped()
+  Escaped()
    : esc_state(0),esc_cnt(0),esc_pos_save(0)
   {
   }
 protected:
-  virtual uint esc_read(uint8_t *buf,uint sz)=0;
+  virtual uint32_t esc_read(uint8_t *buf,uint32_t sz)=0;
   virtual bool esc_write_byte(const uint8_t v)=0; //write to fifo but don't send
 
   virtual void escError(void){}
   virtual void escWriteDone(void){}
 
 
-  uint readEscaped(uint8_t *buf,uint sz)
+  uint32_t readEscaped(uint8_t *buf,uint32_t sz)
   {
-    uint cnt=readEscaped();
+    uint32_t cnt=readEscaped();
     if(!cnt)return 0;
     if(cnt>sz){
       return 0;
@@ -37,10 +37,10 @@ protected:
     return cnt;
   }
 
-  bool writeEscaped(const uint8_t *buf,uint cnt)
+  bool writeEscaped(const uint8_t *buf,uint32_t cnt)
   {
     while(1){
-      uint v,crc=0;
+      uint32_t v,crc=0;
       if(!esc_write_byte(0x55))break;
       if(!esc_write_byte(0x01))break;
       while(cnt){
@@ -71,14 +71,14 @@ protected:
   uint16_t esc_cnt,esc_pos_save,esc_cnt_save;
   uint8_t esc_rx[UART_esc_size];      //data from readEscaped()
 
-  uint readEscaped(void) //to local buf esc_rx
+  uint32_t readEscaped(void) //to local buf esc_rx
   {
-    uint rcnt=esc_pos_save?esc_cnt_save:esc_read(esc_tmp,sizeof(esc_tmp));
+    uint32_t rcnt=esc_pos_save?esc_cnt_save:esc_read(esc_tmp,sizeof(esc_tmp));
     if(!rcnt)return 0;
     return readEscaped(rcnt);
   }
 
-  uint readEscaped(uint rcnt) //to local buf esc_rx, from esc_rx
+  uint32_t readEscaped(uint32_t rcnt) //to local buf esc_rx, from esc_rx
   {
     // 0x55..0x01..DATA(0x55.0x02)..CRC..0x55..0x03
     uint8_t v,*rd=esc_tmp+esc_pos_save;

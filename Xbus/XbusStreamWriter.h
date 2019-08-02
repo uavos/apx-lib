@@ -7,7 +7,6 @@
 
 #include "endian.h"
 
-
 class XbusStreamWriter
 {
 public:
@@ -22,15 +21,8 @@ public:
 
     {}
 
-    inline void reset()
-    {
-        pos = 0;
-    }
-    inline uint16_t position() const
-    {
-        return pos;
-    }
-
+    inline void reset(uint16_t new_pos = 0) { pos = new_pos; }
+    inline uint16_t position() const { return pos; }
 
     //template<typename _T>
     //void write(const _T data);
@@ -41,15 +33,17 @@ public:
     template<class _T, size_t _Size>
     void write(const std::array<_T, _Size> &data);
 
-
-
     template<typename _T>
-    inline void operator<< (const _T data)
-    {write<_T>(data);}
+    inline void operator<<(const _T data)
+    {
+        write<_T>(data);
+    }
 
     template<class _T, size_t _Size>
-    inline void operator<< (const std::array<_T, _Size> &data)
-    {write<_T>(data);}
+    inline void operator<<(const std::array<_T, _Size> &data)
+    {
+        write<_T>(data);
+    }
 
 private:
     uint8_t *msg;
@@ -128,4 +122,3 @@ void XbusStreamWriter::write(const std::array<_T, _Size> &data)
         *this << v;
     }
 }
-

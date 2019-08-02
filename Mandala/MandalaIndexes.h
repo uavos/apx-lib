@@ -20,8 +20,7 @@
  * Floor, Boston, MA 02110-1301, USA.
  *
  */
-#ifndef __MANDALA_INDEXES_H
-#define __MANDALA_INDEXES_H
+#pragma once
 //=============================================================================
 #include "MandalaTemplate.h" //get constants
 
@@ -42,4 +41,3 @@ enum {
 };
 
 //=============================================================================
-#endif // once
