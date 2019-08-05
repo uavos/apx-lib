@@ -98,16 +98,6 @@ bool Mandala::get_text_names(uint16_t varmsk, const char **name, const char **de
     return false;
 }
 //===========================================================================
-uint32_t Mandala::archive(uint8_t *buf, uint32_t size, uint32_t var_idx)
-{
-    //check for special protocol archiveSize
-    //if(var_idx==idx_downstream)return archive_downstream(buf,size);
-    if (var_idx < idxPAD)
-        return 0;
-    //basic vars
-    return pack(buf, var_idx);
-}
-//=============================================================================
 uint32_t Mandala::extract(const uint8_t *buf, uint32_t size)
 {
     if (!size)
@@ -119,11 +109,11 @@ uint32_t Mandala::extract(const uint8_t *buf, uint32_t size, uint32_t var_idx)
 {
     //check for special protocol archiveSize
     if (var_idx == idx_downstream)
-        return blockDownstream ? size : extract_downstream(buf, size);
+        return blockDownstream ? size : unpack_downstream(buf, size);
     return unpack(buf, size, var_idx);
 }
 //=============================================================================
-uint32_t Mandala::archive_downstream(uint8_t *buf, uint32_t maxSize, uint32_t timestamp)
+uint32_t Mandala::pack_downstream(uint8_t *buf, uint32_t maxSize, uint32_t timestamp)
 {
     // telemetry stream format:
     // <timestampL>,<timestampH>,<bitsig>,<archived data>,[<bitsig>,<data>...]
@@ -207,7 +197,7 @@ uint32_t Mandala::archive_downstream(uint8_t *buf, uint32_t maxSize, uint32_t ti
     return dl_size;
 }
 //=============================================================================
-uint32_t Mandala::extract_downstream(const uint8_t *buf, uint32_t cnt)
+uint32_t Mandala::unpack_downstream(const uint8_t *buf, uint32_t cnt)
 {
     //header
     dl_size = cnt;

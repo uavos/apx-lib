@@ -76,9 +76,12 @@ public:
 
     //-----------------------------------------------------------------------------
     //extended - check buf size
-    uint32_t archive(uint8_t *buf, uint32_t size, uint32_t var_idx);
     uint32_t extract(const uint8_t *buf, uint32_t size); //overloaded - first byte=var_idx
     //-----------------------------------------------------------------------------
+
+    // some special protocols
+    uint32_t pack_downstream(uint8_t *buf, uint32_t maxSize, uint32_t timestamp);
+    uint32_t unpack_downstream(const uint8_t *buf, uint32_t cnt);
 
     //-----------------------------------------------------------------------------
     // additional methods (debug, math, NAV helper functions)
@@ -154,10 +157,6 @@ public:
     _var_float wind_circle(_var_float crs,
                            _var_float span,
                            _var_float r) const; //return air path length for ground circle flight
-
-    // some special protocols
-    uint32_t archive_downstream(uint8_t *buf, uint32_t maxSize, uint32_t timestamp);
-    uint32_t extract_downstream(const uint8_t *buf, uint32_t cnt);
 
 private:
     //math optimizations

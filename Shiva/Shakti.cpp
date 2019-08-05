@@ -141,7 +141,7 @@ void Shakti::fly(_var_float a_dt)
         if (var.ctr_brake > 0) {
             var.ctr_brakeL = var.ctr_brakeR = var.ctr_brake;
         } else if (std::fabs(var.ctr_steering) > apcfg.dbrk_steering) {
-            float err = (fabs(var.ctr_steering) - apcfg.dbrk_steering)
+            float err = (std::fabs(var.ctr_steering) - apcfg.dbrk_steering)
                         / (1.0 - apcfg.dbrk_steering);
             float v = err * apcfg.dbrk_Kp;
             var.ctr_brakeL = var.ctr_steering > 0 ? 0 : var.limit(v, 0, 1);
