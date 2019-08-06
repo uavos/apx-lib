@@ -16,7 +16,7 @@ import qbs.Process
 Probe {
     // Inputs
     property stringList names
-    property path searchPath
+    property stringList searchPaths
 
     // Output
     property stringList files:      []
@@ -31,11 +31,16 @@ Probe {
         var v=[]
         if(!names.length>0)return v
         var p = new Process();
-        if(p.exec("python", [
-                      FileInfo.joinPaths(path,"scan_modules.py"),
-                      "--path", searchPath,
-                      "--modules"]
-                  .concat(names), true)===0){
+
+        var args = []
+        args.push(FileInfo.joinPaths(path,"scan_modules.py"))
+        args.push("--paths")
+        args=args.concat(searchPaths)
+        args.push("--modules")
+        args=args.concat(names)
+
+
+        if(p.exec("python", args, true)===0){
             json=p.readStdOut()
             //console.info(json)
             v=JSON.parse(json)
@@ -106,9 +111,10 @@ Probe {
             v_mdefs.push("MODULE_"+m.name.replace(/\//g,"_").toUpperCase())
         }
 
-        //fix relpath for files
+        //fix path for files
         for(var i in v_files){
-            v_files[i]=FileInfo.relativePath(searchPath,v_files[i])
+            //v_files[i]=FileInfo.relativePath(searchPath,v_files[i])
+            v_files[i]=FileInfo.cleanPath(v_files[i])
         }
 
         files=removeDups(v_files)
@@ -117,7 +123,7 @@ Probe {
         paths=removeDups(v_paths)
         mdefs=removeDups(v_mdefs)
         libs=removeDups(v_libs)
-        //console.info(libs)
+        //console.info(files)
     }
 
 }

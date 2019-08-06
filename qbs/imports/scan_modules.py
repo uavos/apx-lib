@@ -10,7 +10,7 @@ import argparse
 # Parse commandline
 parser = argparse.ArgumentParser(description='Scan modules for dependencies using YAML config and print JSON array')
 parser.add_argument('--modules', nargs='+', required=True, help='list of modules')
-parser.add_argument('--path', action='store', required=True, help='search path')
+parser.add_argument('--paths', nargs='+', required=True, help='search paths')
 args = parser.parse_args()
 
 configExt = '.yml'
@@ -31,18 +31,22 @@ class Module(dict):
         # find configFile
         config = ''
         fname = os.path.split(name)[-1]
-        for f in [
-            os.path.join(args.path, name, fname + configExt),
-            os.path.join(args.path, os.path.split(name)[0], fname + configExt),
-            os.path.join(args.path, name, 'module' + configExt),
-            os.path.join(args.path, fname + configExt)
-        ]:
-            if os.path.exists(f):
-                config = f
+        for path in args.paths:
+            for f in [
+                os.path.join(path, name, fname + configExt),
+                os.path.join(path, os.path.split(name)[0], fname + configExt),
+                os.path.join(path, name, 'module' + configExt),
+                os.path.join(path, fname + configExt)
+            ]:
+                if os.path.exists(f):
+                    config = f
+                    break
+
+            if os.path.exists(config):
                 break
 
         if not os.path.exists(config):
-            raise Exception('Module config file not found: ' + name + ' in ' + args.path)
+            raise Exception('Module config file not found: ' + name + ' in ' + ','.join(args.paths))
 
         with open(config, 'r') as f:
             obj = yaml.load(f.read())
