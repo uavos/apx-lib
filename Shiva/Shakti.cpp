@@ -895,7 +895,7 @@ bool Shakti::goWpt(uint32_t n)
     var.cmd_altitude = mission.current.wp->alt;
 
     set_airspeed(apcfg.spd_cruise);
-    mission.current.pi = NULL;
+    mission.current.pi = nullptr;
 
     //some preliminary wpt actions
     if (apcfg.spd_VNO > apcfg.spd_cruise && apcfg.spd_VSI < apcfg.spd_cruise) {

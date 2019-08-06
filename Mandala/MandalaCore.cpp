@@ -130,7 +130,7 @@ bool MandalaCore::get_ptr(uint8_t var_idx, void **var_ptr, uint32_t *type)
 #define MIDX(aname, ...) \
     case idx_##aname: \
         *type = vt_idx; \
-        *var_ptr = NULL; \
+        *var_ptr = nullptr; \
         return true;
 #define MVAR(atype, aname, adescr, ...) \
     case idx_##aname: \

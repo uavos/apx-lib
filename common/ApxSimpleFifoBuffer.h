@@ -36,7 +36,7 @@ public:
   //============================================================================
   inline T * element(const uint16_t i)
   {
-    if(is_empty())return NULL;
+    if(is_empty())return nullptr;
     return pool+(pos_read+i)%fifo_size;
   }
   //============================================================================
