@@ -31,7 +31,7 @@ class Module(dict):
         # find configFile
         config = ''
         fname = os.path.split(name)[-1]
-        for path in args.paths:
+        for path in list(args.paths):
             for f in [
                 os.path.join(path, name, fname + configExt),
                 os.path.join(path, os.path.split(name)[0], fname + configExt),
@@ -46,7 +46,7 @@ class Module(dict):
                 break
 
         if not os.path.exists(config):
-            raise Exception('Module config file not found: ' + name + ' in ' + ','.join(args.paths))
+            raise Exception('Module config file not found: ' + name + ' in ' + ','.join(list(args.paths)))
 
         with open(config, 'r') as f:
             obj = yaml.load(f.read())
