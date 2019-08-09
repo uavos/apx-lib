@@ -741,12 +741,16 @@ uint8_t Mandala::var_index(const char *name)
 #endif
 void Mandala::dump(const uint8_t *ptr, uint32_t cnt, bool hex)
 {
+    (void) ptr;
+    (void) hex;
     for (uint32_t i = 0; i < cnt; i++)
         dmsg(hex ? "%.2X " : "%u ", *ptr++);
     dmsg("\n");
 }
 void Mandala::dump(const _var_vect &v, const char *str)
 {
+    (void) v;
+    (void) str;
     dmsg("%s: %.2f\t%.2f\t%.2f\n", str, (_var_float) v[0], (_var_float) v[1], (_var_float) v[2]);
 }
 void Mandala::dump(uint8_t var_idx)

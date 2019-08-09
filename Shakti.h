@@ -1,13 +1,11 @@
 #ifndef Shakti_H
 #define Shakti_H
 //==============================================================================
-#include <Mandala/Mandala.h>
-#include <Math/filters.h>
-
+#include "Mandala.h"
 #include "Mission.h"
 #include "conf_apcfg.h"
 #include "conf_node.h"
-
+#include "filters.h"
 //==============================================================================
 class REG_PID
 {
@@ -149,8 +147,8 @@ protected:
     void stabilize();                        //inner loops
     void navigate(bool do_stabilize = true); //outer loops
     void setNE(const Point &ne);             //setup delta, desiredNED, calc dist
-    bool goWpt(uint32_t n);                  //set current waypoint and fly
-    bool goPi(uint32_t n);                   //set current point of interest and fly
+    bool goWpt(uint n);                      //set current waypoint and fly
+    bool goPi(uint n);                       //set current point of interest and fly
     void ctr_autoflaps(); //_var_float cfgv=0,bool use_cmd=false); //check cfg and control flaps if needed
     _var_float last_autoflaps;
 
@@ -210,7 +208,7 @@ protected:
 
     //initial procedures after power on
     bool power_on_reset;
-    uint32_t counter; //loop counter
+    uint counter; //loop counter
 
     bool doAutoFlaps; //do in navigate()
 
@@ -222,18 +220,18 @@ private:
     _var_float get_gain_tas();
 
     //var timeouts
-    uint32_t rc_timeout, link_timeout;
+    uint rc_timeout, link_timeout;
 
     //RPM timeout
-    uint32_t rpm_time_s;
+    uint rpm_time_s;
     //RPM peak filter
-    uint32_t rpm_s, rpmv_s, rpm_cnt;
+    uint rpm_s, rpmv_s, rpm_cnt;
 
     bool safety_Ve;
     bool safety_Vs;
     bool safety_VeERS;
     uint32_t wrn_mask; //warnings mask
-    uint32_t time_wrn_s;
+    uint time_wrn_s;
 
     //dynamics
     void smooth_cmd_airspeed();
@@ -241,14 +239,14 @@ private:
 
     //waypoint reached calc
     _var_float last_wpHDG;
-    uint32_t wpHDG_cnt;
+    uint wpHDG_cnt;
     bool check_wp_reached(_var_float sdist);
 
     uint8_t mode_s;
     void checkModeChange(void);
 
     //ETA
-    uint32_t time_eta_s;
+    uint time_eta_s;
     _var_float last_dWPT;
     _var_float dot_dWPT;
 
@@ -257,10 +255,10 @@ private:
     void cam_stab_front(void);
     void cam_stab_down(void);
     void cam_stab_roll(void);
-    uint32_t cam_mode_s;
-    uint32_t time_cam_s;
+    uint cam_mode_s;
+    uint time_cam_s;
     //shutter
-    uint32_t time_shtr_s;
+    uint time_shtr_s;
     Point dshot_ll;
 
     //state change mon
@@ -270,15 +268,15 @@ private:
 
     //shutdown control
     _var_flag sb_s;
-    uint32_t time_shdn_s;
+    uint time_shdn_s;
 
     uint8_t starter_stage;
-    uint32_t time_starter_s;
+    uint time_starter_s;
 
-    uint32_t time_frate;
+    uint time_frate;
 
 protected:
-    uint32_t t; //current time
+    uint t; //current time
 
     virtual void onBeforeTakeoff(void);
 
@@ -289,7 +287,7 @@ protected:
     Mission mission;
     Vect currentPOI_LLH(void);
     void doWaypointActions(void);
-    virtual void scr_exec(const char *);
+    virtual void scr_exec(const char *scr);
 
     //est
     void calc_stab(void);
@@ -299,14 +297,14 @@ protected:
     void checkRestrictedAreas(bool reset = false);
     struct
     {
-        uint32_t stage;
-        uint32_t idx, pidx;
+        uint stage;
+        uint idx, pidx;
         float minDist;
         Point intersect;
         Point sum, poly_sum;
         Point p1, p2;
         bool isInside, inside_c;
-        uint32_t poly_cnt;
+        uint poly_cnt;
         Mission::_item_area *area;
         Mission::_item_area_point *point;
         struct

@@ -1,14 +1,11 @@
 //==============================================================================
 #include <math.h>
 #include <string.h>
-#include <strings.h>
 //--------------------------------------------------------
 #include "Shakti.h"
 #include "bus.h"
 #include "time_ms.h"
-
-#include <MandalaStatic.h>
-#include <dmsg.h>
+#include <Mandala>
 //==============================================================================
 void Shakti::init()
 {
@@ -119,7 +116,7 @@ Shakti::Shakti()
 void Shakti::fly(_var_float a_dt)
 {
     dt = a_dt;
-    t = time_ms();
+    t = time;
     if (dt == 0)
         dt = 1.0 / 100.0;
 
@@ -140,8 +137,8 @@ void Shakti::fly(_var_float a_dt)
     if (apcfg.dbrk_steering > 0) {
         if (var.ctr_brake > 0) {
             var.ctr_brakeL = var.ctr_brakeR = var.ctr_brake;
-        } else if (std::abs(var.ctr_steering) > apcfg.dbrk_steering) {
-            float err = (std::abs(var.ctr_steering) - apcfg.dbrk_steering)
+        } else if (fabs(var.ctr_steering) > apcfg.dbrk_steering) {
+            float err = (fabs(var.ctr_steering) - apcfg.dbrk_steering)
                         / (1.0 - apcfg.dbrk_steering);
             float v = err * apcfg.dbrk_Kp;
             var.ctr_brakeL = var.ctr_steering > 0 ? 0 : var.limit(v, 0, 1);
@@ -313,15 +310,15 @@ void Shakti::link_updated(bool valid)
 void Shakti::rpm_updated(bool valid)
 {
     if (valid) {
-        uint32_t d = var.rpm >= rpm_s ? var.rpm - rpm_s : rpm_s - var.rpm;
+        uint d = var.rpm >= rpm_s ? var.rpm - rpm_s : rpm_s - var.rpm;
         rpm_s = var.rpm;
 
         if (apcfg.rpm_pflt && apcfg.rpm > 0) {
             //filter RPM peaks
-            const uint32_t ds = apcfg.rpm
-                                / (apcfg.rpm_pflt == rpm_pflt_p8
-                                       ? 8
-                                       : apcfg.rpm_pflt == rpm_pflt_p4 ? 4 : 2);
+            const uint ds = apcfg.rpm
+                            / (apcfg.rpm_pflt == rpm_pflt_p8
+                                   ? 8
+                                   : apcfg.rpm_pflt == rpm_pflt_p4 ? 4 : 2);
             if (d > ds && rpm_cnt < 5) {
                 rpm_cnt++;
                 var.rpm = rpmv_s;
@@ -333,7 +330,7 @@ void Shakti::rpm_updated(bool valid)
 
         if (var.rpm > 0) {
             if (apcfg.rpm_err != rpm_err_derivative || d > 0) {
-                rpm_time_s = time_ms();
+                rpm_time_s = time;
             }
             var.error &= ~error_rpm;
             return;
@@ -427,7 +424,7 @@ void Shakti::safety()
         time_wrn_s = t;
         uint32_t msk = 1;
         uint32_t warn = 0;
-        for (uint32_t i = 0; i < (sizeof(apcfg.wrn_bind) / sizeof(apcfg.wrn_bind[0])); i++) {
+        for (uint i = 0; i < (sizeof(apcfg.wrn_bind) / sizeof(apcfg.wrn_bind[0])); i++) {
             if (apcfg.wrn_bind[i]) {
                 _var_float v = var.get_data(apcfg.wrn_bind[i]);
                 if (v < apcfg.wrn_min[i])
@@ -437,7 +434,7 @@ void Shakti::safety()
                 while ((warn ^ wrn_mask) & msk & warn) { //changed low-high
                     //print warning var descr
                     uint16_t var_m = apcfg.wrn_bind[i];
-                    uint32_t type;
+                    uint type;
                     void *value_ptr;
                     if (!var.get_ptr(var_m, &value_ptr, &type))
                         break; //get var type
@@ -546,7 +543,6 @@ void Shakti::checkRestrictedAreas(bool reset)
 
     case 1000:
         memset(&area.out, 0, sizeof(area.out));
-        //fallthru
     case 1001:
         area.stage = 1001;
         return;
@@ -598,7 +594,6 @@ void Shakti::starter()
         var.ctrb |= ctrb_horn;
         time_starter_s = t;
         starter_stage++;
-        //fallthru
     case 2:
         if ((!(var.error & error_rpm)) && var.rpm > 0) {
             dmsg("Error: Engine is already running\n");
@@ -609,26 +604,23 @@ void Shakti::starter()
             return;
         time_starter_s = t;
         starter_stage++;
-        //fallthru
     case 3:
         var.ctr_throttle = apcfg.st_thr;
         if ((t - time_starter_s) < (apcfg.st_pause * 1000))
             return;
         starter_stage++;
-        //fallthru
     case 4: //turn on switch for period
         var.sw |= sw_starter;
         var.ctrb &= ~ctrb_horn;
         time_starter_s = t;
         starter_stage++;
-        //fallthru
     case 5: //check if engine started
         var.ctr_throttle = apcfg.st_thr;
         if (apcfg.rpm_idle > 0 && (!(var.error & error_rpm)) && var.rpm >= apcfg.rpm_idle) {
             starter_stage++;
             return;
         } else {
-            uint32_t to = apcfg.st_time * 1000;
+            uint to = apcfg.st_time * 1000;
             if (to < 1000)
                 to = 1000;
             if ((t - time_starter_s) < to)
@@ -791,7 +783,6 @@ void Shakti::flytoCircle(const Point &ne, _var_float r, bool bCCW, bool adj90)
         var.tgHDG = var.boundAngle(var.wpHDG - 90.0);
     }
     ctr_Path();
-    (void) adj90;
     //if(adj90){
     _var_float sdist = apcfg.turnR * 2;
     if (var.rwDelta > sdist)
@@ -878,7 +869,7 @@ void Shakti::checkModeChange(void)
 //==============================================================================
 void Shakti::onBeforeTakeoff(void) {}
 //==============================================================================
-bool Shakti::goWpt(uint32_t n)
+bool Shakti::goWpt(uint n)
 {
     var.mode = mode_WPT;
     checkModeChange();
@@ -896,7 +887,7 @@ bool Shakti::goWpt(uint32_t n)
     var.cmd_altitude = mission.current.wp->alt;
 
     set_airspeed(apcfg.spd_cruise);
-    mission.current.pi = nullptr;
+    mission.current.pi = NULL;
 
     //some preliminary wpt actions
     if (apcfg.spd_VNO > apcfg.spd_cruise && apcfg.spd_VSI < apcfg.spd_cruise) {
@@ -1000,9 +991,9 @@ void Shakti::doWaypointActions(void)
         }
     }
 }
-void Shakti::scr_exec(const char *) {}
+void Shakti::scr_exec(const char *scr) {}
 //==============================================================================
-bool Shakti::goPi(uint32_t n)
+bool Shakti::goPi(uint n)
 {
     var.mode = mode_STBY;
     checkModeChange();
@@ -1032,7 +1023,7 @@ Vect Shakti::currentPOI_LLH(void)
 //==============================================================================
 void Shakti::calcETA(_var_float dWPT, _var_float spd, bool checkHDG)
 {
-    uint32_t idt = t - time_eta_s;
+    uint idt = t - time_eta_s;
     if (idt < 1000)
         return;
     time_eta_s = t;
@@ -1110,9 +1101,6 @@ void Shakti::control_cam()
             break;
         case cam_default_position:
             var.cam_mode = cam_mode_position;
-            break;
-        case cam_default_speed:
-            var.cam_mode = cam_mode_speed;
             break;
         }
     }
@@ -1296,7 +1284,7 @@ void Shakti::ctr_autoflaps() //_var_float cfgv,bool use_cmd)
         else if (spd > spdMax)
             spd = spdMax;
         _var_float vf = (1.0 - (spd - spdMin) / spdSz) * apcfg.flaps_auto;
-        uint32_t vi = vf * 10.0;
+        uint vi = vf * 10.0;
         vf = vi * 0.1;
         if (fabs(last_autoflaps - vf) >= 0.1) {
             v = vf;
@@ -1412,9 +1400,14 @@ bool Shakti::ctr_Yaw(void)
                                           apcfg.ay_Lp),
                           apcfg.Yaw.Lo);
         }
-        v /= -100.0;
-        set_steering(v * get_gain(var.gSpeed, apcfg.Ks_steering_low, 0));
-        set_rud(v);
+        v /= 100.0;
+        _var_float rud = -v * get_gain_rpm(apcfg.Ks_rudder_rpm);
+        if (apcfg.heli_ymin != 0 && rud < apcfg.heli_ymin)
+            rud = apcfg.heli_ymin;
+        if (apcfg.heli_yrev)
+            rud = -rud;
+        set_rud(rud);
+        set_steering(-v * get_gain(var.gSpeed, apcfg.Ks_steering_low, 0));
     } break;
     case type_blimp: {
         _var_float err = var.boundAngle(var.cmd_course
@@ -1470,14 +1463,14 @@ bool Shakti::ctr_Governor(void)
             reg_VSpeed.reset(v);
             return true;
         }
-        uint32_t target_rpm = var.ctr_brake ? apcfg.rpm_idle : apcfg.rpm;
+        uint target_rpm = var.ctr_brake ? apcfg.rpm_idle : apcfg.rpm;
         if (var.cmd_rpm > target_rpm)
             var.cmd_rpm = target_rpm;
         else {
-            uint32_t rpm_step = (_var_float) apcfg.rpm_max * dt * apcfg.to_thrRise;
+            uint rpm_step = (_var_float) apcfg.rpm_max * dt * apcfg.to_thrRise;
             if (!rpm_step)
                 rpm_step = 1;
-            uint32_t new_rpm = var.cmd_rpm + rpm_step;
+            uint new_rpm = var.cmd_rpm + rpm_step;
             if (new_rpm < target_rpm)
                 var.cmd_rpm = new_rpm;
             else
@@ -1504,7 +1497,7 @@ bool Shakti::ctr_AirbrkApp(void)
     if (bias < 0 || bias > 1 || (var.error & error_rpm))
         bias = 0;
     _var_float v = var.limit(bias * 100.0 + reg_AirbrkApp.step(err, dt) * (1.0 - bias), 0, 100);
-    uint32_t iv = v / 20;
+    uint iv = v / 20;
     v = iv * 20;
     v /= 100.0;
     if (fabs(var.ctr_airbrk - v) >= 0.2)
@@ -1519,7 +1512,7 @@ bool Shakti::ctr_AirbrkDS(_var_float vDS)
         return false;
     _var_float err = var.vspeed + vDS;
     _var_float v = var.limit(reg_AirbrkDS.step(err, dt), 0, 100);
-    uint32_t iv = v / 10;
+    uint iv = v / 10;
     v = iv * 10;
     v /= 100.0;
     if (fabs(var.ctr_airbrk - v) >= 0.1)
@@ -1582,10 +1575,10 @@ bool Shakti::ctr_Course(void)
             else if (err < (-90) && var.cmd_theta[0] > (tLo))
                 err += 360;
         }
-        if (apcfg.type == type_helicopter && apcfg.heli_topt && fabs(err) > 90) {
-            if (apcfg.heli_rotor == heli_rotor_CW)
+        if (apcfg.type == type_helicopter && apcfg.heli_turn != heli_turn_auto && fabs(err) > 90) {
+            if (apcfg.heli_turn == heli_turn_left)
                 err -= 360;
-            else
+            else if (apcfg.heli_turn == heli_turn_right)
                 err += 360;
         }
         //crs to roll reg PID/PPI
@@ -1741,8 +1734,8 @@ bool Shakti::ctr_Taxi(void)
     } else {
         _var_float v = -reg_Taxi.stepPPI(err, vel, dt) / 100.0;
         v += var.limit(-var.gyro[2] * apcfg.Yaw.Kp + var.rc_yaw * 15.0, apcfg.Yaw.Lp) / 100.0;
-        set_steering(v * get_gain(var.gSpeed, apcfg.Ks_steering_low, 0));
         set_rud(v * get_gain(var.airspeed, apcfg.Ks_rudder_low, apcfg.Ks_rudder_high), false);
+        set_steering(v * get_gain(var.gSpeed, apcfg.Ks_steering_low, 0));
         var.cmd_course = var.tgHDG + v * 25.0; //display only
     }
     return true;
@@ -1989,7 +1982,7 @@ _var_float Shakti::get_gain_stab(_var_float Ks_slw)
     if (Ks_slw == 0 || Ks_slw > 1 || Ks_slw < -1)
         return 1.0;
     _var_float stab = var.limit(var.stab, 0, 1);
-    return 1.0 - (1.0 - Ks_slw) / 2.0 * (1.0 - cos((2.0 * PI) / (1.0 + stab)));
+    return 1.0 - (1.0 - Ks_slw) / 2.0 * (1.0 - cos((2.0 * M_PI) / (1.0 + stab)));
 }
 //==============================================================================
 //==============================================================================
@@ -2027,59 +2020,20 @@ void Shakti::set_thr(_var_float v, bool doResetPID)
 //-----------------------------
 void Shakti::set_rud(_var_float v, bool doMix)
 {
-    if (apcfg.type == type_helicopter) {
-        if (doMix) {
+    if (doMix) {
+        if (apcfg.type == type_helicopter) {
             _var_float Ks = get_gain_rpm(apcfg.Ks_rudder_rpm);
             v += var.limit(Ks * fabs(var.ctr_collective) * apcfg.mix_crud_Kp, apcfg.mix_crud_Lo)
                  / 100.0; //mix to collective
-        }
-        v = var.limit(v, 1.0);
-        var.ctr_rudder = v;
-        if (apcfg.heli_yesc) {
-            //control electric tail via ctr_steering
-            _var_float b = apcfg.heli_ybias / 100.0;
-            _var_float m = apcfg.heli_ymin / 100.0;
-            bool bInv = apcfg.heli_rotor == heli_rotor_CCW;
-            if (bInv)
-                v = -v;
-            if (b > 0.0 && b < 1.0) {
-                v = v * (1.0 - b) + b;
-            } else
-                b = 0;
-            if (m > 0.0 && m < 1.0) {
-            } else
-                m = 0;
-            if (var.ctr_brake > 0 || (!(var.power & power_ignition)) || (var.ctrb & ctrb_ers)) {
-                //shutdown esc
-                v = 0;
-            } else if (m > 0) {
-                //never stop the motor
-                if (v < m)
-                    v = m;
-            } else if (v < 0)
-                v = 0;
-            set_steering(v);
-            //fix regYaw integral
-            _var_flag r0 = (m - b) / (1.0 - b) * 100.0;
-            if (!bInv) {
-                r0 = -r0;
-                if (reg_Yaw.sum > r0)
-                    reg_Yaw.sum = r0;
-            } else {
-                if (reg_Yaw.sum < r0)
-                    reg_Yaw.sum = r0;
-            }
-        }
-    } else {
-        if (doMix) {
+        } else {
             _var_float Ks = get_gain(var.airspeed, 0, apcfg.Ks_rudder_high);
             v += var.limit(Ks * var.cmd_theta[0] * apcfg.mix_rud_Kp, apcfg.mix_rud_Lo)
                  / 100.0; //mix to roll
             v += var.limit(Ks * var.gyro[0] * apcfg.mix_grud_Kp, apcfg.mix_grud_Lo)
                  / 100.0; //mix to roll gyro
         }
-        var.ctr_rudder = var.limit(v, 1.0);
     }
+    var.ctr_rudder = var.limit(v, 1.0);
 }
 //-----------------------------
 void Shakti::set_steering(_var_float v)
@@ -2182,7 +2136,7 @@ void Shakti::smooth_cmd_airspeed()
 //==============================================================================
 void Shakti::print_status_flag(uint8_t var_idx, _var_flag value_prev)
 {
-    uint32_t type;
+    uint type;
     void *value_ptr;
     if (!var.get_ptr(var_idx, &value_ptr, &type))
         return;
@@ -2217,7 +2171,7 @@ void Shakti::print_status_flag(uint8_t var_idx, _var_flag value_prev)
 //==============================================================================
 void Shakti::print_status_enum(uint8_t var_idx, _var_enum value_prev)
 {
-    uint32_t type;
+    uint type;
     void *value_ptr;
     if (!var.get_ptr(var_idx, &value_ptr, &type))
         return;
@@ -2238,7 +2192,7 @@ void Shakti::print_status_enum(uint8_t var_idx, _var_enum value_prev)
 //==============================================================================
 void Shakti::print_status_float(uint8_t var_idx, _var_float *value_prev)
 {
-    uint32_t type;
+    uint type;
     void *value_ptr;
     if (!var.get_ptr(var_idx, &value_ptr, &type))
         return;
