@@ -1374,8 +1374,10 @@ bool Shakti::ctr_Pitch(void)
         reg_Pitch.gain[2] = 1.0;
         v = reg_Pitch.step(err, vel, dt);
     } else {
-        vel -= std::abs(R2D * 9.81 * tan(var.cmd_theta[0] * D2R)
-                        / (var.cmd_airspeed / get_gain_tas()));
+        if (apcfg.type == type_airplane) {
+            vel -= std::abs(R2D * 9.81 * tan(var.cmd_theta[0] * D2R)
+                            / (var.cmd_airspeed / get_gain_tas()));
+        }
 
         reg_Pitch.gain[0] = Ktas * cos(var.theta[0] * D2R);
         reg_Pitch.gain[1] = Ktas;
@@ -1956,6 +1958,8 @@ _var_float Shakti::get_gain_rpm(_var_float Ks_low)
 }
 _var_float Shakti::get_gain_tas()
 {
+    if (apcfg.type != type_airplane)
+        return 1.0;
     if (!apcfg.Ks_tas_stab)
         return 1.0;
     if (apcfg.spd_cruise == 0)
