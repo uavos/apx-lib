@@ -1,5 +1,5 @@
 //==============================================================================
-#include <math.h>
+#include <cmath>
 #include <string.h>
 #include <strings.h>
 //--------------------------------------------------------
@@ -249,11 +249,11 @@ void Shakti::calc_stab(void)
     _var_float vstab = (var.theta[0] - var.cmd_theta[0]);
     //turn
     _var_float spd = var.cmd_airspeed * var.cas2tas;
-    _var_float turn_rate = spd > 0 ? R2D * 9.81 * tan(var.cmd_theta[0] * D2R) / spd : 0;
+    _var_float turn_rate = spd > 0 ? R2D * 9.81 * std::tan(var.cmd_theta[0] * D2R) / spd : 0;
     turn_rate = (var.gyro[2] - turn_rate);
     //var.user1=turn_rate;
     if (apcfg.stab_opt == stab_opt_HPF) {
-        if (fabs(turn_rate) < 1)
+        if (std::abs(turn_rate) < 1)
             f_stab_turn.reset(turn_rate);
         turn_rate = f_stab_turn.step(turn_rate, dt, dt * 100.0);
     }
@@ -269,7 +269,7 @@ void Shakti::calc_stab(void)
         vstab *= vs * vs;
     }
     //limit & filter
-    vstab = fabs(vstab);
+    vstab = std::abs(vstab);
     if (apcfg.stab_opt == stab_opt_airspeed)
         vstab *= apcfg.spd_cruise - var.airspeed;
     vstab = (vstab <= 0) ? 0.0 : var.limit(1.0 - apcfg.stab_est / vstab, 0, 1);
@@ -514,7 +514,7 @@ void Shakti::checkRestrictedAreas(bool reset)
     case 4: {
         Point pd = var.lineDistance(area.p1, area.p2);
         float dist2 = pd.mag2();
-        float dist = sqrt(dist2);
+        float dist = std::sqrt(dist2);
         //update sum of vectors
         area.poly_sum -= (pd / dist2);
         area.poly_cnt++;
@@ -761,7 +761,7 @@ bool Shakti::flytoHover(const Point &ne, _var_float sdist)
         var.calc();
         return true;
     }
-    if (flyto(ne, sdist) && fabs(var.boundAngle(var.course - var.cmd_course)) < 45) {
+    if (flyto(ne, sdist) && std::abs(var.boundAngle(var.course - var.cmd_course)) < 45) {
         var.cmode |= cmode_hover;
         var.cmd_course = var.tgHDG;
         var.cmd_airspeed = 0;
@@ -811,7 +811,7 @@ bool Shakti::check_wp_reached(_var_float sdist)
     if ((counter % (int) (0.2 / dt)) == 0) {
         _var_float d = var.boundAngle(var.wpHDG - last_wpHDG) / 0.2;
         last_wpHDG = var.wpHDG;
-        if (fabs(d) >= apcfg.wpt_drv)
+        if (std::abs(d) >= apcfg.wpt_drv)
             wpHDG_cnt++;
         else
             wpHDG_cnt = 0;
@@ -1247,7 +1247,7 @@ void Shakti::cam_stab_front(void)
     qUAV.conjugate();
     qGimbal.qmult(qUAV);
     Vect euler = qGimbal.toEuler(Quat::EulOrdXYXs) * (R2D);
-    if (fabs(euler[2]) > 90) {
+    if (std::abs(euler[2]) > 90) {
         euler[0] = var.boundAngle(180.0 + euler[0]);
         euler[1] = -euler[1];
     }
@@ -1298,7 +1298,7 @@ void Shakti::ctr_autoflaps() //_var_float cfgv,bool use_cmd)
         _var_float vf = (1.0 - (spd - spdMin) / spdSz) * apcfg.flaps_auto;
         uint32_t vi = vf * 10.0;
         vf = vi * 0.1;
-        if (fabs(last_autoflaps - vf) >= 0.1) {
+        if (std::abs(last_autoflaps - vf) >= 0.1) {
             v = vf;
             last_autoflaps = v;
         }
@@ -1375,11 +1375,11 @@ bool Shakti::ctr_Pitch(void)
         v = reg_Pitch.step(err, vel, dt);
     } else {
         if (apcfg.type == type_airplane) {
-            vel -= std::abs(R2D * 9.81 * tan(var.cmd_theta[0] * D2R)
+            vel -= std::abs(R2D * 9.81 * std::tan(var.cmd_theta[0] * D2R)
                             / (var.cmd_airspeed / get_gain_tas()));
         }
 
-        reg_Pitch.gain[0] = Ktas * cos(var.theta[0] * D2R);
+        reg_Pitch.gain[0] = Ktas * std::cos(var.theta[0] * D2R);
         reg_Pitch.gain[1] = Ktas;
         reg_Pitch.gain[2] = Ktas;
         v = reg_Pitch.stepPPI_elv(err, vel, dt);
@@ -1509,7 +1509,7 @@ bool Shakti::ctr_AirbrkApp(void)
     uint32_t iv = v / 20;
     v = iv * 20;
     v /= 100.0;
-    if (fabs(var.ctr_airbrk - v) >= 0.2)
+    if (std::abs(var.ctr_airbrk - v) >= 0.2)
         var.ctr_airbrk = v;
     reg_AirbrkDS.reset((var.ctr_airbrk) * 100.0);
     return true;
@@ -1524,7 +1524,7 @@ bool Shakti::ctr_AirbrkDS(_var_float vDS)
     uint32_t iv = v / 10;
     v = iv * 10;
     v /= 100.0;
-    if (fabs(var.ctr_airbrk - v) >= 0.1)
+    if (std::abs(var.ctr_airbrk - v) >= 0.1)
         var.ctr_airbrk = v;
     return true;
 }
@@ -1544,7 +1544,7 @@ bool Shakti::ctr_Course(void)
 {
     if (apcfg.Course.Lo == 0)
         return false;
-    if (isnan(var.cmd_course) || isinf(var.cmd_course))
+    if (std::isnan(var.cmd_course) || std::isinf(var.cmd_course))
         var.cmd_course = 0;
     switch (apcfg.type) {
     case type_airplane:
@@ -1584,7 +1584,7 @@ bool Shakti::ctr_Course(void)
             else if (err < (-90) && var.cmd_theta[0] > (tLo))
                 err += 360;
         }
-        if (apcfg.type == type_helicopter && apcfg.heli_topt && fabs(err) > 90) {
+        if (apcfg.type == type_helicopter && apcfg.heli_topt && std::abs(err) > 90) {
             if (apcfg.heli_rotor == heli_rotor_CW)
                 err -= 360;
             else
@@ -1640,7 +1640,7 @@ bool Shakti::ctr_VSpeed(void)
             //alternative vs control
             //err=(var.vspeed*var.vspeed-var.cmd_vspeed*var.cmd_vspeed)/(apcfg.ld_tdAlt/2);
             _var_float err_s = err;
-            _var_float Kc = cos(var.theta[0] * D2R) * cos(var.theta[1] * D2R);
+            _var_float Kc = std::cos(var.theta[0] * D2R) * std::cos(var.theta[1] * D2R);
             err = (err + 10.0) / Kc + var.acc[2]; //vel;
             vel = 0;                              //var.denergy;
             //var.user1=var.denergy;
@@ -1822,10 +1822,10 @@ bool Shakti::ctr_Airspeed(void)
     _var_float cmd = cmd_airspeed_dyn / 100.0;
     switch (apcfg.type) {
     case type_airplane: {
-        //protect stall speed from roll stall(correct)=stall*sqrt(1/cos(cmd_roll))
+        //protect stall speed from roll stall(correct)=stall*std::sqrt(1/std::cos(cmd_roll))
         if (apcfg.spd_stall > 0 && apcfg.spd_stall < apcfg.spd_cruise) {
             _var_float vmin = apcfg.spd_stall
-                              * sqrt(1.0 / cos(var.limit(var.cmd_theta[0], -80, 80) * D2R));
+                              * std::sqrt(1.0 / std::cos(var.limit(var.cmd_theta[0], -80, 80) * D2R));
             if (cmd < vmin)
                 cmd = vmin;
         }
@@ -1881,8 +1881,8 @@ bool Shakti::ctr_Slip(void)
         reg_Slip.gain[2] = Ktas;
         vel -= var.limit(err * apcfg.Slip.Kp, apcfg.Slip.Lp);
         if (var.cmd_airspeed > 0)
-            vel -= R2D * 9.81 * tan(var.cmd_theta[0] * D2R)
-                   / (var.cmd_airspeed / get_gain_tas()); //*cos(var.theta[0]*D2R)
+            vel -= R2D * 9.81 * std::tan(var.cmd_theta[0] * D2R)
+                   / (var.cmd_airspeed / get_gain_tas()); //*std::cos(var.theta[0]*D2R)
         v = -reg_Slip.stepPPI(0, vel, dt) / 100.0 + var.rc_yaw;
     }
 
@@ -1909,7 +1909,7 @@ bool Shakti::ctr_HoverY(void)
     _var_float vel = var.vXY[1] - var.rc_roll * 10.0;
     set_roll(-reg_HoverY.step(err, vel, dt), true, apcfg.dyn_roll * 2.0);
     if ((var.cmode & cmode_hyaw) && apcfg.heli_hYaw > 0
-        && fabs(var.cmd_theta[0]) > apcfg.heli_hYaw) {
+        && std::abs(var.cmd_theta[0]) > apcfg.heli_hYaw) {
         if (var.cmd_theta[0] > 0)
             var.cmd_course += 5.0 * dt;
         else
@@ -1974,8 +1974,8 @@ _var_float Shakti::get_gain_tas()
         alt = 0;
     else if (alt > 35000.0)
         alt = 35000.0;
-    _var_float tas = sqrtf(powf(1.0 - 0.00002257 * alt, 4.255));
-    if (isinf(tas) || isnan(tas))
+    _var_float tas = std::sqrt(std::pow(1.0 - 0.00002257 * alt, 4.255));
+    if (std::isinf(tas) || std::isnan(tas))
         tas = 0.001;
 
     _var_float k = tas * apcfg.spd_cruise / speed;
@@ -1993,7 +1993,7 @@ _var_float Shakti::get_gain_stab(_var_float Ks_slw)
     if (Ks_slw == 0 || Ks_slw > 1 || Ks_slw < -1)
         return 1.0;
     _var_float stab = var.limit(var.stab, 0, 1);
-    return 1.0 - (1.0 - Ks_slw) / 2.0 * (1.0 - cos((2.0 * PI) / (1.0 + stab)));
+    return 1.0 - (1.0 - Ks_slw) / 2.0 * (1.0 - std::cos((2.0 * PI) / (1.0 + stab)));
 }
 //==============================================================================
 //==============================================================================
@@ -2005,7 +2005,7 @@ void Shakti::set_ail(_var_float v)
 void Shakti::set_elv(_var_float v, bool doMix)
 {
     if (doMix)
-        v += var.limit(get_gain(var.airspeed, 0, apcfg.Ks_elevator_high) * fabs(var.cmd_theta[0])
+        v += var.limit(get_gain(var.airspeed, 0, apcfg.Ks_elevator_high) * std::abs(var.cmd_theta[0])
                            * apcfg.mix_elv_Kp,
                        apcfg.mix_elv_Lo)
              / 100.0; //mix to roll
@@ -2034,7 +2034,7 @@ void Shakti::set_rud(_var_float v, bool doMix)
     if (apcfg.type == type_helicopter) {
         if (doMix) {
             _var_float Ks = get_gain_rpm(apcfg.Ks_rudder_rpm);
-            v += var.limit(Ks * fabs(var.ctr_collective) * apcfg.mix_crud_Kp, apcfg.mix_crud_Lo)
+            v += var.limit(Ks * std::abs(var.ctr_collective) * apcfg.mix_crud_Kp, apcfg.mix_crud_Lo)
                  / 100.0; //mix to collective
         }
         v = var.limit(v, 1.0);
@@ -2150,7 +2150,7 @@ void Shakti::set_airspeed(_var_float v)
 //==============================================================================
 void Shakti::ctr_smooth(_var_float *v, _var_float vSet, _var_float speed)
 {
-    if (isinf(vSet) || isnan(vSet))
+    if (std::isinf(vSet) || std::isnan(vSet))
         vSet = 0;
     _var_float delta = vSet - *v;
     _var_float rstep = speed * dt;
@@ -2308,9 +2308,9 @@ void Shakti::check_config(void)
 //==============================================================================
 _var_float REG_PID::step(_var_float err, _var_float vel, _var_float dt)
 {
-    if (isinf(err) || isnan(err))
+    if (std::isinf(err) || std::isnan(err))
         err = 0;
-    if (isinf(vel) || isnan(vel))
+    if (std::isinf(vel) || std::isnan(vel))
         vel = 0;
     out = var.limit(cfg->Kp * gain[0] * err, cfg->Lp) + var.limit(cfg->Kd * gain[1] * vel, cfg->Ld)
           + sum;
@@ -2323,9 +2323,9 @@ _var_float REG_PID::step(_var_float err, _var_float vel, _var_float dt)
 }
 _var_float REG_PID::stepPPI(_var_float err, _var_float vel, _var_float dt)
 {
-    if (isinf(err) || isnan(err))
+    if (std::isinf(err) || std::isnan(err))
         err = 0;
-    if (isinf(vel) || isnan(vel))
+    if (std::isinf(vel) || std::isnan(vel))
         vel = 0;
     err = err * cfg->Kp * gain[0];
     if (cfg->Lp != 255)
@@ -2342,9 +2342,9 @@ _var_float REG_PID::stepPPI(_var_float err, _var_float vel, _var_float dt)
 _var_float REG_PID::stepPPI_elv(_var_float err, _var_float vel, _var_float dt)
 {
     //limit error for integral
-    if (isinf(err) || isnan(err))
+    if (std::isinf(err) || std::isnan(err))
         err = 0;
-    if (isinf(vel) || isnan(vel))
+    if (std::isinf(vel) || std::isnan(vel))
         vel = 0;
     err = err * cfg->Kp * gain[0];
     if (cfg->Lp != 255)
@@ -2363,9 +2363,9 @@ _var_float REG_PID::stepPPI_elv(_var_float err, _var_float vel, _var_float dt)
 _var_float REG_PID::stepPPI_ail(_var_float err, _var_float vel, _var_float dt)
 {
     //limit error for integral
-    if (isinf(err) || isnan(err))
+    if (std::isinf(err) || std::isnan(err))
         err = 0;
-    if (isinf(vel) || isnan(vel))
+    if (std::isinf(vel) || std::isnan(vel))
         vel = 0;
     err = err * cfg->Kp * gain[0];
     if (cfg->Lp != 255)
@@ -2383,7 +2383,7 @@ _var_float REG_PID::stepPPI_ail(_var_float err, _var_float vel, _var_float dt)
 }
 _var_float REG_PI::step(_var_float err, _var_float dt)
 {
-    if (isinf(err) || isnan(err))
+    if (std::isinf(err) || std::isnan(err))
         err = 0;
     out = var.limit(cfg->Kp * err, cfg->Lp) + sum;
     if (cfg->Ki == 0)
@@ -2395,7 +2395,7 @@ _var_float REG_PI::step(_var_float err, _var_float dt)
 }
 _var_float REG_TPI::step(_var_float err, _var_float dt)
 {
-    if (isinf(err) || isnan(err))
+    if (std::isinf(err) || std::isnan(err))
         err = 0;
     if (cfg->Ki == 0)
         sum = 0;
@@ -2406,15 +2406,15 @@ _var_float REG_TPI::step(_var_float err, _var_float dt)
 }
 _var_float REG_P::step(_var_float err)
 {
-    if (isinf(err) || isnan(err))
+    if (std::isinf(err) || std::isnan(err))
         err = 0;
     return var.limit(cfg->Kp * err, cfg->Lo);
 }
 _var_float REG_PPI::step(_var_float err, _var_float vel, _var_float dt)
 {
-    if (isinf(err) || isnan(err))
+    if (std::isinf(err) || std::isnan(err))
         err = 0;
-    if (isinf(vel) || isnan(vel))
+    if (std::isinf(vel) || std::isnan(vel))
         vel = 0;
     err = err * cfg->Kpp;
     if (cfg->Lpp != 255)

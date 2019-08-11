@@ -1,7 +1,6 @@
 #ifndef _filters_h
 #define _filters_h
 #include <Mandala/MatrixMath.h>
-#include <math.h>
 #include <inttypes.h>
 //=============================================================================
 #define FLT_CHECK_NAN
@@ -73,7 +72,7 @@ private:
     float bound(float v, float span) const
     {
         const float dspan = span * 2.0;
-        return v - floorf(v / dspan + 0.5) * dspan;
+        return v - std::floor(v / dspan + 0.5) * dspan;
     }
 };
 //=============================================================================
@@ -180,7 +179,7 @@ private:
     {
         float s, r;
         s = avg(k);
-        r = (2 * K) / sqrtf(2 * k + 1);
+        r = (2.0f * K) / std::sqrt(2.0f * k + 1.0f);
         interval[0] = s - r;
         interval[1] = s + r;
     }

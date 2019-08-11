@@ -2,8 +2,8 @@
 
 #include "time_ms.h"
 
+#include <cmath>
 #include <dmsg.h>
-#include <math.h>
 //==============================================================================
 extern Mandala var;
 //==============================================================================
@@ -178,7 +178,7 @@ void Shiva::WPT(void)
         break;
     case mtype_line:
         bReached = flytoLine(var.cmd_NE);
-        if ((!bReached) && (fabs(var.boundAngle(var.tgHDG - var.wpHDG)) > 90))
+        if ((!bReached) && (std::abs(var.boundAngle(var.tgHDG - var.wpHDG)) > 90))
             var.mtype = mtype_hdg;
         break;
     }
@@ -296,8 +296,8 @@ void Shiva::STBY(void)
             }
         }
     } else { //airplane
-        var.turnR = mission.current.turnR + var.rwAdj * (fabs(mission.current.turnR) * 0.5);
-        flytoCircle(var.cmd_NE, fabs(var.turnR), var.turnR < 0);
+        var.turnR = mission.current.turnR + var.rwAdj * (std::abs(mission.current.turnR) * 0.5);
+        flytoCircle(var.cmd_NE, std::abs(var.turnR), var.turnR < 0);
         //thermals
         if (var.turnR == 0 && (!mission.current.pi) && apcfg.type == type_airplane
             && ctr_Thermal()) {
@@ -310,7 +310,7 @@ void Shiva::STBY(void)
             return;
         }
         //count loops
-        if (fabs(var.boundAngle(cSpan - var.wpHDG)) >= 90) {
+        if (std::abs(var.boundAngle(cSpan - var.wpHDG)) >= 90) {
             cSpan = var.wpHDG;
             turnsVE++;
             if (turnsVE >= 4) {
@@ -339,9 +339,9 @@ void Shiva::STBY(void)
         else
             var.ETA = 0;
     } else { //loops
-        _var_float dist = fabs(var.turnR) * (2.0 * PI);
+        _var_float dist = std::abs(var.turnR) * (2.0 * PI);
         var.dWPT = dist * var.loops
-                   + dist * (360.0 - (fabs(var.boundAngle(cSpan - var.wpHDG)) + turnsVE * 90.0))
+                   + dist * (360.0 - (std::abs(var.boundAngle(cSpan - var.wpHDG)) + turnsVE * 90.0))
                          / 360.0;
         calcETA(var.dWPT, var.cmd_airspeed * var.cas2tas, false);
     }
@@ -1193,7 +1193,7 @@ uint32_t Shiva::LANDING_fixedwing(uint32_t stage)
         get_landing_length(ers_landing ? apcfg.ld_flareAlt : 0);
         //check if on circle side
         Point ne = rwNE - var.pos_NE;
-        _var_float rwDelta = var.distance(ne) * sin((var.heading(ne) + 180.0 - rwHDG) * D2R);
+        _var_float rwDelta = var.distance(ne) * std::sin((var.heading(ne) + 180.0 - rwHDG) * D2R);
         bool bSideOk = rwLeft ? (rwDelta < 0) : (rwDelta > 0);
         //var.user2=rwDelta;
         if (var.delta > (vLE_est * 0.5) || (!bSideOk)) { //loiter to descend
@@ -1207,8 +1207,8 @@ uint32_t Shiva::LANDING_fixedwing(uint32_t stage)
                 var.cmd_altitude = vf > vs ? vf : vs; //max
             }
         } else if (var.delta > 0 && (var.dWPT - cR) < (cR))
-            stage++; //cSpan>200 && fabs(var.dWPT-cR)<(cR) &&
-        flytoCircle(var.cmd_NE, fabs(var.turnR), rwLeft, false);
+            stage++; //cSpan>200 && std::abs(var.dWPT-cR)<(cR) &&
+        flytoCircle(var.cmd_NE, std::abs(var.turnR), rwLeft, false);
         navigate();
         reg_AirbrkApp.reset((var.ctr_airbrk - apcfg.ld_Airbrk_bias) * 100.0);
         reg_AirbrkDS.reset((var.ctr_airbrk - apcfg.ld_Airbrk_bias) * 100.0);
@@ -1264,7 +1264,7 @@ uint32_t Shiva::LANDING_fixedwing(uint32_t stage)
         //calc delta
         vLE_total = (var.altitude - var.cmd_altitude) * var.ldratio;
         _var_float dWP = var.dWPT;
-        if (fabs(var.boundAngle(var.wpHDG - rwHDG)) > 90)
+        if (std::abs(var.boundAngle(var.wpHDG - rwHDG)) > 90)
             dWP = -dWP;
         vLE_est = dWP / var.wind_triangle(rwHDG);
         setDelta(vLE_total - vLE_est);
@@ -1277,7 +1277,7 @@ uint32_t Shiva::LANDING_fixedwing(uint32_t stage)
                           || var.delta
                                  > (var.cmd_airspeed * -7.0); //check delta on second half only
                     bOk &= dWP > (appLength * 0.3)
-                           || fabs(var.rwDelta + var.rwAdj) < 20; //check alignment
+                           || std::abs(var.rwDelta + var.rwAdj) < 20; //check alignment
                     bOk &= ers_landing
                            || var.altitude
                                   > apcfg.ld_flareAlt; // || var.delta>(var.cmd_airspeed*-7.0);
@@ -1356,7 +1356,7 @@ uint32_t Shiva::LANDING_fixedwing(uint32_t stage)
                     set_pitch(apcfg.ld_flarePitch);
             } else { //wait until stabilize
                 if ( //(apcfg.ld_runGy==0||var.gyro.mag()<apcfg.ld_runGy) &&
-                    (apcfg.ld_flareDS == 0 || fabs(var.vspeed) < apcfg.ld_flareDS)
+                    (apcfg.ld_flareDS == 0 || std::abs(var.vspeed) < apcfg.ld_flareDS)
                     && (apcfg.ld_runAz == 0 || var.acc.mag() < (9.81 + apcfg.ld_runAz))) {
                     if ((t - time_s) > 3000) {
                         stage++;
@@ -1423,7 +1423,7 @@ uint32_t Shiva::LANDING_fixedwing(uint32_t stage)
         //calc delta
         vLE_total = var.altitude * var.ldratio;
         delta = var.dWPT;
-        if (fabs(var.boundAngle(var.wpHDG - rwHDG)) > 90)
+        if (std::abs(var.boundAngle(var.wpHDG - rwHDG)) > 90)
             delta = -delta;
         setDelta(vLE_total - delta / var.wind_triangle(rwHDG));
 
@@ -1471,7 +1471,7 @@ uint32_t Shiva::LANDING_fixedwing(uint32_t stage)
         if (ers_landing) {
             set_roll(0);
             ctr_Airspeed();
-            if (fabs(var.vspeed) < 3) {
+            if (std::abs(var.vspeed) < 3) {
                 if (apcfg.ld_runAz >= 0 && var.acc.mag() >= (9.81 + apcfg.ld_runAz)
                     && (t - time_s) > 200)
                     stage++;
@@ -1511,7 +1511,7 @@ uint32_t Shiva::LANDING_fixedwing(uint32_t stage)
             if (var.airspeed > apcfg.ld_runSpeed) {
                 if (apcfg.ld_runAz > 0 && var.acc[2] <= -(9.81 + apcfg.ld_runAz)) {
                     //if(apcfg.ld_runGy<5)stage++;
-                    //else if(fabs(var.gyro[1])>=apcfg.ld_runGy)stage++;
+                    //else if(std::abs(var.gyro[1])>=apcfg.ld_runGy)stage++;
                 } else
                     time_s = t;
             }
@@ -1624,7 +1624,7 @@ uint32_t Shiva::LANDING_helicopter(uint32_t stage)
         navigate();
         //check if hover stabilized
         if (var.cmode & cmode_hover && var.dWPT <= apcfg.ld_maxRun && var.gSpeed < 1
-            && fabs(var.boundAngle(var.theta[2] - var.cmd_theta[2])) < 30)
+            && std::abs(var.boundAngle(var.theta[2] - var.cmd_theta[2])) < 30)
             stage++;
     } break;
     case LANDING_stage::App: {
@@ -1969,7 +1969,7 @@ void Shiva::get_landing_length(_var_float gnd_altitude)
     //var.user1=way;
     //arc way
     _var_float arc_way = var.wind_circle(arc_start,
-                                         rwLeft ? -fabs(cSpan) : fabs(cSpan),
+                                         rwLeft ? -std::abs(cSpan) : std::abs(cSpan),
                                          cR); //circle arc
     way += arc_way;
     app_Kwt = var.wind_triangle(rwHDG);
@@ -1988,7 +1988,7 @@ void Shiva::setDelta(_var_float delta)
         var.delta = delta;
     } else {
         delta_kf.step(delta, &(var.delta), 0.1, 15);
-        if (isinf(var.delta) || isnan(var.delta)) {
+        if (std::isinf(var.delta) || std::isnan(var.delta)) {
             delta_kf.reset(delta);
             var.delta = delta;
         }
@@ -2005,14 +2005,14 @@ Point Shiva::find_landing_tangent(void)
     const Point dp = p - c;
     if (var.distance(dp) <= R * 1.5) {
         _var_float a = (var.heading(dp, true) + (rwLeft ? 30 : -30)) * D2R;
-        tp = c + R * Point(sin(a), cos(a));
+        tp = c + R * Point(std::sin(a), std::cos(a));
     } else {
         _var_float Xc = c[1], Yc = c[0], Xo = p[1], Yo = p[0];
         _var_float A, B, C, k1, R2 = R * R;
         A = 2 * Xc * Xo - Xc * Xc + R2 - Xo * Xo;
         B = Xc * Yc - Xc * Yo + Yo * Xo - Xo * Yc;
         C = R2 - Yc * Yc - Yo * Yo + 2 * Yc * Yo;
-        k1 = (-B + sqrt(B * B - A * C)) / A; //k2=-(-B+sqrt(B*B-A*C))/A;
+        k1 = (-B + std::sqrt(B * B - A * C)) / A; //k2=-(-B+std::sqrt(B*B-A*C))/A;
         if (!rwLeft)
             k1 = -k1;
         tp[1] = (Xc + k1 * (Yc + k1 * Xo - Yo)) / (k1 * k1 + 1);

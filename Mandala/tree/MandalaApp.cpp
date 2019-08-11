@@ -302,29 +302,29 @@ void MandalaApp::sleep(uint ms)
 //=============================================================================
 QString MandalaApp::latToString(double v)
 {
-    double lat = fabs(v);
-    double lat_m = 60 * (lat - floor(lat)), lat_s = 60 * (lat_m - floor(lat_m)),
-           lat_ss = 100 * (lat_s - floor(lat_s));
+    double lat = std::abs(v);
+    double lat_m = 60 * (lat - std::floor(lat)), lat_s = 60 * (lat_m - std::floor(lat_m)),
+           lat_ss = 100 * (lat_s - std::floor(lat_s));
     return QString().sprintf("%c %g%c%02g'%02g.%02g\"",
                              (v >= 0) ? 'N' : 'S',
-                             floor(lat),
+                             std::floor(lat),
                              176,
-                             floor(lat_m),
-                             floor(lat_s),
-                             floor(lat_ss));
+                             std::floor(lat_m),
+                             std::floor(lat_s),
+                             std::floor(lat_ss));
 }
 QString MandalaApp::lonToString(double v)
 {
-    double lat = fabs(v);
-    double lat_m = 60 * (lat - floor(lat)), lat_s = 60 * (lat_m - floor(lat_m)),
-           lat_ss = 100 * (lat_s - floor(lat_s));
+    double lat = std::abs(v);
+    double lat_m = 60 * (lat - std::floor(lat)), lat_s = 60 * (lat_m - std::floor(lat_m)),
+           lat_ss = 100 * (lat_s - std::floor(lat_s));
     return QString().sprintf("%c %g%c%02g'%02g.%02g\"",
                              (v >= 0) ? 'E' : 'W',
-                             floor(lat),
+                             std::floor(lat),
                              176,
-                             floor(lat_m),
-                             floor(lat_s),
-                             floor(lat_ss));
+                             std::floor(lat_m),
+                             std::floor(lat_s),
+                             std::floor(lat_ss));
 }
 double MandalaApp::latFromString(QString s)
 {
@@ -387,7 +387,7 @@ uint MandalaApp::timeFromString(QString s)
         bool ok = false;
         double dv = ds.toDouble(&ok);
         if (ok && dv > 0)
-            t += floor(dv * (double) (24 * 60 * 60));
+            t += std::floor(dv * (double) (24 * 60 * 60));
     }
     if (s.contains('h')) {
         QString ds = s.left(s.indexOf('h')).trimmed();
@@ -395,7 +395,7 @@ uint MandalaApp::timeFromString(QString s)
         bool ok = false;
         double dv = ds.toDouble(&ok);
         if (ok && dv > 0)
-            t += floor(dv * (double) (60 * 60));
+            t += std::floor(dv * (double) (60 * 60));
     }
     if (s.contains('m')) {
         QString ds = s.left(s.indexOf('m')).trimmed();
@@ -403,7 +403,7 @@ uint MandalaApp::timeFromString(QString s)
         bool ok = false;
         double dv = ds.toDouble(&ok);
         if (ok && dv > 0)
-            t += floor(dv * (double) (60));
+            t += std::floor(dv * (double) (60));
     }
     if (s.contains('s')) {
         QString ds = s.left(s.indexOf('s')).trimmed();
@@ -411,7 +411,7 @@ uint MandalaApp::timeFromString(QString s)
         bool ok = false;
         double dv = ds.toDouble(&ok);
         if (ok && dv > 0)
-            t += floor(dv);
+            t += std::floor(dv);
         s.clear();
     }
     if (s.contains(':')) {
@@ -420,19 +420,19 @@ uint MandalaApp::timeFromString(QString s)
         bool ok = false;
         double dv = ds.toDouble(&ok);
         if (ok && dv > 0)
-            t += floor(dv * (double) (60 * 60));
+            t += std::floor(dv * (double) (60 * 60));
         if (s.contains(':')) {
             QString ds = s.left(s.indexOf(':')).trimmed();
             s = s.remove(0, s.indexOf(':') + 1).trimmed();
             bool ok = false;
             double dv = ds.toDouble(&ok);
             if (ok && dv > 0)
-                t += floor(dv * (double) (60));
+                t += std::floor(dv * (double) (60));
         } else {
             bool ok = false;
             double dv = s.toDouble(&ok);
             if (ok && dv > 0)
-                t += floor(dv * (double) (60));
+                t += std::floor(dv * (double) (60));
             s.clear();
         }
     }
@@ -440,7 +440,7 @@ uint MandalaApp::timeFromString(QString s)
         bool ok = false;
         double dv = s.toDouble(&ok);
         if (ok && dv > 0)
-            t += floor(dv);
+            t += std::floor(dv);
     }
     return t;
 }

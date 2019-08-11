@@ -23,74 +23,19 @@
 #ifndef MATRIXMATH_H
 #define MATRIXMATH_H
 //#include <iostream>
-#include <math.h>
+#include <cmath>
 //=============================================================================
 namespace matrixmath {
 #ifdef USE_FLOAT_TYPE
 typedef float _mat_float;
-#define cos cosf
-#define sin sinf
-#define acos acosf
-#define asin asinf
-#define atan atanf
-#define atan2 atan2f
-#define sqrt sqrtf
-#define pow powf
-#define floor floorf
-#ifdef _VSTD
-//#define fabs std::abs
-#else
-//#define fabs fabsf
-#endif
 #else
 typedef double _mat_float;
 #endif
 typedef int index_t;
 //=============================================================================
-//std lib fixes
-//#define MATH_CHECK_NAN
-static inline bool f_isnan(const _mat_float &value)
+static inline bool f_isvalid(const _mat_float &value)
 {
-#ifdef __APPLE__
-    return isnan(value);
-#else
-#ifndef isnan
-    return std::isnan(value);
-#else
-#ifdef __arm__
-    return isnan(value);
-#else
-    return isnan(value);
-#endif
-#endif
-#endif
-}
-static inline bool f_isinf(const _mat_float &value)
-{
-#ifdef __APPLE__
-    return isnan(value);
-#else
-#ifndef isinf
-    return std::isinf(value);
-#else
-#ifdef __arm__
-    return isinf(value);
-#else
-    return isinf(value);
-#endif
-#endif
-#endif
-}
-static inline bool f_isvalid(const _mat_float value)
-{
-    return !(f_isnan(value) || f_isinf(value));
-}
-static inline bool f_fixNAN(_mat_float *value)
-{
-    if (f_isvalid(*value))
-        return false;
-    (*value) = 0;
-    return true;
+    return !(std::isnan(value) || std::isinf(value));
 }
 //=============================================================================
 #if defined(USE_FLOAT_TYPE) && (!defined(MANDALA_FULL))
@@ -194,12 +139,12 @@ public:
     }
     /*bool isWithin(const T &value){
     for (index_t i=0 ; i < n ; i++)
-      if(fabs((*this)[i])>value)return false;
+      if(std::abs((*this)[i])>value)return false;
     return true;
   }
   bool isWithin(const Vector &cmp){
     for (index_t i=0 ; i < n ; i++)
-      if(fabs((*this)[i])>cmp[i])return false;
+      if(std::abs((*this)[i])>cmp[i])return false;
     return true;
   }*/
 
@@ -214,7 +159,7 @@ public:
     bool operator!=(const Vector &cmp) const { return !((*this) == cmp); }
     //Magnitude
     inline const T mag2() const { return (*this) * (*this); }
-    inline const T mag() const { return sqrt(this->mag2()); }
+    inline const T mag() const { return std::sqrt(this->mag2()); }
 
     //add vectors
     inline const Vector operator+(const Vector &that) const { return Vector(*this) += that; }
@@ -318,7 +263,7 @@ public:
     {
         const _mat_float dspan = span * 2.0;
         for (index_t i = 0; i < n; i++) {
-            (*this)[i] = (*this)[i] - floor((*this)[i] / dspan + 0.5) * dspan;
+            (*this)[i] = (*this)[i] - std::floor((*this)[i] / dspan + 0.5) * dspan;
         }
         fixNAN(this);
         return (*this);
@@ -555,7 +500,7 @@ public:
                              Matrix<3, 3> &tmp2)
     {
         const _mat_float eps2 = eps * eps;
-        const _mat_float eta = eps2 >= 1 ? 0 : sqrt(1 - eps2);
+        const _mat_float eta = eps2 >= 1 ? 0 : std::sqrt(1 - eps2);
         Matrix<3, 3> &W(*this);
         if (eta != 0) {
             tmp.eulerWx(v * (-2.0 / eta));
@@ -578,7 +523,7 @@ public:
     /*void Wmtrx(const Vector<3> &eps,const Vector<3> &v)
   {
     const _mat_float eps2=eps*eps;
-    const _mat_float eta=eps2>=1?0:sqrt(1-eps2);
+    const _mat_float eta=eps2>=1?0:std::sqrt(1-eps2);
     Matrix<3,3> &W(*this);
     Matrix<3,3> tmp;//=eulerWx(v);
     const _mat_float & p = v[0];
@@ -635,7 +580,7 @@ public:
             const Vector<m, T> &A_i(A[i]);
             v = v + A_i.mag2();
         }
-        return sqrt(v);
+        return std::sqrt(v);
     }
     // Make a square identity matrix
     void eye(const T &value = T(1))
@@ -894,8 +839,8 @@ public:
     Quat(const Vector<3> &axis, _mat_float angle)
     {
         _mat_float angle2 = angle / 2.0;
-        _mat_float s = sin(angle2);
-        (*this)[0] = cos(angle2);
+        _mat_float s = std::sin(angle2);
+        (*this)[0] = std::cos(angle2);
         (*this)[1] = axis[0] * s;
         (*this)[2] = axis[1] * s;
         (*this)[3] = axis[2] * s;
@@ -918,7 +863,7 @@ public:
     Quat &qbuild(const Vector<3> &eps)
     {
         const _mat_float eps2 = 1.0 - eps * eps;
-        const _mat_float eta = eps2 <= 0 ? 0 : sqrt(eps2);
+        const _mat_float eta = eps2 <= 0 ? 0 : std::sqrt(eps2);
         (*this)[0] = eta;
         (*this)[1] = eps[0];
         (*this)[2] = eps[1];
@@ -1036,7 +981,7 @@ public:
 // a - weight
 // r - reference vector   (NED)
 // b - observation vector (BODY)
-// 100,1,[0 0 1]',[cos(decl) sin(decl) 0]',-acc/norm(acc),mag/norm(mag)
+// 100,1,[0 0 1]',[std::cos(decl) std::sin(decl) 0]',-acc/norm(acc),mag/norm(mag)
 //extern const Quat qmethod(const _mat_float &a1,const _mat_float &a2,const Vect &r1,const Vect &r2,const Vect &b1,const Vect &b2);
 
 // For the quaternion differential equation:
@@ -1045,7 +990,7 @@ public:
 
 // Jacobian of Transposed rotation matrix:
 // Returns the partial derivative of  R(q)'*v  with
-// respect to eps, when q = [sqrt(1-eps'*eps); eps].
+// respect to eps, when q = [std::sqrt(1-eps'*eps); eps].
 //extern const Matrix<3,3> Wmtrx(const Vect &eps,const Vect &v);
 
 // For the quaternion differential equation:

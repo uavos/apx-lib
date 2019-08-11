@@ -24,7 +24,6 @@
 #include <string.h>
 
 #include "MandalaCore.h"
-#include "math.h"
 #include "preprocessor.h"
 
 //===========================================================================
@@ -763,7 +762,7 @@ _var_float MandalaCore::inHgToAltitude(_var_float inHg, _var_float inHg_gnd)
 {
     if (inHg_gnd == 0)
         return 0;
-    return (1.0 - powf(inHg / inHg_gnd, 0.1902632)) * 44330.77;
+    return (1.0 - std::pow(inHg / inHg_gnd, 0.1902632)) * 44330.77;
 }
 //=============================================================================
 //=============================================================================

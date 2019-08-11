@@ -23,7 +23,6 @@
 #ifndef MANDALA_CORE_H
 #define MANDALA_CORE_H
 //=============================================================================
-#include <math.h>
 #include <string.h>
 
 #include <inttypes.h>

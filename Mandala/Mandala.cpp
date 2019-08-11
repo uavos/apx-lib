@@ -22,8 +22,8 @@
  */
 #include "Mandala.h"
 //#include "time_ms.h"
+#include <cmath>
 #include <ctype.h>
-#include <math.h>
 #include <stdlib.h>
 //===========================================================================
 Mandala::Mandala()
@@ -246,7 +246,7 @@ void Mandala::calc(void)
     dHome = distance(pos_NE);
     wpHDG = heading(dNE);
     homeHDG = heading(pos_NE, true);
-    rwDelta = dWPT * sin((wpHDG + 180.0 - tgHDG) * D2R) - rwAdj;
+    rwDelta = dWPT * std::sin((wpHDG + 180.0 - tgHDG) * D2R) - rwAdj;
     rwDV = rotate(vel_NE, tgHDG)[1];
     gSpeed = distance(vel_NE);
 }
@@ -254,7 +254,7 @@ void Mandala::calc(void)
 _var_float Mandala::boundAngle(_var_float v, _var_float span)
 {
     const _var_float dspan = span * 2.0;
-    return v - floor(v / dspan + 0.5) * dspan;
+    return v - std::floor(v / dspan + 0.5) * dspan;
 }
 //===========================================================================
 _var_vect Mandala::boundAngle(const _var_vect &v, _var_float span)
@@ -299,7 +299,7 @@ uint32_t Mandala::snap(uint32_t v, uint32_t snapv)
 //===========================================================================
 _var_float Mandala::hyst(_var_float err, _var_float ahyst)
 {
-    if (fabs(err) <= ahyst)
+    if (std::abs(err) <= ahyst)
         return 0.0;
     else
         return err - ((err > 0.0) ? ahyst : -ahyst);
@@ -322,9 +322,9 @@ _var_float Mandala::heading(const _var_point &ne, bool back) const
 _var_float Mandala::heading(const _var_float N, const _var_float E, bool back) const
 {
     if (back)
-        return atan2(-E, -N) * R2D;
+        return std::atan2(-E, -N) * R2D;
     else
-        return atan2(E, N) * R2D;
+        return std::atan2(E, N) * R2D;
 }
 //=============================================================================
 // http://www.movable-type.co.uk/scripts/latlong.html
@@ -336,8 +336,10 @@ _var_float Mandala::bearing(const _var_point &ll1, const _var_point &ll2)
     const _var_float latB = ll2[0] * D2R;
     const _var_float lonB = ll2[1] * D2R;
     const _var_float dLon = lonB - lonA;
-    const _var_float clatB = cos(latB);
-    return R2D * atan2(clatB * sin(dLon), cos(latA) * sin(latB) - sin(latA) * clatB * cos(dLon));
+    const _var_float clatB = std::cos(latB);
+    return R2D
+           * std::atan2(clatB * std::sin(dLon),
+                        std::cos(latA) * std::sin(latB) - std::sin(latA) * clatB * std::cos(dLon));
 }
 //=============================================================================
 _var_float Mandala::distance(const _var_point &ll1, const _var_point &ll2)
@@ -346,10 +348,11 @@ _var_float Mandala::distance(const _var_point &ll1, const _var_point &ll2)
     const _var_float lonA = ll1[1] * D2R;
     const _var_float latB = ll2[0] * D2R;
     const _var_float lonB = ll2[1] * D2R;
-    const _var_float dLat = (latB - latA) / 2.0;
-    const _var_float dLon = (lonB - lonA) / 2.0;
-    const _var_float a = pow(sin(dLat), 2) + cos(latA) * cos(latB) * pow(sin(dLon), 2);
-    const _var_float c = 2.0 * atan2(sqrt(a), sqrt(1 - a));
+    const _var_float dLat = (latB - latA) / 2.0f;
+    const _var_float dLon = (lonB - lonA) / 2.0f;
+    const _var_float a = std::pow(std::sin(dLat), 2.0f)
+                         + std::cos(latA) * std::cos(latB) * std::pow(std::sin(dLon), 2.0f);
+    const _var_float c = 2.0f * std::atan2(std::sqrt(a), std::sqrt(1.0f - a));
     return EARTH_MRADIUS * c; //mean earth radius
 }
 //=============================================================================
@@ -358,7 +361,7 @@ _var_float Mandala::distance(const _var_point &ll1, const _var_point &ll2, const
     const _var_float d13 = distance(ll1, ll) / EARTH_MRADIUS;
     const _var_float b13 = bearing(ll1, ll);
     const _var_float b12 = bearing(ll1, ll2);
-    return EARTH_MRADIUS * asin(sin(d13) * sin(b13 - b12));
+    return EARTH_MRADIUS * std::asin(std::sin(d13) * std::sin(b13 - b12));
 }
 //=============================================================================
 const _var_point Mandala::destination(const _var_point &ll,
@@ -368,12 +371,15 @@ const _var_point Mandala::destination(const _var_point &ll,
     const _var_float latA = ll[0] * D2R;
     const _var_float brng = bearing * D2R;
     const _var_float dR = distance / EARTH_MRADIUS; //6371000.0 mean radius
-    const _var_float slatA = sin(latA);
-    const _var_float clatA = cos(latA);
-    const _var_float sdR = sin(dR);
-    const _var_float cdR = cos(dR);
-    const _var_float latB = asin(slatA * cdR + clatA * sdR * cos(brng));
-    const _var_float lonB = ll[1] + R2D * atan2(sin(brng) * sdR * clatA, cdR - slatA * sin(latB));
+    const _var_float slatA = std::sin(latA);
+    const _var_float clatA = std::cos(latA);
+    const _var_float sdR = std::sin(dR);
+    const _var_float cdR = std::cos(dR);
+    const _var_float latB = std::asin(slatA * cdR + clatA * sdR * std::cos(brng));
+    const _var_float lonB = ll[1]
+                            + R2D
+                                  * std::atan2(std::sin(brng) * sdR * clatA,
+                                               cdR - slatA * std::sin(latB));
     return _var_point(latB * R2D, boundAngle(lonB));
 }
 //=============================================================================
@@ -382,9 +388,9 @@ _var_float Mandala::bearing_rhumb(const _var_point &ll1, const _var_point &ll2)
 {
     const _var_float latA = ll1[0] * D2R;
     const _var_float latB = ll2[0] * D2R;
-    const _var_float dF = log(tan(PI / 4.0 + latB / 2.0) / tan(PI / 4.0 + latA / 2.0));
+    const _var_float dF = log(std::tan(PI / 4.0 + latB / 2.0) / std::tan(PI / 4.0 + latA / 2.0));
     const _var_float dLon = D2R * boundAngle(ll2[1] - ll1[1]);
-    return R2D * atan2(dLon, dF);
+    return R2D * std::atan2(dLon, dF);
 }
 //=============================================================================
 _var_float Mandala::distance_rhumb(const _var_point &ll1, const _var_point &ll2)
@@ -393,9 +399,9 @@ _var_float Mandala::distance_rhumb(const _var_point &ll1, const _var_point &ll2)
     const _var_float latB = ll2[0] * D2R;
     const _var_float dLat = D2R * boundAngle(ll2[0] - ll1[0]);
     const _var_float dLon = D2R * boundAngle(ll2[1] - ll1[1]);
-    const _var_float dF = log(tan(PI / 4.0 + latB / 2.0) / tan(PI / 4.0 + latA / 2.0));
-    const _var_float q = fabs(dF) > 10e-12 ? dLat / dF : cos(latA);
-    return EARTH_MRADIUS * sqrt(pow(dLat, 2) + pow(dLon * q, 2));
+    const _var_float dF = log(std::tan(PI / 4.0 + latB / 2.0) / std::tan(PI / 4.0 + latA / 2.0));
+    const _var_float q = std::abs(dF) > 10e-12 ? dLat / dF : std::cos(latA);
+    return EARTH_MRADIUS * std::sqrt(std::pow(dLat, 2.0f) + std::pow(dLon * q, 2.0f));
 }
 //=============================================================================
 const _var_point Mandala::destination_rhumb(const _var_point &ll,
@@ -406,13 +412,13 @@ const _var_point Mandala::destination_rhumb(const _var_point &ll,
     const _var_float lonA = ll[1] * D2R;
     const _var_float brng = bearing * D2R;
     const _var_float dR = distance / EARTH_MRADIUS;
-    const _var_float dLat = dR * cos(brng);
+    const _var_float dLat = dR * std::cos(brng);
     _var_float latB = latA + dLat;
-    if (fabs(latB) > PI / 2.0)
+    if (std::abs(latB) > PI / 2.0)
         latB = latB > 0 ? PI - latB : -PI - latB;
-    const _var_float dF = log(tan(PI / 4.0 + latB / 2.0) / tan(PI / 4.0 + latA / 2.0));
-    const _var_float q = fabs(dF) > 10e-12 ? dLat / dF : cos(latA);
-    const _var_float dLon = dR * sin(brng) / q;
+    const _var_float dF = log(std::tan(PI / 4.0 + latB / 2.0) / std::tan(PI / 4.0 + latA / 2.0));
+    const _var_float q = std::abs(dF) > 10e-12 ? dLat / dF : std::cos(latA);
+    const _var_float dLon = dR * std::sin(brng) / q;
     const _var_float lonB = lonA + dLon;
     return _var_point(latB * D2R, boundAngle(lonB * D2R));
 }
@@ -425,7 +431,7 @@ _var_float Mandala::distance(const _var_point &ne) const
 //=============================================================================
 _var_float Mandala::distance(const _var_float N, const _var_float E) const
 {
-    return sqrt(sqr(N) + sqr(E));
+    return std::sqrt(sqr(N) + sqr(E));
 }
 //=============================================================================
 const _var_point Mandala::lineDistance(const _var_point p1, const _var_point p2) const
@@ -455,8 +461,8 @@ const _var_point Mandala::rotate(const _var_point &v_in, const _var_float psi) c
 const _var_point Mandala::rotate(const _var_float N, const _var_float E, const _var_float psi) const
 {
     const _var_float psi_r = psi * D2R;
-    _var_float cos_theta = cos(psi_r);
-    _var_float sin_theta = sin(psi_r);
+    _var_float cos_theta = std::cos(psi_r);
+    _var_float sin_theta = std::sin(psi_r);
     return _var_point(N * cos_theta + E * sin_theta, E * cos_theta - N * sin_theta);
 }
 //===========================================================================
@@ -471,12 +477,12 @@ const _var_vect Mandala::rotate(const _var_vect &v_in, const _var_vect &atheta)
     /*const _var_float phi=atheta[0]*D2R;
   const _var_float the=atheta[1]*D2R;
   const _var_float psi=atheta[2]*D2R;
-  const _var_float cpsi=cos(psi);
-  const _var_float cphi=cos(phi);
-  const _var_float ctheta=cos(the);
-  const _var_float spsi=sin(psi);
-  const _var_float sphi=sin(phi);
-  const _var_float stheta=sin(the);
+  const _var_float cpsi=std::cos(psi);
+  const _var_float cphi=std::cos(phi);
+  const _var_float ctheta=std::cos(the);
+  const _var_float spsi=std::sin(psi);
+  const _var_float sphi=std::sin(phi);
+  const _var_float stheta=std::sin(the);
   _var_vect eulerDC[3]={_var_vect(cpsi*ctheta,spsi*ctheta,-stheta),
                    _var_vect(-spsi*cphi + cpsi*stheta*sphi,cpsi*cphi + spsi*stheta*sphi,ctheta*sphi),
                    _var_vect(spsi*sphi + cpsi*stheta*cphi,-cpsi*sphi + spsi*stheta*cphi,ctheta*cphi)
@@ -496,12 +502,12 @@ const _var_vect Mandala::rotate(const _var_vect &v_in, const _var_vect &atheta)
             const _var_float phi = atheta[0] * D2R;
             const _var_float the = atheta[1] * D2R;
             const _var_float psi = atheta[2] * D2R;
-            const _var_float cpsi = cos(psi);
-            const _var_float cphi = cos(phi);
-            const _var_float ctheta = cos(the);
-            const _var_float spsi = sin(psi);
-            const _var_float sphi = sin(phi);
-            const _var_float stheta = sin(the);
+            const _var_float cpsi = std::cos(psi);
+            const _var_float cphi = std::cos(phi);
+            const _var_float ctheta = std::cos(the);
+            const _var_float spsi = std::sin(psi);
+            const _var_float sphi = std::sin(phi);
+            const _var_float stheta = std::sin(the);
             const _var_float spsi_stheta = spsi * stheta;
             const _var_float cpsi_stheta = cpsi * stheta;
             rotate_DC[0][0] = cpsi * ctheta;
@@ -576,10 +582,10 @@ const _var_point Mandala::ECEF2Tangent(const _var_vect &ECEF,
                                        const _var_float longitude) const
 {
     const _var_float lat_r = latitude * D2R, lon_r = longitude * D2R;
-    _var_float clat = cos(lat_r);
-    _var_float clon = cos(lon_r);
-    _var_float slat = sin(lat_r);
-    _var_float slon = sin(lon_r);
+    _var_float clat = std::cos(lat_r);
+    _var_float clon = std::cos(lon_r);
+    _var_float slat = std::sin(lat_r);
+    _var_float slon = std::sin(lon_r);
     _var_float Re2t[2][3];
 
     Re2t[0][0] = -slat * clon;
@@ -607,10 +613,10 @@ const _var_vect Mandala::Tangent2ECEF(const _var_point &ne,
                                       const _var_float longitude) const
 {
     const _var_float lat_r = latitude * D2R, lon_r = longitude * D2R;
-    _var_float clat = cos(lat_r);
-    _var_float clon = cos(lon_r);
-    _var_float slat = sin(lat_r);
-    _var_float slon = sin(lon_r);
+    _var_float clat = std::cos(lat_r);
+    _var_float clon = std::cos(lon_r);
+    _var_float slat = std::sin(lat_r);
+    _var_float slon = std::sin(lon_r);
     _var_float Rt2e[3][2];
     Rt2e[0][0] = -slat * clon;
     Rt2e[1][0] = -slat * slon;
@@ -642,16 +648,16 @@ const _var_point Mandala::ECEF2ll(const _var_vect &ECEF) const
     const _var_float Y = ECEF[1];
     const _var_float Z = ECEF[2];
     const _var_float f = (C_WGS84_a - C_WGS84_b) / C_WGS84_a;
-    const _var_float e = sqrt(2 * f - f * f);
+    const _var_float e = std::sqrt(2 * f - f * f);
     _var_float h = 0;
     _var_float N = C_WGS84_a;
     _var_point ll;
-    ll[1] = atan2(Y, X);
+    ll[1] = std::atan2(Y, X);
     for (int n = 0; n < 50; ++n) {
         _var_float sin_lat = Z / (N * (1 - sqr(e)) + h);
-        ll[0] = atan((Z + e * e * N * sin_lat) / sqrt(X * X + Y * Y));
-        N = C_WGS84_a / sqrt(1 - sqr(e) * sqr(sin(ll[0])));
-        h = sqrt(X * X + Y * Y) / cos(ll[0]) - N;
+        ll[0] = std::atan((Z + e * e * N * sin_lat) / std::sqrt(X * X + Y * Y));
+        N = C_WGS84_a / std::sqrt(1 - sqr(e) * sqr(std::sin(ll[0])));
+        h = std::sqrt(X * X + Y * Y) / std::cos(ll[0]) - N;
     }
     //ll[2]=h;
     return ll * R2D;
@@ -660,14 +666,14 @@ const _var_point Mandala::ECEF2ll(const _var_vect &ECEF) const
 const _var_vect Mandala::llh2ECEF(const _var_vect &llh) const
 {
     const _var_float lat_r = llh[0] * D2R, lon_r = llh[1] * D2R, hmsl = llh[2];
-    const _var_float clat = cos(lat_r);
-    const _var_float slat = sin(lat_r);
+    const _var_float clat = std::cos(lat_r);
+    const _var_float slat = std::sin(lat_r);
     const _var_float f = (C_WGS84_a - C_WGS84_b) / C_WGS84_a;
-    const _var_float e = sqrt(2 * f - f * f);
-    const _var_float N = C_WGS84_a / sqrt(1 - e * e * sqr(slat));
+    const _var_float e = std::sqrt(2 * f - f * f);
+    const _var_float N = C_WGS84_a / std::sqrt(1 - e * e * sqr(slat));
     _var_vect ECEF;
-    ECEF[0] = (N + hmsl) * clat * cos(lon_r);
-    ECEF[1] = (N + hmsl) * clat * sin(lon_r);
+    ECEF[0] = (N + hmsl) * clat * std::cos(lon_r);
+    ECEF[1] = (N + hmsl) * clat * std::sin(lon_r);
     ECEF[2] = (N * (1 - e * e) + hmsl) * slat;
     return ECEF;
 }
@@ -679,9 +685,9 @@ _var_float Mandala::wind_triangle(_var_float crs) const
         return 0.0001;
     const _var_float wnd_r = (windHdg) *D2R;
     const _var_float Kvel = windSpd / spd;
-    const _var_float aWTA = crs * D2R - wnd_r; //fabs??
-    const _var_float aWCA = asin(Kvel * sin(aWTA));
-    const _var_float kWS = cos(aWCA) + Kvel * cos(aWTA);
+    const _var_float aWTA = crs * D2R - wnd_r; //std::abs??
+    const _var_float aWCA = std::asin(Kvel * std::sin(aWTA));
+    const _var_float kWS = std::cos(aWCA) + Kvel * std::cos(aWTA);
     return kWS;
 }
 //=============================================================================
@@ -701,8 +707,8 @@ _var_float Mandala::wind_circle(_var_float crs, _var_float span, _var_float r) c
     _var_float kWS = 1;
     while (sz--) {
         _var_float aWTA = crs * D2R - wnd_r;
-        _var_float aWCA = asin(Kvel * sin(aWTA));
-        kWS = cos(aWCA) + Kvel * cos(aWTA);
+        _var_float aWCA = std::asin(Kvel * std::sin(aWTA));
+        kWS = std::cos(aWCA) + Kvel * std::cos(aWTA);
         kWSs += 1.0 / kWS;
         crs += crs_step;
     }
@@ -710,7 +716,7 @@ _var_float Mandala::wind_circle(_var_float crs, _var_float span, _var_float r) c
         span = -(crs_e - crs);
     else
         span = (crs_e - crs);
-    return (kWSs * fabs(crs_step) + span / kWS) * r * (2.0 * PI / 360.0);
+    return (kWSs * std::abs(crs_step) + span / kWS) * r * (2.0 * PI / 360.0);
 }
 //=============================================================================
 //=============================================================================

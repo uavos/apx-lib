@@ -33,12 +33,12 @@ const Matrix<3,3> eulerDC(const Vector<3> & euler) {
   const _mat_float & phi = euler[0];
   const _mat_float & theta = euler[1];
   const _mat_float & psi = euler[2];
-  const _mat_float cpsi = cos(psi);
-  const _mat_float cphi = cos(phi);
-  const _mat_float ctheta = cos(theta);
-  const _mat_float spsi = sin(psi);
-  const _mat_float sphi = sin(phi);
-  const _mat_float stheta = sin(theta);
+  const _mat_float cpsi = std::cos(psi);
+  const _mat_float cphi = std::cos(phi);
+  const _mat_float ctheta = std::cos(theta);
+  const _mat_float spsi = std::sin(psi);
+  const _mat_float sphi = std::sin(phi);
+  const _mat_float stheta = std::sin(theta);
   return Matrix<3,3>(
            Vector<3>(cpsi*ctheta, spsi*ctheta, -stheta),
            Vector<3>(-spsi*cphi + cpsi*stheta*sphi, cpsi*cphi + spsi*stheta*sphi, ctheta*sphi),
@@ -98,7 +98,7 @@ const Vector<4> dtheta_dq(const Vector<4> & quat, const Matrix<3,3> & DCM) {
   const _mat_float q2 = quat[2];
   const _mat_float q3 = quat[3];
   const _mat_float dcm02 = DCM[0][2];
-  const _mat_float err = -2 / sqrt(1 - dcm02*dcm02);
+  const _mat_float err = -2 / std::sqrt(1 - dcm02*dcm02);
   return Vector<4>(-q2 * err, q3 * err, -q0 * err, q1 * err);
 }
 const Vector<4> dpsi_dq(const Vector<4> & quat, const Matrix<3,3> & DCM) {
@@ -151,7 +151,7 @@ const Vector<4> dpsi_dq(const Vector<4> & quat, const Matrix<3,3> & DCM) {
 /*const Matrix<3,3> Wmtrx(const Vect &eps,const Vect &v)
 {
   const _mat_float eps2=eps*eps;
-  const _mat_float eta=eps2>=1?0:sqrt(1-eps2);
+  const _mat_float eta=eps2>=1?0:std::sqrt(1-eps2);
   Matrix<3,3> W,tmp,tmp2;
 
   if(eta!=0){
@@ -193,18 +193,18 @@ const Vector<3> Quat::toEuler() const
   const _mat_float & q1 = (*this)[1];
   const _mat_float & q2 = (*this)[2];
   const _mat_float & q3 = (*this)[3];
-  _mat_float phi = atan2(2.0*(q2*q3 + q0*q1), 1.0-2.0*(q1*q1 + q2*q2));
-  _mat_float theta = -asin(2*(q1*q3 - q0*q2));
-  _mat_float psi = atan2(2.0*(q1*q2 + q0*q3), 1.0-2.0*(q2*q2 + q3*q3));
+  _mat_float phi = std::atan2(2.0*(q2*q3 + q0*q1), 1.0-2.0*(q1*q1 + q2*q2));
+  _mat_float theta = -std::asin(2*(q1*q3 - q0*q2));
+  _mat_float psi = std::atan2(2.0*(q1*q2 + q0*q3), 1.0-2.0*(q2*q2 + q3*q3));
   return Vector<3>(phi, theta, psi);
   /*const _mat_float & qw = (*this)[0];
   const _mat_float & qx = (*this)[1];
   const _mat_float & qy = (*this)[2];
   const _mat_float & qz = (*this)[3];
   Vector<3> euler;
-  euler[0]=atan2(2.0*(qx*qw+qy*qz),1.0-2.0*(qx*qx-qz*qz));
-  euler[1]=asin(2.0*(qx*qy+qz*qw));
-  euler[2]=atan2(2.0*(qy*qw-qx*qz),1.0-2.0*(qy*qy-qz*qz));
+  euler[0]=std::atan2(2.0*(qx*qw+qy*qz),1.0-2.0*(qx*qx-qz*qz));
+  euler[1]=std::asin(2.0*(qx*qy+qz*qw));
+  euler[2]=std::atan2(2.0*(qy*qw-qx*qz),1.0-2.0*(qy*qy-qz*qz));
   return euler;*/
 }
 //=============================================================================
@@ -240,12 +240,12 @@ Quat & Quat::fromEuler(const Vector<3> & euler)
   const _mat_float phi = euler[0] / 2.0;
   const _mat_float theta = euler[1] / 2.0;
   const _mat_float psi = euler[2] / 2.0;
-  const _mat_float shphi0 = sin(phi);
-  const _mat_float chphi0 = cos(phi);
-  const _mat_float shtheta0 = sin(theta);
-  const _mat_float chtheta0 = cos(theta);
-  const _mat_float shpsi0 = sin(psi);
-  const _mat_float chpsi0 = cos(psi);
+  const _mat_float shphi0 = std::sin(phi);
+  const _mat_float chphi0 = std::cos(phi);
+  const _mat_float shtheta0 = std::sin(theta);
+  const _mat_float chtheta0 = std::cos(theta);
+  const _mat_float shpsi0 = std::sin(psi);
+  const _mat_float chpsi0 = std::cos(psi);
   (*this)[0]= chphi0 * chtheta0 * chpsi0 + shphi0 * shtheta0 * shpsi0;
   (*this)[1]=-chphi0 * shtheta0 * shpsi0 + shphi0 * chtheta0 * chpsi0;
   (*this)[2]= chphi0 * shtheta0 * chpsi0 + shphi0 * chtheta0 * shpsi0;
@@ -301,8 +301,8 @@ void Quat::fromEuler(Vector<3> euler,int order)
   if (f==EulFrmR) {float t = euler[0]; euler[0] = euler[2]; euler[2] = t;}
   if (n==EulParOdd) euler[1] = -euler[1];
   ti = euler[0]*0.5; tj = euler[1]*0.5; th = euler[2]*0.5;
-  ci = cos(ti);  cj = cos(tj);  ch = cos(th);
-  si = sin(ti);  sj = sin(tj);  sh = sin(th);
+  ci = std::cos(ti);  cj = std::cos(tj);  ch = std::cos(th);
+  si = std::sin(ti);  sj = std::sin(tj);  sh = std::sin(th);
   cc = ci*ch; cs = ci*sh; sc = si*ch; ss = si*sh;
   if (s==EulRepYes) {
     a[i] = cj*(cs + sc);    /* Could speed up with */
@@ -327,8 +327,8 @@ void Quat::euler2HMatrix(Vector<3> euler,int order)
   if (f==EulFrmR) {float t = euler[0]; euler[0] = euler[2]; euler[2] = t;}
   if (n==EulParOdd) {euler[0] = -euler[0]; euler[1] = -euler[1]; euler[2] = -euler[2];}
   ti = euler[0];    tj = euler[1];    th = euler[2];
-  ci = cos(ti); cj = cos(tj); ch = cos(th);
-  si = sin(ti); sj = sin(tj); sh = sin(th);
+  ci = std::cos(ti); cj = std::cos(tj); ch = std::cos(th);
+  si = std::sin(ti); sj = std::sin(tj); sh = std::sin(th);
   cc = ci*ch; cs = ci*sh; sc = si*ch; ss = si*sh;
   if (s==EulRepYes) {
     HMatrix[i][i] = cj;     HMatrix[i][j] =  sj*si;    HMatrix[i][k] =  sj*ci;
@@ -349,25 +349,25 @@ const Vector<3> Quat::HMatrix2euler(int order) const
   EulGetOrd(order,i,j,k,h,n,s,f);
   (void)h;
   if (s==EulRepYes) {
-    _mat_float sy = sqrt(HMatrix[i][j]*HMatrix[i][j] + HMatrix[i][k]*HMatrix[i][k]);
+    _mat_float sy = std::sqrt(HMatrix[i][j]*HMatrix[i][j] + HMatrix[i][k]*HMatrix[i][k]);
     if (sy > 16*FLT_EPSILON) {
-      euler[0] = atan2(HMatrix[i][j], HMatrix[i][k]);
-      euler[1] = atan2(sy, HMatrix[i][i]);
-      euler[2] = atan2(HMatrix[j][i], -HMatrix[k][i]);
+      euler[0] = std::atan2(HMatrix[i][j], HMatrix[i][k]);
+      euler[1] = std::atan2(sy, HMatrix[i][i]);
+      euler[2] = std::atan2(HMatrix[j][i], -HMatrix[k][i]);
     } else {
-      euler[0] = atan2(-HMatrix[j][k], HMatrix[j][j]);
-      euler[1] = atan2(sy, HMatrix[i][i]);
+      euler[0] = std::atan2(-HMatrix[j][k], HMatrix[j][j]);
+      euler[1] = std::atan2(sy, HMatrix[i][i]);
       euler[2] = 0;
     }
   } else {
-    _mat_float cy = sqrt(HMatrix[i][i]*HMatrix[i][i] + HMatrix[j][i]*HMatrix[j][i]);
+    _mat_float cy = std::sqrt(HMatrix[i][i]*HMatrix[i][i] + HMatrix[j][i]*HMatrix[j][i]);
     if (cy > 16*FLT_EPSILON) {
-      euler[0] = atan2(HMatrix[k][j], HMatrix[k][k]);
-      euler[1] = atan2(-HMatrix[k][i], cy);
-      euler[2] = atan2(HMatrix[j][i], HMatrix[i][i]);
+      euler[0] = std::atan2(HMatrix[k][j], HMatrix[k][k]);
+      euler[1] = std::atan2(-HMatrix[k][i], cy);
+      euler[2] = std::atan2(HMatrix[j][i], HMatrix[i][i]);
     } else {
-      euler[0] = atan2(-HMatrix[j][k], HMatrix[j][j]);
-      euler[1] = atan2(-HMatrix[k][i], cy);
+      euler[0] = std::atan2(-HMatrix[j][k], HMatrix[j][j]);
+      euler[1] = std::atan2(-HMatrix[k][i], cy);
       euler[2] = 0;
     }
   }

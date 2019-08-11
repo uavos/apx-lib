@@ -716,7 +716,7 @@ public:
     static _mandala_float &boundAngle(_mandala_float &v, _mandala_float span = 180.0)
     {
         const _mandala_float dspan = span * 2.0;
-        v = v - floor(v / dspan + 0.5) * dspan;
+        v = v - std::floor(v / dspan + 0.5) * dspan;
         return v;
     }
     //===========================================================================
