@@ -20,6 +20,8 @@
  * Floor, Boston, MA 02110-1301, USA.
  *
  */
+#include <cmath>
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -762,7 +764,7 @@ _var_float MandalaCore::inHgToAltitude(_var_float inHg, _var_float inHg_gnd)
 {
     if (inHg_gnd == 0)
         return 0;
-    return (1.0 - std::pow(inHg / inHg_gnd, 0.1902632)) * 44330.77;
+    return (1.0f - std::pow(inHg / inHg_gnd, 0.1902632f)) * 44330.77f;
 }
 //=============================================================================
 //=============================================================================
