@@ -20,7 +20,7 @@ public:
   }
 protected:
   virtual uint32_t esc_read(uint8_t *buf,uint32_t sz)=0;
-  virtual bool esc_write_byte(const uint8_t v)=0; //write to fifo but don't send
+  virtual bool esc_write_byte(const uint8_t v){(void)v;return false;} //write to fifo but don't send
 
   virtual void escError(void){}
   virtual void escWriteDone(void){}
