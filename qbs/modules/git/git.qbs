@@ -17,9 +17,9 @@ Module {
         property var mod: File.lastModified(git_top + "/.git/logs/HEAD")
         property string projectName: project.name
         configure: {
-            version = "0.0.0";
-            branch = "";
-            year = "";
+            version = "0.0.0"
+            branch = ""
+            year = ""
             if(File.exists(git_top+"/.git")){
                 var p = new Process();
                 p.throwOnError=true
