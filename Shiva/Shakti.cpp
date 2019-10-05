@@ -1236,16 +1236,20 @@ void Shakti::lookTo(const Vect &llh)
 //==============================================================================
 void Shakti::cam_stab_front(void)
 {
-    Quat qUAV;
-    qUAV.fromEuler(Vect(0, var.theta[1] * D2R, 0));
     Quat qGimbal;
     var.cambias_theta[0] = var.limit(var.cambias_theta[0], 80);
     var.cambias_theta[1] = var.limit(var.cambias_theta[1], -100, 10);
     qGimbal.fromEuler(Vect(var.cambias_theta[0] * D2R,
                            var.cambias_theta[1] * D2R,
                            0)); //var.cambias_theta[0]*D2R),Quat::EulOrdXYXs);
-    qUAV.conjugate();
-    qGimbal.qmult(qUAV);
+
+    if (apcfg.cam_stab != cam_stab_off) {
+        Quat qUAV;
+        qUAV.fromEuler(Vect(0, var.theta[1] * D2R, 0));
+        qUAV.conjugate();
+        qGimbal.qmult(qUAV);
+    }
+
     Vect euler = qGimbal.toEuler(Quat::EulOrdXYXs) * (R2D);
     if (std::abs(euler[2]) > 90) {
         euler[0] = var.boundAngle(180.0 + euler[0]);
@@ -1266,16 +1270,21 @@ void Shakti::cam_stab_front(void)
 //==============================================================================
 void Shakti::cam_stab_down(void)
 {
-    Quat qUAV(var.theta * D2R);
-    var.camctr_theta = qUAV.conjugate()
-                           .qmult(Vect(0, var.cambias_theta[1] * D2R, (var.cambias_theta[2]) * D2R))
-                           .toEuler()
-                       * (R2D / 180.0);
+    Vect vGimbal(0, var.cambias_theta[1], (var.cambias_theta[2]));
+    if (apcfg.cam_stab != cam_stab_off) {
+        Quat qUAV(var.theta * D2R);
+        qUAV.conjugate();
+        var.camctr_theta = qUAV.qmult(vGimbal * D2R).toEuler() * (R2D / 180.0);
+    } else {
+        var.camctr_theta = vGimbal / 180.0;
+    }
 }
 //==============================================================================
 void Shakti::cam_stab_roll(void)
 {
-    var.camctr_theta[0] = -var.theta[0] / 180.0;
+    if (apcfg.cam_stab != cam_stab_off) {
+        var.camctr_theta[0] = -var.theta[0] / 180.0;
+    }
 }
 //==============================================================================
 //==============================================================================
@@ -1825,7 +1834,8 @@ bool Shakti::ctr_Airspeed(void)
         //protect stall speed from roll stall(correct)=stall*std::sqrt(1/std::cos(cmd_roll))
         if (apcfg.spd_stall > 0 && apcfg.spd_stall < apcfg.spd_cruise) {
             _var_float vmin = apcfg.spd_stall
-                              * std::sqrt(1.0 / std::cos(var.limit(var.cmd_theta[0], -80, 80) * D2R));
+                              * std::sqrt(1.0
+                                          / std::cos(var.limit(var.cmd_theta[0], -80, 80) * D2R));
             if (cmd < vmin)
                 cmd = vmin;
         }
@@ -2005,8 +2015,8 @@ void Shakti::set_ail(_var_float v)
 void Shakti::set_elv(_var_float v, bool doMix)
 {
     if (doMix)
-        v += var.limit(get_gain(var.airspeed, 0, apcfg.Ks_elevator_high) * std::abs(var.cmd_theta[0])
-                           * apcfg.mix_elv_Kp,
+        v += var.limit(get_gain(var.airspeed, 0, apcfg.Ks_elevator_high)
+                           * std::abs(var.cmd_theta[0]) * apcfg.mix_elv_Kp,
                        apcfg.mix_elv_Lo)
              / 100.0; //mix to roll
     var.ctr_elevator = var.limit(v, 1.0);
