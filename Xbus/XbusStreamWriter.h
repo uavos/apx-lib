@@ -54,6 +54,8 @@ private:
 };
 
 // implementation
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
 template<typename _T, typename _Tin>
 void XbusStreamWriter::set_data(_T &buf, _Tin data)
@@ -85,6 +87,7 @@ void XbusStreamWriter::set_data(_T &buf, _Tin data)
 
     memcpy(&msg[pos], &buf, sizeof(buf));
 }
+#pragma GCC diagnostic pop
 
 template<typename _T, typename _Tin>
 void XbusStreamWriter::write(const _Tin data)
