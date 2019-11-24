@@ -22,6 +22,8 @@ Probe {
     // flat contents of all collected modules
     property var contents: {}
 
+    property var modified: [] //for dep update tracking
+
     // internal
     property var array: {
         var v=[]
@@ -53,7 +55,7 @@ Probe {
     configure: {
         var values = {}
 
-        function nodeModuleFiles(m)
+        function moduleFiles(m)
         {
             //check files exist
             var list=[]
@@ -69,7 +71,7 @@ Probe {
             return list
         }
 
-        function removeStringDups(names)
+        /*function removeStringDups(names)
         {
           unique = {}
           names.forEach(function(i) {
@@ -78,25 +80,20 @@ Probe {
             }
           })
           return Object.keys(unique)
-        }
+        }*/
 
         for(var i in array){
             var m=array[i]
 
-            m.files = nodeModuleFiles(m)
-            m.files.push(m.config)
+            modified.push(m.timestamp) //for dep update tracking
 
-            //var mpath=FileInfo.path(m.config) //config yml path
-            //m["path"] = mpath
+            m.files = moduleFiles(m)
+            m.files.push(m.config)
 
             //includes are relative to module path
             for(var j in m.include){
                 m.include[j] = FileInfo.cleanPath(FileInfo.joinPaths(mpath,m.include[j]))
             }
-
-            //module defines
-            //m["mdef"] = "MODULE_"+m.name.replace(/\//g,"_").toUpperCase()
-
 
             //update values object
             for(var key in m){
@@ -119,7 +116,7 @@ Probe {
             }
         }
         //ensure required fields present
-        var rkeys =[ "files", "libs" ]
+        var rkeys =[ "files", "libs", "app" ]
         for(var i in rkeys){
             var key=rkeys[i]
             if(!values[key])
