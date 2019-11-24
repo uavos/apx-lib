@@ -19,12 +19,8 @@ Probe {
     property stringList searchPaths
 
     // Output
-    property stringList files:      []
-    property stringList includes:   []
-    property stringList defines:    []
-    property stringList paths:      []
-    property stringList mdefs:      []
-    property stringList libs:       []
+    // flat contents of all collected modules
+    property var contents: {}
 
     // internal
     property var array: {
@@ -55,14 +51,7 @@ Probe {
     }
 
     configure: {
-        var v_files=[]
-        var v_inc=[]
-        var v_def=[]
-
-        var v_paths=[]
-        var v_mdefs=[]
-
-        var v_libs=[]
+        var values = {}
 
         function nodeModuleFiles(m)
         {
@@ -72,7 +61,7 @@ Probe {
             for(var i in m.files){
                 var f=FileInfo.joinPaths(p,m.files[i])
                 if(File.exists(f)){
-                    list.push(f)
+                    list.push(FileInfo.cleanPath(f))
                 }else{
                     throw new Error("Node file not found ("+m.name+"): " + f)
                 }
@@ -80,7 +69,7 @@ Probe {
             return list
         }
 
-        function removeDups(names)
+        function removeStringDups(names)
         {
           unique = {}
           names.forEach(function(i) {
@@ -93,36 +82,52 @@ Probe {
 
         for(var i in array){
             var m=array[i]
-            v_files.push(m.config)
-            v_files.push.apply(v_files,nodeModuleFiles(m))
 
-            v_libs.push.apply(v_libs, m.libs)
+            m.files = nodeModuleFiles(m)
+            m.files.push(m.config)
 
-            var mpath=FileInfo.path(m.config)
-            for(var j in m.includes){
-                var p=m.includes[j]
-                v_inc.push(FileInfo.cleanPath(FileInfo.joinPaths(mpath,p)))
+            //var mpath=FileInfo.path(m.config) //config yml path
+            //m["path"] = mpath
+
+            //includes are relative to module path
+            for(var j in m.include){
+                m.include[j] = FileInfo.cleanPath(FileInfo.joinPaths(mpath,m.include[j]))
             }
 
-            v_def.push.apply(v_def,m.defines)
+            //module defines
+            //m["mdef"] = "MODULE_"+m.name.replace(/\//g,"_").toUpperCase()
 
-            v_paths.push(mpath)
-            v_mdefs.push("MODULE_"+m.name.replace(/\//g,"_").toUpperCase())
+
+            //update values object
+            for(var key in m){
+                if(!m[key]) continue
+                if(!values[key])
+                    values[key]=[]
+                var p=m[key]
+                if(p instanceof Array){
+                    for(var k in m[key]){
+                        var v=m[key][k]
+                        if(values[key].contains(v))
+                            continue
+                        values[key].push(v)
+                    }
+                }else{
+                    if(values[key].contains(m[key]))
+                        continue
+                    values[key].push(m[key])
+                }
+            }
+        }
+        //ensure required fields present
+        var rkeys =[ "files", "libs" ]
+        for(var i in rkeys){
+            var key=rkeys[i]
+            if(!values[key])
+                values[key]=[]
         }
 
-        //fix path for files
-        for(var i in v_files){
-            //v_files[i]=FileInfo.relativePath(searchPath,v_files[i])
-            v_files[i]=FileInfo.cleanPath(v_files[i])
-        }
-
-        files=removeDups(v_files)
-        includes=removeDups(v_inc)
-        defines=removeDups(v_def)
-        paths=removeDups(v_paths)
-        mdefs=removeDups(v_mdefs)
-        libs=removeDups(v_libs)
-        //console.info(files)
+        contents = values
+        console.info(JSON.stringify(contents,0,2))
     }
 
 }

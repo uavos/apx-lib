@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
+import argparse
+import glob
+import os
+
 import simplejson
 import yaml
-import os
-import glob
-
-import argparse
 
 # Parse commandline
 parser = argparse.ArgumentParser(description='Scan modules for dependencies using YAML config and print JSON array')
@@ -39,7 +39,7 @@ class Module(dict):
                 os.path.join(path, fname + configExt)
             ]:
                 if os.path.exists(f):
-                    config = f
+                    config = os.path.abspath(f)
                     break
 
             if os.path.exists(config):
