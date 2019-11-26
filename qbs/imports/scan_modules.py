@@ -30,23 +30,14 @@ class Module(dict):
 
         # find configFile
         config = ''
-        fname = os.path.split(name)[-1]
+        configFileName = name.split('.')[-1] + configExt
         for path in list(args.paths):
-            for f in [
-                os.path.join(path, name, fname + configExt),
-                os.path.join(path, os.path.split(name)[0], fname + configExt),
-                os.path.join(path, name, 'module' + configExt),
-                os.path.join(path, fname + configExt)
-            ]:
-                if os.path.exists(f):
-                    config = os.path.abspath(f)
-                    break
-
+            config = os.path.abspath(os.path.join(path, name.replace('.', '/'), configFileName))
             if os.path.exists(config):
                 break
 
         if not os.path.exists(config):
-            raise Exception('Module config file not found: ' + name + ' in ' + ','.join(list(args.paths)))
+            raise Exception('Module config file not found: ' + config)
 
         with open(config, 'r') as f:
             obj = yaml.load(f.read())
@@ -59,24 +50,38 @@ class Module(dict):
 
 
 class Modules(list):
-    def __init__(self, names):
+    def __init__(self, names, paths):
         list.__init__(self)
+        self.paths = paths
         self.names = list()
-        for name in names:
-            self.add_module(name)
+        if 'all' in names:
+            self.add_all()
+        else:
+            for name in names:
+                self.add_module(name)
 
-    def add_module(self, name):
+    def add_module(self, name, depends=True):
         if name in self.names:
             return
         m = Module(name)
         self.append(m)
         self.names.append(name)
-        if 'depends' in m and isinstance(m['depends'], list):
+        if depends and 'depends' in m and isinstance(m['depends'], list):
             for dep in m['depends']:
                 self.add_module(dep)
 
+    def add_all(self):
+        for path in list(self.paths):
+            for root, dirs, files in os.walk(path):
+                for f in files:
+                    if os.path.splitext(f)[1] != configExt:
+                        continue
+                    name = os.path.relpath(os.path.dirname(os.path.join(root, f)), path).replace('/', '.')
+                    # print(name)
+                    self.add_module(name, depends=False)
 
-modules = Modules(args.modules)
+
+modules = Modules(args.modules, args.paths)
 
 # print args.modules
 # print modules.names

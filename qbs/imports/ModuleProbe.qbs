@@ -124,7 +124,7 @@ Probe {
         }
 
         contents = values
-        console.info(JSON.stringify(contents,0,2))
+        //console.info(JSON.stringify(contents,0,2))
     }
 
 }

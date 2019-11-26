@@ -1,7 +1,0 @@
-depends:
-files:
-- MandalaConstants.h
-- MandalaCore.*
-- MandalaIndexes.h
-- MandalaTemplate.h
-- preprocessor.h
