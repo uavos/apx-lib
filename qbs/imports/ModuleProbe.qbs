@@ -28,10 +28,10 @@ Probe {
     property var array: {
         var v=[]
         if(!names.length>0)return v
-        var p = new Process();
 
+        var p = new Process();
         var args = []
-        args.push(FileInfo.joinPaths(path,"scan_modules.py"))
+        args.push(FileInfo.joinPaths(path,"../scan_modules.py"))
         args.push("--paths")
         args=args.concat(searchPaths)
         args.push("--modules")
@@ -39,6 +39,7 @@ Probe {
 
         if(p.exec("python", args, true)===0){
             json=p.readStdOut()
+            p.close()
             //console.info(json)
             v=JSON.parse(json)
         }else{
