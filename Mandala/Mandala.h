@@ -27,7 +27,7 @@
 #include <cmath>
 #include <string.h>
 //-----------------------------------------------------------------------------
-#include "MandalaCore.h"
+#include "MandalaCore/MandalaCore.h"
 //=============================================================================
 // AP constants
 //=============================================================================
@@ -48,13 +48,10 @@ public:
     //---- Internal use -----
     bool blockDownstream;
     // telemetry framework
-    bool dl_reset;             // set true to send everything next time
-    uint8_t dl_snapshot[1024]; // all archived variables snapshot
-    uint8_t dl_reset_mask[(idx_local - idxPAD) / 8
-                          + (((idx_local - idxPAD) & 3)
-                                 ? 1
-                                 : 0)]; // bitmask 1=send var, auto clear after sent
-    uint8_t dl_var[3 * 4];              // one var max size (tmp buf)
+    bool dl_reset;                                                                          // set true to send everything next time
+    uint8_t dl_snapshot[1024];                                                              // all archived variables snapshot
+    uint8_t dl_reset_mask[(idx_local - idxPAD) / 8 + (((idx_local - idxPAD) & 3) ? 1 : 0)]; // bitmask 1=send var, auto clear after sent
+    uint8_t dl_var[3 * 4];                                                                  // one var max size (tmp buf)
     //filled by extract_downstream
     uint32_t dl_frcnt;  // downlink frame cnt (inc by extract_downlink)
     uint32_t dl_errcnt; // errors counter (by extract_downlink)
@@ -115,18 +112,13 @@ public:
     //LLH Earth navigation (great circle path)
     static _var_float bearing(const _var_point &ll1, const _var_point &ll2);
     static _var_float distance(const _var_point &ll1, const _var_point &ll2);
-    static _var_float distance(const _var_point &ll1,
-                               const _var_point &ll2,
+    static _var_float distance(const _var_point &ll1, const _var_point &ll2,
                                const _var_point &ll); //crosstrack
-    static const _var_point destination(const _var_point &ll,
-                                        const _var_float &bearing,
-                                        const _var_float &distance);
+    static const _var_point destination(const _var_point &ll, const _var_float &bearing, const _var_float &distance);
     //rhumb LLH nav (straight line on mercator)
     static _var_float bearing_rhumb(const _var_point &ll1, const _var_point &ll2);
     static _var_float distance_rhumb(const _var_point &ll1, const _var_point &ll2);
-    static const _var_point destination_rhumb(const _var_point &ll,
-                                              const _var_float &bearing,
-                                              const _var_float &distance);
+    static const _var_point destination_rhumb(const _var_point &ll, const _var_float &bearing, const _var_float &distance);
 
     //helper nav
     const _var_point lineDistance(const _var_point p1, const _var_point p2) const;
@@ -134,28 +126,17 @@ public:
     const _var_point rotate(const _var_float N, const _var_float E, const _var_float psi) const;
     const _var_vect rotate(const _var_vect &v_in, const _var_float psi);
     const _var_vect rotate(const _var_vect &v_in, const _var_vect &theta);
-    const _var_point LLH_dist(const _var_vect &llh1,
-                              const _var_vect &llh2,
-                              const _var_float lat,
-                              const _var_float lon) const;
-    const _var_point ECEF_dist(const _var_vect &ecef1,
-                               const _var_vect &ecef2,
-                               const _var_float lat,
-                               const _var_float lon) const;
-    const _var_point ECEF2Tangent(const _var_vect &ECEF,
-                                  const _var_float latitude,
-                                  const _var_float longitude) const;
-    const _var_vect Tangent2ECEF(const _var_point &ne,
-                                 const _var_float latitude,
-                                 const _var_float longitude) const;
+    const _var_point LLH_dist(const _var_vect &llh1, const _var_vect &llh2, const _var_float lat, const _var_float lon) const;
+    const _var_point ECEF_dist(const _var_vect &ecef1, const _var_vect &ecef2, const _var_float lat, const _var_float lon) const;
+    const _var_point ECEF2Tangent(const _var_vect &ECEF, const _var_float latitude, const _var_float longitude) const;
+    const _var_vect Tangent2ECEF(const _var_point &ne, const _var_float latitude, const _var_float longitude) const;
     const _var_point ECEF2ll(const _var_vect &ECEF) const;
     const _var_vect llh2ECEF(const _var_vect &llh) const;
     const _var_point ne2ll(const _var_point &ne) const;
     const _var_point ne2ll(const _var_point &ne, const _var_vect &home_llh) const;
     _var_float sqr(const _var_float x) const;
     _var_float wind_triangle(_var_float crs) const; //return TAS to gSpeed multiplier for given course
-    _var_float wind_circle(_var_float crs,
-                           _var_float span,
+    _var_float wind_circle(_var_float crs, _var_float span,
                            _var_float r) const; //return air path length for ground circle flight
 
 private:

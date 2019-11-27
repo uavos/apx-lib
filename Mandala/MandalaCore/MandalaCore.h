@@ -28,7 +28,7 @@
 #include <inttypes.h>
 #include <sys/types.h>
 
-#include "MatrixMath.h"
+#include "../MatrixMath.h"
 
 using namespace matrixmath;
 //=============================================================================
@@ -69,19 +69,13 @@ public:
 
     // basic protocols
     uint32_t unpack_stream(const uint8_t *buf, uint32_t cnt, bool hd); //downstream without header
-    uint32_t unpack_set(const uint8_t *buf, uint32_t cnt); //unpack component <var_idx><mask><value>
-    uint32_t pack_set(uint8_t *buf, uint16_t var_m);       //pack component <var_idx><mask><value>
+    uint32_t unpack_set(const uint8_t *buf, uint32_t cnt);             //unpack component <var_idx><mask><value>
+    uint32_t pack_set(uint8_t *buf, uint16_t var_m);                   //pack component <var_idx><mask><value>
 
     bool get_ptr(uint8_t var_idx, void **var_ptr, uint32_t *type);
 
-    static void filter(const _var_float &fv,
-                       _var_float *var_p,
-                       const _var_float &fS = 0.05 / 100.0,
-                       const _var_float &fL = 0.9 / 100.0);
-    static void filter(const _var_vect &v,
-                       _var_vect *var_p,
-                       const _var_float &S = 0.05 / 100.0,
-                       const _var_float &L = 0.9 / 100.0);
+    static void filter(const _var_float &fv, _var_float *var_p, const _var_float &fS = 0.05 / 100.0, const _var_float &fL = 0.9 / 100.0);
+    static void filter(const _var_vect &v, _var_vect *var_p, const _var_float &S = 0.05 / 100.0, const _var_float &L = 0.9 / 100.0);
     static void filter_m(const _var_float &v, _var_float *var_p, const _var_float &f);
     static void filter_m(const _var_vect &v, _var_vect *var_p, const _var_float &f);
     //member=mask, if var is a bitfield, or vect idx

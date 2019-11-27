@@ -46,7 +46,7 @@ void Mandala::init(void)
     //------------------------
     //init all vars
 #define MVAR(atype, aname, ...) aname = 0;
-#include "MandalaTemplate.h"
+#include "MandalaCore/MandalaTemplate.h"
     cas2tas = 1.0;
     //debug
     /*uint32_t cnt=0,sz=0,sz_hd=0;
@@ -76,7 +76,7 @@ bool Mandala::get_text_names(uint16_t varmsk, const char **name, const char **de
         *name = #abitname; \
         *descr = adescr; \
         return true;
-#include "MandalaTemplate.h"
+#include "MandalaCore/MandalaTemplate.h"
         }
         if (m)
             return false;
@@ -93,7 +93,7 @@ bool Mandala::get_text_names(uint16_t varmsk, const char **name, const char **de
         *name = #aname; \
         *descr = adescr; \
         return true;
-#include "MandalaTemplate.h"
+#include "MandalaCore/MandalaTemplate.h"
     }
     return false;
 }
@@ -337,9 +337,7 @@ _var_float Mandala::bearing(const _var_point &ll1, const _var_point &ll2)
     const _var_float lonB = ll2[1] * D2R;
     const _var_float dLon = lonB - lonA;
     const _var_float clatB = std::cos(latB);
-    return R2D
-           * std::atan2(clatB * std::sin(dLon),
-                        std::cos(latA) * std::sin(latB) - std::sin(latA) * clatB * std::cos(dLon));
+    return R2D * std::atan2(clatB * std::sin(dLon), std::cos(latA) * std::sin(latB) - std::sin(latA) * clatB * std::cos(dLon));
 }
 //=============================================================================
 _var_float Mandala::distance(const _var_point &ll1, const _var_point &ll2)
@@ -350,8 +348,7 @@ _var_float Mandala::distance(const _var_point &ll1, const _var_point &ll2)
     const _var_float lonB = ll2[1] * D2R;
     const _var_float dLat = (latB - latA) / 2.0f;
     const _var_float dLon = (lonB - lonA) / 2.0f;
-    const _var_float a = std::pow(std::sin(dLat), 2.0f)
-                         + std::cos(latA) * std::cos(latB) * std::pow(std::sin(dLon), 2.0f);
+    const _var_float a = std::pow(std::sin(dLat), 2.0f) + std::cos(latA) * std::cos(latB) * std::pow(std::sin(dLon), 2.0f);
     const _var_float c = 2.0f * std::atan2(std::sqrt(a), std::sqrt(1.0f - a));
     return EARTH_MRADIUS * c; //mean earth radius
 }
@@ -364,9 +361,7 @@ _var_float Mandala::distance(const _var_point &ll1, const _var_point &ll2, const
     return EARTH_MRADIUS * std::asin(std::sin(d13) * std::sin(b13 - b12));
 }
 //=============================================================================
-const _var_point Mandala::destination(const _var_point &ll,
-                                      const _var_float &bearing,
-                                      const _var_float &distance)
+const _var_point Mandala::destination(const _var_point &ll, const _var_float &bearing, const _var_float &distance)
 {
     const _var_float latA = ll[0] * D2R;
     const _var_float brng = bearing * D2R;
@@ -376,10 +371,7 @@ const _var_point Mandala::destination(const _var_point &ll,
     const _var_float sdR = std::sin(dR);
     const _var_float cdR = std::cos(dR);
     const _var_float latB = std::asin(slatA * cdR + clatA * sdR * std::cos(brng));
-    const _var_float lonB = ll[1]
-                            + R2D
-                                  * std::atan2(std::sin(brng) * sdR * clatA,
-                                               cdR - slatA * std::sin(latB));
+    const _var_float lonB = ll[1] + R2D * std::atan2(std::sin(brng) * sdR * clatA, cdR - slatA * std::sin(latB));
     return _var_point(latB * R2D, boundAngle(lonB));
 }
 //=============================================================================
@@ -404,9 +396,7 @@ _var_float Mandala::distance_rhumb(const _var_point &ll1, const _var_point &ll2)
     return EARTH_MRADIUS * std::sqrt(std::pow(dLat, 2.0f) + std::pow(dLon * q, 2.0f));
 }
 //=============================================================================
-const _var_point Mandala::destination_rhumb(const _var_point &ll,
-                                            const _var_float &bearing,
-                                            const _var_float &distance)
+const _var_point Mandala::destination_rhumb(const _var_point &ll, const _var_float &bearing, const _var_float &distance)
 {
     const _var_float latA = ll[0] * D2R;
     const _var_float lonA = ll[1] * D2R;
@@ -558,10 +548,7 @@ const _var_point Mandala::ne2ll(const _var_point &ne, const _var_vect &home_llh)
     return ECEF2ll(llh2ECEF(home_llh) + Tangent2ECEF(ne, home_llh[0], home_llh[1]));
 }
 //===========================================================================
-const _var_point Mandala::LLH_dist(const _var_vect &llh1,
-                                   const _var_vect &llh2,
-                                   const _var_float lat,
-                                   const _var_float lon) const
+const _var_point Mandala::LLH_dist(const _var_vect &llh1, const _var_vect &llh2, const _var_float lat, const _var_float lon) const
 {
     const _var_vect &ecef1(llh2ECEF(llh1));
     const _var_vect &ecef2(llh2ECEF(llh2));
@@ -569,17 +556,12 @@ const _var_point Mandala::LLH_dist(const _var_vect &llh1,
     return ECEF2Tangent(diff, lat, lon);
 }
 //=============================================================================
-const _var_point Mandala::ECEF_dist(const _var_vect &ecef1,
-                                    const _var_vect &ecef2,
-                                    const _var_float lat,
-                                    const _var_float lon) const
+const _var_point Mandala::ECEF_dist(const _var_vect &ecef1, const _var_vect &ecef2, const _var_float lat, const _var_float lon) const
 {
     return ECEF2Tangent(ecef1 - ecef2, lat, lon);
 }
 //=============================================================================
-const _var_point Mandala::ECEF2Tangent(const _var_vect &ECEF,
-                                       const _var_float latitude,
-                                       const _var_float longitude) const
+const _var_point Mandala::ECEF2Tangent(const _var_vect &ECEF, const _var_float latitude, const _var_float longitude) const
 {
     const _var_float lat_r = latitude * D2R, lon_r = longitude * D2R;
     _var_float clat = std::cos(lat_r);
@@ -608,9 +590,7 @@ const _var_point Mandala::ECEF2Tangent(const _var_vect &ECEF,
     return c;
 }
 //=============================================================================
-const _var_vect Mandala::Tangent2ECEF(const _var_point &ne,
-                                      const _var_float latitude,
-                                      const _var_float longitude) const
+const _var_vect Mandala::Tangent2ECEF(const _var_point &ne, const _var_float latitude, const _var_float longitude) const
 {
     const _var_float lat_r = latitude * D2R, lon_r = longitude * D2R;
     _var_float clat = std::cos(lat_r);
@@ -777,10 +757,7 @@ void Mandala::dump(uint8_t var_idx)
         dmsg("%.2f", *((_var_float *) value_ptr));
         break;
     case vt_vect:
-        dmsg("(%.2f,%.2f,%.2f)",
-             (*((_var_vect *) value_ptr))[0],
-             (*((_var_vect *) value_ptr))[1],
-             (*((_var_vect *) value_ptr))[2]);
+        dmsg("(%.2f,%.2f,%.2f)", (*((_var_vect *) value_ptr))[0], (*((_var_vect *) value_ptr))[1], (*((_var_vect *) value_ptr))[2]);
         break;
     case vt_point:
         dmsg("(%.2f,%.2f)", (*((_var_point *) value_ptr))[0], (*((_var_point *) value_ptr))[1]);
