@@ -230,7 +230,7 @@ uint32_t Mandala::unpack_downstream(const uint8_t *buf, uint32_t cnt)
     }
     //calculate vars filtered by sig dl_filter, otherwise calculated by ahrs
     pos_NE = llh2ne(gps_pos);
-    vel_NE = Point(gps_vel[0], gps_vel[1]);
+    vel_NE = _var_point(gps_vel[0], gps_vel[1]);
     vXY = rotate(vel_NE, theta[2]);
     calc();
     return tcnt;
@@ -240,7 +240,7 @@ uint32_t Mandala::unpack_downstream(const uint8_t *buf, uint32_t cnt)
 //=============================================================================
 void Mandala::calc(void)
 {
-    const Point dNE = cmd_NE - pos_NE;
+    const _var_point dNE = cmd_NE - pos_NE;
     dXY = rotate(dNE, theta[2]);
     dWPT = distance(dNE);
     dHome = distance(pos_NE);
@@ -440,7 +440,7 @@ const _var_point Mandala::lineDistance(const _var_point p1, const _var_point p2)
     else if (r > 1)
         return p2;
     else
-        return p1 + Point(C, D) * r;
+        return p1 + _var_point(C, D) * r;
 }
 //=============================================================================
 const _var_point Mandala::rotate(const _var_point &v_in, const _var_float psi) const

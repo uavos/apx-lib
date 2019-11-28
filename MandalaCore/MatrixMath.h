@@ -26,17 +26,16 @@
 #include <cmath>
 //=============================================================================
 namespace matrixmath {
-#ifdef USE_FLOAT_TYPE
+
+typedef float _mat_float;
+typedef int index_t;
+
+/*#ifdef USE_FLOAT_TYPE
 typedef float _mat_float;
 #else
 typedef double _mat_float;
 #endif
 typedef int index_t;
-//=============================================================================
-static inline bool f_isvalid(const _mat_float &value)
-{
-    return !(std::isnan(value) || std::isinf(value));
-}
 //=============================================================================
 #if defined(USE_FLOAT_TYPE) && (!defined(MANDALA_FULL))
 // Simplified Vector math
@@ -68,7 +67,7 @@ protected:
     _mat_float v[3];
 };
 typedef _mat_float Point[2];
-#else
+#else*/
 //=============================================================================
 // VECTOR
 //=============================================================================
@@ -282,9 +281,7 @@ Vector<n, T1> operator*(const T2 &s, const Vector<n, T1> &v)
 template<class T>
 const Vector<3, T> cross(const Vector<3, T> &a, const Vector<3, T> &b)
 {
-    return Vector<3, T>(a[1] * b[2] - a[2] * b[1],
-                        a[2] * b[0] - a[0] * b[2],
-                        a[0] * b[1] - a[1] * b[0]);
+    return Vector<3, T>(a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]);
 }
 
 //Splice extracts a portion of a vector
@@ -494,10 +491,7 @@ public:
         C[2] = Vector<3>(-q, p, 0);
     }
 
-    const Matrix<3, 3> Wmtrx(const Vector<3> &eps,
-                             const Vector<3> &v,
-                             Matrix<3, 3> &tmp,
-                             Matrix<3, 3> &tmp2)
+    const Matrix<3, 3> Wmtrx(const Vector<3> &eps, const Vector<3> &v, Matrix<3, 3> &tmp, Matrix<3, 3> &tmp2)
     {
         const _mat_float eps2 = eps * eps;
         const _mat_float eta = eps2 >= 1 ? 0 : std::sqrt(1 - eps2);
@@ -813,8 +807,8 @@ std::ostream &operator<<(std::ostream &out,const Vector<n,T> &v)
 //=============================================================================
 //Common types
 //typedef Vector<4> Quat;
-typedef Vector<3> Vect;
-typedef Vector<2> Point;
+//typedef Vector<3> Vect3;
+//typedef Vector<2> Point;
 //=============================================================================
 // QUATERNIONS
 //=============================================================================
@@ -855,10 +849,7 @@ public:
         return (*this);
     }
 
-    bool isReset()
-    {
-        return (*this)[0] == 1 && (*this)[1] == 0 && (*this)[2] == 0 && (*this)[3] == 0;
-    }
+    bool isReset() { return (*this)[0] == 1 && (*this)[1] == 0 && (*this)[2] == 0 && (*this)[3] == 0; }
 
     Quat &qbuild(const Vector<3> &eps)
     {
@@ -1001,4 +992,4 @@ public:
 //=============================================================================
 }; // namespace matrixmath
 //=============================================================================
-#endif
+//#endif

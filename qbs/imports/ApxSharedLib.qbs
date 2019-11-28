@@ -6,17 +6,19 @@ StaticLibrary {
     Depends { name: "cpp" }
 
     files: [
-        "*.h",
+        "*.h*",
         "*.c*",
     ]
 
-    /*Group {
-        fileTagsFilter: ["staticlibrary"]
-        fileTags: ["apx_lib", "apx_lib_Calc"]
-        overrideTags: false
-        filesAreTargets: true
-    }*/
+    cpp.cLanguageVersion: "c11"
+    cpp.cxxLanguageVersion: "c++11"
 
+    //support multiplex build
+    qbs.architectures: project.qbs.architectures
+    multiplexByQbsProperties: ["architectures"]
+    aggregate: false
+
+    Depends { name: "sdk"; submodules: [ "headers" ]; condition: project.sdk }
     //cpp.visibility: "default"
     //cpp.defines: project.cpp_defines
 

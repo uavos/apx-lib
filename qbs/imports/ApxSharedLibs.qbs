@@ -2,11 +2,14 @@ import qbs.FileInfo
 
 Project {
 
-    name: "ApxSharedLibs"
+    //name: "ApxSharedLibs"
     property stringList names: []
+    property string prefix: name+"."
+
+    property bool sdk: false
 
     references: names.map(function(s){
-        console.info("Library: "+s)
+        //console.info("Library: "+s)
         s=FileInfo.cleanPath(FileInfo.joinPaths(project.sourceDirectory, "../lib", s, s.split("/").slice(-1)[0]+".qbs"))
         //console.info(s)
         return s

@@ -25,29 +25,35 @@
 //=============================================================================
 #include <string.h>
 
-#include <inttypes.h>
-#include <sys/types.h>
+#include <cstdint>
+#include <math.h>
 
-#include "../MatrixMath.h"
+//#include "../MatrixMath.h"
 
-using namespace matrixmath;
+//using namespace matrixmath;
 //=============================================================================
 #ifndef assert
 #define assert(...)
 #endif
 //=============================================================================
-#ifdef USE_FLOAT_TYPE
+//#ifdef USE_FLOAT_TYPE
 typedef float _var_float;
-#else
-typedef double _var_float;
-#endif
-//=============================================================================
-typedef Vect _var_vect;
-typedef Point _var_point;
+//#else
+//typedef double _var_float;
+//#endif
 typedef uint8_t _var_byte;
 typedef uint32_t _var_uint;
 typedef uint8_t _var_flag;
 typedef uint8_t _var_enum;
+//=============================================================================
+//typedef _var_float _var_vect[3];
+//typedef _var_float _var_point[3];
+#include "MatrixMath.h"
+//using namespace matrixmath;
+typedef matrixmath::Vector<3> _var_vect;
+typedef matrixmath::Vector<2> _var_point;
+typedef _var_vect Vect;
+typedef _var_point Point;
 //=============================================================================
 //get constants
 #include "MandalaConstants.h"
@@ -83,6 +89,9 @@ public:
     _var_float get_data(uint16_t var_m, uint32_t type, void *value_ptr);
     void set_data(uint16_t var_m, _var_float value);
     void set_data(uint16_t var_m, uint32_t type, void *value_ptr, _var_float value);
+
+    static inline bool f_isvalid(const _var_float &value) { return !(std::isnan(value) || std::isinf(value)); }
+
 //-----------------------------------------------------------------------------
 #define MVAR(atype, aname, ...) var_typedef_##aname aname;
 #include "MandalaTemplate.h"

@@ -1,13 +1,13 @@
 #ifndef _filters_h
 #define _filters_h
-#include <Mandala/MatrixMath.h>
-#include <inttypes.h>
+#include <cmath>
+#include <cstdint>
 //=============================================================================
 #define FLT_CHECK_NAN
 //=============================================================================
 #ifdef FLT_CHECK_NAN
 #define FLT_CHECK_NAN_IMPL(avalue) \
-    if (!matrixmath::f_isvalid(avalue)) { \
+    if (std::isnan(avalue) || std::isinf(avalue)) { \
         avalue = 0; \
         reset(); \
     }
@@ -30,15 +30,13 @@ public:
     float step_angle(float value, const float &dt, const float &span)
     {
         f_dv[index_4] = value;
-        float diff = (4.0 / 3.0 / 2.0) * bound(f_dv[index_3] - f_dv[index_1], span) / dt
-                     - (1.0 / 3.0 / 4.0) * bound(value - f_dv[index_0], span) / dt;
+        float diff = (4.0 / 3.0 / 2.0) * bound(f_dv[index_3] - f_dv[index_1], span) / dt - (1.0 / 3.0 / 4.0) * bound(value - f_dv[index_0], span) / dt;
         return step_next(diff);
     }
     float step(float value, const float &dt)
     {
         f_dv[index_4] = value;
-        float diff = (4.0 / 3.0 / 2.0) * (f_dv[index_3] - f_dv[index_1]) / dt
-                     - (1.0 / 3.0 / 4.0) * (value - f_dv[index_0]) / dt;
+        float diff = (4.0 / 3.0 / 2.0) * (f_dv[index_3] - f_dv[index_1]) / dt - (1.0 / 3.0 / 4.0) * (value - f_dv[index_0]) / dt;
         return step_next(diff);
     }
     void reset(const float &v = 0)

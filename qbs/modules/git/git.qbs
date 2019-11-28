@@ -7,15 +7,21 @@ Module {
 
     Probe {
         id: _probe
+
+        //input
+        property string git_top: FileInfo.cleanPath(FileInfo.joinPaths(project.sourceDirectory, "../"))
+        property var mod: File.lastModified(git_top + "/.git/logs/HEAD")
+        property string projectName: FileInfo.baseName(project.sourceDirectory)
+
+
+        //output
         property string identity
         property string version
         property string branch
         property string hash
         property string time
         property string year
-        property string git_top: FileInfo.joinPaths(project.sourceDirectory, "../")
-        property var mod: File.lastModified(git_top + "/.git/logs/HEAD")
-        property string projectName: project.name
+
         configure: {
             version = "0.0.0"
             branch = ""

@@ -114,8 +114,7 @@ void MandalaCore::set_data(uint16_t var_m, uint32_t type, void *value_ptr, _var_
         break;
     case vt_flag:
         if (m)
-            (*(_var_flag *) value_ptr) = (value <= 0) ? ((*(_var_flag *) value_ptr) & (~m))
-                                                      : ((*(_var_flag *) value_ptr) | m);
+            (*(_var_flag *) value_ptr) = (value <= 0) ? ((*(_var_flag *) value_ptr) & (~m)) : ((*(_var_flag *) value_ptr) | m);
         else
             *(_var_flag *) value_ptr = value;
         break;
@@ -255,7 +254,7 @@ uint32_t MandalaCore::pack_float_u100(void *buf, void *value_ptr)
 uint32_t MandalaCore::pack_float_f2(void *buf, void *value_ptr)
 { //IEEE 754r
     float f = *((_var_float *) value_ptr);
-    if (!matrixmath::f_isvalid(*((_var_float *) value_ptr)))
+    if (!MandalaCore::f_isvalid(*((_var_float *) value_ptr)))
         *((_var_float *) value_ptr) = 0;
     uint8_t *ptr = (uint8_t *) &f;
     uint32_t x = ptr[0] | ptr[1] << 8 | ptr[2] << 16 | ptr[3] << 24, xs, xe, xm;
@@ -270,33 +269,32 @@ uint32_t MandalaCore::pack_float_f2(void *buf, void *value_ptr)
         xm = x & 0x007FFFFFu;        // Pick off mantissa bits
         if (xe == 0) {               // Denormal will underflow, return a signed zero
             *hp++ = (uint16_t)(xs >> 16);
-        } else if (xe == 0x7F800000u) { // Inf or NaN (all the exponent bits are set)
-            if (xm == 0) {              // If mantissa is zero ...
+        } else if (xe == 0x7F800000u) {                   // Inf or NaN (all the exponent bits are set)
+            if (xm == 0) {                                // If mantissa is zero ...
                 *hp++ = (uint16_t)((xs >> 16) | 0x7C00u); // Signed Inf
             } else {
                 *hp++ = (uint16_t) 0xFE00u; // NaN, only 1st mantissa bit set
             }
-        } else {                                 // Normalized number
-            hs = (uint16_t)(xs >> 16);           // Sign bit
-            hes = ((int) (xe >> 23)) - 127 + 15; // Exponent unbias the single, then bias the halfp
-            if (hes >= 0x1F) {                   // Overflow
+        } else {                                          // Normalized number
+            hs = (uint16_t)(xs >> 16);                    // Sign bit
+            hes = ((int) (xe >> 23)) - 127 + 15;          // Exponent unbias the single, then bias the halfp
+            if (hes >= 0x1F) {                            // Overflow
                 *hp++ = (uint16_t)((xs >> 16) | 0x7C00u); // Signed Inf
             } else if (hes <= 0) {                        // Underflow
-                if ((14 - hes) > 24) { // Mantissa shifted all the way off & no rounding possibility
-                    hm = (uint16_t) 0u; // Set mantissa to zero
+                if ((14 - hes) > 24) {                    // Mantissa shifted all the way off & no rounding possibility
+                    hm = (uint16_t) 0u;                   // Set mantissa to zero
                 } else {
                     xm |= 0x00800000u;                    // Add the hidden leading bit
                     hm = (uint16_t)(xm >> (14 - hes));    // Mantissa
                     if ((xm >> (13 - hes)) & 0x00000001u) // Check for rounding
-                        hm += (uint16_t) 1u; // Round, might overflow into exp bit, but this is OK
+                        hm += (uint16_t) 1u;              // Round, might overflow into exp bit, but this is OK
                 }
                 *hp++ = (hs | hm); // Combine sign bit and mantissa bits, biased exponent is zero
             } else {
-                he = (uint16_t)(hes << 10); // Exponent
-                hm = (uint16_t)(xm >> 13);  // Mantissa
-                if (xm & 0x00001000u)       // Check for rounding
-                    *hp++ = (hs | he | hm)
-                            + (uint16_t) 1u; // Round, might overflow to inf, this is OK
+                he = (uint16_t)(hes << 10);                 // Exponent
+                hm = (uint16_t)(xm >> 13);                  // Mantissa
+                if (xm & 0x00001000u)                       // Check for rounding
+                    *hp++ = (hs | he | hm) + (uint16_t) 1u; // Round, might overflow to inf, this is OK
                 else
                     *hp++ = (hs | he | hm); // No rounding
             }
@@ -308,7 +306,7 @@ uint32_t MandalaCore::pack_float_f2(void *buf, void *value_ptr)
 uint32_t MandalaCore::pack_float_f4(void *buf, void *value_ptr)
 {
     float f = *(_var_float *) value_ptr;
-    if (!matrixmath::f_isvalid(*(_var_float *) value_ptr))
+    if (!MandalaCore::f_isvalid(*(_var_float *) value_ptr))
         *(_var_float *) value_ptr = 0;
     uint8_t *src = (uint8_t *) &f;
     uint8_t *dest = (uint8_t *) buf;
@@ -507,33 +505,31 @@ uint32_t MandalaCore::unpack_float_f2(const void *buf, void *value_ptr)
         he = h & 0x7C00u;             // Pick off exponent bits
         hm = h & 0x03FFu;             // Pick off mantissa bits
         if (he == 0) {                // Denormal will convert to normalized
-            e = -1; // The following loop figures out how much extra to adjust the exponent
+            e = -1;                   // The following loop figures out how much extra to adjust the exponent
             do {
                 e++;
                 hm <<= 1;
-            } while ((hm & 0x0400u) == 0); // Shift until leading bit overflows into exponent bit
-            xs = ((uint32_t) hs) << 16;    // Sign bit
-            xes = ((int32_t)(he >> 10)) - 15 + 127
-                  - e;                  // Exponent unbias the halfp, then bias the single
-            xe = (uint32_t)(xes << 23); // Exponent
-            xm = ((uint32_t)(hm & 0x03FFu)) << 13; // Mantissa
-            *xp++ = (xs | xe | xm); // Combine sign bit, exponent bits, and mantissa bits
-        } else if (he == 0x7C00u) { // Inf or NaN (all the exponent bits are set)
-            if (hm == 0) {          // If mantissa is zero ...
+            } while ((hm & 0x0400u) == 0);                                  // Shift until leading bit overflows into exponent bit
+            xs = ((uint32_t) hs) << 16;                                     // Sign bit
+            xes = ((int32_t)(he >> 10)) - 15 + 127 - e;                     // Exponent unbias the halfp, then bias the single
+            xe = (uint32_t)(xes << 23);                                     // Exponent
+            xm = ((uint32_t)(hm & 0x03FFu)) << 13;                          // Mantissa
+            *xp++ = (xs | xe | xm);                                         // Combine sign bit, exponent bits, and mantissa bits
+        } else if (he == 0x7C00u) {                                         // Inf or NaN (all the exponent bits are set)
+            if (hm == 0) {                                                  // If mantissa is zero ...
                 *xp++ = (((uint32_t) hs) << 16) | ((uint32_t) 0x7F800000u); // Signed Inf
             } else {
                 *xp++ = (uint32_t) 0xFFC00000u; // NaN, only 1st mantissa bit set
             }
-        } else {                        // Normalized number
-            xs = ((uint32_t) hs) << 16; // Sign bit
-            xes = ((int32_t)(he >> 10)) - 15
-                  + 127;                // Exponent unbias the halfp, then bias the single
-            xe = (uint32_t)(xes << 23); // Exponent
-            xm = ((uint32_t) hm) << 13; // Mantissa
-            *xp++ = (xs | xe | xm);     // Combine sign bit, exponent bits, and mantissa bits
+        } else {                                    // Normalized number
+            xs = ((uint32_t) hs) << 16;             // Sign bit
+            xes = ((int32_t)(he >> 10)) - 15 + 127; // Exponent unbias the halfp, then bias the single
+            xe = (uint32_t)(xes << 23);             // Exponent
+            xm = ((uint32_t) hm) << 13;             // Mantissa
+            *xp++ = (xs | xe | xm);                 // Combine sign bit, exponent bits, and mantissa bits
         }
     }
-    if (!matrixmath::f_isvalid(f))
+    if (!MandalaCore::f_isvalid(f))
         f = 0;
     *((_var_float *) value_ptr) = f;
     return 2;
@@ -548,7 +544,7 @@ uint32_t MandalaCore::unpack_float_f4(const void *buf, void *value_ptr)
     *dest++ = *src++;
     *dest++ = *src++;
     *dest = *src;
-    if (!matrixmath::f_isvalid(f))
+    if (!MandalaCore::f_isvalid(f))
         f = 0;
     *((_var_float *) value_ptr) = f;
     return 4;
@@ -718,10 +714,7 @@ uint32_t MandalaCore::unpack_set(const uint8_t *buf, uint32_t cnt)
 }
 //=============================================================================
 //=============================================================================
-void MandalaCore::filter(const _var_float &fv,
-                         _var_float *var_p,
-                         const _var_float &fS,
-                         const _var_float &fL)
+void MandalaCore::filter(const _var_float &fv, _var_float *var_p, const _var_float &fS, const _var_float &fL)
 {
     _var_float fD = fv - *var_p;
     _var_float fDL = fD / fL;
@@ -735,10 +728,7 @@ void MandalaCore::filter(const _var_float &fv,
         return;
     *var_p = 0;
 }
-void MandalaCore::filter(const _var_vect &v,
-                         _var_vect *var_p,
-                         const _var_float &S,
-                         const _var_float &L)
+void MandalaCore::filter(const _var_vect &v, _var_vect *var_p, const _var_float &S, const _var_float &L)
 {
     for (uint32_t i = 0; i < 3; i++)
         filter(v[i], &((*var_p)[i]), S, L);
@@ -770,7 +760,7 @@ _var_float MandalaCore::inHgToAltitude(_var_float inHg, _var_float inHg_gnd)
 //=============================================================================
 //=============================================================================
 //=============================================================================
-#if defined(USE_FLOAT_TYPE) && !defined(MANDALA_FULL)
+/*#if defined(USE_FLOAT_TYPE) && !defined(MANDALA_FULL)
 // Simplified Vector math
 Vect::Vect()
 {
@@ -867,7 +857,7 @@ Vect &Vect::operator/=(const _var_float &scale)
         (*this)[i] /= scale;
     return (*this);
 }
-#endif
+#endif*/
 //=============================================================================
 //=============================================================================
 //=============================================================================
