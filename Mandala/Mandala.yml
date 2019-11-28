@@ -1,7 +1,0 @@
-depends:
-  - Mandala.Core
-files:
-  - Mandala.*
-  - MatrixMath.*
-defines:
-  - MANDALA_FULL

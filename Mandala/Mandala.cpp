@@ -46,7 +46,7 @@ void Mandala::init(void)
     //------------------------
     //init all vars
 #define MVAR(atype, aname, ...) aname = 0;
-#include "MandalaCore/MandalaTemplate.h"
+#include "MandalaTemplate.h"
     cas2tas = 1.0;
     //debug
     /*uint32_t cnt=0,sz=0,sz_hd=0;
@@ -76,7 +76,7 @@ bool Mandala::get_text_names(uint16_t varmsk, const char **name, const char **de
         *name = #abitname; \
         *descr = adescr; \
         return true;
-#include "MandalaCore/MandalaTemplate.h"
+#include "MandalaTemplate.h"
         }
         if (m)
             return false;
@@ -93,7 +93,7 @@ bool Mandala::get_text_names(uint16_t varmsk, const char **name, const char **de
         *name = #aname; \
         *descr = adescr; \
         return true;
-#include "MandalaCore/MandalaTemplate.h"
+#include "MandalaTemplate.h"
     }
     return false;
 }

@@ -28,28 +28,19 @@
 #include <cstdint>
 #include <math.h>
 
-//#include "../MatrixMath.h"
-
-//using namespace matrixmath;
 //=============================================================================
 #ifndef assert
 #define assert(...)
 #endif
 //=============================================================================
-//#ifdef USE_FLOAT_TYPE
 typedef float _var_float;
-//#else
-//typedef double _var_float;
-//#endif
 typedef uint8_t _var_byte;
 typedef uint32_t _var_uint;
 typedef uint8_t _var_flag;
 typedef uint8_t _var_enum;
 //=============================================================================
-//typedef _var_float _var_vect[3];
-//typedef _var_float _var_point[3];
 #include "MatrixMath.h"
-//using namespace matrixmath;
+
 typedef matrixmath::Vector<3> _var_vect;
 typedef matrixmath::Vector<2> _var_point;
 typedef _var_vect Vect;

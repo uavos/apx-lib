@@ -27,7 +27,7 @@
 #include <cmath>
 #include <string.h>
 //-----------------------------------------------------------------------------
-#include "MandalaCore/MandalaCore.h"
+#include "MandalaCore.h"
 
 using namespace matrixmath;
 //=============================================================================

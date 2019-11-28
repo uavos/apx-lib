@@ -13,6 +13,8 @@ StaticLibrary {
     cpp.cLanguageVersion: "c11"
     cpp.cxxLanguageVersion: "c++11"
 
+    cpp.defines: project.defines
+
     //support multiplex build
     qbs.architectures: project.qbs.architectures
     multiplexByQbsProperties: ["architectures"]
@@ -25,7 +27,7 @@ StaticLibrary {
     Export {
         Depends { name: "cpp" }
         cpp.includePaths: FileInfo.joinPaths(project.sourceDirectory, "../lib")
-        cpp.defines: product.cpp.defines
+        //cpp.defines: product.cpp.defines
 
         Parameters {
             cpp.linkWholeArchive: true

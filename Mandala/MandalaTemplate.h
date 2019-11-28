@@ -51,76 +51,8 @@ enum { vt_void = 0, vt_idx, vt_byte, vt_uint, vt_flag, vt_enum, vt_float, vt_vec
 #define C_WGS84_f ((C_WGS84_a - C_WGS84_b) / C_WGS84_a)
 #define C_WIE 7.2321151467e-05 // WGS-84 earth rotation rate (rad/s)
 //=============================================================================
-#define VA_NUM_ARGS(...) \
-    (sizeof(#__VA_ARGS__) == sizeof("") ? 0 \
-                                        : VA_NUM_ARGS_IMPL(__VA_ARGS__, \
-                                                           32, \
-                                                           31, \
-                                                           30, \
-                                                           29, \
-                                                           28, \
-                                                           27, \
-                                                           26, \
-                                                           25, \
-                                                           24, \
-                                                           23, \
-                                                           22, \
-                                                           21, \
-                                                           20, \
-                                                           19, \
-                                                           18, \
-                                                           17, \
-                                                           16, \
-                                                           15, \
-                                                           14, \
-                                                           13, \
-                                                           12, \
-                                                           11, \
-                                                           10, \
-                                                           9, \
-                                                           8, \
-                                                           7, \
-                                                           6, \
-                                                           5, \
-                                                           4, \
-                                                           3, \
-                                                           2, \
-                                                           1))
-#define VA_NUM_ARGS_IMPL(_1, \
-                         _2, \
-                         _3, \
-                         _4, \
-                         _5, \
-                         _6, \
-                         _7, \
-                         _8, \
-                         _9, \
-                         _10, \
-                         _11, \
-                         _12, \
-                         _13, \
-                         _14, \
-                         _15, \
-                         _16, \
-                         _17, \
-                         _18, \
-                         _19, \
-                         _20, \
-                         _21, \
-                         _22, \
-                         _23, \
-                         _24, \
-                         _25, \
-                         _26, \
-                         _27, \
-                         _28, \
-                         _29, \
-                         _30, \
-                         _31, \
-                         _32, \
-                         N, \
-                         ...) \
-    N
+#define VA_NUM_ARGS(...) (sizeof(#__VA_ARGS__) == sizeof("") ? 0 : VA_NUM_ARGS_IMPL(__VA_ARGS__, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1))
+#define VA_NUM_ARGS_IMPL(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, _32, N, ...) N
 //=============================================================================
 #endif
 //=============================================================================
@@ -162,12 +94,9 @@ MIDX(vor, "VOR beacon <packed data>")
 //------------------------------
 // idx LISTS
 // send to bus on change
-#define MANDALA_LIST_CTR \
-    idx_mode, idx_status, idx_error, idx_cmode, idx_power, idx_sw, idx_cam_ch, idx_cam_mode, \
-        idx_cam_opt, idx_cam_ctrb, idx_cams
+#define MANDALA_LIST_CTR idx_mode, idx_status, idx_error, idx_cmode, idx_power, idx_sw, idx_cam_ch, idx_cam_mode, idx_cam_opt, idx_cam_ctrb, idx_cams
 // send to GCU
-#define MANDALA_LIST_DLINK \
-    idx_xpdr, idx_ident, idx_dlink, idx_downstream, idx_ping, idx_mission, idx_data
+#define MANDALA_LIST_DLINK idx_xpdr, idx_ident, idx_dlink, idx_downstream, idx_ping, idx_mission, idx_data
 //------------------------------
 #undef MIDX
 #ifndef MVAR
@@ -546,10 +475,7 @@ MVAR(float, gcu_RSS, "GCU modem signal strength [0..1]", u001, u001)
 MVAR(float, gcu_Ve, "GCU battery voltage [v]", u01, u01)
 MVAR(float, gcu_MT, "GCU modem temperature [C]", s1, s1)
 
-#if defined(PAWN) || defined(QT_CORE_LIB) || defined(MANDALA_VMVARS)
-#ifndef MANDALA_VMVARS
-#define MANDALA_VMVARS
-#endif
+#if !defined(MANDALA_TINY)
 MVAR(float, VM1, "script value 1", f4, f4)
 MVAR(float, VM2, "script value 2", f4, f4)
 MVAR(float, VM3, "script value 3", f4, f4)

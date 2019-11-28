@@ -22,7 +22,6 @@
  */
 #ifndef MATRIXMATH_H
 #define MATRIXMATH_H
-//#include <iostream>
 #include <cmath>
 //=============================================================================
 namespace matrixmath {
@@ -30,44 +29,6 @@ namespace matrixmath {
 typedef float _mat_float;
 typedef int index_t;
 
-/*#ifdef USE_FLOAT_TYPE
-typedef float _mat_float;
-#else
-typedef double _mat_float;
-#endif
-typedef int index_t;
-//=============================================================================
-#if defined(USE_FLOAT_TYPE) && (!defined(MANDALA_FULL))
-// Simplified Vector math
-typedef float _mat_float;
-class Vect
-{
-public:
-    Vect();
-    Vect(const _mat_float &s);
-    Vect(const _mat_float &s0, const _mat_float &s1, const _mat_float &s2);
-    void fill(const _mat_float &value = 0);
-    _mat_float *array();
-    const _mat_float *array() const;
-    _mat_float &operator[](unsigned int index);
-    const _mat_float &operator[](unsigned int index) const;
-    Vect &operator=(const _mat_float value);
-    bool operator==(const Vect &value) const;
-    bool operator!=(const Vect &value) const;
-    const Vect operator+(const Vect &that) const;
-    Vect &operator+=(const Vect &that);
-    const Vect operator-(const Vect &that) const;
-    Vect &operator-=(const Vect &that);
-    const Vect operator*(const _mat_float &scale) const;
-    Vect &operator*=(const _mat_float &scale);
-    const Vect operator/(const _mat_float &scale) const;
-    Vect &operator/=(const _mat_float &scale);
-
-protected:
-    _mat_float v[3];
-};
-typedef _mat_float Point[2];
-#else*/
 //=============================================================================
 // VECTOR
 //=============================================================================
