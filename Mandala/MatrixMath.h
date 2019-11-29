@@ -949,8 +949,7 @@ public:
 // q_dot = Omega(w)*q;
 //extern const Matrix<4,4> Omega(const Vect &w);
 
-#endif //simplified vector
 //=============================================================================
 }; // namespace matrixmath
 //=============================================================================
-//#endif
+#endif
