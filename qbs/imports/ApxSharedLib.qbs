@@ -2,6 +2,8 @@ import qbs.FileInfo
 
 StaticLibrary {
 
+    property path libSourceDirectory: FileInfo.joinPaths(project.sourceDirectory, "../lib")
+
     Depends { name: project.arch; condition: project.arch }
     Depends { name: "cpp" }
 
@@ -15,19 +17,19 @@ StaticLibrary {
 
     cpp.defines: project.defines
 
+    cpp.includePaths: libSourceDirectory
+
+
     //support multiplex build
     qbs.architectures: project.qbs.architectures
     multiplexByQbsProperties: ["architectures"]
     aggregate: false
 
     Depends { name: "sdk"; submodules: [ "headers" ]; condition: project.sdk }
-    //cpp.visibility: "default"
-    //cpp.defines: project.cpp_defines
 
     Export {
         Depends { name: "cpp" }
-        cpp.includePaths: FileInfo.joinPaths(project.sourceDirectory, "../lib")
-        //cpp.defines: product.cpp.defines
+        cpp.includePaths: product.libSourceDirectory
 
         Parameters {
             cpp.linkWholeArchive: true
