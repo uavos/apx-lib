@@ -1,38 +1,25 @@
 import qbs.FileInfo
 
-StaticLibrary {
+Module {
+    id: _module
 
-    property path libSourceDirectory: FileInfo.joinPaths(project.sourceDirectory, "../lib")
-
-    Depends { name: project.arch; condition: project.arch }
-    Depends { name: "cpp" }
-
-    files: [
-        "*.h*",
-        "*.c*",
+    property stringList files: [
+        "*.*",
     ]
 
-    cpp.cLanguageVersion: "c11"
-    cpp.cxxLanguageVersion: "c++11"
+    property string libName: name.split(".").pop()
 
-    cpp.defines: project.defines
+    property string libsPath: FileInfo.cleanPath(FileInfo.joinPaths(path, "../.."))
+    property string libPath: FileInfo.joinPaths(libsPath, libName)
 
-    cpp.includePaths: libSourceDirectory
-
-
-    //support multiplex build
-    qbs.architectures: project.qbs.architectures
-    multiplexByQbsProperties: ["architectures"]
-    aggregate: false
-
-    Depends { name: "sdk"; submodules: [ "headers" ]; condition: project.sdk }
-
-    Export {
-        Depends { name: "cpp" }
-        cpp.includePaths: product.libSourceDirectory
-
-        Parameters {
-            cpp.linkWholeArchive: true
-        }
+    Group {
+        name: _module.name
+        files: _module.files
+        prefix: _module.libPath+"/"
+        excludeFiles: ["*.qbs"]
     }
+
+    Depends { name: "cpp" }
+    cpp.includePaths: libsPath
+
 }
