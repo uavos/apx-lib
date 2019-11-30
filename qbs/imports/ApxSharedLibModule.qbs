@@ -19,7 +19,7 @@ Module {
         prefix: _module.libPath+"/"
         excludeFiles: ["*.qbs"]
         condition: !skip_libs
-        //filesAreTargets: skip_libs
+        filesAreTargets: skip_libs
     }
 
     Depends { name: "cpp" }
