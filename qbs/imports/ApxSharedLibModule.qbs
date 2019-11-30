@@ -13,10 +13,13 @@ Module {
     property string libPath: FileInfo.joinPaths(libsPath, libName)
 
     Group {
+        property bool skip_libs: product.skip_libs
         name: _module.name
-        files: _module.files
+        files: skip_libs?[]:_module.files
         prefix: _module.libPath+"/"
         excludeFiles: ["*.qbs"]
+        condition: !skip_libs
+        //filesAreTargets: skip_libs
     }
 
     Depends { name: "cpp" }

@@ -1,2 +1,2 @@
-ApxSharedLib {
+ApxSharedLibModule {
 }
