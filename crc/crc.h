@@ -1,6 +1,6 @@
 #pragma once
 #include <inttypes.h>
-#include "../common/visibility.h"
+#include <visibility.h>
 
 __BEGIN_DECLS
 

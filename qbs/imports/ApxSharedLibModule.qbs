@@ -23,6 +23,8 @@ Module {
     }
 
     Depends { name: "cpp" }
-    cpp.includePaths: libsPath
+    cpp.includePaths: [
+        libsPath,
+    ]
 
 }
