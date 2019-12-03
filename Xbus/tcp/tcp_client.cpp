@@ -14,7 +14,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <Calc/crc.h>
+#include <crc/crc.h>
 //==============================================================================
 _tcp_client::_tcp_client(const char *name)
     : silent(false)
