@@ -13,7 +13,7 @@ using namespace xbus;
 
 bool CanWriter::sendPacket(uint8_t src_addr, uint16_t pid, const uint8_t *data, uint16_t cnt) const
 {
-    uint32_t extid = XCAN_SRC(src_addr) | XCAN_PID(pid) | XCAN_PRI_MASK;
+    uint32_t extid = XCAN_SRC(src_addr) | XCAN_PID(pid) | XCAN_PRI_MASK | (1 << 31);
 
     if (cnt <= 8) {
         return sendMessage(extid | XCAN_END_MASK, data, cnt);
@@ -22,7 +22,7 @@ bool CanWriter::sendPacket(uint8_t src_addr, uint16_t pid, const uint8_t *data, 
     //multi-frame
     uint32_t ext = 0;
     while (cnt > 0) {
-        uint32_t dtc;
+        uint8_t dtc;
         if (cnt > 8) {
             dtc = 8;
         } else {

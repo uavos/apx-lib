@@ -98,7 +98,7 @@ protected:
      * @param data packet payload data.
      * @param cnt packet payload size.
      */
-    virtual void packetReceived(uint8_t src_addr, uint16_t pid, const uint8_t *data, uint16_t cnt) const = 0;
+    virtual void packetReceived(uint8_t src_addr, uint16_t pid, const uint8_t *data, uint16_t cnt) = 0;
 
     /**
      * @brief virtual method is called to send simple zero payload can message when addressing.
