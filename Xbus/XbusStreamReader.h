@@ -26,6 +26,7 @@ public:
     inline void reset(uint16_t new_pos = 0) { pos = new_pos; }
     inline uint16_t position() const { return pos; }
     inline uint16_t tail() const { return len > pos ? len - pos : 0; }
+    inline const uint8_t *data() const { return &(msg[len > pos ? pos : (len - 1)]); }
 
     template<typename _T>
     void read(_T &data);
