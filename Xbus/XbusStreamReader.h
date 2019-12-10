@@ -3,39 +3,29 @@
 #include <sys/types.h>
 
 #include <array>
-#include <string>
+#include <cstring>
 
 #include "endian.h"
 
 class XbusStreamReader
 {
 public:
-    explicit XbusStreamReader(const uint8_t *p, uint16_t size=0)
+    explicit XbusStreamReader(const uint8_t *p, uint16_t size = 0)
         : msg(p)
         , pos(0)
         , len(size)
 
     {}
-    explicit XbusStreamReader(const uint8_t &p, uint16_t size=0)
+    explicit XbusStreamReader(const uint8_t &p, uint16_t size = 0)
         : msg(&p)
         , pos(0)
         , len(size)
 
     {}
 
-    inline void reset(uint16_t new_pos=0)
-    {
-        pos = new_pos;
-    }
-    inline uint16_t position() const
-    {
-        return pos;
-    }
-    inline uint16_t tail() const
-    {
-        return len>pos?len-pos:0;
-    }
-
+    inline void reset(uint16_t new_pos = 0) { pos = new_pos; }
+    inline uint16_t position() const { return pos; }
+    inline uint16_t tail() const { return len > pos ? len - pos : 0; }
 
     template<typename _T>
     void read(_T &data);
@@ -58,16 +48,17 @@ public:
         return v;
     }
 
-
-
     template<typename _T>
-    inline void operator>> (_T &data)
-    {read(data);}
+    inline void operator>>(_T &data)
+    {
+        read(data);
+    }
 
     template<class _T, size_t _Size>
-    inline void operator>> (std::array<_T, _Size> &data)
-    {read(data);}
-
+    inline void operator>>(std::array<_T, _Size> &data)
+    {
+        read(data);
+    }
 
 private:
     const uint8_t *msg;
@@ -86,7 +77,7 @@ void XbusStreamReader::get_data(_T &buf, _Tout &data)
     memcpy(&buf, &msg[pos], sizeof(_T));
 
     // message is trimmed - bzero tail
-    if (len>0 && pos + sizeof(_T) > len) {
+    if (len > 0 && pos + sizeof(_T) > len) {
         union {
             _T d;
             uint8_t u8[sizeof(_T)];
@@ -128,7 +119,7 @@ template<typename _T>
 void XbusStreamReader::read(_T &data)
 {
     // message is trimmed - fill with zeroes
-    if (len>0 && pos >= len) {
+    if (len > 0 && pos >= len) {
         data = 0;
         pos += sizeof(_T);
         return;
@@ -167,4 +158,3 @@ void XbusStreamReader::read(std::array<_T, _Size> &data)
         *this >> v;
     }
 }
-
