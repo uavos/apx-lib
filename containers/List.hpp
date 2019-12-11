@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <stdlib.h>
+#include <cinttypes>
 
 template<class T>
 class ListNode
@@ -82,8 +82,8 @@ public:
         }
     };
 
-    Iterator begin() { return Iterator(getHead()); }
-    Iterator end() { return Iterator(nullptr); }
+    Iterator begin() const { return Iterator(getHead()); }
+    Iterator end() const { return Iterator(nullptr); }
 
     const T getHead() const { return _head; }
 
