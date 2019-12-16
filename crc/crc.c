@@ -97,7 +97,7 @@ uint16_t CRC_16_CCITT_QT(const uint8_t *buf, uint32_t size, uint16_t crc)
     return crc;
 }
 //==============================================================================
-uint32_t CRC_32_NODES(const void *data, uint32_t size, uint32_t crc)
+uint32_t CRC_32(const void *data, uint32_t size, uint32_t crc, const uint32_t poly)
 {
     const uint8_t *buf = (const uint8_t *) data;
     while (size--) {
@@ -105,12 +105,16 @@ uint32_t CRC_32_NODES(const void *data, uint32_t size, uint32_t crc)
         uint32_t i = v ^ ((crc) &0x000000FF);
         for (uint32_t j = 8; j > 0; j--) {
             if (i & 1)
-                i = (i >> 1) ^ 0xEDB88320;
+                i = (i >> 1) ^ poly;
             else
                 i >>= 1;
         }
         crc = ((crc) >> 8) ^ i;
     }
     return crc;
+}
+uint32_t CRC_32_NODES(const void *data, uint32_t size, uint32_t crc)
+{
+    return CRC_32(data, size, crc, 0xEDB88320);
 }
 //==============================================================================
