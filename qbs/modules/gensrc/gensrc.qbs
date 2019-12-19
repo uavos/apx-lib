@@ -14,12 +14,16 @@ import qbs.FileInfo
 Module {
     id: _module
 
+    //input
+    property varList data
+
+
+    //internal
     Depends { name: "cpp" }
     cpp.includePaths: [FileInfo.joinPaths(product.buildDirectory,"gensrc")]
 
     property string tool: FileInfo.joinPaths(path, "gensrc.py")
 
-    property var data
     FileTagger {
         patterns: ["*.h.j2", "*.cpp.j2"]
         fileTags: ["gensrc.input"]
@@ -60,8 +64,11 @@ Module {
             args.push(JSON.stringify(product.gensrc.data))
 
             cmd = new Command("python", args);
-            cmd.description = "Generating source files..."
-            cmd.highlight = "filegen"
+            cmd.description = "Parsing "+input.fileName
+            cmd.highlight = "codegen"
+            cmd.stdoutFilterFunction=function(s){
+                return ""
+            }
             commands.push(cmd)
 
             return commands
