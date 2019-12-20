@@ -25,12 +25,12 @@ Module {
     property string tool: FileInfo.joinPaths(path, "gensrc.py")
 
     FileTagger {
-        patterns: ["*.h.j2", "*.cpp.j2"]
+        patterns: ["*.h.j2", "*.cpp.j2", "*.c.j2"]
         fileTags: ["gensrc.input"]
     }
     Rule {
         inputs: ["gensrc.input"]
-        outputFileTags: ["cpp", "h"]
+        outputFileTags: ["h", "cpp", "c"]
         outputArtifacts: {
             var a, list = []
             var data=product.gensrc.data
