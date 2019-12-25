@@ -10,14 +10,8 @@
 class XbusStreamReader
 {
 public:
-    explicit XbusStreamReader(const uint8_t *p, uint16_t size = 0)
-        : msg(p)
-        , pos(0)
-        , len(size)
-
-    {}
-    explicit XbusStreamReader(const uint8_t &p, uint16_t size = 0)
-        : msg(&p)
+    explicit XbusStreamReader(const void *p, uint16_t size = 0)
+        : msg(static_cast<const uint8_t *>(p))
         , pos(0)
         , len(size)
 
