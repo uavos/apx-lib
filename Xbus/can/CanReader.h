@@ -8,6 +8,7 @@
 
 #include <cstdint>
 
+#include <Xbus/XbusPacket.h>
 #include <common/do_not_copy.h>
 
 #ifndef XCAN_PACKET_MAX_SIZE
@@ -45,16 +46,16 @@ private:
     uint8_t src_address(uint32_t extid) const;
 
     /**
-     * @brief Extract packet id from can ID.
+     * @brief Extract xbus packet id from can ID.
      * @param extid can ID of the received message.
      * @return Returns packet id.
      */
-    uint16_t pid(uint32_t extid) const;
+    xbus::pid_t pid(uint32_t extid) const;
 
     /**
      * @brief Prepare and send addressing packet.
      */
-    void sendAddressing() const;
+    void sendAddressing();
 
     class Pool
     {
@@ -75,6 +76,7 @@ private:
 
     Pool pool;
 
+    //pid is prepended
     uint8_t _rxdata[XCAN_PACKET_MAX_SIZE];
 
 protected:
@@ -98,13 +100,13 @@ protected:
      * @param data packet payload data.
      * @param cnt packet payload size.
      */
-    virtual void packetReceived(uint8_t src_addr, uint16_t pid, const uint8_t *data, uint16_t cnt) = 0;
+    virtual void packetReceived(uint8_t src_addr, const uint8_t *data, uint16_t cnt) = 0;
 
     /**
      * @brief virtual method is called to send simple zero payload can message when addressing.
      * @param extid can ID of the message, MSB=EXTID (Extended ID indication).
      */
-    virtual void sendAddressingResponse(uint32_t extid) const = 0;
+    virtual void sendAddressingResponse(uint32_t extid) = 0;
 
     /**
      * @brief virtual method is called to indicate error.

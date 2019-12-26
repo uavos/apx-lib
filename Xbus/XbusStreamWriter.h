@@ -24,6 +24,7 @@ public:
     inline void reset(uint16_t new_pos = 0) { pos = new_pos; }
     inline uint16_t position() const { return pos; }
     inline uint8_t *buf() const { return msg; }
+    inline uint8_t *data() const { return &(msg[pos]); }
 
     //template<typename _T>
     //void write(const _T data);

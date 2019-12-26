@@ -4,8 +4,10 @@
 
 namespace xdb {
 
-struct nmt_data_t : public iface_data_base_t
+struct nmt_data_t
 {
+    const uint8_t *data;
+    size_t size;
     uint16_t cmd;
 };
 
