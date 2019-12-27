@@ -11,11 +11,6 @@ namespace xdb {
 class XdbManager
 {
 public:
-    explicit XdbManager();
-    static XdbManager *instance() { return _instance; }
-
-    static void initialize();
-
     static void publish(uid_t uid, const void *data, uint16_t size);
 
     static void subscribe(XdbSub *n);
@@ -25,10 +20,8 @@ public:
     static void unadvertise(XdbPub *n);
 
 private:
-    static XdbManager *_instance;
-
-    List<XdbPub *> _pubs;
-    OrderedList<XdbSub *> _subs;
+    static List<XdbPub *> _pubs;
+    static OrderedList<XdbSub *> _subs;
 };
 
 } // namespace xdb

@@ -30,7 +30,7 @@ Module {
     }
     Rule {
         inputs: ["gensrc.input"]
-        outputFileTags: ["h", "cpp", "c"]
+        outputFileTags: ["h", "cpp", "c", "gensrc.output"]
         outputArtifacts: {
             var a, list = []
             var data=product.gensrc.data
@@ -46,7 +46,7 @@ Module {
                 list.push(a)
             }*/
             a = {}
-            a.fileTags = [ FileInfo.completeSuffix(tname) ]
+            a.fileTags = [ FileInfo.completeSuffix(tname), "gensrc.output" ]
             a.filePath = FileInfo.joinPaths(product.buildDirectory, "gensrc", tname)
             list.push(a)
             return list
