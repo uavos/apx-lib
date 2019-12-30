@@ -29,6 +29,7 @@ Module {
         fileTags: ["gensrc.input"]
     }
     Rule {
+        inputsFromDependencies: ["gensrc.input"]
         inputs: ["gensrc.input"]
         outputFileTags: ["h", "cpp", "c", "gensrc.output"]
         outputArtifacts: {
@@ -61,7 +62,20 @@ Module {
             args.push("--dest")
             args.push(FileInfo.joinPaths(product.buildDirectory, "gensrc"))
             args.push("--data")
-            args.push(JSON.stringify(product.gensrc.data))
+
+            var data=[]
+            var src=product.gensrc.data
+            for(var i in src){
+                var m=(src[i])
+                delete m.files
+                delete m.config
+                delete m.depends
+                delete m.libs
+                delete m.timestamp
+                data.push(m)
+            }
+
+            args.push(JSON.stringify(data))
 
             cmd = new Command("python", args);
             cmd.description = "Parsing "+input.fileName
