@@ -1,0 +1,334 @@
+- name: engine
+  title: Engine sensors
+
+  content:
+    - name: rpm
+      title: RPM sensors
+      units: 1/min
+      type: uint
+      sprec: u2
+      content:
+        - name: eng
+          alias: rpm
+          title: Engine RPM
+        - name: clutch
+          title: Clutch RPM
+        - name: prop
+          title: Prop RPM
+
+    - name: power
+      title: Engine power
+      content:
+        - name: thrust
+          title: Engine thrust
+          units: "N"
+          sprec: u2
+        - name: turbo
+          title: Turbocharger
+          type: enum
+          content:
+            - name: "off"
+              suffix: "off"
+            - name: active
+              suffix: active
+            - name: warn
+              suffix: warning
+            - name: caution
+              suffix: caution
+
+    - name: temp
+      title: Engine temperature sensors
+      units: C
+      sprec: u1
+      content:
+        - name: head
+          alias: ET
+          title: Engine temperature
+        - name: oil
+          alias: OT
+          title: Oil temperature OT
+        - name: intake
+          title: Intake air box pressure IAP
+          units: kPa
+          sprec: f2
+        - name: exhaust
+          alias: EGT
+          title: Exhaust temperature EGT
+          sprec: u10
+        - name: egtd
+          title: Exhaust delta temperature
+          sprec: u10
+
+    - name: pressure
+      title: Engine pressure sensors
+      content:
+        - name: op
+          alias: OP
+          title: Oil pressure
+          units: bar
+          sprec: u01
+        - name: map
+          title: Mainfold air pressure
+          units: Pa
+          sprec: f2
+        - name: fuel
+          title: Fuel pressure
+          units: bar
+          sprec: u1
+
+    - name: clutch
+      title: Clutch status
+      type: enum
+      content:
+        - name: "off"
+          title: Clutch off
+        - name: "on"
+          title: Clutch engaged
+        - name: busy
+          title: Clutch busy
+
+- name: power
+  title: Power measurements
+  content:
+    - name: sys
+      title: System
+      content:
+        - name: voltage
+          alias: Ve
+          suffix: voltage
+          units: v
+        - name: current
+          alias: Ie
+          suffix: current
+          units: A
+          sprec: u001
+
+    - name: servo
+      title: Servo
+      content:
+        - name: voltage
+          alias: Vs
+          suffix: voltage
+          units: v
+          sprec: f2
+        - name: current
+          alias: Is
+          suffix: current
+          units: A
+          sprec: u01
+
+    - name: payload
+      title: Payload
+      content:
+        - name: voltage
+          alias: Vp
+          suffix: voltage
+          units: v
+          sprec: f2
+        - name: current
+          alias: Ip
+          suffix: current
+          units: A
+          sprec: u01
+
+    - name: engine
+      title: Engine ECU
+      content:
+        - name: voltage
+          alias: Vm
+          suffix: voltage
+          units: v
+          sprec: f2
+        - name: current
+          alias: Im
+          suffix: current
+          units: A
+          sprec: u1
+
+- name: energy
+  title: Energy capacity sensors
+  content:
+    - name: fuel
+      title: Fuel information
+      content:
+        - name: capacity
+          alias: fuel
+          title: Fuel capacity
+          units: l
+        - name: rate
+          alias: frate
+          title: Fuel flow rate
+          units: l/h
+          sprec: f2
+
+    - name: bat
+      title: Battery
+      content:
+        - name: voltage
+          suffix: voltage
+          units: v
+          sprec: f2
+        - name: current
+          suffix: current
+          units: A
+          sprec: u01
+        - name: temp
+          suffix: temperature
+          units: C
+          sprec: s1
+        - name: capacity
+          suffix: capacity
+          units: A/h
+          sprec: u1
+        - name: status
+          title: Battery status
+          type: enum
+          content:
+            - name: ok
+              title: Battery ok
+            - name: "off"
+              title: Battery off
+            - name: chg
+              title: Battery charging
+            - name: err
+              title: Battery error
+
+    - name: gen
+      title: Power generator
+      content:
+        - name: voltage
+          suffix: voltage
+          units: v
+          sprec: f2
+        - name: current
+          suffix: current
+          units: A
+          sprec: u1
+        - name: temp
+          suffix: temperature
+          units: C
+          sprec: s1
+
+- name: comm
+  title: Communication sensors
+  content:
+    - name: radio
+      title: Datalink radio sensors
+      content:
+        - name: rss
+          alias: RSS
+          title: Received signal strength
+          units: "%"
+          type: byte
+          sprec: u1
+        - name: snr
+          title: Signal to noise ratio
+          units: u
+          type: uint
+          sprec: u2
+        - name: temp
+          alias: MT
+          title: Modem temperature
+          units: C
+          sprec: s1
+        - name: hdg
+          title: Radio heading to transmitter
+          units: deg
+          sprec: f2
+        - name: dme
+          title: Radio distance to transmitter
+          units: m
+          type: uint
+          sprec: u4
+
+    - name: formation
+      title: Formation flight data
+      content:
+        - name: dme
+          title: Distance to neighbour
+          units: m
+          type: uint
+          sprec: u4
+
+- name: target
+  title: Target tracking"
+  content:
+    - name: radar
+      title: Radar target tracking"
+      content:
+        - name: hdg
+          title: Radar heading to target
+          units: deg
+        - name: elv
+          title: Radar elevation to target
+          units: deg
+        - name: DME
+          title: Radar distance to target
+          type: uint
+          units: m
+          sprec: u2
+        - name: vel
+          title: Radar target velocity
+          units: m/s
+
+- name: status
+  title: Vehicle status sensors
+  content:
+    - name: temp
+      title: Auxilary temperature sensors
+      units: C
+      sprec: s1
+      content:
+        - name: room
+          alias: RT
+          title: Room temperature
+
+    - name: err
+      title: Error sensors
+      content:
+        - name: ers
+          alias: sb_ers_err
+          title: ERS status
+          type: enum
+          content:
+            - name: ERS ok
+              suffix: ERS ok
+            - name: ERS error
+              suffix: ERS error
+
+    - name: landed
+      title: Vehicle landed detectors
+      content:
+        - name: gear
+          title: Landing gear force sensor
+          units: "%"
+          type: byte
+
+    - name: switch
+      title: Front panel switches
+      content:
+        - name: ers
+          title: ERS switch
+          type: enum
+          content:
+            - name: disarmed
+              suffix: disarmed
+            - name: armed
+              suffix: armed
+        - name: starter
+          alias: ctrb_starter
+          title: Engine starter
+          type: enum
+          content:
+            - name: "off"
+              suffix: "off"
+            - name: "on"
+              suffix: "on"
+        - name: safe
+          title: Safety switch
+          type: enum
+          content:
+            - name: "off"
+              suffix: "off"
+            - name: "on"
+              suffix: "on"
