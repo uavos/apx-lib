@@ -1,0 +1,8 @@
+{%- set indent_size = 4 -%}
+
+{%- macro comment(v) -%}
+{% if v %} // {{ v }}{% endif %}
+{% endmacro -%}
+
+{%- block content -%}
+{% endblock %}

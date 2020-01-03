@@ -19,6 +19,8 @@ configExt = '.yml'
 
 # construct dict based on file [config] or data
 class Mandala(dict):
+    config = None
+
     def __init__(self, config=None, data=None, parent=None):
         dict.__init__(self)
 
@@ -34,8 +36,8 @@ class Mandala(dict):
                     continue
                 self[p] = parent[p]
 
-        if config:
-            self['config'] = config
+        if config and not Mandala.config:
+            Mandala.config = config
 
         for key in data:
             if key == 'content':
@@ -48,19 +50,20 @@ class Mandala(dict):
             obj = data[key]
             self[key] = list()
             if not isinstance(obj, list):
-                obj = self.read_config(os.path.join(os.path.dirname(self['config']), obj+configExt))
+                conf = os.path.join(os.path.dirname(Mandala.config), obj+configExt)
+                obj = self.read_config(conf)
             for i in list(obj):
                 self[key].append(Mandala(data=i, parent=self))
 
         # post process some fields
         if 'suffix' in self:
-            print parent
+            # print parent
             assert(parent)
             self['title'] = parent['title']+' '+self['suffix']
             del self['suffix']
 
     def read_config(self, config):
-        print('Reading {}...'.format(config))
+        # print('Reading {}...'.format(config))
         with open(config, 'r') as f:
             return yaml.load(f.read())
 

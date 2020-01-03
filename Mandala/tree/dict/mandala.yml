@@ -12,10 +12,12 @@ desc: Vehicle core data manager and data structure.
 # prec:   number precision, decimal points
 # sprec:  stream packing format
 # suffix: make title from parent.title+suffix
+# alias:  shortcut name
 
 # Parameters are inherited from parent by child fields
 
 # Tree UID contains 6 levels of IDs (15 bits):
+# 0CCT SSSM MMGG GFFF
 #
 #   4  classes      2 bits  b14-b13   x4  [sns, ctr, state, cmd]
 #   2  types        1 bit   b12       x2  [nav, env]

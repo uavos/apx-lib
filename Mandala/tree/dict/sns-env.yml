@@ -251,10 +251,10 @@
           sprec: u4
 
 - name: target
-  title: Target tracking"
+  title: Target tracking
   content:
     - name: radar
-      title: Radar target tracking"
+      title: Radar target tracking
       content:
         - name: hdg
           title: Radar heading to target
@@ -291,10 +291,10 @@
           title: ERS status
           type: enum
           content:
-            - name: ERS ok
-              suffix: ERS ok
-            - name: ERS error
-              suffix: ERS error
+            - name: ok
+              suffix: ok
+            - name: error
+              suffix: error
 
     - name: landed
       title: Vehicle landed detectors
@@ -304,7 +304,7 @@
           units: "%"
           type: byte
 
-    - name: switch
+    - name: button
       title: Front panel switches
       content:
         - name: ers

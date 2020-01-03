@@ -1,0 +1,41 @@
+{%- extends 'Mandala.j2' %}
+
+{%- macro mandala_dict_expand(d, indent, path=[], level=0) -%}
+{% set ind = ' '*indent*indent_size %}
+{% set ind1 = ' '*(indent+1)*indent_size %}
+{% if level == 0 %}
+{% set name = 'data' %}
+{% set path = path+['meta'] %}
+{% else %}
+{% set name = d.name %}
+{% set path = path+[name] %}
+{% endif %}
+{% set meta = path|join('::') %}
+{{ ind }}{
+{{ ind1 }}.name = {{ meta }}::name,
+{{ ind1 }}.title = {{ meta }}::title,
+{{ ind1 }}.descr = {{ meta }}::descr,
+{{ ind1 }}.uid = {{ meta }}::uid,
+{{ ind1 }}.level = {{ level }},
+{{ ind }}},
+{% for i in d.content %}
+{{ mandala_dict_expand(i, indent, path, level+1) }}
+{%- endfor -%}
+{%- endmacro -%}
+
+{%- block content %}
+
+#pragma once
+
+#include <Mandala/tree/MandalaDictBase.h>
+#include <MandalaMeta.h>
+
+namespace mandala {
+
+static constexpr const mandala::dict_meta_t dict[] = {
+{{ mandala_dict_expand(data, 1) }}
+}; // dict array
+
+}; // namespace
+
+{% endblock %}

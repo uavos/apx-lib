@@ -1,0 +1,54 @@
+{%- extends 'Mandala.j2' %}
+
+{% set uid_power = [13,12,9,6,3,0,0] %}
+
+
+{%- macro constants_expand(d, indent, uid) -%}
+{% set ind = ' '*indent*indent_size %}
+{{ ind }}static constexpr const char *name{"{{ d.name }}"};
+{{ ind }}static constexpr const char *title{"{{ d.title }}"};
+{{ ind }}static constexpr const char *descr{"{{ d.desc }}"};
+{{ ind }}static constexpr const mandala::uid_t uid{ 0x{{ '%0x' % uid }} };
+{% if d.content is not defined %}
+{{ ind }}static constexpr const mandala::type_id_t type_id{ mandala::type_{{ d.type }} };
+{% endif %}
+{%- endmacro -%}
+
+{%- macro mandala_expand(d, indent, path=[], level=0, uid=0) -%}
+{% set ind = ' '*indent*indent_size %}
+{% if d.content is defined %}
+{% set pub = 'meta_'+level|string+'_t' %}
+{% else %}
+{% set pub = 'field_t<mandala::'+d.type+'_t>' %}
+{% endif %}
+{% if level == 0 %}
+{% set name = 'meta' %}
+{% else %}
+{% set name = d.name %}
+{% endif %}
+{% set path = path+[name] %}
+{{ ind }}// {{ path|join('::') }}
+{{ ind }}class {{ name }}: public mandala::{{ pub }}
+{{ ind }}{
+{{ ind }}public:
+{{ constants_expand(d, indent+1, uid) }}
+{% for i in d.content %}
+{{ mandala_expand(i, indent+1, path, level+1, uid+(loop.index0*(2**uid_power[level]))) }}
+{% endfor %}
+{{ ind }}};  // {{ name }}
+{%- endmacro -%}
+
+{%- block content %}
+
+#pragma once
+
+#include <Mandala/tree/MandalaMetaBase.h>
+#include <Mandala/tree/MandalaValue.h>
+
+namespace mandala {
+
+{{ mandala_expand(data, 0) }}
+
+}; // namespace
+
+{% endblock %}

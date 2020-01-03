@@ -2,43 +2,40 @@
 
 - name: ins
   title: Inertial Navigation System
-  content: # 8 groups, 8 subgroups, 8 fields
-    - name: imu
-      title: Inertial sensors data
+  content: # 8 groups, 8 subgroups, 8 fields/redundancies
+    - name: gyro
+      title: Angular rate
+      units: deg/s
+      prec: 0
       content:
-        - name: gyro
-          title: Angular rate
-          units: deg/s
-          prec: 0
-          content:
-            - name: x
-              suffix: X
-            - name: "y"
-              suffix: "Y"
-            - name: z
-              suffix: Z
-        - name: acc
-          title: Acceleration
-          units: m/s2
-          content:
-            - name: x
-              suffix: X
-            - name: "y"
-              suffix: "Y"
-            - name: z
-              suffix: Z
+        - name: "x"
+          suffix: "X"
+        - name: "y"
+          suffix: "Y"
+        - name: "z"
+          suffix: "Z"
+    - name: acc
+      title: Acceleration
+      units: m/s2
+      content:
+        - name: "x"
+          suffix: "X"
+        - name: "y"
+          suffix: "Y"
+        - name: "z"
+          suffix: "Z"
 
     - name: mag
       title: Magnetic field
       units: a.u.
       prec: 3
       content:
-        - name: x
-          suffix: X
+        - name: "x"
+          suffix: "X"
         - name: "y"
           suffix: "Y"
-        - name: z
-          suffix: Z
+        - name: "z"
+          suffix: "Z"
 
     - name: temp
       title: INS temperature

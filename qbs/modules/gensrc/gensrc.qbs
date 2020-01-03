@@ -15,7 +15,7 @@ Module {
     id: _module
 
     //input
-    property varList data
+    property var data
 
 
     //internal
@@ -63,7 +63,7 @@ Module {
             args.push(FileInfo.joinPaths(product.buildDirectory, "gensrc"))
             args.push("--data")
 
-            var data=[]
+            /*var data=[]
             var src=product.gensrc.data
             for(var i in src){
                 var m=(src[i])
@@ -73,9 +73,9 @@ Module {
                 delete m.libs
                 delete m.timestamp
                 data.push(m)
-            }
+            }*/
 
-            args.push(JSON.stringify(data))
+            args.push(JSON.stringify(product.gensrc.data))
 
             cmd = new Command("python", args);
             cmd.description = "Parsing "+input.fileName
