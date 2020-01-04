@@ -34,24 +34,14 @@ Module {
         outputFileTags: ["h", "cpp", "c", "gensrc.output"]
         outputArtifacts: {
             var a, list = []
-            var data=product.gensrc.data
             var tname = input.completeBaseName
-            /*if(!(data instanceof Array)){
-                data=[data]
-            }
-            for(var i in data){
-                var d=data[i]
-                a = {}
-                a.fileTags = [ FileInfo.completeSuffix(tname) ]
-                a.filePath = FileInfo.joinPaths(product.buildDirectory, "gensrc", d.name.replace(/\./g,"_")+"_"+tname)
-                list.push(a)
-            }*/
             a = {}
             a.fileTags = [ FileInfo.completeSuffix(tname), "gensrc.output" ]
             a.filePath = FileInfo.joinPaths(product.buildDirectory, "gensrc", tname)
             list.push(a)
             return list
         }
+
         prepare: {
             var cmd, commands = []
 
@@ -62,18 +52,6 @@ Module {
             args.push("--dest")
             args.push(FileInfo.joinPaths(product.buildDirectory, "gensrc"))
             args.push("--data")
-
-            /*var data=[]
-            var src=product.gensrc.data
-            for(var i in src){
-                var m=(src[i])
-                delete m.files
-                delete m.config
-                delete m.depends
-                delete m.libs
-                delete m.timestamp
-                data.push(m)
-            }*/
 
             args.push(JSON.stringify(product.gensrc.data))
 

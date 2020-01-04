@@ -1,41 +1,40 @@
 {%- extends 'Mandala.j2' %}
 
-{% set uid_power = [13,12,9,6,3,0,0] %}
+{% set uid_shift = data.uid_shift %}
 
 
-{%- macro constants_expand(d, indent, uid) -%}
+{%- macro constants_expand(d, indent, uid, parent) -%}
 {% set ind = ' '*indent*indent_size %}
+{% if d.suffix is defined %}
+{% set title = parent.title+' '+d.suffix %}
+{% else %}
+{% set title = d.title %}
+{% endif %}
 {{ ind }}static constexpr const char *name{"{{ d.name }}"};
-{{ ind }}static constexpr const char *title{"{{ d.title }}"};
-{{ ind }}static constexpr const char *descr{"{{ d.desc }}"};
+{{ ind }}static constexpr const char *title{"{{ title }}"};
 {{ ind }}static constexpr const mandala::uid_t uid{ 0x{{ '%0x' % uid }} };
 {% if d.content is not defined %}
 {{ ind }}static constexpr const mandala::type_id_t type_id{ mandala::type_{{ d.type }} };
 {% endif %}
 {%- endmacro -%}
 
-{%- macro mandala_expand(d, indent, path=[], level=0, uid=0) -%}
+{%- macro mandala_expand(d, indent=0, path=[], level=0, uid=0, parent={}) -%}
 {% set ind = ' '*indent*indent_size %}
+{% set path = path+[d.name] %}
 {% if d.content is defined %}
-{% set pub = 'meta_'+level|string+'_t' %}
+{% set pub = 'meta_'+level|string+'_t<'+d.name+'>' %}
 {% else %}
-{% set pub = 'field_t<mandala::'+d.type+'_t>' %}
+{% set pub = 'meta_field_t<mandala::'+d.type+'_t, '+d.name+'>' %}
 {% endif %}
-{% if level == 0 %}
-{% set name = 'meta' %}
-{% else %}
-{% set name = d.name %}
-{% endif %}
-{% set path = path+[name] %}
 {{ ind }}// {{ path|join('::') }}
-{{ ind }}class {{ name }}: public mandala::{{ pub }}
+{{ ind }}struct {{ d.name }}: public mandala::{{ pub }}
 {{ ind }}{
-{{ ind }}public:
-{{ constants_expand(d, indent+1, uid) }}
+{{ constants_expand(d, indent+1, uid, parent) }}
+{% set uid_mul = 2**uid_shift[level] %}
 {% for i in d.content %}
-{{ mandala_expand(i, indent+1, path, level+1, uid+(loop.index0*(2**uid_power[level]))) }}
+{{ mandala_expand(i, indent+1, path, level+1, uid+loop.index0*uid_mul, d) }}
 {% endfor %}
-{{ ind }}};  // {{ name }}
+{{ ind }}};  // {{ d.name }}
 {%- endmacro -%}
 
 {%- block content %}
@@ -43,11 +42,12 @@
 #pragma once
 
 #include <Mandala/tree/MandalaMetaBase.h>
-#include <Mandala/tree/MandalaValue.h>
 
 namespace mandala {
 
-{{ mandala_expand(data, 0) }}
+{% for i in data.content %}
+{{ mandala_expand(i) }}
+{% endfor %}
 
 }; // namespace
 

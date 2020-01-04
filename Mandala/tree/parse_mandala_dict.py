@@ -14,35 +14,32 @@ args = parser.parse_args()
 
 args.dict = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dict/mandala.yml')
 
-configExt = '.yml'
-
 
 # construct dict based on file [config] or data
 class Mandala(dict):
+    # static members
+    configExt = '.yml'
     config = None
+    inheritance = list()
 
-    def __init__(self, config=None, data=None, parent=None):
+    def __init__(self, root_config=None, data=None, parent=None):
         dict.__init__(self)
 
-        if not data:
-            data = self.read_config(config)
+        if root_config:
+            assert(data is None and parent is None)
+            data = self.read_config(root_config)
+            Mandala.config = root_config
+            Mandala.inheritance = data['inheritance']
 
         # inherit parent props
         if parent:
-            for p in parent:
-                if isinstance(parent[p], list):
-                    continue
-                if p in ['name', 'title', 'desc']:
-                    continue
-                self[p] = parent[p]
-
-        if config and not Mandala.config:
-            Mandala.config = config
+            for key in parent:
+                if key in Mandala.inheritance:
+                    self[key] = parent[key]
 
         for key in data:
-            if key == 'content':
-                continue
-            self[key] = data[key]
+            if key != 'content':
+                self[key] = data[key]
 
         for key in data:
             if key != 'content':
@@ -50,17 +47,10 @@ class Mandala(dict):
             obj = data[key]
             self[key] = list()
             if not isinstance(obj, list):
-                conf = os.path.join(os.path.dirname(Mandala.config), obj+configExt)
+                conf = os.path.join(os.path.dirname(Mandala.config), obj+Mandala.configExt)
                 obj = self.read_config(conf)
             for i in list(obj):
                 self[key].append(Mandala(data=i, parent=self))
-
-        # post process some fields
-        if 'suffix' in self:
-            # print parent
-            assert(parent)
-            self['title'] = parent['title']+' '+self['suffix']
-            del self['suffix']
 
     def read_config(self, config):
         # print('Reading {}...'.format(config))
@@ -68,6 +58,6 @@ class Mandala(dict):
             return yaml.load(f.read())
 
 
-mandala = Mandala(config=args.dict)
+mandala = Mandala(root_config=args.dict)
 
 print(simplejson.dumps(mandala))

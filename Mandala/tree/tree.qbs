@@ -4,7 +4,11 @@ import qbs.Process
 
 ApxSharedLibModule {
     id: _module
-    Depends { name: "gensrc" }
+
+    Depends {
+        //limitToSubProject: true
+        name: "gensrc"
+    }
     gensrc.data: _probe.data
 
     files: base

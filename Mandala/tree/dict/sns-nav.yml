@@ -41,7 +41,7 @@
       title: INS temperature
       units: C
       prec: 1
-      sprec: s1
+      sfmt: s1
       content:
         - name: gyro
           title: Gyro temperature
@@ -58,7 +58,7 @@
       content:
         - name: pos
           title: GNSS postition
-          sprec: f4
+          sfmt: f4
           content:
             - name: lat
               suffix: Latitude
@@ -114,7 +114,7 @@
           title: GNSS receiver temperature
           units: C
           prec: 1
-          sprec: s1
+          sfmt: s1
 
     - name: jamming
       title: GNSS jamming
@@ -127,14 +127,10 @@
           suffix: status
           type: enum
           units:
-            - name: "off"
-              suffix: disabled
-            - name: ok
-              suffix: ok
-            - name: warn
-              suffix: warning
-            - name: critical
-              suffix: critical warning
+            - disabled
+            - ok
+            - warning
+            - critical
 
 - name: air
   title: Aerodynamic sensors
@@ -161,7 +157,7 @@
           title: Air temperature
           units: C
           prec: 1
-          sprec: s1
+          sfmt: s1
           content:
             - name: air
               title: Ambient air temperature
@@ -204,13 +200,13 @@
           title: Laser AGL altitude
         - name: radio
           title: Radio AGL altitude
-          sprec: f4
+          sfmt: f4
 
     - name: proximity
       title: Proximity sensor
       units: m
       prec: 1
-      sprec: u01
+      sfmt: u01
       content:
         - name: front
           suffix: front
@@ -285,7 +281,7 @@
           title: ILS distance to VOR1
           units: m
           type: uint
-          sprec: u2
+          sfmt: u2
         - name: rss
           title: ILS signal strength
           units: "%"
@@ -302,7 +298,7 @@
       content:
         - name: pos
           title: Platform postition
-          sprec: f4
+          sfmt: f4
           content:
             - name: lat
               suffix: Latitude

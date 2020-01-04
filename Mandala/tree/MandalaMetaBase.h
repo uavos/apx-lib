@@ -19,46 +19,108 @@ enum type_id_t {
     type_enum,
 };
 
-class meta_base_t
-{
+enum sfmt_id_t {
+    sfmt_f4,
+    sfmt_f2,
+    sfmt_u1,
+    sfmt_u2,
+    sfmt_u4,
+    sfmt_u10,
+    sfmt_u01,
+    sfmt_u001,
+    sfmt_s1,
 };
 
-class meta_0_t : public meta_base_t
+template<typename T>
+struct meta_base_t
 {
+    static constexpr const char *name() { return T::name; }
+    static constexpr const char *title() { return T::title; }
+    static constexpr const char *descr() { return T::descr; }
+    static constexpr mandala::uid_t uid() { return T::uid; }
 };
 
-class meta_1_t : public meta_base_t
-{
-};
-
-class meta_2_t : public meta_base_t
-{
-};
-
-class meta_3_t : public meta_base_t
-{
-};
-
-class meta_4_t : public meta_base_t
-{
-};
-
-class meta_5_t : public meta_base_t
+template<typename T>
+struct meta_0_t : public meta_base_t<T>
 {
 };
 
 template<typename T>
-class meta_field_t : public meta_base_t
+struct meta_1_t : public meta_base_t<T>
 {
 };
 
-template<typename M>
-class Text
+template<typename T>
+struct meta_2_t : public meta_base_t<T>
+{
+};
+
+template<typename T>
+struct meta_3_t : public meta_base_t<T>
+{
+};
+
+template<typename T>
+struct meta_4_t : public meta_base_t<T>
+{
+};
+
+template<typename T>
+struct meta_5_t : public meta_base_t<T>
+{
+};
+
+template<typename DataType, typename T>
+class meta_field_t : public meta_base_t<T>
 {
 public:
-    constexpr const char *name() { return M::name; }
-    constexpr const char *title() { return M::title; }
-    constexpr const char *descr() { return M::descr; }
+    operator DataType() const { return m_value; }
+
+    const DataType &get() const { return m_value; }
+
+    bool set(const DataType &v)
+    {
+        if (m_value == v)
+            return false;
+        m_value = v;
+        return true;
+    }
+
+    /*explicit field_t() {}
+    field_t(const field_t &) = delete;
+    field_t &operator=(const field_t &) = delete;
+    field_t(field_t &&) = delete;
+    field_t &operator=(field_t &&) = delete;*/
+
+private:
+    DataType m_value{};
 };
+
+template<typename M>
+struct Text
+{
+    static constexpr const char *name() { return M::name; }
+    static constexpr const char *title() { return M::title; }
+    static constexpr const char *descr() { return M::descr; }
+};
+
+template<class M>
+class Value : public M
+{
+};
+
+template<class M>
+class StaticValue
+{
+public:
+    operator M() const { return m_data; }
+    M &data() const { return m_data; }
+
+private:
+    static M m_data;
+};
+
+template<class M>
+M StaticValue<M>::m_data;
 
 }; // namespace mandala

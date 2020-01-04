@@ -6,7 +6,7 @@
       title: RPM sensors
       units: 1/min
       type: uint
-      sprec: u2
+      sfmt: u2
       content:
         - name: eng
           alias: rpm
@@ -22,24 +22,20 @@
         - name: thrust
           title: Engine thrust
           units: "N"
-          sprec: u2
+          sfmt: u2
         - name: turbo
           title: Turbocharger
           type: enum
-          content:
-            - name: "off"
-              suffix: "off"
-            - name: active
-              suffix: active
-            - name: warn
-              suffix: warning
-            - name: caution
-              suffix: caution
+          units:
+            - "off"
+            - active
+            - warn
+            - caution
 
     - name: temp
       title: Engine temperature sensors
       units: C
-      sprec: u1
+      sfmt: u1
       content:
         - name: head
           alias: ET
@@ -50,14 +46,14 @@
         - name: intake
           title: Intake air box pressure IAP
           units: kPa
-          sprec: f2
+          sfmt: f2
         - name: exhaust
           alias: EGT
           title: Exhaust temperature EGT
-          sprec: u10
+          sfmt: u10
         - name: egtd
           title: Exhaust delta temperature
-          sprec: u10
+          sfmt: u10
 
     - name: pressure
       title: Engine pressure sensors
@@ -66,26 +62,23 @@
           alias: OP
           title: Oil pressure
           units: bar
-          sprec: u01
+          sfmt: u01
         - name: map
           title: Mainfold air pressure
           units: Pa
-          sprec: f2
+          sfmt: f2
         - name: fuel
           title: Fuel pressure
           units: bar
-          sprec: u1
+          sfmt: u1
 
     - name: clutch
       title: Clutch status
       type: enum
-      content:
-        - name: "off"
-          title: Clutch off
-        - name: "on"
-          title: Clutch engaged
-        - name: busy
-          title: Clutch busy
+      units:
+        - "off"
+        - "on"
+        - busy
 
 - name: power
   title: Power measurements
@@ -101,7 +94,7 @@
           alias: Ie
           suffix: current
           units: A
-          sprec: u001
+          sfmt: u001
 
     - name: servo
       title: Servo
@@ -110,12 +103,12 @@
           alias: Vs
           suffix: voltage
           units: v
-          sprec: f2
+          sfmt: f2
         - name: current
           alias: Is
           suffix: current
           units: A
-          sprec: u01
+          sfmt: u01
 
     - name: payload
       title: Payload
@@ -124,12 +117,12 @@
           alias: Vp
           suffix: voltage
           units: v
-          sprec: f2
+          sfmt: f2
         - name: current
           alias: Ip
           suffix: current
           units: A
-          sprec: u01
+          sfmt: u01
 
     - name: engine
       title: Engine ECU
@@ -138,12 +131,12 @@
           alias: Vm
           suffix: voltage
           units: v
-          sprec: f2
+          sfmt: f2
         - name: current
           alias: Im
           suffix: current
           units: A
-          sprec: u1
+          sfmt: u1
 
 - name: energy
   title: Energy capacity sensors
@@ -159,7 +152,7 @@
           alias: frate
           title: Fuel flow rate
           units: l/h
-          sprec: f2
+          sfmt: f2
 
     - name: bat
       title: Battery
@@ -167,31 +160,27 @@
         - name: voltage
           suffix: voltage
           units: v
-          sprec: f2
+          sfmt: f2
         - name: current
           suffix: current
           units: A
-          sprec: u01
+          sfmt: u01
         - name: temp
           suffix: temperature
           units: C
-          sprec: s1
+          sfmt: s1
         - name: capacity
           suffix: capacity
           units: A/h
-          sprec: u1
+          sfmt: u1
         - name: status
           title: Battery status
           type: enum
-          content:
-            - name: ok
-              title: Battery ok
-            - name: "off"
-              title: Battery off
-            - name: chg
-              title: Battery charging
-            - name: err
-              title: Battery error
+          units:
+            - ok
+            - "off"
+            - charging
+            - error
 
     - name: gen
       title: Power generator
@@ -199,15 +188,15 @@
         - name: voltage
           suffix: voltage
           units: v
-          sprec: f2
+          sfmt: f2
         - name: current
           suffix: current
           units: A
-          sprec: u1
+          sfmt: u1
         - name: temp
           suffix: temperature
           units: C
-          sprec: s1
+          sfmt: s1
 
 - name: comm
   title: Communication sensors
@@ -220,26 +209,26 @@
           title: Received signal strength
           units: "%"
           type: byte
-          sprec: u1
+          sfmt: u1
         - name: snr
           title: Signal to noise ratio
           units: u
           type: uint
-          sprec: u2
+          sfmt: u2
         - name: temp
           alias: MT
           title: Modem temperature
           units: C
-          sprec: s1
+          sfmt: s1
         - name: hdg
           title: Radio heading to transmitter
           units: deg
-          sprec: f2
+          sfmt: f2
         - name: dme
           title: Radio distance to transmitter
           units: m
           type: uint
-          sprec: u4
+          sfmt: u4
 
     - name: formation
       title: Formation flight data
@@ -248,7 +237,7 @@
           title: Distance to neighbour
           units: m
           type: uint
-          sprec: u4
+          sfmt: u4
 
 - name: target
   title: Target tracking
@@ -266,7 +255,7 @@
           title: Radar distance to target
           type: uint
           units: m
-          sprec: u2
+          sfmt: u2
         - name: vel
           title: Radar target velocity
           units: m/s
@@ -277,7 +266,7 @@
     - name: temp
       title: Auxilary temperature sensors
       units: C
-      sprec: s1
+      sfmt: s1
       content:
         - name: room
           alias: RT
@@ -290,11 +279,9 @@
           alias: sb_ers_err
           title: ERS status
           type: enum
-          content:
-            - name: ok
-              suffix: ok
-            - name: error
-              suffix: error
+          units:
+            - ok
+            - error
 
     - name: landed
       title: Vehicle landed detectors
@@ -310,25 +297,19 @@
         - name: ers
           title: ERS switch
           type: enum
-          content:
-            - name: disarmed
-              suffix: disarmed
-            - name: armed
-              suffix: armed
+          units:
+            - disarmed
+            - armed
         - name: starter
           alias: ctrb_starter
           title: Engine starter
           type: enum
-          content:
-            - name: "off"
-              suffix: "off"
-            - name: "on"
-              suffix: "on"
+          units:
+            - "off"
+            - "on"
         - name: safe
           title: Safety switch
           type: enum
-          content:
-            - name: "off"
-              suffix: "off"
-            - name: "on"
-              suffix: "on"
+          units:
+            - "off"
+            - "on"
