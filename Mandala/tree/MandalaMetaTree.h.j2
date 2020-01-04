@@ -1,0 +1,42 @@
+{%- extends 'Mandala.j2' %}
+
+{% set ns = namespace(meta_id=0) %}
+
+{%- macro constants_expand(d, indent) -%}
+{% set ind = ' '*indent*indent_size %}
+{{ ind }}static constexpr const meta_t &meta{ mandala::meta[{{ ns.meta_id }}]  };
+{%- endmacro -%}
+
+{%- macro mandala_expand(d, indent=0, level=0) -%}
+{% set ind = ' '*indent*indent_size %}
+{% if d.content is defined %}
+{% set pub = 'tree_'+level|string+'_t<'+d.name+'>' %}
+{% else %}
+{% set pub = 'tree_value_t<mandala::'+d.type+'_t, '+d.name+'>' %}
+{% endif %}
+{{ ind }}struct {{ d.name }}: public {{ pub }}
+{{ ind }}{
+{{ constants_expand(d, indent+1) }}
+{% set ns.meta_id = ns.meta_id+1 %}
+{% for i in d.content %}
+{{ mandala_expand(i, indent+1, level+1) }}
+{% endfor %}
+{{ ind }}};
+{%- endmacro -%}
+
+{%- block content %}
+
+#pragma once
+
+#include <Mandala/tree/MandalaMetaBase.h>
+#include <MandalaMeta.h>
+
+namespace mandala {
+
+{% for i in data.content %}
+{{ mandala_expand(i) }}
+{% endfor %}
+
+}; // namespace
+
+{% endblock %}

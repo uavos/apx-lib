@@ -31,47 +31,61 @@ enum sfmt_id_t {
     sfmt_s1,
 };
 
-template<typename T>
-struct meta_base_t
+struct meta_t
 {
-    static constexpr const char *name() { return T::name; }
-    static constexpr const char *title() { return T::title; }
-    static constexpr const char *descr() { return T::descr; }
+    const char *name;
+    const char *title;
+    const char *descr;
+    const char *units;
+    const char *alias;
+    const char *path;
+
+    const uid_t uid : sizeof(uid_t) * 8;
+    const uint8_t level : 3;
+    const bool group : 1;
+    const type_id_t type_id : 4;
+    const uint8_t prec : 4;
+    const sfmt_id_t sfmt : 4;
+};
+
+template<typename T>
+struct tree_base_t
+{
     static constexpr mandala::uid_t uid() { return T::uid; }
 };
 
 template<typename T>
-struct meta_0_t : public meta_base_t<T>
+struct tree_0_t : public tree_base_t<T>
 {
 };
 
 template<typename T>
-struct meta_1_t : public meta_base_t<T>
+struct tree_1_t : public tree_base_t<T>
 {
 };
 
 template<typename T>
-struct meta_2_t : public meta_base_t<T>
+struct tree_2_t : public tree_base_t<T>
 {
 };
 
 template<typename T>
-struct meta_3_t : public meta_base_t<T>
+struct tree_3_t : public tree_base_t<T>
 {
 };
 
 template<typename T>
-struct meta_4_t : public meta_base_t<T>
+struct tree_4_t : public tree_base_t<T>
 {
 };
 
 template<typename T>
-struct meta_5_t : public meta_base_t<T>
+struct tree_5_t : public tree_base_t<T>
 {
 };
 
 template<typename DataType, typename T>
-class meta_field_t : public meta_base_t<T>
+class tree_value_t : public tree_base_t<T>
 {
 public:
     operator DataType() const { return m_value; }
@@ -95,32 +109,5 @@ public:
 private:
     DataType m_value{};
 };
-
-template<typename M>
-struct Text
-{
-    static constexpr const char *name() { return M::name; }
-    static constexpr const char *title() { return M::title; }
-    static constexpr const char *descr() { return M::descr; }
-};
-
-template<class M>
-class Value : public M
-{
-};
-
-template<class M>
-class StaticValue
-{
-public:
-    operator M() const { return m_data; }
-    M &data() const { return m_data; }
-
-private:
-    static M m_data;
-};
-
-template<class M>
-M StaticValue<M>::m_data;
 
 }; // namespace mandala

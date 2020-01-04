@@ -35,20 +35,20 @@ descr: Vehicle core data manager and data structure.
 #                  |---------telemetry---------|
 #                               |----uplink----|
 
-# some config for parsers
+# config for parsers
 inheritance:
   - type
   - prec
   - sfmt
   - units
 
-uid_shift:
-  - 13
-  - 12
-  - 9
-  - 6
+uid_bits:
+  - 2
+  - 1
   - 3
-  - 0
+  - 3
+  - 3
+  - 3
 
 # defaults:
 type: float

@@ -1,40 +1,46 @@
 {%- extends 'Mandala.j2' %}
 
-{% set uid_shift = data.uid_shift %}
-
-
-{%- macro constants_expand(d, indent, uid, parent) -%}
+{%- macro mandala_meta_expand(d, indent=0, path=[], level=0, uid=0, parent=0) -%}
 {% set ind = ' '*indent*indent_size %}
-{% if d.suffix is defined %}
+{% set ind1 = ' '*(indent+1)*indent_size %}
+{% set path = path+[d.name] %}
+{% set meta = path|join('::') %}
+
+{%- if d.units is defined -%}
+{% set units = d.units %}
+{% else %}
+{% set units = '' %}
+{%- endif -%}
+
+{%- if d.type == 'enum' -%}
+{% set units = units|join(',') %}
+{%- endif -%}
+
+{%- if d.suffix is defined -%}
 {% set title = parent.title+' '+d.suffix %}
 {% else %}
 {% set title = d.title %}
-{% endif %}
-{{ ind }}static constexpr const char *name{"{{ d.name }}"};
-{{ ind }}static constexpr const char *title{"{{ title }}"};
-{{ ind }}static constexpr const mandala::uid_t uid{ 0x{{ '%0x' % uid }} };
-{% if d.content is not defined %}
-{{ ind }}static constexpr const mandala::type_id_t type_id{ mandala::type_{{ d.type }} };
-{% endif %}
-{%- endmacro -%}
+{%- endif -%}
 
-{%- macro mandala_expand(d, indent=0, path=[], level=0, uid=0, parent={}) -%}
-{% set ind = ' '*indent*indent_size %}
-{% set path = path+[d.name] %}
-{% if d.content is defined %}
-{% set pub = 'meta_'+level|string+'_t<'+d.name+'>' %}
-{% else %}
-{% set pub = 'meta_field_t<mandala::'+d.type+'_t, '+d.name+'>' %}
-{% endif %}
-{{ ind }}// {{ path|join('::') }}
-{{ ind }}struct {{ d.name }}: public mandala::{{ pub }}
 {{ ind }}{
-{{ constants_expand(d, indent+1, uid, parent) }}
-{% set uid_mul = 2**uid_shift[level] %}
+{{ ind1 }}.name = "{{ d.name }}",
+{{ ind1 }}.title = "{{ title }}",
+{{ ind1 }}.descr = "{{ d.descr }}",
+{{ ind1 }}.units = "{{ units }}",
+{{ ind1 }}.alias = "{{ d.alias }}",
+{{ ind1 }}.path = "{{ path|join('.') }}",
+{{ ind1 }}.uid = 0x{{ '%0x' % uid }},
+{{ ind1 }}.level = {{ level }},
+{{ ind1 }}.group = {% if d.content is defined %}1{% else %}0{% endif %},
+{{ ind1 }}.type_id = type_{{ d.type }},
+{{ ind1 }}.prec = {{ d.prec }},
+{{ ind1 }}.sfmt = sfmt_{{ d.sfmt }},
+{{ ind }}},
+{% set uid_pow = data.uid_bits[level+2:]|sum %}
+{% set uid_mul = 2**uid_pow %}
 {% for i in d.content %}
-{{ mandala_expand(i, indent+1, path, level+1, uid+loop.index0*uid_mul, d) }}
-{% endfor %}
-{{ ind }}};  // {{ d.name }}
+{{ mandala_meta_expand(i, indent, path, level+1, uid+loop.index0*uid_mul, d) }}
+{%- endfor -%}
 {%- endmacro -%}
 
 {%- block content %}
@@ -44,10 +50,21 @@
 #include <Mandala/tree/MandalaMetaBase.h>
 
 namespace mandala {
+{% set ind = ' '*indent_size %}
 
+// uid bits by level (level 0=root)
+static constexpr const uint8_t uid_bits[] = {
+{{ ind }}{% for i in data.uid_bits %}{{ i }},{% endfor %} // total {{ data.uid_bits|sum }} bits, {{ data.uid_bits|length }} levels
+};
+
+// flat array of all elements
+static constexpr const mandala::meta_t meta[] = {
 {% for i in data.content %}
-{{ mandala_expand(i) }}
+{% set uid_pow = data.uid_bits[1:]|sum %}
+{% set uid_mul = 2**uid_pow %}
+{{ mandala_meta_expand(i, 1, [], 0, loop.index0*uid_mul) }}
 {% endfor %}
+}; // meta array
 
 }; // namespace
 
