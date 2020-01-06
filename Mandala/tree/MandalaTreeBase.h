@@ -63,9 +63,14 @@ public:
     field_t(field_t &&) = delete;
     field_t &operator=(field_t &&) = delete;*/
 
-    constexpr inline size_t pack(void *buf)
+    constexpr inline size_t pack(void *buf) const
     {
         return stream::pack<_Tree::meta.sfmt>(buf, m_value);
+    }
+
+    constexpr inline size_t unpack(const void *buf)
+    {
+        return stream::unpack<_Tree::meta.sfmt>(buf, m_value);
     }
 
 protected:
