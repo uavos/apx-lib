@@ -1,114 +1,131 @@
 #pragma once
 
-#include "MandalaValue.h"
-
 #include <cmath>
+
+#include "MandalaMetaBase.h"
 
 namespace mandala {
 
-class Stream
-{
-public:
-    //pack
-    static size_t pack_float_s1X(void *buf, const mandala::float_t &v);
-    static size_t pack_float_u1X(void *buf, const mandala::float_t &v);
-
-    static size_t pack_float_s1(void *buf, const void *value_ptr);
-    static size_t pack_float_s01(void *buf, const void *value_ptr);
-    static size_t pack_float_s001(void *buf, const void *value_ptr);
-    static size_t pack_float_s10(void *buf, const void *value_ptr);
-
-    static size_t pack_float_u1(void *buf, const void *value_ptr);
-    static size_t pack_float_u01(void *buf, const void *value_ptr);
-    static size_t pack_float_u001(void *buf, const void *value_ptr);
-    static size_t pack_float_u10(void *buf, const void *value_ptr);
-    static size_t pack_float_u100(void *buf, const void *value_ptr);
-
-    static size_t pack_float_f2(void *buf, const void *value_ptr);
-    static size_t pack_float_f4(void *buf, const void *value_ptr);
-
-    static size_t pack_enum(void *buf, const void *value_ptr);
-    static size_t pack_byte_u1(void *buf, const void *value_ptr);
-    static size_t pack_uint_u4(void *buf, const void *value_ptr);
-    static size_t pack_uint_u2(void *buf, const void *value_ptr);
-
-    //unpack
-    static size_t unpack_float_s1(const void *buf, void *value_ptr);
-    static size_t unpack_float_s01(const void *buf, void *value_ptr);
-    static size_t unpack_float_s001(const void *buf, void *value_ptr);
-    static size_t unpack_float_s10(const void *buf, void *value_ptr);
-
-    static size_t unpack_float_u1(const void *buf, void *value_ptr);
-    static size_t unpack_float_u01(const void *buf, void *value_ptr);
-    static size_t unpack_float_u001(const void *buf, void *value_ptr);
-    static size_t unpack_float_u10(const void *buf, void *value_ptr);
-    static size_t unpack_float_u100(const void *buf, void *value_ptr);
-
-    static size_t unpack_float_f2(const void *buf, void *value_ptr);
-    static size_t unpack_float_f4(const void *buf, void *value_ptr);
-
-    static size_t unpack_enum(const void *buf, void *value_ptr);
-    static size_t unpack_byte_u1(const void *buf, void *value_ptr);
-    static size_t unpack_uint_u4(const void *buf, void *value_ptr);
-    static size_t unpack_uint_u2(const void *buf, void *value_ptr);
-};
-
-template<typename _T, size_t _Size>
 class stream
 {
 public:
-    static size_t pack(void *buf, const void *value_ptr)
+    //pack
+    template<mandala::sfmt_id_t _sfmt, typename _DataType>
+    static size_t pack(void *buf, const _DataType &value)
     {
-        if (std::is_floating_point<_T>::value) {
+        if (std::is_floating_point<_DataType>::value) {
+            if (_sfmt == sfmt_f4) {
+                return pack_raw_int(buf, float_to_f32(value));
+            } else if (_sfmt == sfmt_f2) {
+                return pack_raw_int(buf, float_to_f16(value));
+            } else if (_sfmt == sfmt_u1) {
+            }
+        } else if (_sfmt == sfmt_u4) {
+            uint32_t v = value;
+            return pack_raw_int(buf, v);
+        } else if (_sfmt == sfmt_u2) {
+            uint16_t v = value > 0xFFFF ? 0xFFFF : value;
+            return pack_raw_int(buf, v);
+        } else if (_sfmt == sfmt_u1) {
+            uint8_t v = value > 0xFF ? 0xFF : value;
+            return pack_raw_int(buf, v);
         }
+        return 0;
+    }
 
-        uint32_t v = *static_cast<const _T *>(value_ptr);
+    //unpack
+    template<mandala::sfmt_id_t _sfmt, typename _DataType>
+    static size_t unpack(const void *buf, _DataType &value)
+    {
+        if (std::is_floating_point<_DataType>::value) {
+            if (_sfmt == sfmt_f4) {
+                uint32_t v;
+                if (!unpack_raw_int(buf, v))
+                    return 0;
+                value = float_from_f32(v);
+                return 4;
+            } else if (_sfmt == sfmt_f2) {
+                uint16_t v;
+                if (!unpack_raw_int(buf, v))
+                    return 0;
+                value = float_from_f16(v);
+                return 2;
+            } else if (_sfmt == sfmt_u1) {
+            }
+        } else if (_sfmt == sfmt_u4) {
+            uint32_t v;
+            if (!unpack_raw_int(buf, v))
+                return 0;
+            value = static_cast<_DataType>(v);
+            return 4;
+        } else if (_sfmt == sfmt_u2) {
+            uint16_t v;
+            if (!unpack_raw_int(buf, v))
+                return 0;
+            value = static_cast<_DataType>(v);
+            return 2;
+        } else if (_sfmt == sfmt_u1) {
+            uint8_t v;
+            if (!unpack_raw_int(buf, v))
+                return 0;
+            value = static_cast<_DataType>(v);
+            return 1;
+        }
+        return 0;
+    }
+
+private:
+    template<typename _Tin>
+    static size_t pack_raw_int(void *buf, const _Tin &value)
+    {
         uint8_t *dest = static_cast<uint8_t *>(buf);
-        if (_Size == 4) {
+        if (sizeof(_Tin) == 4) {
+            uint32_t v = static_cast<uint32_t>(value);
             *dest++ = v & 0xFF;
             *dest++ = (v >> 8) & 0xFF;
             *dest++ = (v >> 16) & 0xFF;
             *dest = (v >> 24) & 0xFF;
-        } else if (_Size == 2) {
-            if (v > 0xFFFF)
-                v = 0xFFFF;
+        } else if (sizeof(_Tin) == 2) {
+            uint16_t v = static_cast<uint16_t>(value);
             *dest++ = v & 0xFF;
-            *dest = (v >> 8) & 0xFF;
-        } else if (_Size == 1) {
-            if (v > 0xFF)
-                v = 0xFF;
-            *dest = v & 0xFF;
+            *dest = v >> 8;
+        } else if (sizeof(_Tin) == 1) {
+            uint8_t v = static_cast<uint8_t>(value);
+            *dest = v;
         } else
             return 0;
-        return _Size;
+        return sizeof(_Tin);
     }
 
-    static size_t unpack(const void *buf, void *value_ptr)
+    template<typename _Tout>
+    static size_t unpack_raw_int(const void *buf, _Tout &value)
     {
-        uint32_t v;
         const uint8_t *src = static_cast<const uint8_t *>(buf);
-        uint8_t *dest = reinterpret_cast<uint8_t *>(&v);
-        if (_Size == 4) {
-            *dest++ = *src++;
-            *dest++ = *src++;
-            *dest++ = *src++;
-            *dest = *src;
-        } else if (_Size == 2) {
-            *dest++ = *src++;
-            *dest = *src;
-        } else if (_Size == 1) {
-            *dest = *src;
+        if (sizeof(_Tout) == 4) {
+            uint32_t v;
+            v = *src++;
+            v |= static_cast<uint32_t>(*src++) << 8;
+            v |= static_cast<uint32_t>(*src++) << 16;
+            v |= static_cast<uint32_t>(*src) << 24;
+            value = static_cast<_Tout>(v);
+        } else if (sizeof(_Tout) == 2) {
+            uint16_t v;
+            v = *src++;
+            v |= static_cast<uint32_t>(*src) << 8;
+            value = static_cast<_Tout>(v);
+        } else if (sizeof(_Tout) == 1) {
+            uint8_t v;
+            v = *src;
+            value = static_cast<_Tout>(v);
         } else
             return 0;
-        *static_cast<_T *>(value_ptr) = v;
-        return _Size;
+        return sizeof(_Tout);
     }
 
     static uint16_t float_to_f16(const float &v)
     {
         //IEEE 754r
-        const uint8_t *ptr = reinterpret_cast<const uint8_t *>(&v);
-        uint32_t x = static_cast<uint32_t>(ptr[0]) | static_cast<uint32_t>(ptr[1]) << 8 | static_cast<uint32_t>(ptr[2]) << 16 | static_cast<uint32_t>(ptr[3]) << 24;
+        uint32_t x = float_to_f32(v);
         uint32_t xs, xe, xm;
         uint16_t hs, he, hm;
         uint16_t hp; // = static_cast<uint16_t *>(buf);
@@ -193,12 +210,12 @@ public:
                 xp = (xs | xe | xm);                   // Combine sign bit, exponent bits, and mantissa bits
             }
         }
-        return float_copy(&xp);
+        return float_from_f32(xp);
     }
-    static float float_copy(const void *buf)
+    static float float_from_f32(const uint32_t &f)
     {
         float v;
-        const uint8_t *src = reinterpret_cast<const uint8_t *>(&buf);
+        const uint8_t *src = reinterpret_cast<const uint8_t *>(&f);
         uint8_t *dest = reinterpret_cast<uint8_t *>(&v);
         *dest++ = *src++;
         *dest++ = *src++;
@@ -207,6 +224,19 @@ public:
 
         if (isnan(v))
             return 0;
+        return v;
+    }
+    static uint32_t float_to_f32(const float &f)
+    {
+        if (isnan(f))
+            return 0;
+        uint32_t v;
+        const uint8_t *src = reinterpret_cast<const uint8_t *>(&f);
+        uint8_t *dest = reinterpret_cast<uint8_t *>(&v);
+        *dest++ = *src++;
+        *dest++ = *src++;
+        *dest++ = *src++;
+        *dest = *src;
         return v;
     }
 };

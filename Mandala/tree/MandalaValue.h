@@ -7,6 +7,7 @@ namespace mandala {
 template<class M>
 class Value : public M
 {
+public:
 };
 
 template<class M>
