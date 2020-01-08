@@ -1,0 +1,260 @@
+- name: power
+  title: Power
+  type: enum
+  units:
+    - "off"
+    - "on"
+  content:
+    - name: ap
+      suffix: Avionics
+      alias: power_ap
+    - name: servo
+      suffix: Servo
+      alias: power_servo
+    - name: ignition
+      suffix: Ignition
+      alias: power_ignition
+    - name: payload
+      suffix: Payload
+      alias: power_payload
+    - name: agl
+      suffix: AGL sensor
+      alias: power_agl
+    - name: xpdr
+      suffix: XPDR
+      alias: power_xpdr
+    - name: satcom
+      suffix: Satcom
+    - name: rfamp
+      suffix: RF amplifier
+    - name: ils
+      suffix: ILS
+    - name: ice
+      suffix: Anti-ice
+      alias: sw_ice
+
+- name: psw
+  title: Power switches
+  type: enum
+  units:
+    - "off"
+    - "on"
+  content:
+    - name: starter
+      title: Engine starter
+      alias: sw_starter
+    - name: horn
+      title: Engine horn signal
+      alias: ctrb_horn
+    - name: ign1
+      title: Ignition 1
+    - name: ign2
+      title: Ignition 2
+    - name: fpump
+      title: Fuel pump
+      alias: ctrb_pump
+    - name: xfeed
+      title: Fuel crossfeed
+
+- name: vehicle
+  title: Vehicle controls
+  content:
+    - name: gear
+      title: Landing gear
+      alias: ctrb_gear
+      type: enum
+      units:
+        - down
+        - retract
+# - name: light
+# title: Lighting"
+# MFIELD(bit
+#   sfmt: beacon
+#   title: Beacon light on/off"
+#   sfmt:
+#   sfmt:
+# MFIELD(bit
+#   sfmt: landing
+#   title: Landing lights on/off"
+#   sfmt: sw_lights
+#   sfmt:
+# MFIELD(bit
+#   sfmt: nav
+#   title: Navigation lights on/off"
+#   sfmt:
+#   sfmt:
+# MFIELD(bit
+#   sfmt: strobe
+#   title: Strobe light on/off"
+#   sfmt:
+#   sfmt:
+# MFIELD(bit
+#   sfmt: taxi
+#   title: Taxi lights on/off"
+#   sfmt: sw_taxi
+#   sfmt:
+# MGRP2_END
+# #undef MGRP2
+
+# - name: door
+# title: Doors and latches"
+# MFIELD(bit
+#   sfmt: main
+#   title: Main door open/locked"
+#   sfmt:
+#   sfmt:
+# MFIELD(bit
+#   sfmt: drop
+#   title: Drop-off open/locked"
+#   sfmt: ctrb_drp
+#   sfmt:
+# MGRP2_END
+# #undef MGRP2
+
+# - name: cam
+# title: Camera controls output"
+# - name: ctr_roll
+#   title: Cam servo roll
+#   units: -1..+1
+#   alias: camctr_roll
+#   sfmt: f1smul100
+# - name: ctr_pitch
+#   title: Cam servo pitch
+#   units: -1..+1
+#   alias: camctr_pitch
+#   sfmt: f1smul100
+# - name: ctr_yaw
+#   title: Cam servo yaw
+#   units: -1..+1
+#   alias: camctr_yaw
+#   sfmt: f1smul100
+# //MFVECT(float
+#   sfmt: ctr,roll,pitch,yaw
+#   title: Cam servo
+#   units: -1..+1
+#   alias: camctr_roll,camctr_pitch,camctr_yaw
+#   sfmt: f1smul100
+# MFIELD(bit
+#   sfmt: rec
+#   title: Recording"
+#   sfmt: camctrb_rec
+#   sfmt:
+# MFIELD(bit
+#   sfmt: shot
+#   title: Snapshot"
+#   sfmt: camctrb_shot
+#   sfmt:
+# MFIELD(bit
+#   sfmt: ashot
+#   title: Series snapshots"
+#   sfmt: camctrb_ashot
+#   sfmt:
+# MGRP2_END
+# #undef MGRP2
+
+# - name: ats
+# title: ATS controls output"
+# - name: ctr_roll
+#   title: ATS servo roll
+#   units: -1..+1
+#   alias: atsctr_roll
+#   sfmt: f1smul100
+# - name: ctr_pitch
+#   title: ATS servo pitch
+#   units: -1..+1
+#   alias: atsctr_pitch
+#   sfmt: f1smul100
+# - name: ctr_yaw
+#   title: ATS servo yaw
+#   units: -1..+1
+#   alias: atsctr_yaw
+#   sfmt: f1smul100
+# //MFVECT(float
+#   sfmt: ctr,roll,pitch,yaw
+#   title: ATS servo
+#   units: -1..+1
+#   alias: atsctr_roll,atsctr_pitch,atsctr_yaw
+#   sfmt: f1smul100
+# MGRP2_END
+# #undef MGRP2
+
+# - name: turret
+# title: Turret controls output"
+# - name: ctr_roll
+#   title: Turret servo roll
+#   units: -1..+1
+#   alias:
+#   sfmt: f1smul100
+# - name: ctr_pitch
+#   title: Turret servo pitch
+#   units: -1..+1
+#   alias:
+#   sfmt: f1smul100
+# - name: ctr_yaw
+#   title: Turret servo yaw
+#   units: -1..+1
+#   alias:
+#   sfmt: f1smul100
+# //MFVECT(float
+#   sfmt: ctr,roll,pitch,yaw
+#   title: Turret servo
+#   units: -1..+1
+#   alias: ,,
+#   sfmt: f1smul100
+# MFIELD(bit
+#   sfmt: armed
+#   title: Turret armed/disarmed"
+#   sfmt:
+#   sfmt:
+# MFIELD(bit
+#   sfmt: shoot
+#   title: Turret shooting/standby"
+#   sfmt:
+#   sfmt:
+# MFIELD(bit
+#   sfmt: reload
+#   title: Turret reloading/reloaded"
+#   sfmt:
+#   sfmt:
+# MGRP2_END
+# #undef MGRP2
+
+# - name: usr
+# title: User controls"
+# - name: u1
+#   title: User control 1"
+#   sfmt: ctr1
+#   sfmt: f2
+# - name: u2
+#   title: User control 2"
+#   sfmt: ctr2
+#   sfmt: f2
+# - name: u3
+#   title: User control 3"
+#   sfmt: ctr3
+#   sfmt: f2
+# - name: u4
+#   title: User control 4"
+#   sfmt: ctr4
+#   sfmt: f2
+# - name: u5
+#   title: User control 5"
+#   sfmt: ctr5
+#   sfmt: f2
+# - name: u6
+#   title: User control 6"
+#   sfmt: ctr6
+#   sfmt: f2
+# - name: u7
+#   title: User control 7"
+#   sfmt: ctr7
+#   sfmt: f2
+# - name: u8
+#   title: User control 8"
+#   sfmt: ctr8
+#   sfmt: f2
+# MGRP2_END
+# #undef MGRP2
+
+# MGRP1_END
+# #undef MGRP1

@@ -1,426 +1,118 @@
-//-------------------------
-#define MGRP1 ctr
-MGRP1_BEGIN("Control outputs"
-
 - name: stab
-title: Stability fast controls"
-- name: ail
-  title: Ailerons
+  title: Stability controls
+  sfmt: f1smul100
   units: -1..+1
-  alias: ctr_ailerons
-  sfmt: s001
-- name: elv
-  title: Elevator
-  units: -1..+1
-  alias: ctr_elevator
-  sfmt: s001
-- name: rud
-  title: Rudder
-  units: -1..+1
-  alias: ctr_rudder
-  sfmt: s001
-- name: col
-  title: Collective pitch
-  units: -1..+1
-  alias: ctr_collective
-  sfmt: s001
-- name: str
-  title: Steering
-  units: -1..+1
-  alias: ctr_steering
-  sfmt: s001
-MGRP2_END
-#undef MGRP2
+  content:
+    - name: ail
+      title: Ailerons
+      alias: ctr_ailerons
+    - name: elv
+      title: Elevator
+      alias: ctr_elevator
+    - name: rud
+      title: Rudder
+      alias: ctr_rudder
+    - name: col
+      title: Collective
+      alias: ctr_collective
+    - name: str
+      title: Steering
+      alias: ctr_steering
 
-- name: eng
-title: Engine controls"
-- name: thr
-  title: Throttle
-  units: 0..1
-  alias: ctr_throttle
-  sfmt: u001
-- name: prop
-  title: Prop pitch
-  units: -1..+1
-  alias:
-  sfmt: s001
-- name: mix
-  title: Mixture
-  units: 0..1
-  alias: ctr_mixture
-  sfmt: u001
-- name: tune
-  title: Engine tuning
-  units: -1..1
-  alias: ctr_engine
-  sfmt: s001
-- name: vector
-  title: Thrust vector
-  units: -1..+1
-  alias:
-  sfmt: s001
-MFIELD(bit
-  sfmt: starter
-  title: Engine starter on/off"
-  sfmt: sw_starter
-  sfmt:
-MFIELD(bit
-  sfmt: horn
-  title: Engine horn signal"
-  sfmt: ctrb_horn
-  sfmt:
-MFIELD(bit
-  sfmt: rev
-  title: Thrust reverse on/off"
-  sfmt: ctrb_rev
-  sfmt:
-MFIELD(bit
-  sfmt: ign1
-  title: Ignition 1 on/off"
-  sfmt:
-  sfmt:
-MFIELD(bit
-  sfmt: ign2
-  title: Ignition 2 on/off"
-  sfmt:
-  sfmt:
-MGRP2_END
-#undef MGRP2
+- name: engine
+  title: Engine controls
+  content:
+    - name: thr
+      title: Throttle
+      units: 1
+      alias: ctr_throttle
+      sfmt: f1mul100
+    - name: prop
+      title: Prop pitch
+      units: -1..+1
+      sfmt: f1smul100
+    - name: mix
+      title: Mixture
+      units: 1
+      alias: ctr_mixture
+      sfmt: f1mul100
+    - name: tune
+      title: Engine tuning
+      units: -1..+1
+      alias: ctr_engine
+      sfmt: f1smul100
+    - name: tvec
+      title: Thrust vector
+      units: -1..+1
+      sfmt: f1smul100
+    - name: rev
+      title: Thrust reverse
+      type: enum
+      units:
+        - "off"
+        - "on"
+      alias: ctrb_rev
 
 - name: wing
-title: Wing mechanization"
-- name: flaps
-  title: Flaps
-  units: 0..1
-  alias: ctr_flaps
-  sfmt: u001
-- name: airbrk
-  title: Airbrakes
-  units: 0..1
-  alias: ctr_airbrk
-  sfmt: u001
-- name: slats
-  title: Wing slats
-  units: 0..1
-  alias:
-  sfmt: u001
-- name: sweep
-  title: Wing sweep
-  units: -1..+1
-  alias: ctr_sweep
-  sfmt: s001
-- name: buoyancy
-  title: Buoyancy
-  units: -1..+1
-  alias: ctr_buoyancy
-  sfmt: s001
-MGRP2_END
-#undef MGRP2
+  title: Wing mechanization
+  content:
+    - name: flaps
+      title: Flaps
+      units: 1
+      alias: ctr_flaps
+      sfmt: f1mul100
+    - name: airbrk
+      title: Airbrakes
+      units: 1
+      alias: ctr_airbrk
+      sfmt: f1mul100
+    - name: slats
+      title: Wing slats
+      units: 1
+      sfmt: f1mul100
+    - name: sweep
+      title: Wing sweep
+      units: -1..+1
+      alias: ctr_sweep
+      sfmt: f1smul100
+    - name: buoyancy
+      title: Buoyancy
+      units: -1..+1
+      alias: ctr_buoyancy
+      sfmt: f1smul100
 
 - name: brakes
-title: Brakes system control"
-- name: brake
-  title: Brake
-  units: 0..1
-  alias: ctr_brake
-  sfmt: u001
-- name: brakeL
-  title: Left brake
-  units: 0..1
-  alias: ctr_brakeL
-  sfmt: u001
-- name: brakeR
-  title: Right brake
-  units: 0..1
-  alias: ctr_brakeR
-  sfmt: u001
-MGRP2_END
-#undef MGRP2
+  title: Brakes system control
+  content:
+    - name: brake
+      title: Brake
+      units: 1
+      alias: ctr_brake
+      sfmt: f1mul100
+    - name: brakeL
+      title: Left brake
+      units: 1
+      alias: ctr_brakeL
+      sfmt: f1mul100
+    - name: brakeR
+      title: Right brake
+      units: 1
+      alias: ctr_brakeR
+      sfmt: f1mul100
 
 - name: ers
-title: Emergency Recovery System controls"
-MFIELD(bit
-  sfmt: launch
-  title: ERS on/off"
-  sfmt: ctrb_ers
-  sfmt:
-MFIELD(bit
-  sfmt: rel
-  title: Parachute released/locked"
-  sfmt: ctrb_rel
-  sfmt:
-MGRP2_END
-#undef MGRP2
-
-- name: gear
-title: Landing Gear controls"
-MFIELD(bit
-  sfmt: retract
-  title: Landing gear retracted/extracted"
-  sfmt: ctrb_gear
-  sfmt:
-MGRP2_END
-#undef MGRP2
-
-- name: fuel
-title: Fuel pumps"
-MFIELD(bit
-  sfmt: pump
-  title: Fuel pump on/off"
-  sfmt: ctrb_pump
-  sfmt:
-MFIELD(bit
-  sfmt: xfeed
-  title: Crossfeed on/off"
-  sfmt:
-  sfmt:
-MGRP2_END
-#undef MGRP2
-
-- name: power
-title: Power management controls"
-MFIELD(bit
-  sfmt: ap
-  title: Avionics"
-  sfmt: power_ap
-  sfmt:
-MFIELD(bit
-  sfmt: servo
-  title: Servo on/off"
-  sfmt: power_servo
-  sfmt:
-MFIELD(bit
-  sfmt: ignition
-  title: Engine on/off"
-  sfmt: power_ignition
-  sfmt:
-MFIELD(bit
-  sfmt: payload
-  title: Payload on/off"
-  sfmt: power_payload
-  sfmt:
-MFIELD(bit
-  sfmt: agl
-  title: AGL sensor"
-  sfmt: power_agl
-  sfmt:
-MFIELD(bit
-  sfmt: xpdr
-  title: XPDR on/off"
-  sfmt: power_xpdr
-  sfmt:
-MFIELD(bit
-  sfmt: satcom
-  title: Satcom on/off"
-  sfmt:
-  sfmt:
-MFIELD(bit
-  sfmt: rfamp
-  title: RF amplifier on/off"
-  sfmt:
-  sfmt:
-MFIELD(bit
-  sfmt: ils
-  title: Instrument Landing System on/off"
-  sfmt:
-  sfmt:
-MFIELD(bit
-  sfmt: ice
-  title: Anti-ice on/off"
-  sfmt: sw_ice
-  sfmt:
-MGRP2_END
-#undef MGRP2
-
-- name: light
-title: Lighting"
-MFIELD(bit
-  sfmt: beacon
-  title: Beacon light on/off"
-  sfmt:
-  sfmt:
-MFIELD(bit
-  sfmt: landing
-  title: Landing lights on/off"
-  sfmt: sw_lights
-  sfmt:
-MFIELD(bit
-  sfmt: nav
-  title: Navigation lights on/off"
-  sfmt:
-  sfmt:
-MFIELD(bit
-  sfmt: strobe
-  title: Strobe light on/off"
-  sfmt:
-  sfmt:
-MFIELD(bit
-  sfmt: taxi
-  title: Taxi lights on/off"
-  sfmt: sw_taxi
-  sfmt:
-MGRP2_END
-#undef MGRP2
-
-- name: door
-title: Doors and latches"
-MFIELD(bit
-  sfmt: main
-  title: Main door open/locked"
-  sfmt:
-  sfmt:
-MFIELD(bit
-  sfmt: drop
-  title: Drop-off open/locked"
-  sfmt: ctrb_drp
-  sfmt:
-MGRP2_END
-#undef MGRP2
-
-- name: cam
-title: Camera controls output"
-- name: ctr_roll
-  title: Cam servo roll
-  units: -1..+1
-  alias: camctr_roll
-  sfmt: s001
-- name: ctr_pitch
-  title: Cam servo pitch
-  units: -1..+1
-  alias: camctr_pitch
-  sfmt: s001
-- name: ctr_yaw
-  title: Cam servo yaw
-  units: -1..+1
-  alias: camctr_yaw
-  sfmt: s001
-//MFVECT(float
-  sfmt: ctr,roll,pitch,yaw
-  title: Cam servo
-  units: -1..+1
-  alias: camctr_roll,camctr_pitch,camctr_yaw
-  sfmt: s001
-MFIELD(bit
-  sfmt: rec
-  title: Recording"
-  sfmt: camctrb_rec
-  sfmt:
-MFIELD(bit
-  sfmt: shot
-  title: Snapshot"
-  sfmt: camctrb_shot
-  sfmt:
-MFIELD(bit
-  sfmt: ashot
-  title: Series snapshots"
-  sfmt: camctrb_ashot
-  sfmt:
-MGRP2_END
-#undef MGRP2
-
-- name: ats
-title: ATS controls output"
-- name: ctr_roll
-  title: ATS servo roll
-  units: -1..+1
-  alias: atsctr_roll
-  sfmt: s001
-- name: ctr_pitch
-  title: ATS servo pitch
-  units: -1..+1
-  alias: atsctr_pitch
-  sfmt: s001
-- name: ctr_yaw
-  title: ATS servo yaw
-  units: -1..+1
-  alias: atsctr_yaw
-  sfmt: s001
-//MFVECT(float
-  sfmt: ctr,roll,pitch,yaw
-  title: ATS servo
-  units: -1..+1
-  alias: atsctr_roll,atsctr_pitch,atsctr_yaw
-  sfmt: s001
-MGRP2_END
-#undef MGRP2
-
-- name: turret
-title: Turret controls output"
-- name: ctr_roll
-  title: Turret servo roll
-  units: -1..+1
-  alias:
-  sfmt: s001
-- name: ctr_pitch
-  title: Turret servo pitch
-  units: -1..+1
-  alias:
-  sfmt: s001
-- name: ctr_yaw
-  title: Turret servo yaw
-  units: -1..+1
-  alias:
-  sfmt: s001
-//MFVECT(float
-  sfmt: ctr,roll,pitch,yaw
-  title: Turret servo
-  units: -1..+1
-  alias: ,,
-  sfmt: s001
-MFIELD(bit
-  sfmt: armed
-  title: Turret armed/disarmed"
-  sfmt:
-  sfmt:
-MFIELD(bit
-  sfmt: shoot
-  title: Turret shooting/standby"
-  sfmt:
-  sfmt:
-MFIELD(bit
-  sfmt: reload
-  title: Turret reloading/reloaded"
-  sfmt:
-  sfmt:
-MGRP2_END
-#undef MGRP2
-
-- name: usr
-title: User controls"
-- name: u1
-  title: User control 1"
-  sfmt: ctr1
-  sfmt: f2
-- name: u2
-  title: User control 2"
-  sfmt: ctr2
-  sfmt: f2
-- name: u3
-  title: User control 3"
-  sfmt: ctr3
-  sfmt: f2
-- name: u4
-  title: User control 4"
-  sfmt: ctr4
-  sfmt: f2
-- name: u5
-  title: User control 5"
-  sfmt: ctr5
-  sfmt: f2
-- name: u6
-  title: User control 6"
-  sfmt: ctr6
-  sfmt: f2
-- name: u7
-  title: User control 7"
-  sfmt: ctr7
-  sfmt: f2
-- name: u8
-  title: User control 8"
-  sfmt: ctr8
-  sfmt: f2
-MGRP2_END
-#undef MGRP2
-
-MGRP1_END
-#undef MGRP1
+  title: Emergency Recovery System controls
+  type: enum
+  content:
+    - name: launch
+      title: ERS
+      units:
+        - "off"
+        - "on"
+      alias: ctrb_ers
+    - name: rel
+      title: Parachute
+      units:
+        - locked
+        - released
+      alias: ctrb_rel

@@ -19,7 +19,7 @@
     alias: rc_throttle
     title: RC throttle
     units: u
-    sfmt: u001
+    sfmt: f1mul100
   - name: yaw
     alias: rc_yaw
     title: RC yaw
@@ -109,7 +109,7 @@ title: Ground Station info
   title: GCU modem temperature
   units: C
   alias:
-  sfmt: s1
+  sfmt: f1s
 MGRP2_END
 #undef MGRP2
 
@@ -119,7 +119,7 @@ title: Meteo base station info
   title: wind speed
   units: m/s
   alias:
-  sfmt: u01
+  sfmt: f1mul10
 - name: windHdg
   title: wind direction to
   units: deg
@@ -129,7 +129,7 @@ title: Meteo base station info
   title: Ground outside air temperature
   units: C
   alias:
-  sfmt: s1
+  sfmt: f1s
 - name: altps
   title: barometric altitude on ground level
   units: m

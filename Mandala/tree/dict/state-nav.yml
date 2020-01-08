@@ -265,7 +265,7 @@ title: Navigation parameters"
   title: Stability
   units: 0..1
   alias: stab
-  sfmt: u001
+  sfmt: f1mul100
 - name: corr
   title: Correlator output
   units: K
@@ -409,7 +409,7 @@ title: Wind estimator"
   title: wind speed
   units: m/s
   alias: windSpd
-  sfmt: u01
+  sfmt: f1mul10
 - name: HDG
   title: wind direction to
   units: deg
@@ -419,7 +419,7 @@ title: Wind estimator"
   title: CAS to TAS multiplier
   units: K
   alias: cas2tas
-  sfmt: u001
+  sfmt: f1mul100
 MGRP2_END
 #undef MGRP2
 

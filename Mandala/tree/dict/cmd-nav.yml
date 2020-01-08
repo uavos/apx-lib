@@ -170,7 +170,7 @@ MFIELD(bit
   title: Runway displacement adjust
   units: m
   alias: rwAdj
-  sfmt: s1
+  sfmt: f1s
 MFENUM(enum
   sfmt: mtype
   title: Mission maneuver type"

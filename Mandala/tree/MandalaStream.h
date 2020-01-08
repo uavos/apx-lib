@@ -18,15 +18,29 @@ public:
                 return pack_raw_int(buf, float_to_f32(value));
             } else if (_sfmt == sfmt_f2) {
                 return pack_raw_int(buf, float_to_f16(value));
-            } else if (_sfmt == sfmt_u1) {
+            } else if (_sfmt == sfmt_f1) {
+                return pack_raw_int(buf, float_to_u8(value));
+            } else if (_sfmt == sfmt_f1div10) {
+                return pack_raw_int(buf, float_to_u8(value / 10.0f));
+            } else if (_sfmt == sfmt_f1mul10) {
+                return pack_raw_int(buf, float_to_u8(value * 10.0f));
+            } else if (_sfmt == sfmt_f1mul100) {
+                return pack_raw_int(buf, float_to_u8(value * 100.0f));
+            } else if (_sfmt == sfmt_f1s) {
+                return pack_raw_int(buf, float_to_s8(value));
+            } else if (_sfmt == sfmt_f1smul100) {
+                return pack_raw_int(buf, float_to_s8(value * 100.0f));
             }
         } else if (_sfmt == sfmt_u4) {
+            static_assert(sizeof(_DataType) == 4, "sfmt");
             uint32_t v = value;
             return pack_raw_int(buf, v);
         } else if (_sfmt == sfmt_u2) {
+            static_assert(sizeof(_DataType) >= 2, "sfmt");
             uint16_t v = value > 0xFFFF ? 0xFFFF : value;
             return pack_raw_int(buf, v);
         } else if (_sfmt == sfmt_u1) {
+            static_assert(sizeof(_DataType) >= 1, "sfmt");
             uint8_t v = value > 0xFF ? 0xFF : value;
             return pack_raw_int(buf, v);
         }
@@ -50,21 +64,53 @@ public:
                     return 0;
                 value = float_from_f16(v);
                 return 2;
-            } else if (_sfmt == sfmt_u1) {
+            } else if (_sfmt == sfmt_f1) {
+                uint8_t v;
+                if (!unpack_raw_int(buf, v))
+                    return 0;
+                value = v;
+                return 1;
+            } else if (_sfmt == sfmt_f1div10) {
+                uint8_t v;
+                if (!unpack_raw_int(buf, v))
+                    return 0;
+                value = v * 10.0f;
+                return 1;
+            } else if (_sfmt == sfmt_f1mul10) {
+                uint8_t v;
+                if (!unpack_raw_int(buf, v))
+                    return 0;
+                value = v / 10.0f;
+                return 1;
+            } else if (_sfmt == sfmt_f1mul100) {
+                uint8_t v;
+                if (!unpack_raw_int(buf, v))
+                    return 0;
+                value = v / 100.0f;
+                return 1;
+            } else if (_sfmt == sfmt_f1s) {
+                int8_t v;
+                if (!unpack_raw_int(buf, v))
+                    return 0;
+                value = v;
+                return 1;
             }
         } else if (_sfmt == sfmt_u4) {
+            static_assert(sizeof(_DataType) == 4, "sfmt");
             uint32_t v;
             if (!unpack_raw_int(buf, v))
                 return 0;
             value = static_cast<_DataType>(v);
             return 4;
         } else if (_sfmt == sfmt_u2) {
+            static_assert(sizeof(_DataType) >= 2, "sfmt");
             uint16_t v;
             if (!unpack_raw_int(buf, v))
                 return 0;
             value = static_cast<_DataType>(v);
             return 2;
         } else if (_sfmt == sfmt_u1) {
+            static_assert(sizeof(_DataType) >= 2, "sfmt");
             uint8_t v;
             if (!unpack_raw_int(buf, v))
                 return 0;
@@ -215,13 +261,13 @@ private:
     static float float_from_f32(const uint32_t &f)
     {
         float v;
-        const uint8_t *src = reinterpret_cast<const uint8_t *>(&f);
+        /*const uint8_t *src = reinterpret_cast<const uint8_t *>(&f);
         uint8_t *dest = reinterpret_cast<uint8_t *>(&v);
         *dest++ = *src++;
         *dest++ = *src++;
         *dest++ = *src++;
-        *dest = *src;
-
+        *dest = *src;*/
+        v = *static_cast<const float *>(static_cast<const void *>(&f));
         if (isnan(v))
             return 0;
         return v;
@@ -231,12 +277,29 @@ private:
         if (isnan(f))
             return 0;
         uint32_t v;
-        const uint8_t *src = reinterpret_cast<const uint8_t *>(&f);
+        /*const uint8_t *src = reinterpret_cast<const uint8_t *>(&f);
         uint8_t *dest = reinterpret_cast<uint8_t *>(&v);
         *dest++ = *src++;
         *dest++ = *src++;
         *dest++ = *src++;
-        *dest = *src;
+        *dest = *src;*/
+        v = *static_cast<const uint32_t *>(static_cast<const void *>(&f));
+        return v;
+    }
+    static uint8_t float_to_u8(const float &f)
+    {
+        if (isnan(f))
+            return 0;
+        int32_t v32 = static_cast<int32_t>(f);
+        uint8_t v = v32 > 255 ? 255 : v32 < 0 ? 0 : static_cast<uint8_t>(f);
+        return v;
+    }
+    static int8_t float_to_s8(const float &f)
+    {
+        if (isnan(f))
+            return 0;
+        int32_t v32 = static_cast<int32_t>(f);
+        int8_t v = v32 > 127 ? 127 : v32 < -128 ? -128 : static_cast<int8_t>(f);
         return v;
     }
 };

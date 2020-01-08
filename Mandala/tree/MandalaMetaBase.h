@@ -20,15 +20,19 @@ enum type_id_t {
 };
 
 enum sfmt_id_t {
-    sfmt_f4,
-    sfmt_f2,
-    sfmt_u1,
-    sfmt_u2,
-    sfmt_u4,
-    sfmt_u10,
-    sfmt_u01,
-    sfmt_u001,
-    sfmt_s1,
+    sfmt_u1, //(uint8)uint
+    sfmt_u2, //(uint16)uint
+    sfmt_u4, //(uint32)uint
+
+    sfmt_f4,        //float32
+    sfmt_f2,        //float16
+    sfmt_f1,        //(uint8)float
+    sfmt_f1div10,   //(uint8)float/10
+    sfmt_f1mul10,   //(uint8)float*10
+    sfmt_f1mul100,  //(uint8)float*100
+    sfmt_f1s,       //(int8)float
+    sfmt_f1smul100, //(int8)float*100
+
 };
 
 struct meta_t
