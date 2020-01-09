@@ -1,510 +1,364 @@
-//-------------------------
-#define MGRP1 cmd
-MGRP1_BEGIN("Command"
-
 - name: reg
-title: Commanded regulator values"
-- name: roll
-  title: Commanded roll
-  units: deg
-  alias: cmd_roll
-  sfmt: f2
-- name: pitch
-  title: Commanded pitch
-  units: deg
-  alias: cmd_pitch
-  sfmt: f2
-- name: yaw
-  title: Commanded yaw
-  units: deg
-  alias: cmd_yaw
-  sfmt: f2
-- name: pos
-  sfmt: lat
-  sfmt: lon
-  sfmt: hmsl
-- name: lat
-  title: Commanded latitude
-  units: deg
-  alias:
-  sfmt: f4
-- name: lon
-  title: Commanded latitude
-  units: deg
-  alias:
-  sfmt: f4
-- name: hmsl
-  title: Commanded altitude MSL
-  units: m
-  alias:
-  sfmt: f4
-//MFVECT(float
-  sfmt: att,roll,pitch,yaw
-  title: Commanded attitude
-  units: deg
-  alias: cmd_roll,cmd_pitch,cmd_yaw
-  sfmt: f2
-//MFVECT(float
-  sfmt: pos,lat,lon,hmsl
-  sfmt: "Commanded global position
-  units: deg,deg,m
-  alias: ,,
-  sfmt: f4
-- name: course
-  title: Commanded course
-  units: deg
-  alias: cmd_course
-  sfmt: f2
-- name: altitude
-  title: Commanded altitude
-  units: m
-  alias: cmd_altitude
-  sfmt: f4
-- name: airspeed
-  title: Commanded airspeed
-  units: m/s
-  alias: cmd_airspeed
-  sfmt: f2
-- name: vspeed
-  title: Commanded vspeed
-  units: m/s
-  alias: cmd_vspeed
-  sfmt: f2
-- name: slip
-  title: Commanded slip
-  units: deg
-  alias: cmd_slip
-  sfmt: f2
-MFIELD(uint
-  sfmt: rpm
-  title: Commanded RPM
-  units: 1/m
-  alias: cmd_rpm
-  sfmt: u2
-//MFVEC2(ne
-  sfmt: north,east
-- name: north
-  title: Commanded position north
-  units: m
-  alias:
-  sfmt: f4
-- name: east
-  title: Commanded position east
-  units: m
-  alias:
-  sfmt: f4
-//MFVEC2(float
-  sfmt: NE,N,E
-  sfmt: "Commanded position
-  units: m
-  alias: cmd_north,cmd_east
-  sfmt: f4
-MGRP2_END
-#undef MGRP2
+  title: Commanded regulator values
+  content:
+    - name: roll
+      title: Commanded roll
+      units: deg
+      alias: cmd_roll
+      sfmt: f2
+    - name: pitch
+      title: Commanded pitch
+      units: deg
+      alias: cmd_pitch
+      sfmt: f2
+    - name: yaw
+      title: Commanded yaw
+      units: deg
+      alias: cmd_yaw
+      sfmt: f2
 
-- name: op
-title: Operation mode"
-MFENUM(enum
-  sfmt: mode
-  title: flight mode"
-  sfmt: mode
-  sfmt:
-MFENUMV(mode
-  sfmt: EMG
-  title: Realtime control"
-  sfmt: 0
-MFENUMV(mode
-  sfmt: RPV
-  title: Angles control"
-  sfmt: 1
-MFENUMV(mode
-  sfmt: UAV
-  title: Heading control"
-  sfmt: 2
-MFENUMV(mode
-  sfmt: WPT
-  title: Waypoints navigation"
-  sfmt: 3
-MFENUMV(mode
-  sfmt: HOME
-  title: Go back home"
-  sfmt: 4
-MFENUMV(mode
-  sfmt: STBY
-  title: Loiter around DNED"
-  sfmt: 5
-MFENUMV(mode
-  sfmt: TAXI
-  title: Taxi"
-  sfmt: 6
-MFENUMV(mode
-  sfmt: TAKEOFF
-  title: Takeoff"
-  sfmt: 7
-MFENUMV(mode
-  sfmt: LANDING
-  title: Landing"
-  sfmt: 8
-MFENUM_END(mode
-MFIELD(byte
-  sfmt: stage
-  title: Maneuver stage"
-  sfmt: stage
-  sfmt:
-MFIELD(bit
-  sfmt: cancel
-  title: Cancel current procedure"
-  sfmt:
-  sfmt:
-MFIELD(bit
-  sfmt: inc
-  title: Increment mission index"
-  sfmt:
-  sfmt:
-MFIELD(bit
-  sfmt: dec
-  title: Decrement mission index"
-  sfmt:
-  sfmt:
-- name: rwAdj
-  title: Runway displacement adjust
-  units: m
-  alias: rwAdj
-  sfmt: f1s
-MFENUM(enum
-  sfmt: mtype
-  title: Mission maneuver type"
-  sfmt: mtype
-  sfmt:
-MFENUMV(mtype
-  sfmt: hdg
-  title: Heading navigation"
-  sfmt: 0
-MFENUMV(mtype
-  sfmt: line
-  title: Line navigation"
-  sfmt: 1
-MFENUM_END(mtype
-MFIELD(byte
-  sfmt: loops
-  title: Number of remaining turns or loops
-  units: 0..255
-  alias: loops
-  sfmt:
-- name: turnR
-  title: Current circle radius
-  units: m
-  alias: turnR
-  sfmt: f2
-MGRP2_END
-#undef MGRP2
+    - name: lat
+      title: Commanded latitude
+      units: deg
+      sfmt: f4
+    - name: lon
+      title: Commanded latitude
+      units: deg
+      sfmt: f4
+    - name: hmsl
+      title: Commanded altitude MSL
+      units: m
+      sfmt: f4
+
+    - name: course
+      title: Commanded course
+      units: deg
+      alias: cmd_course
+      sfmt: f2
+    - name: altitude
+      title: Commanded altitude
+      units: m
+      alias: cmd_altitude
+      sfmt: f4
+    - name: airspeed
+      title: Commanded airspeed
+      units: m/s
+      alias: cmd_airspeed
+      sfmt: f2
+    - name: vspeed
+      title: Commanded vspeed
+      units: m/s
+      alias: cmd_vspeed
+      sfmt: f2
+    - name: slip
+      title: Commanded slip
+      units: deg
+      alias: cmd_slip
+      sfmt: f2
+
+    - name: rpm
+      title: Commanded RPM
+      units: 1/m
+      alias: cmd_rpm
+      type: uint
+      sfmt: u2
+
+    - name: north
+      title: Commanded position north
+      units: m
+      sfmt: f4
+    - name: east
+      title: Commanded position east
+      units: m
+      sfmt: f4
+
+- name: ctr
+  title: Control commands
+  content:
+    - name: mode
+      title: Flight mode
+      alias: mode
+      type: enum
+      units:
+        - EMG
+        - RPV
+        - UAV
+        - WPT
+        - HOME
+        - STBY
+        - TAXI
+        - TAKEOFF
+        - LANDING
+
+    - name: stage
+      title: Maneuver stage
+      alias: stage
+      type: byte
+
+    - name: action
+      title: Procedure action
+      type: enum
+      units:
+        - idle
+        - next
+        - cancel
+        - inc
+        - dec
+
+    - name: adj
+      title: Maneuver adjust
+      units: m
+      alias: rwAdj
+      sfmt: f1s
 
 - name: opt
-title: AP options"
-MFIELD(bit
-  sfmt: thrcut
-  title: Throttle cut on/off"
-  sfmt: cmode_thrcut
-  sfmt:
-MFIELD(bit
-  sfmt: throvr
-  title: Throttle override on/off"
-  sfmt: cmode_throvr
-  sfmt:
-MFIELD(bit
-  sfmt: ahrs
-  title: AHRS mode inertial/gps"
-  sfmt: cmode_ahrs
-  sfmt:
-MFIELD(bit
-  sfmt: nomag
-  title: Magnetometer blocked/on"
-  sfmt: cmode_nomag
-  sfmt:
-MFIELD(bit
-  sfmt: hover
-  title: Stabilization mode hover/run"
-  sfmt: cmode_hover
-  sfmt:
-MFIELD(bit
-  sfmt: hyaw
-  title: Hover yaw compensated/fixed"
-  sfmt: cmode_hyaw
-  sfmt:
-MFIELD(bit
-  sfmt: dlhd
-  title: High precision downstream on/off"
-  sfmt: cmode_dlhd
-  sfmt:
-MGRP2_END
-#undef MGRP2
+  title: Control options
+  type: enum
+  units:
+    - "off"
+    - "on"
+  content:
+    - name: thrcut
+      title: Throttle cut
+      alias: cmode_thrcut
+    - name: throvr
+      title: Throttle override
+      alias: cmode_throvr
+    - name: ahrs
+      title: AHRS mode
+      alias: cmode_ahrs
+      units:
+        - gps
+        - inertial
+    - name: nomag
+      title: Magnetometer
+      alias: cmode_nomag
+      units:
+        - "on"
+        - "blocked"
+    - name: hover
+      title: Stabilization mode
+      alias: cmode_hover
+      units:
+        - "normal"
+        - "hover"
+    - name: hyaw
+      title: Hover yaw
+      alias: cmode_hyaw
+      units:
+        - "fixed"
+        - "compensated"
 
-- name: cam
-title: Camera commanded values"
-- name: att
-  sfmt: roll
-  sfmt: pitch
-  sfmt: yaw
-- name: roll
-  title: Commanded cam roll
-  units: deg
-  alias: camcmd_roll
-  sfmt: f2
-- name: pitch
-  title: Commanded cam pitch
-  units: deg
-  alias: camcmd_pitch
-  sfmt: f2
-- name: yaw
-  title: Commanded cam yaw
-  units: deg
-  alias: camcmd_yaw
-  sfmt: f2
-- name: bias_roll
-  title: Cam stability bias roll
-  units: deg/s
-  alias: cambias_roll
-  sfmt: f4
-- name: bias_pitch
-  title: Cam stability bias pitch
-  units: deg/s
-  alias: cambias_pitch
-  sfmt: f4
-- name: bias_yaw
-  title: Cam stability bias yaw
-  units: deg/s
-  alias: cambias_yaw
-  sfmt: f4
-//MFVECT(float
-  sfmt: att,roll,pitch,yaw
-  sfmt: "Commanded cam attitude
-  units: deg
-  alias: camcmd_roll,camcmd_pitch,camcmd_yaw
-  sfmt: f4
-//MFVECT(float
-  sfmt: bias,roll,pitch,yaw
-  sfmt: "Cam stability bias
-  units: deg/s
-  alias: cambias_roll,cambias_pitch,cambias_yaw
-  sfmt: f4
-MFENUM(enum
-  sfmt: camop
-  title: Cam control mode"
-  sfmt: cam_mode
-  sfmt:
-MFENUMV(camop
-  sfmt: off
-  title: camera off"
-  sfmt: 0
-MFENUMV(camop
-  sfmt: fixed
-  title: fixed position"
-  sfmt: 1
-MFENUMV(camop
-  sfmt: stab
-  title: gyro stabilization"
-  sfmt: 2
-MFENUMV(camop
-  sfmt: position
-  title: attitude position"
-  sfmt: 3
-MFENUMV(camop
-  sfmt: speed
-  title: attitude speed control"
-  sfmt: 4
-MFENUMV(camop
-  sfmt: target
-  title: target position tracking"
-  sfmt: 5
-MFENUM_END(camop
-- name: zoom
-  title: Cam zoom level
-  units: 0..1
-  alias: cam_zoom
-  sfmt: f2
-- name: focus
-  title: Cam focus
-  units: 0..1
-  alias: cam_focus
-  sfmt: f2
-MFIELD(uint
-  sfmt: tperiod
-  title: Cam period for timestamps
-  units: ms
-  alias: cam_tperiod
-  sfmt: u2
-MFIELD(byte
-  sfmt: ch
-  title: Video channel
-  units: 0..255
-  alias: cam_ch
-  sfmt:
-MFIELD(byte
-  sfmt: src
-  title: Camera source subindex
-  units: 0..255
-  alias: cam_src
-  sfmt:
-MFIELD(bit
-  sfmt: PF
-  title: picture flip on/off"
-  sfmt: cam_opt_PF
-  sfmt:
-MFIELD(bit
-  sfmt: NIR
-  title: NIR filter on/off"
-  sfmt: cam_opt_NIR
-  sfmt:
-MFIELD(bit
-  sfmt: DSP
-  title: display information on/off"
-  sfmt: cam_opt_DSP
-  sfmt:
-MFIELD(bit
-  sfmt: FMI
-  title: focus mode infinity/auto"
-  sfmt: cam_opt_FMI
-  sfmt:
-MFIELD(bit
-  sfmt: FM
-  title: focus manual/auto"
-  sfmt: cam_opt_FM
-  sfmt:
-MFIELD(bit
-  sfmt: laser
-  title: rangefinder on/off"
-  sfmt: cam_opt_laser
-  sfmt:
-- name: pos
-  sfmt: lat
-  sfmt: lon
-  sfmt: hmsl
-- name: lat
-  title: Tracking latitude
-  units: deg
-  alias: cam_lat
-  sfmt: f4
-- name: lon
-  title: Tracking latitude
-  units: deg
-  alias: cam_lon
-  sfmt: f4
-- name: hmsl
-  title: Tracking altitude MSL
-  units: m
-  alias: cam_hmsl
-  sfmt: f4
-//MFVECT(float
-  sfmt: pos,lat,lon,hmsl,"Tracking position
-  units: deg,deg,m
-  alias: cam_lat,cam_lon,cam_hmsl
-  sfmt: f4
-MGRP2_END
-#undef MGRP2
+- name: rc
+  title: Realtime controls override
+  content:
+    - name: ovr
+      alias: rc_override
+      title: RC override
+      type: enum
+      units:
+        - "off"
+        - "on"
+    - name: roll
+      alias: rc_roll
+      title: RC roll
+      units: -1..+1
+      sfmt: f1smul100
+    - name: pitch
+      alias: rc_pitch
+      title: RC pitch
+      units: -1..+1
+      sfmt: f1smul100
+    - name: throttle
+      alias: rc_throttle
+      title: RC throttle
+      units: 0..1
+      sfmt: f1mul100
+    - name: yaw
+      alias: rc_yaw
+      title: RC yaw
+      units: -1..+1
+      sfmt: f1smul100
 
 - name: ats
-title: ATS commanded values"
-- name: att
-  sfmt: roll
-  sfmt: pitch
-  sfmt: yaw
-- name: roll
-  title: Commanded ATS roll
-  units: deg
-  alias: atscmd_roll
-  sfmt: f2
-- name: pitch
-  title: Commanded ATS pitch
-  units: deg
-  alias: atscmd_pitch
-  sfmt: f2
-- name: yaw
-  title: Commanded ATS yaw
-  units: deg
-  alias: atscmd_yaw
-  sfmt: f2
-//MFVECT(float
-  sfmt: att,roll,pitch,yaw
-  sfmt: "Commanded ATS attitude
-  units: deg
-  alias: atscmd_roll,atscmd_pitch,atscmd_yaw
-  sfmt: f4
-MGRP2_END
-#undef MGRP2
+  title: ATS commanded values
+  content:
+    - name: roll
+      title: Commanded ATS roll
+      units: deg
+      alias: atscmd_roll
+      sfmt: f2
+    - name: pitch
+      title: Commanded ATS pitch
+      units: deg
+      alias: atscmd_pitch
+      sfmt: f2
+    - name: yaw
+      title: Commanded ATS yaw
+      units: deg
+      alias: atscmd_yaw
+      sfmt: f2
+
+- name: cam
+  title: Camera commanded values
+  content:
+    - name: mode
+      title: Cam mode
+      alias: cam_mode
+      type: enum
+      units:
+        - "off"
+        - "fixed"
+        - "stab"
+        - "pos"
+        - "speed"
+        - "target"
+
+    - name: roll
+      title: Commanded cam roll
+      units: deg
+      alias: camcmd_roll
+    - name: pitch
+      title: Commanded cam pitch
+      units: deg
+      alias: camcmd_pitch
+    - name: yaw
+      title: Commanded cam yaw
+      units: deg
+      alias: camcmd_yaw
+
+    - name: broll
+      title: Cam stability bias roll
+      units: deg/s
+      alias: cambias_roll
+      sfmt: f4
+    - name: bpitch
+      title: Cam stability bias pitch
+      units: deg/s
+      alias: cambias_pitch
+      sfmt: f4
+    - name: byaw
+      title: Cam stability bias yaw
+      units: deg/s
+      alias: cambias_yaw
+      sfmt: f4
+
+    - name: zoom
+      title: Cam zoom level
+      units: 0..1
+      alias: cam_zoom
+      sfmt: f2
+    - name: focus
+      title: Cam focus
+      units: 0..1
+      alias: cam_focus
+      sfmt: f2
+
+    - name: ch
+      title: Video channel
+      units: 0..255
+      alias: cam_ch
+      type: byte
+
+    - name: src
+      title: Camera source index
+      units: 0..255
+      alias: cam_src
+
+    - name: PF
+      title: picture flip
+      alias: cam_opt_PF
+      type: enum
+      units:
+        - "off"
+        - "on"
+    - name: NIR
+      title: NIR filter
+      alias: cam_opt_NIR
+      type: enum
+      units:
+        - "off"
+        - "on"
+    - name: DSP
+      title: display information
+      alias: cam_opt_DSP
+      type: enum
+      units:
+        - "off"
+        - "on"
+    - name: FMI
+      title: focus mode
+      alias: cam_opt_FMI
+      type: enum
+      units:
+        - "auto"
+        - "infinity"
+    - name: FM
+      title: focus type
+      alias: cam_opt_FM
+      type: enum
+      units:
+        - "auto"
+        - "manual"
+    - name: laser
+      title: rangefinder
+      alias: cam_opt_laser
+      type: enum
+      units:
+        - "off"
+        - "on"
+
+    - name: lat
+      title: Tracking latitude
+      units: deg
+      alias: cam_lat
+      sfmt: f4
+    - name: lon
+      title: Tracking latitude
+      units: deg
+      alias: cam_lon
+      sfmt: f4
+    - name: hmsl
+      title: Tracking altitude MSL
+      units: m
+      alias: cam_hmsl
+      sfmt: f4
 
 - name: turret
-title: Turret commanded values"
-MFENUM(enum
-  sfmt: turret
-  title: Turret control mode"
-  sfmt:
-  sfmt:
-MFENUMV(turret
-  sfmt: off
-  title: turret off"
-  sfmt: 0
-MFENUMV(turret
-  sfmt: fixed
-  title: fixed position"
-  sfmt: 1
-MFENUMV(turret
-  sfmt: stab
-  title: gyro stabilization"
-  sfmt: 2
-MFENUMV(turret
-  sfmt: position
-  title: attitude position"
-  sfmt: 3
-MFENUMV(turret
-  sfmt: speed
-  title: attitude speed control"
-  sfmt: 4
-MFENUM_END(turret
-- name: att
-  sfmt: roll
-  sfmt: pitch
-  sfmt: yaw
-- name: roll
-  title: Commanded turret roll
-  units: deg
-  alias:
-  sfmt: f2
-- name: pitch
-  title: Commanded turret pitch
-  units: deg
-  alias:
-  sfmt: f2
-- name: yaw
-  title: Commanded turret yaw
-  units: deg
-  alias:
-  sfmt: f2
-- name: bias_roll
-  title: Turret bias roll
-  units: deg/s
-  alias:
-  sfmt: f4
-- name: bias_pitch
-  title: Turret bias pitch
-  units: deg/s
-  alias:
-  sfmt: f4
-- name: bias_yaw
-  title: Turret bias yaw
-  units: deg/s
-  alias:
-  sfmt: f4
-//MFVECT(float
-  sfmt: att,roll,pitch,yaw
-  sfmt: "Commanded turret attitude
-  units: deg
-  alias: ,,
-  sfmt: f4
-//MFVECT(float
-  sfmt: bias,roll,pitch,yaw
-  sfmt: "Turret stability bias
-  units: deg/s
-  alias: ,,
-  sfmt: f4
-MGRP2_END
-#undef MGRP2
+  title: Turret commanded values
+  content:
+    - name: mode
+      title: Turret control mode
+      type: enum
+      units:
+        - "off"
+        - "fixed"
+        - "stab"
+        - "position"
+        - "speed"
+
+    - name: roll
+      title: Commanded turret roll
+      units: deg
+      sfmt: f2
+    - name: pitch
+      title: Commanded turret pitch
+      units: deg
+      sfmt: f2
+    - name: yaw
+      title: Commanded turret yaw
+      units: deg
+      sfmt: f2
+
+    - name: broll
+      title: Turret bias roll
+      units: deg/s
+      sfmt: f4
+    - name: bipitch
+      title: Turret bias pitch
+      units: deg/s
+      sfmt: f4
+    - name: byaw
+      title: Turret bias yaw
+      units: deg/s
+      sfmt: f4

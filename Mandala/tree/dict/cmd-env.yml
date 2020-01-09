@@ -1,142 +1,99 @@
-- name: rc
-  title: Realtime controls override
-  - name: ovr
-    alias: rc_override
-    title: RC override
-    units: u
-    type: byte
-  - name: roll
-    alias: rc_roll
-    title: RC roll
-    units: u
-    sfmt: s001
-  - name: pitch
-    alias: rc_pitch
-    title: RC pitch
-    units: u
-    sfmt: s001
-  - name: throttle
-    alias: rc_throttle
-    title: RC throttle
-    units: u
-    sfmt: f1mul100
-  - name: yaw
-    alias: rc_yaw
-    title: RC yaw
-    units: u
-    sfmt: s001
+- name: nmt
+  title: Network Management
+  content:
+    - name: search
+      title: Search network for nodes
 
+- name: dict
+  title: Dictionary Management
+  content:
+    - name: mn
+      title: Magic number
+      descr: <hash>
 
+- name: vehicle
+  title: Vehicle addressed data
+  content:
+    - name: ident
+      title: Vehicle Identification
+      descr: <ident data>
+    - name: xpdr
+      title: Transponder data from vehicle
+      descr: <squawk><xpdr data>
+    - name: downlink
+      title: Data packet from vehicle
+      descr: <squawk><uid><data...>
+    - name: uplink
+      title: Data packet from GCS to vehicle
+      descr: <squawk><uid><data...>
 
+- name: telemetry
+  title: Telemetry packed stream
+  content:
+    - name: format
+      title: Telemetry data format feed
+      descr: <packing format feed...>
+    - name: data
+      title: Telemetry data stream
+      descr: <format_mn><time><packed data...>
 
+- name: mission
+  title: Mission data
+  content:
+    - name: info
+      title: Mission information
+    - name: data
+      title: Mission data
 
+- name: vcp
+  title: Virtual comm port data
+  content:
+    - name: rx
+      title: Received VCP serial data
+      descr: <port_id><data...>
+    - name: tx
+      title: Transmit VCP serial data
+      descr: <port_id><data...>
+    - name: can
+      title: Auxilary CAN port message
+      descr: <port_id><ID32 b31=IDE><data...>
 
-- name: gcu
-title: Ground Station info
-- name: pos
-  sfmt: lat
-  sfmt: lon
-  sfmt: hmsl
-- name: lat
-  title: GCU latitude
-  units: deg
-  alias: gcu_lat
-  sfmt: f4
-- name: lon
-  title: GCU latitude
-  units: deg
-  alias: gcu_lon
-  sfmt: f4
-- name: hmsl
-  title: GCU altitude MSL
-  units: m
-  alias: gcu_hmsl
-  sfmt: f4
-- name: vel
-  sfmt: vn
-  sfmt: ve
-  sfmt: vd
-- name: vn
-  title: GCU velocity North
-  units: m/s
-  alias:
-  sfmt: f2
-- name: ve
-  title: GCU velocity East
-  units: m/s
-  alias:
-  sfmt: f2
-- name: vd
-  title: GCU velocity Down
-  units: m/s
-  alias:
-  sfmt: f2
-- name: att
-  sfmt: roll
-  sfmt: pitch
-  sfmt: yaw
-- name: roll
-  title: GCU attitude roll
-  units: deg
-  alias:
-  sfmt: f2
-- name: pitch
-  title: GCU attitude pitch
-  units: deg
-  alias:
-  sfmt: f2
-- name: yaw
-  title: GCU attitude yaw
-  units: deg
-  alias:
-  sfmt: f2
-//MFVECT(float
-  sfmt: pos,lat,lon,hmsl,GCU global position
-  units: deg,deg,ms
-  alias: gcu_lat,gcu_lon,gcu_hmsl
-  sfmt: f4
-- name: RSS
-  title: GCU modem signal strength
-  units: 0..1
-  alias: gcu_RSS
-  sfmt: f2
-- name: Ve
-  title: GCU system battery voltage
-  units: v
-  alias: gcu_Ve
-  sfmt: f2
-- name: MT
-  title: GCU modem temperature
-  units: C
-  alias:
-  sfmt: f1s
-MGRP2_END
-#undef MGRP2
+- name: redundancy
+  title: Redundancy management
+  content:
+    - name: active
+      title: Autopilot active flag
 
-- name: meteo
-title: Meteo base station info
-- name: windSpd
-  title: wind speed
-  units: m/s
-  alias:
-  sfmt: f1mul10
-- name: windHdg
-  title: wind direction to
-  units: deg
-  alias:
-  sfmt: f2
-- name: temp
-  title: Ground outside air temperature
-  units: C
-  alias:
-  sfmt: f1s
-- name: altps
-  title: barometric altitude on ground level
-  units: m
-  alias:
-  sfmt: f2
-MGRP2_END
-#undef MGRP2
+- name: stream
+  title: Special streams and wrappers
+  content:
+    - name: local
+      title: Local data no uplink
+      descr: <local><uid><payload>
+    - name: hid
+      title: Human interface
+      descr: <hid><uid><payload>
+    - name: video
+      title: Video data
 
-MGRP1_END
-#undef MGRP1
+- name: script
+  title: Scripting commands
+  content:
+    - name: vmexec
+      title: Execute VM script onboard
+      descr: <@function>
+    - name: jsexec
+      title: Execute JS script on GCS
+      descr: <script text>
+
+- name: formation
+  title: Formation data
+  content:
+    - name: haps
+      title: HAPS shared data
+    - name: left
+      title: Left wing data
+    - name: right
+      title: Right wing data
+    - name: center
+      title: Center wing data

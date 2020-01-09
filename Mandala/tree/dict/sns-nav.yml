@@ -83,6 +83,7 @@
       title: UTC Time from 1970 1st Jan
       units: sec
       type: uint
+      sfmt: u4
     - name: sv
       suffix: visible satellites
       units: u
@@ -112,30 +113,55 @@
         - warning
         - critical
 
-- name: air
-  title: Aerodynamic sensors
+- name: pt
+  title: Dynamic pressure
   content:
-    - name: pt
-      alias: spdpt
+    - name: airspeed
       title: Airspeed
+      alias: spdpt
       units: m/s
       prec: 1
-    - name: ps
+    - name: temp
+      title: Pitot probe temperature
+      units: C
+      prec: 1
+      sfmt: f1s
+    - name: acc
+      title: Airspeed derivative
+      units: m/s^2
+      prec: 1
+      sfmt: f1smul100
+    - name: raw
+      suffix: value
+      units: kPa
+      prec: 1
+
+- name: ps
+  title: Static pressure
+  content:
+    - name: altitude
       alias: altps
       title: Barometric altitude
       units: m
       prec: 2
-    - name: vario
+    - name: temp
+      title: Altitude probe temperature
+      units: C
+      prec: 1
+      sfmt: f1s
+    - name: speed
       alias: vario
-      title: Barometric variometer
+      title: Barometric altitude derivative
       units: m/s
       prec: 1
-    - name: buo
-      alias: buoyancy
-      title: Blimp ballonet pressure
+    - name: raw
+      suffix: value
       units: kPa
       prec: 1
 
+- name: air
+  title: Aerodynamic sensors
+  content:
     - name: slip
       alias: slip
       title: Slip
@@ -146,17 +172,16 @@
       title: Angle of attack
       units: deg
       prec: 1
-
-    - name: atemp
+    - name: temp
       title: Ambient air temperature
       units: C
       prec: 1
       sfmt: f1s
-    - name: ptemp
-      title: Pitot probe temperature
-      units: C
+    - name: buo
+      alias: buoyancy
+      title: Blimp ballonet pressure
+      units: kPa
       prec: 1
-      sfmt: f1s
 
 - name: agl
   title: Altitude above ground sensors

@@ -44,7 +44,8 @@ public:
             uint8_t v = value > 0xFF ? 0xFF : value;
             return pack_raw_int(buf, v);
         }
-        return 0;
+        //pack as is
+        return pack_raw_int(buf, value);
     }
 
     //unpack
@@ -94,7 +95,14 @@ public:
                     return 0;
                 value = v;
                 return 1;
+            } else if (_sfmt == sfmt_f1smul100) {
+                int8_t v;
+                if (!unpack_raw_int(buf, v))
+                    return 0;
+                value = v / 100.0f;
+                return 1;
             }
+            return 0;
         } else if (_sfmt == sfmt_u4) {
             static_assert(sizeof(_DataType) == 4, "sfmt");
             uint32_t v;
@@ -117,7 +125,8 @@ public:
             value = static_cast<_DataType>(v);
             return 1;
         }
-        return 0;
+        //unpack as is
+        return unpack_raw_int(buf, value);
     }
 
 private:
