@@ -34,17 +34,18 @@ descr: Vehicle core data manager and data structure.
 #                               |----uplink----|
 
 # config for parsers
-inheritance:
-  - type
-  - prec
-  - sfmt
-  - units
-
+uid_base: 0x1000
 uid_bits:
   - 2
   - 1
   - 4
   - 5
+
+inheritance:
+  - type
+  - prec
+  - sfmt
+  - units
 
 # defaults:
 type: float

@@ -56,13 +56,14 @@ namespace mandala {
 static constexpr const uint8_t uid_bits[] = {
 {{ ind }}{% for i in data.uid_bits %}{{ i }},{% endfor %} // total {{ data.uid_bits|sum }} bits, {{ data.uid_bits|length }} levels
 };
+static constexpr const mandala::uid_t uid_base = 0x{{ '%0x' % data.uid_base }};
 
 // flat array of all elements
 static constexpr const mandala::meta_t meta[] = {
 {% for i in data.content %}
 {% set uid_pow = data.uid_bits[1:]|sum %}
 {% set uid_mul = 2**uid_pow %}
-{{ mandala_meta_expand(i, 1, [], 0, loop.index0*uid_mul) }}
+{{ mandala_meta_expand(i, 1, [], 0, data.uid_base+loop.index0*uid_mul) }}
 {% endfor %}
 }; // meta array
 

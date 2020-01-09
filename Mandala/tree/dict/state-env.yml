@@ -50,6 +50,31 @@
       type: uint
       sfmt: u4
 
+- name: ils
+  title: ILS status
+  type: enum
+  content:
+    - name: armed
+      title: ILS
+      units:
+        - "off"
+        - "armed"
+    - name: approach
+      title: ILS approach
+      units:
+        - "lost"
+        - "available"
+    - name: offset
+      title: ILS offset
+      units:
+        - "lost"
+        - "available"
+    - name: platform
+      title: ILS platform
+      units:
+        - "lost"
+        - "available"
+
 - name: ats
   title: ATS system state
   content:
@@ -80,6 +105,65 @@
       title: ATS encoder yaw
       units: deg
       alias: atsenc_yaw
+      sfmt: f2
+
+- name: cam
+  title: Camera control system state
+  content:
+    - name: roll
+      title: Cam attitude roll
+      units: deg
+      alias: cam_roll
+      sfmt: f2
+    - name: pitch
+      title: Cam attitude pitch
+      units: deg
+      alias: cam_pitch
+      sfmt: f2
+    - name: yaw
+      title: Cam attitude yaw
+      units: deg
+      alias: cam_yaw
+      sfmt: f2
+
+    - name: timestamp
+      title: Cam timestamp
+      units: ms
+      alias: cam_timestamp
+      type: uint
+      sfmt: u4
+    - name: dist
+      title: Distance to tracking object
+      units: m
+      sfmt: f2
+
+- name: turret
+  title: Turret system state
+  content:
+    - name: roll
+      title: Turret attitude roll
+      units: deg
+      sfmt: f2
+    - name: pitch
+      title: Turret attitude pitch
+      units: deg
+      sfmt: f2
+    - name: yaw
+      title: Turret attitude yaw
+      units: deg
+      sfmt: f2
+
+    - name: eroll
+      title: Turret encoder roll
+      units: deg
+      sfmt: f2
+    - name: epitch
+      title: Turret encoder pitch
+      units: deg
+      sfmt: f2
+    - name: eyaw
+      title: Turret encoder yaw
+      units: deg
       sfmt: f2
 
 - name: gcs
@@ -142,90 +226,6 @@
     - name: altps
       title: barometric altitude on ground level
       units: m
-      sfmt: f2
-
-- name: ils
-  title: ILS status
-  type: enum
-  content:
-    - name: armed
-      title: ILS
-      units:
-        - "off"
-        - "armed"
-    - name: approach
-      title: ILS approach
-      units:
-        - "lost"
-        - "available"
-    - name: offset
-      title: ILS offset
-      units:
-        - "lost"
-        - "available"
-    - name: platform
-      title: ILS platform
-      units:
-        - "lost"
-        - "available"
-
-- name: cam
-  title: Camera control system state
-  content:
-    - name: roll
-      title: Cam attitude roll
-      units: deg
-      alias: cam_roll
-      sfmt: f2
-    - name: pitch
-      title: Cam attitude pitch
-      units: deg
-      alias: cam_pitch
-      sfmt: f2
-    - name: yaw
-      title: Cam attitude yaw
-      units: deg
-      alias: cam_yaw
-      sfmt: f2
-
-    - name: timestamp
-      title: Cam timestamp
-      units: ms
-      alias: cam_timestamp
-      type: uint
-      sfmt: u4
-    - name: dist
-      title: Distance to tracking object
-      units: m
-      sfmt: f2
-
-- name: turret
-  title: Turret system state
-  content:
-    - name: roll
-      title: Turret attitude roll
-      units: deg
-      sfmt: f2
-    - name: pitch
-      title: Turret attitude pitch
-      units: deg
-      sfmt: f2
-    - name: yaw
-      title: Turret attitude yaw
-      units: deg
-      sfmt: f2
-
-    - name: eroll
-      title: Turret encoder roll
-      units: deg
-      sfmt: f2
-    - name: epitch
-      title: Turret encoder pitch
-      units: deg
-      sfmt: f2
-    - name: eyaw
-      title: Turret encoder yaw
-      units: deg
       sfmt: f2
 
 - name: usr

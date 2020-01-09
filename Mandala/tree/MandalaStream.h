@@ -13,6 +13,8 @@ public:
     template<mandala::sfmt_id_t _sfmt, typename _DataType>
     static size_t pack(void *buf, const _DataType &value)
     {
+        static_assert(sizeof(_DataType) >= psize<_sfmt>(), "sfmt");
+
         if (std::is_floating_point<_DataType>::value) {
             if (_sfmt == sfmt_f4) {
                 return pack_raw_int(buf, float_to_f32(value));
@@ -32,18 +34,18 @@ public:
                 return pack_raw_int(buf, float_to_s8(value * 100.0f));
             }
         } else if (_sfmt == sfmt_u4) {
-            static_assert(sizeof(_DataType) == 4, "sfmt");
             uint32_t v = value;
             return pack_raw_int(buf, v);
         } else if (_sfmt == sfmt_u2) {
-            static_assert(sizeof(_DataType) >= 2, "sfmt");
+            //static_assert(sizeof(_DataType) >= 2, "sfmt");
             uint16_t v = value > 0xFFFF ? 0xFFFF : value;
             return pack_raw_int(buf, v);
         } else if (_sfmt == sfmt_u1) {
-            static_assert(sizeof(_DataType) >= 1, "sfmt");
+            //static_assert(sizeof(_DataType) >= 1, "sfmt");
             uint8_t v = value > 0xFF ? 0xFF : value;
             return pack_raw_int(buf, v);
         }
+        //static_assert(!std::is_floating_point<_DataType>::value, "sfmt");
         //pack as is
         return pack_raw_int(buf, value);
     }
@@ -52,6 +54,8 @@ public:
     template<mandala::sfmt_id_t _sfmt, typename _DataType>
     static size_t unpack(const void *buf, _DataType &value)
     {
+        static_assert(sizeof(_DataType) >= psize<_sfmt>(), "sfmt");
+
         if (std::is_floating_point<_DataType>::value) {
             if (_sfmt == sfmt_f4) {
                 uint32_t v;
@@ -104,21 +108,21 @@ public:
             }
             return 0;
         } else if (_sfmt == sfmt_u4) {
-            static_assert(sizeof(_DataType) == 4, "sfmt");
+            //static_assert(sizeof(_DataType) == 4, "sfmt");
             uint32_t v;
             if (!unpack_raw_int(buf, v))
                 return 0;
             value = static_cast<_DataType>(v);
             return 4;
         } else if (_sfmt == sfmt_u2) {
-            static_assert(sizeof(_DataType) >= 2, "sfmt");
+            //static_assert(sizeof(_DataType) >= 2, "sfmt");
             uint16_t v;
             if (!unpack_raw_int(buf, v))
                 return 0;
             value = static_cast<_DataType>(v);
             return 2;
         } else if (_sfmt == sfmt_u1) {
-            static_assert(sizeof(_DataType) >= 2, "sfmt");
+            //static_assert(sizeof(_DataType) >= 2, "sfmt");
             uint8_t v;
             if (!unpack_raw_int(buf, v))
                 return 0;
@@ -127,6 +131,21 @@ public:
         }
         //unpack as is
         return unpack_raw_int(buf, value);
+    }
+
+    template<mandala::sfmt_id_t _sfmt>
+    constexpr static size_t psize()
+    {
+        switch (_sfmt) {
+        case sfmt_f4:
+        case sfmt_u4:
+            return 4;
+        case sfmt_f2:
+        case sfmt_u2:
+            return 2;
+        default:
+            return 1;
+        }
     }
 
 private:

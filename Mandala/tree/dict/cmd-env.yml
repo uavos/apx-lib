@@ -1,15 +1,11 @@
-- name: nmt
-  title: Network Management
-  content:
-    - name: search
-      title: Search network for nodes
-
 - name: dict
   title: Dictionary Management
   content:
-    - name: mn
-      title: Magic number
-      descr: <hash>
+    - name: search
+      title: Search for dict source
+    - name: ident
+      title: Dictionary identifier
+      descr: <hash><node_uid>
 
 - name: vehicle
   title: Vehicle addressed data
