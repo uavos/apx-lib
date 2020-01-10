@@ -9,21 +9,16 @@
       title: Fatal
     - name: power
       title: Power supply
-      alias: error_power
     - name: engine
       title: Engine
     - name: rpm
       title: RPM sensor
-      alias: error_rpm
     - name: cas
       title: CAS
-      alias: error_cas
     - name: pstatic
       title: Static pressure
-      alias: error_pstatic
     - name: gyro
       title: IMU gyros bias
-      alias: error_gyro
     - name: ers
       title: ERS
 
@@ -32,7 +27,6 @@
   content:
     - name: uplink
       title: Uplink
-      alias: status_modem
       type: enum
       units:
         - "lost"
@@ -40,15 +34,11 @@
     - name: period
       title: downlink period
       units: ms
-      alias: dl_period
-      type: uint
-      sfmt: u2
+      type: word
     - name: timestamp
       title: downlink timestamp
       units: ms
-      alias: dl_timestamp
-      type: uint
-      sfmt: u4
+      type: dword
 
 - name: ils
   title: ILS status
@@ -81,31 +71,22 @@
     - name: roll
       title: ATS attitude roll
       units: deg
-      sfmt: f2
     - name: pitch
       title: ATS attitude pitch
       units: deg
-      sfmt: f2
     - name: yaw
       title: ATS attitude yaw
       units: deg
-      sfmt: f2
 
     - name: eroll
       title: ATS encoder roll
       units: deg
-      alias: atsenc_roll
-      sfmt: f2
     - name: epitch
       title: ATS encoder pitch
       units: deg
-      alias: atsenc_pitch
-      sfmt: f2
     - name: eyaw
       title: ATS encoder yaw
       units: deg
-      alias: atsenc_yaw
-      sfmt: f2
 
 - name: cam
   title: Camera control system state
@@ -113,29 +94,20 @@
     - name: roll
       title: Cam attitude roll
       units: deg
-      alias: cam_roll
-      sfmt: f2
     - name: pitch
       title: Cam attitude pitch
       units: deg
-      alias: cam_pitch
-      sfmt: f2
     - name: yaw
       title: Cam attitude yaw
       units: deg
-      alias: cam_yaw
-      sfmt: f2
 
     - name: timestamp
       title: Cam timestamp
       units: ms
-      alias: cam_timestamp
-      type: uint
-      sfmt: u4
+      type: dword
     - name: dist
       title: Distance to tracking object
       units: m
-      sfmt: f2
 
 - name: turret
   title: Turret system state
@@ -143,28 +115,22 @@
     - name: roll
       title: Turret attitude roll
       units: deg
-      sfmt: f2
     - name: pitch
       title: Turret attitude pitch
       units: deg
-      sfmt: f2
     - name: yaw
       title: Turret attitude yaw
       units: deg
-      sfmt: f2
 
     - name: eroll
       title: Turret encoder roll
       units: deg
-      sfmt: f2
     - name: epitch
       title: Turret encoder pitch
       units: deg
-      sfmt: f2
     - name: eyaw
       title: Turret encoder yaw
       units: deg
-      sfmt: f2
 
 - name: gcs
   title: Ground Control state
@@ -172,41 +138,32 @@
     - name: lat
       title: GCS latitude
       units: deg
-      sfmt: f4
     - name: lon
       title: GCS latitude
       units: deg
-      sfmt: f4
     - name: hmsl
       title: GCS altitude MSL
       units: m
-      sfmt: f4
 
     - name: vn
       title: GCS velocity North
       units: m/s
-      sfmt: f2
     - name: ve
       title: GCS velocity East
       units: m/s
-      sfmt: f2
     - name: vd
       title: GCS velocity Down
       units: m/s
-      sfmt: f2
 
     - name: roll
       title: GCS attitude roll
       units: deg
-      sfmt: f2
     - name: pitch
       title: GCS attitude pitch
       units: deg
-      sfmt: f2
     - name: yaw
       title: GCS attitude yaw
       units: deg
-      sfmt: f2
 
 - name: meteo
   title: Meteo data
@@ -214,109 +171,73 @@
     - name: wspd
       title: wind speed
       units: m/s
-      sfmt: f1mul10
     - name: whdg
       title: wind direction to
       units: deg
-      sfmt: f2
     - name: temp
       title: Ground outside air temperature
       units: C
-      sfmt: f1s
     - name: altps
       title: barometric altitude on ground level
       units: m
-      sfmt: f2
 
 - name: usr
   title: User values
   content:
     - name: u1
       title: User value 1
-      alias: user1
-      sfmt: f2
     - name: u2
       title: User value 2
-      alias: user2
-      sfmt: f2
     - name: u3
       title: User value 3
-      alias: user3
-      sfmt: f2
     - name: u4
       title: User value 4
-      alias: user4
-      sfmt: f2
     - name: u5
       title: User value 5
-      alias: user5
-      sfmt: f2
     - name: u6
       title: User value 6
-      alias: user6
-      sfmt: f2
     - name: u7
       title: User value 7
-      alias: user7
-      sfmt: f2
     - name: u8
       title: User value 8
-      alias: user8
-      sfmt: f2
     - name: u9
       title: User value 9
-      sfmt: f2
     - name: u10
       title: User value 10
-      sfmt: f2
     - name: u11
       title: User value 11
-      sfmt: f2
     - name: u12
       title: User value 12
-      sfmt: f2
     - name: u13
       title: User value 13
-      sfmt: f2
     - name: u14
       title: User value 14
-      sfmt: f2
     - name: u15
       title: User value 15
-      sfmt: f2
     - name: u16
       title: User value 16
-      sfmt: f2
 
     - name: b1
       title: User byte 1
-      alias: userb_1
       type: byte
     - name: b2
       title: User byte 2
-      alias: userb_2
       type: byte
     - name: b3
       title: User byte 3
-      alias: userb_3
       type: byte
     - name: b4
       title: User byte 4
-      alias: userb_4
       type: byte
     - name: b5
       title: User byte 5
-      alias: userb_5
       type: byte
     - name: b6
       title: User byte 6
-      alias: userb_6
       type: byte
     - name: b7
       title: User byte 7
-      alias: userb_7
       type: byte
     - name: b8
       title: User byte 8
-      alias: userb_8
       type: byte

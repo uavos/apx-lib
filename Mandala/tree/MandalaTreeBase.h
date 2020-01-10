@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MandalaMetaBase.h"
-#include "MandalaStream.h"
+//#include "MandalaStream.h"
 
 namespace mandala {
 
@@ -27,7 +27,7 @@ struct tree_2_t : public tree_base_t<_Tree>
 };
 
 template<typename _DataType, typename _Tree>
-class tree_value_t : public tree_base_t<_Tree>, private stream
+class tree_value_t : public tree_base_t<_Tree>
 {
 public:
     constexpr operator _DataType() const { return m_value; }
@@ -48,30 +48,24 @@ public:
     field_t(field_t &&) = delete;
     field_t &operator=(field_t &&) = delete;*/
 
-    constexpr inline size_t pack(void *buf) const
+    /*constexpr inline size_t pack(void *buf) const
     {
         return stream::pack<_Tree::meta.sfmt>(buf, m_value);
     }
     constexpr inline size_t unpack(const void *buf)
     {
         return stream::unpack<_Tree::meta.sfmt>(buf, m_value);
-    }
+    }*/
 
     constexpr inline size_t copy_to(void *buf) const
     {
-        if (std::is_floating_point<_DataType>::value) {
-            return stream::pack<sfmt_f4>(buf, m_value);
-        } else {
-            return pack_raw_int(buf, m_value);
-        }
+        memcpy(buf, &m_value, sizeof(_DataType));
+        return sizeof(_DataType);
     }
     constexpr inline size_t copy_from(const void *buf)
     {
-        if (std::is_floating_point<_DataType>::value) {
-            return stream::unpack<sfmt_f4>(buf, m_value);
-        } else {
-            return unpack_raw_int(buf, m_value);
-        }
+        memcpy(&m_value, buf, sizeof(_DataType));
+        return sizeof(_DataType);
     }
 
 protected:

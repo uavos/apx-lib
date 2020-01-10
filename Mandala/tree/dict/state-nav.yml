@@ -1,100 +1,126 @@
-- name: ahrs
-  title: Attitude and position estimation
+- name: att
+  title: Attitude
   content:
     - name: roll
-      title: Attitude roll
+      suffix: roll
       units: deg
-      alias: roll
     - name: pitch
-      title: Attitude pitch
+      suffix: pitch
       units: deg
-      alias: pitch
     - name: yaw
-      title: Attitude yaw
+      suffix: yaw
       units: deg
-      alias: yaw
 
+    - name: qa
+      suffix: quat a
+    - name: qb
+      suffix: quat b
+    - name: qc
+      suffix: quat c
+    - name: qd
+      suffix: quat d
+
+    - name: p
+      title: Angular rate X
+      units: deg/s
+    - name: q
+      title: Angular rate Y
+      units: deg/s
+    - name: r
+      title: Angular rate Z
+      units: deg/s
+
+- name: pos
+  title: Position
+  content:
     - name: lat
       title: Latitude
       units: deg
-      sfmt: f4
     - name: lon
       title: Longitude
       units: deg
-      sfmt: f4
+    - name: hmsl
+      title: Altitude MSL
+      units: m
 
-    - name: north
+    - name: "n"
       title: Local position north
       units: m
-      sfmt: f4
-    - name: east
+    - name: "e"
       title: Local position east
       units: m
-      sfmt: f4
+    - name: "d"
+      title: Local position down
+      units: m
 
     - name: vn
-      title: Local velocity north
+      title: Velocity north
       units: m/s
-      sfmt: f2
     - name: ve
-      title: Local velocity east
+      title: Velocity east
       units: m/s
-      sfmt: f2
+    - name: vd
+      title: Velocity down
+      units: m/s
 
-    - name: altitude
-      title: Altitude
-      units: m
-      alias: altitude
-      sfmt: f4
+    - name: ax
+      title: Acceleration X
+      units: m/s2
+    - name: ay
+      title: Acceleration Y
+      units: m/s2
+    - name: az
+      title: Acceleration Z
+      units: m/s2
+
+    - name: vx
+      title: Velocity X
+      units: m/s
+    - name: vy
+      title: Velocity Y
+      units: m/s
+    - name: vz
+      title: Velocity Z
+      units: m/s
+
     - name: course
       title: Moving direction
       units: deg
-      alias: course
-      sfmt: f2
+
     - name: gSpeed
       title: Ground speed
       units: m/s
-      alias: gSpeed
-      sfmt: f2
 
 - name: flight
   title: Flight parameters
   content:
+    - name: altitude
+      title: Flight altitude
+      units: m
     - name: airspeed
       title: Airspeed
       units: m/s
-      alias: airspeed
-      sfmt: f2
     - name: vspeed
       title: Vertical speed
       units: m/s
-      alias: vspeed
-      sfmt: f2
-    - name: ldratio
-      title: Glide ratio
-      units: Lift/Drag
-      alias: ldratio
-      sfmt: f2
-    - name: venergy
-      title: Compensated variometer
-      units: m/s
-      alias: venergy
-      sfmt: f2
-    - name: agl
-      title: Above Ground Level altitude
-      units: m
-      alias: agl
-      sfmt: f2
+
     - name: vcas
       title: Airspeed derivative
       units: m/s^2
-      alias: vcas
-      sfmt: f2
+
+    - name: agl
+      title: Above Ground Level altitude
+      units: m
+
+    - name: venergy
+      title: Compensated variometer
+      units: m/s
     - name: denergy
       title: Venergy derivative
       units: m/s^2
-      alias: denergy
-      sfmt: f2
+    - name: ldratio
+      title: Glide ratio
+      units: Lift/Drag
 
 - name: wind
   title: Wind estimator
@@ -102,18 +128,12 @@
     - name: speed
       title: wind speed
       units: m/s
-      alias: windSpd
-      sfmt: f1mul10
     - name: hdg
       title: wind direction to
       units: deg
-      alias: windHdg
-      sfmt: f2
     - name: ktas
       title: CAS to TAS multiplier
       units: K
-      alias: cas2tas
-      sfmt: f1mul100
 
 - name: status
   title: Status of subsystems
@@ -121,31 +141,26 @@
   content:
     - name: rc
       title: Controls override
-      alias: status_rc
       units:
         - "off"
         - "on"
     - name: gps
       title: GPS data
-      alias: status_gps
       units:
         - "lost"
         - "available"
     - name: agl
       title: AGL data
-      alias: status_agl
       units:
         - "unavailable"
         - "available"
     - name: landed
       title: Vehicle
-      alias: status_landed
       units:
         - "flying"
         - "landed"
     - name: touch
       title: Landing gear
-      alias: status_touch
       units:
         - "floating"
         - "touchdown"
@@ -156,45 +171,32 @@
     - name: dx
       title: Bodyframe delta X
       units: m
-      sfmt: f2
     - name: dy
       title: Bodyframe delta Y
       units: m
-      sfmt: f2
 
     - name: vx
       title: Bodyframe velocity X
       units: m/s
-      sfmt: f2
     - name: vy
       title: Bodyframe velocity Y
       units: m/s
-      sfmt: f2
 
     - name: delta
       title: General delta
       units: m
-      alias: delta
-      sfmt: f2
     - name: thdg
       title: Current tangent heading
       units: deg
-      alias: tgHDG
-      sfmt: f2
     - name: drw
       title: Runway alignment
       units: m
-      alias: rwDelta
-      sfmt: f2
     - name: ddrw
       title: Runway alignment velocity
       units: m/s
-      alias: rwDV
-      sfmt: f2
 
     - name: mtype
       title: Mission maneuver type
-      alias: mtype
       type: enum
       units:
         - hdg
@@ -202,26 +204,18 @@
 
     - name: loops
       title: Number of remaining turns or loops
-      units: "n"
-      alias: loops
-      type: uint
-      sfmt: u2
+      type: word
 
     - name: turnR
       title: Current circle radius
       units: m
-      alias: turnR
-      sfmt: f2
 
     - name: stab
       title: Stability
       units: 0..1
-      alias: stab
-      sfmt: f1mul100
     - name: corr
       title: Correlator output
       units: K
-      sfmt: f2
 
 - name: mission
   title: Maneuver information
@@ -229,52 +223,33 @@
     - name: dist
       title: Distance to waypoint
       units: m
-      alias: dWPT
-      sfmt: f2
     - name: hdg
       title: Current waypoint heading
       units: deg
-      alias: wpHDG
-      sfmt: f2
 
     - name: eta
       title: Estimated time of arrival
       units: s
-      type: uint
-      alias: ETA
-      sfmt: u4
+      type: word
 
     - name: wpidx
       title: Current waypoint
-      units: "n"
-      alias: wpidx
-      type: uint
-      sfmt: u2
+      type: word
     - name: rwidx
       title: Current runway
-      units: "n"
-      alias: rwidx
-      type: uint
-      sfmt: u1
+      type: word
     - name: twidx
       title: Current taxiway
-      units: "n"
-      alias: twidx
-      type: uint
-      sfmt: u1
+      type: word
     - name: piidx
       title: Current point of interest
-      units: "n"
-      alias: piidx
-      type: uint
-      sfmt: u1
+      type: word
 
 - name: home
   title: Home point
   content:
     - name: status
       title: Home point status
-      alias: status_home
       type: enum
       units:
         - "unavailable"
@@ -283,32 +258,20 @@
     - name: lat
       title: Home latitude
       units: deg
-      alias: home_lat
-      sfmt: f4
     - name: lon
       title: Home latitude
       units: deg
-      alias: home_lon
-      sfmt: f4
     - name: hmsl
       title: Home altitude MSL
       units: m
-      alias: home_hmsl
-      sfmt: f4
 
     - name: altps
       title: Barometric altitude on ground level
       units: m
-      alias: altps_gnd
-      sfmt: f2
 
     - name: hdg
       title: Heading to home
       units: deg
-      alias: homeHDG
-      sfmt: f2
     - name: dist
       title: Distance to home
       units: m
-      alias: dHome
-      sfmt: f2

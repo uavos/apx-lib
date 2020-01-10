@@ -1,7 +1,6 @@
 - name: gyro
   title: Gyro
   units: deg/s
-  prec: 0
   content:
     - name: "x"
       suffix: "X"
@@ -9,11 +8,10 @@
       suffix: "Y"
     - name: "z"
       suffix: "Z"
-    - name: "temp"
-      suffix: "Temperature"
+    - name: temp
+      suffix: temperature
       units: C
-      prec: 1
-      sfmt: f1s
+
 - name: acc
   title: Accelerometer
   units: m/s2
@@ -24,16 +22,13 @@
       suffix: "Y"
     - name: "z"
       suffix: "Z"
-    - name: "temp"
-      suffix: "Temperature"
+    - name: temp
+      suffix: temperature
       units: C
-      prec: 1
-      sfmt: f1s
 
 - name: mag
   title: Magnetometer
   units: a.u.
-  prec: 3
   content:
     - name: "x"
       suffix: "X"
@@ -41,64 +36,47 @@
       suffix: "Y"
     - name: "z"
       suffix: "Z"
-    - name: "temp"
-      suffix: "Temperature"
+    - name: temp
+      suffix: temperature
       units: C
-      prec: 1
-      sfmt: f1s
 
 - name: gnss
   title: GNSS
   content:
     - name: lat
-      suffix: Latitude
+      suffix: latitude
       units: deg
-      prec: 6
-      sfmt: f4
     - name: lon
-      suffix: Longitude
+      suffix: longitude
       units: deg
-      prec: 6
-      sfmt: f4
     - name: hmsl
-      suffix: Altitude
+      suffix: altitude
       units: m
-      prec: 2
-      sfmt: f4
 
-    - name: "vn"
-      suffix: Velocity North
-      prec: 2
+    - name: vn
+      suffix: Velocity north
       units: m/s
-    - name: "ve"
-      suffix: Velocity East
-      prec: 2
+    - name: ve
+      suffix: Velocity east
       units: m/s
-    - name: "vd"
-      suffix: Velocity Down
-      prec: 2
+    - name: vd
+      suffix: Velocity down
       units: m/s
 
     - name: time
       title: UTC Time from 1970 1st Jan
       units: sec
-      type: uint
-      sfmt: u4
+      type: dword
     - name: sv
       suffix: visible satellites
-      units: u
-      type: uint
-      sfmt: u1
+      type: word
     - name: su
       suffix: used satellites
-      units: u
-      type: uint
-      sfmt: u1
+      type: word
     - name: temp
       suffix: temperature
       units: C
       prec: 1
-      sfmt: f1s
 
     - name: jam
       suffix: jamming level
@@ -118,19 +96,16 @@
   content:
     - name: airspeed
       title: Airspeed
-      alias: spdpt
       units: m/s
       prec: 1
     - name: temp
       title: Pitot probe temperature
       units: C
       prec: 1
-      sfmt: f1s
-    - name: acc
+    - name: vairspeed
       title: Airspeed derivative
-      units: m/s^2
+      units: m/s2
       prec: 1
-      sfmt: f1smul100
     - name: raw
       suffix: value
       units: kPa
@@ -140,7 +115,6 @@
   title: Static pressure
   content:
     - name: altitude
-      alias: altps
       title: Barometric altitude
       units: m
       prec: 2
@@ -148,9 +122,7 @@
       title: Altitude probe temperature
       units: C
       prec: 1
-      sfmt: f1s
     - name: speed
-      alias: vario
       title: Barometric altitude derivative
       units: m/s
       prec: 1
@@ -163,12 +135,10 @@
   title: Aerodynamic sensors
   content:
     - name: slip
-      alias: slip
       title: Slip
       units: deg
       prec: 1
     - name: aoa
-      alias: attack
       title: Angle of attack
       units: deg
       prec: 1
@@ -176,9 +146,7 @@
       title: Ambient air temperature
       units: C
       prec: 1
-      sfmt: f1s
     - name: buo
-      alias: buoyancy
       title: Blimp ballonet pressure
       units: kPa
       prec: 1
@@ -214,16 +182,13 @@
       title: Platform Latitude
       units: deg
       prec: 6
-      sfmt: f4
     - name: lon
       title: Platform Longitude
       units: deg
       prec: 6
-      sfmt: f4
     - name: hmsl
       title: Platform Altitude
       units: m
-      sfmt: f4
 
     - name: vn
       title: Platform velocity North
@@ -267,8 +232,6 @@
     - name: dme
       title: ILS distance to VOR1
       units: m
-      type: uint
-      sfmt: u2
     - name: rss
       title: ILS signal strength
       units: "%"

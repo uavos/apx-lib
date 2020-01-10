@@ -1,23 +1,17 @@
 - name: stab
   title: Stability controls
-  sfmt: f1smul100
   units: -1..+1
   content:
     - name: ail
       title: Ailerons
-      alias: ctr_ailerons
     - name: elv
       title: Elevator
-      alias: ctr_elevator
     - name: rud
       title: Rudder
-      alias: ctr_rudder
     - name: col
       title: Collective
-      alias: ctr_collective
     - name: str
       title: Steering
-      alias: ctr_steering
 
 - name: engine
   title: Engine controls
@@ -25,33 +19,24 @@
     - name: thr
       title: Throttle
       units: 1
-      alias: ctr_throttle
-      sfmt: f1mul100
     - name: prop
       title: Prop pitch
       units: -1..+1
-      sfmt: f1smul100
     - name: mix
       title: Mixture
       units: 1
-      alias: ctr_mixture
-      sfmt: f1mul100
     - name: tune
       title: Engine tuning
       units: -1..+1
-      alias: ctr_engine
-      sfmt: f1smul100
     - name: tvec
       title: Thrust vector
       units: -1..+1
-      sfmt: f1smul100
     - name: rev
       title: Thrust reverse
       type: enum
       units:
         - "off"
         - "on"
-      alias: ctrb_rev
 
 - name: wing
   title: Wing mechanization
@@ -59,27 +44,18 @@
     - name: flaps
       title: Flaps
       units: 1
-      alias: ctr_flaps
-      sfmt: f1mul100
     - name: airbrk
       title: Airbrakes
       units: 1
-      alias: ctr_airbrk
-      sfmt: f1mul100
     - name: slats
       title: Wing slats
       units: 1
-      sfmt: f1mul100
     - name: sweep
       title: Wing sweep
       units: -1..+1
-      alias: ctr_sweep
-      sfmt: f1smul100
     - name: buoyancy
       title: Buoyancy
       units: -1..+1
-      alias: ctr_buoyancy
-      sfmt: f1smul100
 
 - name: brakes
   title: Brakes system control
@@ -87,18 +63,12 @@
     - name: brake
       title: Brake
       units: 1
-      alias: ctr_brake
-      sfmt: f1mul100
     - name: brakeL
       title: Left brake
       units: 1
-      alias: ctr_brakeL
-      sfmt: f1mul100
     - name: brakeR
       title: Right brake
       units: 1
-      alias: ctr_brakeR
-      sfmt: f1mul100
 
 - name: ers
   title: Emergency Recovery System controls
@@ -109,10 +79,8 @@
       units:
         - "off"
         - "on"
-      alias: ctrb_ers
     - name: rel
       title: Parachute
       units:
         - locked
         - released
-      alias: ctrb_rel

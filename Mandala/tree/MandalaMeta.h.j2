@@ -1,5 +1,7 @@
 {%- extends 'Mandala.j2' %}
 
+{% set ns = namespace(path_uid={}) %}
+
 {%- macro mandala_meta_expand(d, indent=0, path=[], level=0, uid=0, parent=0) -%}
 {% set ind = ' '*indent*indent_size %}
 {% set ind1 = ' '*(indent+1)*indent_size %}
@@ -33,9 +35,8 @@
 {{ ind1 }}.level = {{ level }},
 {{ ind1 }}.group = {% if d.content is defined %}1{% else %}0{% endif %},
 {{ ind1 }}.type_id = type_{{ d.type }},
-{{ ind1 }}.prec = {{ d.prec }},
-{{ ind1 }}.sfmt = sfmt_{{ d.sfmt }},
 {{ ind }}},
+{% set _dummy = ns.path_uid.update({path|join('.'):uid}) %}
 {% set uid_pow = data.uid_bits[level+2:]|sum %}
 {% set uid_mul = 2**uid_pow %}
 {% for i in d.content %}
@@ -66,6 +67,26 @@ static constexpr const mandala::meta_t meta[] = {
 {{ mandala_meta_expand(i, 1, [], 0, data.uid_base+loop.index0*uid_mul) }}
 {% endfor %}
 }; // meta array
+
+// Default streams
+{% for s in data.streams %}
+// stream: {{ s.name }}: {{ s.title }}
+static constexpr const mandala::stream_item_t stream_{{ s.name }}[] = {
+{% for i in s.content %}
+{% set path = i.keys()[0] %}
+{% set fmt = i.values()[0] %}
+{% set uid = ns.path_uid[path] %}
+{ .uid = 0x{{ '%0x' % uid }}, .sfmt = sfmt_{{ fmt }} },  // {{ path }}
+{% endfor %}
+{ .uid = 0, .sfmt = sfmt_void }
+};
+{% endfor %}
+
+static constexpr const mandala::stream_id_t streams[] = {
+{% for s in data.streams %}
+{ .name = "{{ s.name }}", .title = "{{ s.title }}", .content = stream_{{ s.name }} },
+{% endfor %}
+};
 
 }; // namespace
 

@@ -10,9 +10,7 @@ descr: Vehicle core data manager and data structure.
 # units:  text units of measure
 # type:   data type
 # prec:   number precision, decimal points
-# sfmt:   stream packing format
 # suffix: make title from parent.title+suffix
-# alias:  shortcut name
 
 # Parameters are inherited from parent by child fields
 
@@ -44,13 +42,11 @@ uid_bits:
 inheritance:
   - type
   - prec
-  - sfmt
   - units
 
 # defaults:
 type: float
 prec: 2
-sfmt: f2
 
 # 4 classes
 content:
@@ -123,3 +119,17 @@ content:
         title: System data identifiers
         descr: Special protocols and data wrappers.
         type: byte # void
+
+streams:
+  - name: v9_sd
+    title: Standard v9.xx telemetry
+    content:
+      - state.nav.att.roll: f2
+      - state.nav.att.pitch: f2
+      - state.nav.att.yaw: f2
+      - state.nav.pos.ax: f1_s
+      - state.nav.pos.ay: f1_s
+      - state.nav.pos.az: f1_s
+      - state.nav.att.p: f1_s10
+      - state.nav.att.q: f1_s10
+      - state.nav.att.r: f1_s10

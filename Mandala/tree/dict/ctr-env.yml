@@ -7,22 +7,16 @@
   content:
     - name: ap
       suffix: Avionics
-      alias: power_ap
     - name: servo
       suffix: Servo
-      alias: power_servo
     - name: ignition
       suffix: Ignition
-      alias: power_ignition
     - name: payload
       suffix: Payload
-      alias: power_payload
     - name: agl
       suffix: AGL sensor
-      alias: power_agl
     - name: xpdr
       suffix: XPDR
-      alias: power_xpdr
     - name: satcom
       suffix: Satcom
     - name: rfamp
@@ -31,7 +25,6 @@
       suffix: ILS
     - name: ice
       suffix: Anti-ice
-      alias: sw_ice
 
 - name: psw
   title: Power switches
@@ -42,17 +35,14 @@
   content:
     - name: starter
       title: Engine starter
-      alias: sw_starter
     - name: horn
       title: Engine horn signal
-      alias: ctrb_horn
     - name: ign1
       title: Ignition 1
     - name: ign2
       title: Ignition 2
     - name: fpump
       title: Fuel pump
-      alias: ctrb_pump
     - name: xfeed
       title: Fuel crossfeed
 
@@ -61,7 +51,6 @@
   content:
     - name: gear
       title: Landing gear
-      alias: ctrb_gear
       type: enum
       units:
         - down
@@ -78,14 +67,12 @@
       title: Beacon light
     - name: landing
       title: Landing lights
-      alias: sw_lights
     - name: nav
       title: Navigation lights
     - name: strobe
       title: Strobe light
     - name: taxi
       title: Taxi lights
-      alias: sw_taxi
 
 - name: door
   title: Doors and latches
@@ -98,7 +85,6 @@
       title: Main door
     - name: drop
       title: Drop-off
-      alias: ctrb_drp
 
 - name: cam
   title: Camera controls output
@@ -106,36 +92,27 @@
     - name: roll
       title: Cam servo roll
       units: -1..+1
-      alias: camctr_roll
-      sfmt: f1smul100
     - name: pitch
       title: Cam servo pitch
       units: -1..+1
-      alias: camctr_pitch
-      sfmt: f1smul100
     - name: yaw
       title: Cam servo yaw
       units: -1..+1
-      alias: camctr_yaw
-      sfmt: f1smul100
 
     - name: rec
       title: Recording
-      alias: camctrb_rec
       type: enum
       units:
         - "off"
         - "on"
     - name: shot
       title: Snapshot
-      alias: camctrb_shot
       type: enum
       units:
         - "off"
         - "on"
     - name: ashot
       title: Series snapshots
-      alias: camctrb_ashot
       type: enum
       units:
         - "off"
@@ -147,18 +124,12 @@
     - name: roll
       title: ATS servo roll
       units: -1..+1
-      alias: atsctr_roll
-      sfmt: f1smul100
     - name: pitch
       title: ATS servo pitch
       units: -1..+1
-      alias: atsctr_pitch
-      sfmt: f1smul100
     - name: yaw
       title: ATS servo yaw
       units: -1..+1
-      alias: atsctr_yaw
-      sfmt: f1smul100
 
 - name: turret
   title: Turret controls output
@@ -166,15 +137,12 @@
     - name: roll
       title: Turret servo roll
       units: -1..+1
-      sfmt: f1smul100
     - name: pitch
       title: Turret servo pitch
       units: -1..+1
-      sfmt: f1smul100
     - name: yaw
       title: Turret servo yaw
       units: -1..+1
-      sfmt: f1smul100
 
     - name: armed
       title: Turret
@@ -197,7 +165,6 @@
 
 - name: usr
   title: User controls
-  sfmt: f2
   content:
     - name: ctr1
       title: User control 1

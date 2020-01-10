@@ -4,80 +4,55 @@
     - name: roll
       title: Commanded roll
       units: deg
-      alias: cmd_roll
-      sfmt: f2
     - name: pitch
       title: Commanded pitch
       units: deg
-      alias: cmd_pitch
-      sfmt: f2
     - name: yaw
       title: Commanded yaw
       units: deg
-      alias: cmd_yaw
-      sfmt: f2
 
     - name: lat
       title: Commanded latitude
       units: deg
-      sfmt: f4
     - name: lon
       title: Commanded latitude
       units: deg
-      sfmt: f4
     - name: hmsl
       title: Commanded altitude MSL
       units: m
-      sfmt: f4
 
     - name: course
       title: Commanded course
       units: deg
-      alias: cmd_course
-      sfmt: f2
     - name: altitude
       title: Commanded altitude
       units: m
-      alias: cmd_altitude
-      sfmt: f4
     - name: airspeed
       title: Commanded airspeed
       units: m/s
-      alias: cmd_airspeed
-      sfmt: f2
     - name: vspeed
       title: Commanded vspeed
       units: m/s
-      alias: cmd_vspeed
-      sfmt: f2
     - name: slip
       title: Commanded slip
       units: deg
-      alias: cmd_slip
-      sfmt: f2
 
     - name: rpm
       title: Commanded RPM
       units: 1/m
-      alias: cmd_rpm
-      type: uint
-      sfmt: u2
 
     - name: north
       title: Commanded position north
       units: m
-      sfmt: f4
     - name: east
       title: Commanded position east
       units: m
-      sfmt: f4
 
 - name: ctr
   title: Control commands
   content:
     - name: mode
       title: Flight mode
-      alias: mode
       type: enum
       units:
         - EMG
@@ -92,7 +67,6 @@
 
     - name: stage
       title: Maneuver stage
-      alias: stage
       type: byte
 
     - name: action
@@ -108,8 +82,6 @@
     - name: adj
       title: Maneuver adjust
       units: m
-      alias: rwAdj
-      sfmt: f1s
 
 - name: opt
   title: Control options
@@ -120,31 +92,25 @@
   content:
     - name: thrcut
       title: Throttle cut
-      alias: cmode_thrcut
     - name: throvr
       title: Throttle override
-      alias: cmode_throvr
     - name: ahrs
       title: AHRS mode
-      alias: cmode_ahrs
       units:
         - gps
         - inertial
     - name: nomag
       title: Magnetometer
-      alias: cmode_nomag
       units:
         - "on"
         - "blocked"
     - name: hover
       title: Stabilization mode
-      alias: cmode_hover
       units:
         - "normal"
         - "hover"
     - name: hyaw
       title: Hover yaw
-      alias: cmode_hyaw
       units:
         - "fixed"
         - "compensated"
@@ -153,32 +119,23 @@
   title: Realtime controls override
   content:
     - name: ovr
-      alias: rc_override
       title: RC override
       type: enum
       units:
         - "off"
         - "on"
     - name: roll
-      alias: rc_roll
       title: RC roll
       units: -1..+1
-      sfmt: f1smul100
     - name: pitch
-      alias: rc_pitch
       title: RC pitch
       units: -1..+1
-      sfmt: f1smul100
     - name: throttle
-      alias: rc_throttle
       title: RC throttle
       units: 0..1
-      sfmt: f1mul100
     - name: yaw
-      alias: rc_yaw
       title: RC yaw
       units: -1..+1
-      sfmt: f1smul100
 
 - name: ats
   title: ATS commanded values
@@ -186,25 +143,18 @@
     - name: roll
       title: Commanded ATS roll
       units: deg
-      alias: atscmd_roll
-      sfmt: f2
     - name: pitch
       title: Commanded ATS pitch
       units: deg
-      alias: atscmd_pitch
-      sfmt: f2
     - name: yaw
       title: Commanded ATS yaw
       units: deg
-      alias: atscmd_yaw
-      sfmt: f2
 
 - name: cam
   title: Camera commanded values
   content:
     - name: mode
       title: Cam mode
-      alias: cam_mode
       type: enum
       units:
         - "off"
@@ -217,92 +167,71 @@
     - name: roll
       title: Commanded cam roll
       units: deg
-      alias: camcmd_roll
     - name: pitch
       title: Commanded cam pitch
       units: deg
-      alias: camcmd_pitch
     - name: yaw
       title: Commanded cam yaw
       units: deg
-      alias: camcmd_yaw
 
     - name: broll
       title: Cam stability bias roll
       units: deg/s
-      alias: cambias_roll
-      sfmt: f4
     - name: bpitch
       title: Cam stability bias pitch
       units: deg/s
-      alias: cambias_pitch
-      sfmt: f4
     - name: byaw
       title: Cam stability bias yaw
       units: deg/s
-      alias: cambias_yaw
-      sfmt: f4
 
     - name: zoom
       title: Cam zoom level
       units: 0..1
-      alias: cam_zoom
-      sfmt: f2
     - name: focus
       title: Cam focus
       units: 0..1
-      alias: cam_focus
-      sfmt: f2
 
     - name: ch
       title: Video channel
       units: 0..255
-      alias: cam_ch
       type: byte
 
     - name: src
       title: Camera source index
       units: 0..255
-      alias: cam_src
 
     - name: PF
       title: picture flip
-      alias: cam_opt_PF
       type: enum
       units:
         - "off"
         - "on"
     - name: NIR
       title: NIR filter
-      alias: cam_opt_NIR
       type: enum
       units:
         - "off"
         - "on"
     - name: DSP
       title: display information
-      alias: cam_opt_DSP
       type: enum
       units:
         - "off"
         - "on"
     - name: FMI
       title: focus mode
-      alias: cam_opt_FMI
       type: enum
       units:
         - "auto"
         - "infinity"
     - name: FM
       title: focus type
-      alias: cam_opt_FM
       type: enum
       units:
         - "auto"
         - "manual"
     - name: laser
       title: rangefinder
-      alias: cam_opt_laser
       type: enum
       units:
         - "off"
@@ -311,18 +240,12 @@
     - name: lat
       title: Tracking latitude
       units: deg
-      alias: cam_lat
-      sfmt: f4
     - name: lon
       title: Tracking latitude
       units: deg
-      alias: cam_lon
-      sfmt: f4
     - name: hmsl
       title: Tracking altitude MSL
       units: m
-      alias: cam_hmsl
-      sfmt: f4
 
 - name: turret
   title: Turret commanded values
@@ -340,25 +263,19 @@
     - name: roll
       title: Commanded turret roll
       units: deg
-      sfmt: f2
     - name: pitch
       title: Commanded turret pitch
       units: deg
-      sfmt: f2
     - name: yaw
       title: Commanded turret yaw
       units: deg
-      sfmt: f2
 
     - name: broll
       title: Turret bias roll
       units: deg/s
-      sfmt: f4
     - name: bipitch
       title: Turret bias pitch
       units: deg/s
-      sfmt: f4
     - name: byaw
       title: Turret bias yaw
       units: deg/s
-      sfmt: f4
