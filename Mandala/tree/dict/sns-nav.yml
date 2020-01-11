@@ -65,7 +65,7 @@
 
     - name: time
       title: UTC Time from 1970 1st Jan
-      units: sec
+      units: s
       type: dword
     - name: sv
       suffix: visible satellites
@@ -80,8 +80,7 @@
 
     - name: jam
       suffix: jamming level
-      units: "%"
-      type: byte
+      units: 0..1
     - name: jams
       suffix: jamming status
       type: enum
@@ -179,49 +178,72 @@
   title: Landing Assistance sensors
   content:
     - name: lat
-      title: Platform Latitude
+      title: Platform latitude
       units: deg
       prec: 6
     - name: lon
-      title: Platform Longitude
+      title: Platform longitude
       units: deg
       prec: 6
     - name: hmsl
-      title: Platform Altitude
+      title: Platform altitude
       units: m
 
     - name: vn
-      title: Platform velocity North
+      title: Platform velocity north
       units: m/s
       prec: 1
     - name: ve
-      title: Platform velocity East
+      title: Platform velocity east
       units: m/s
       prec: 1
     - name: vd
-      title: Platform velocity Down
+      title: Platform velocity down
       units: m/s
       prec: 1
 
     - name: roll
-      title: Platform Roll
+      title: Platform roll
       units: deg
     - name: pitch
-      title: Platform Pitch
+      title: Platform pitch
       units: deg
     - name: yaw
-      title: Platform Yaw
+      title: Platform yaw
       units: deg
 
     - name: dx
-      suffix: dX
+      title: Platform delta X
       units: m
     - name: dy
-      suffix: dY
+      title: Platform delta Y
       units: m
     - name: dz
-      suffix: dZ
+      title: Platform delta Z
       units: m
+
+- name: dps
+  title: Differential positioning
+  content:
+    - name: dx
+      title: Local delta X
+      units: m
+    - name: dy
+      title: Local delta Y
+      units: m
+    - name: dz
+      title: Local delta Z
+      units: m
+
+    - name: vx
+      suffix: Local velocity X
+      units: m/s
+    - name: vy
+      suffix: Local velocity Y
+      units: m/s
+    - name: vz
+      suffix: Local velocity Z
+      units: m/s
 
 - name: ils
   title: Instrument Landing system
@@ -234,8 +256,7 @@
       units: m
     - name: rss
       title: ILS signal strength
-      units: "%"
-      type: byte
+      units: 0..1
     - name: dhdg
       title: ILS error heading
       units: deg

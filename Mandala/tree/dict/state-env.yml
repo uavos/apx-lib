@@ -1,3 +1,23 @@
+- name: sys
+  title: System state
+  content:
+    - name: health
+      title: System health
+      type: enum
+      units:
+        - "unknown"
+        - "normal"
+        - "warning"
+        - "critical"
+    - name: time
+      title: System time
+      type: dword
+      units: s
+    - name: uptime
+      title: Uptime
+      type: dword
+      units: ms
+
 - name: error
   title: System errors and warnings
   type: enum
@@ -7,10 +27,14 @@
   content:
     - name: fatal
       title: Fatal
-    - name: power
+    - name: pwr
       title: Power supply
-    - name: engine
+    - name: eng
       title: Engine
+    - name: bat
+      title: Battery
+    - name: gen
+      title: Generator
     - name: rpm
       title: RPM sensor
     - name: cas
@@ -22,9 +46,22 @@
     - name: ers
       title: ERS
 
-- name: datalink
+- name: pwr
+  title: Power state
+  content:
+    - name: energy
+      title: Energy capacity
+      units: 0..1
+    - name: rate
+      title: Energy rate
+      units: 1/sec
+
+- name: com
   title: Datalink state
   content:
+    - name: rss
+      title: Datalink availability
+      units: 0..1
     - name: uplink
       title: Uplink
       type: enum

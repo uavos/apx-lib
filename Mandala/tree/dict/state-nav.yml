@@ -108,6 +108,13 @@
       title: Airspeed derivative
       units: m/s^2
 
+    - name: slip
+      title: Slip angle
+      units: deg
+    - name: aoa
+      title: Angle of attack
+      units: deg
+
     - name: agl
       title: Above Ground Level altitude
       units: m
@@ -122,66 +129,13 @@
       title: Glide ratio
       units: Lift/Drag
 
-- name: wind
-  title: Wind estimator
-  content:
-    - name: speed
-      title: wind speed
-      units: m/s
-    - name: hdg
-      title: wind direction to
-      units: deg
-    - name: ktas
-      title: CAS to TAS multiplier
-      units: K
-
-- name: status
-  title: Status of subsystems
-  type: enum
-  content:
-    - name: rc
-      title: Controls override
-      units:
-        - "off"
-        - "on"
-    - name: gps
-      title: GPS data
-      units:
-        - "lost"
-        - "available"
-    - name: agl
-      title: AGL data
-      units:
-        - "unavailable"
-        - "available"
-    - name: landed
-      title: Vehicle
-      units:
-        - "flying"
-        - "landed"
-    - name: touch
-      title: Landing gear
-      units:
-        - "floating"
-        - "touchdown"
+    - name: buo
+      title: Buoyancy
+      units: kPa
 
 - name: ctr
   title: Control parameters
   content:
-    - name: dx
-      title: Bodyframe delta X
-      units: m
-    - name: dy
-      title: Bodyframe delta Y
-      units: m
-
-    - name: vx
-      title: Bodyframe velocity X
-      units: m/s
-    - name: vy
-      title: Bodyframe velocity Y
-      units: m/s
-
     - name: delta
       title: General delta
       units: m
@@ -195,6 +149,20 @@
       title: Runway alignment velocity
       units: m/s
 
+    - name: dx
+      title: Bodyframe delta X
+      units: m
+    - name: dy
+      title: Bodyframe delta Y
+      units: m
+    - name: dz
+      title: Bodyframe delta Z
+      units: m
+
+    - name: turnR
+      title: Current circle radius
+      units: m
+
     - name: mtype
       title: Mission maneuver type
       type: enum
@@ -202,20 +170,20 @@
         - hdg
         - line
 
+    - name: hover
+      title: Stabilization mode
+      type: enum
+      units:
+        - "normal"
+        - "hover"
+
     - name: loops
       title: Number of remaining turns or loops
       type: word
 
-    - name: turnR
-      title: Current circle radius
+    - name: rpm
+      title: Governor RPM
       units: m
-
-    - name: stab
-      title: Stability
-      units: 0..1
-    - name: corr
-      title: Correlator output
-      units: K
 
 - name: mission
   title: Maneuver information
@@ -244,6 +212,71 @@
     - name: piidx
       title: Current point of interest
       type: word
+
+- name: status
+  title: Status of subsystems
+  content:
+    - name: rc
+      title: Controls override
+      type: enum
+      units:
+        - "off"
+        - "on"
+    - name: gps
+      title: GPS data
+      type: enum
+      units:
+        - "lost"
+        - "available"
+    - name: agl
+      title: AGL data
+      type: enum
+      units:
+        - "unavailable"
+        - "available"
+    - name: landed
+      title: Vehicle
+      type: enum
+      units:
+        - "flying"
+        - "landed"
+    - name: touch
+      title: Landing gear
+      type: enum
+      units:
+        - "floating"
+        - "touchdown"
+
+    - name: stab
+      title: Stability
+      units: 0..1
+    - name: corr
+      title: Correlator output
+      units: K
+
+    - name: mag
+      title: Magnetometer magnitude
+      units: a.u.
+
+    - name: fuel
+      title: Fuel capacity
+      units: l
+    - name: frate
+      title: Fuel consumption rate
+      units: l/h
+
+- name: wind
+  title: Wind estimator
+  content:
+    - name: speed
+      title: wind speed
+      units: m/s
+    - name: hdg
+      title: wind direction to
+      units: deg
+    - name: ktas
+      title: CAS to TAS multiplier
+      units: K
 
 - name: home
   title: Home point

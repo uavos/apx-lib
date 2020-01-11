@@ -41,10 +41,10 @@
       title: Commanded RPM
       units: 1/m
 
-    - name: north
+    - name: "n"
       title: Commanded position north
       units: m
-    - name: east
+    - name: "e"
       title: Commanded position east
       units: m
 
@@ -104,16 +104,12 @@
       units:
         - "on"
         - "blocked"
-    - name: hover
-      title: Stabilization mode
-      units:
-        - "normal"
-        - "hover"
     - name: hyaw
       title: Hover yaw
+      type: enum
       units:
-        - "fixed"
         - "compensated"
+        - "fixed"
 
 - name: rc
   title: Realtime controls override

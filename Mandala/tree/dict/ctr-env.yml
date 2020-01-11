@@ -1,4 +1,4 @@
-- name: power
+- name: pwr
   title: Power
   type: enum
   units:
@@ -26,8 +26,8 @@
     - name: ice
       suffix: Anti-ice
 
-- name: psw
-  title: Power switches
+- name: sw
+  title: Switches
   type: enum
   units:
     - "off"
@@ -45,16 +45,6 @@
       title: Fuel pump
     - name: xfeed
       title: Fuel crossfeed
-
-- name: vehicle
-  title: Vehicle controls
-  content:
-    - name: gear
-      title: Landing gear
-      type: enum
-      units:
-        - down
-        - retract
 
 - name: light
   title: Lighting
@@ -182,3 +172,28 @@
       title: User control 7
     - name: ctr8
       title: User control 8
+
+    - name: cb1
+      type: byte
+      title: User control byte 1
+    - name: cb2
+      type: byte
+      title: User control byte 2
+    - name: cb3
+      type: byte
+      title: User control byte 3
+    - name: cb4
+      type: byte
+      title: User control byte 4
+    - name: cb5
+      type: byte
+      title: User control byte 5
+    - name: cb6
+      type: byte
+      title: User control byte 6
+    - name: cb7
+      type: byte
+      title: User control byte 7
+    - name: cb8
+      type: byte
+      title: User control byte 8

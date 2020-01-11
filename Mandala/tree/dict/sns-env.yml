@@ -1,4 +1,4 @@
-- name: engine
+- name: eng
   title: Engine sensors
 
   content:
@@ -13,6 +13,14 @@
     - name: temp
       title: Engine temperature
       units: C
+
+    - name: voltage
+      title: Engine ECU voltage
+      units: v
+    - name: current
+      title: Engine ECU current
+      units: A
+
     - name: ot
       title: Oil temperature OT
       units: C
@@ -45,7 +53,7 @@
         - warn
         - caution
 
-- name: gearbox
+- name: gbox
   title: Gearbox
   content:
     - name: rpm
@@ -76,8 +84,8 @@
       units: "N"
 
     - name: pitch
-      suffix: pitch encoder
-      units: 1
+      suffix: pitch position
+      units: -1..+1
 
 - name: fuel
   title: Fuel
@@ -126,8 +134,8 @@
         - charging
         - error
 
-- name: power
-  title: Power measurements
+- name: pwr
+  title: Power distribution
   content:
     - name: vsys
       title: System voltage
@@ -143,39 +151,42 @@
       title: Servo current
       units: A
 
-    - name: vpld
-      title: Payload voltage
-      units: v
-    - name: ipld
-      title: Payload current
-      units: A
-
-    - name: vecu
-      title: Engine ECU voltage
-      units: v
-    - name: iecu
-      title: Engine ECU current
-      units: A
-
-- name: comm
+- name: com
   title: Datalink sensors
   content:
     - name: rss
       title: Received signal strength
-      units: "%"
-      type: byte
+      units: 0..1
     - name: snr
       title: Signal to noise ratio
       units: u
     - name: temp
       title: Modem temperature
       units: C
+
+    - name: voltage
+      title: Modem voltage
+      units: v
+    - name: current
+      title: Modem current
+      units: A
+
     - name: hdg
       title: Radio heading to transmitter
       units: deg
     - name: dme
       title: Radio distance to transmitter
       units: m
+
+- name: pld
+  title: Payload sensors
+  content:
+    - name: voltage
+      title: Payload voltage
+      units: v
+    - name: current
+      title: Payload current
+      units: A
 
 - name: ers
   title: ERS
@@ -214,12 +225,12 @@
       units:
         - "off"
         - "on"
-    - name: ers
-      title: ERS switch
+    - name: ersdis
+      title: ERS disarm switch
       type: enum
       units:
-        - disarmed
         - armed
+        - disarmed
 
 - name: vehicle
   title: Vehicle sensors
@@ -235,21 +246,20 @@
         - retracted
     - name: fgear
       suffix: Landing gear force
-      units: "%"
-      type: byte
+      units: 0..1
 
 - name: radar
-  title: Radar target tracking
+  title: Radar sensor
   content:
+    - name: dist
+      title: Radar distance to target
+      units: m
     - name: hdg
       title: Radar heading to target
       units: deg
     - name: elv
       title: Radar elevation to target
       units: deg
-    - name: DME
-      title: Radar distance to target
-      units: m
     - name: vel
       title: Radar doppler velocity
       units: m/s

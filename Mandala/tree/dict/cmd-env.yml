@@ -32,6 +32,11 @@
     - name: data
       title: Telemetry data stream
       descr: <format_mn><time><packed data...>
+    - name: stream
+      title: Telemetry stream request/select
+    - name: request
+      title: Specific uid request
+      descr: <uid><period_ms>[<format>]
 
 - name: mission
   title: Mission data

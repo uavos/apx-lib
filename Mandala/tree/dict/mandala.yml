@@ -121,15 +121,67 @@ content:
         type: byte # void
 
 streams:
-  - name: v9_sd
-    title: Standard v9.xx telemetry
+  - name: sd
+    title: Standard telemetry
     content:
       - state.nav.att.roll: f2
       - state.nav.att.pitch: f2
       - state.nav.att.yaw: f2
-      - state.nav.pos.ax: f1_s
-      - state.nav.pos.ay: f1_s
-      - state.nav.pos.az: f1_s
+
       - state.nav.att.p: f1_s10
       - state.nav.att.q: f1_s10
       - state.nav.att.r: f1_s10
+
+      - state.nav.pos.ax: f1_s
+      - state.nav.pos.ay: f1_s
+      - state.nav.pos.az: f1_s
+
+      - state.nav.status.mag: f1_s001
+
+      - state.nav.flight.altitude: f4
+      - state.nav.flight.airspeed: f2
+      - state.nav.flight.vspeed: f2
+      - state.nav.pos.course: f2
+
+      - state.nav.ctr.rpm: f2
+      - state.nav.flight.agl: f2
+      - state.nav.flight.slip: f1_s01
+      - state.nav.flight.aoa: f1_s01
+      - state.nav.flight.venergy: f2
+      - state.nav.flight.ldratio: f2
+      - state.nav.flight.buo: f2
+
+      - ctr.nav.stab.ail: f1_s001
+      - ctr.nav.stab.elv: f1_s001
+      - ctr.nav.stab.rud: f1_s001
+      - ctr.nav.stab.col: f1_s001
+
+      - ctr.nav.engine.thr: f1_001
+      - ctr.nav.engine.prop: f1_s001
+      - ctr.nav.engine.choke: f1_001
+      - ctr.nav.engine.tune: f1_s001
+      - ctr.nav.engine.tvec: f1_s001
+      - ctr.nav.engine.rev: bit
+
+      - ctr.nav.wing.flaps: f1_001
+      - ctr.nav.wing.airbrk: f1_001
+      - ctr.nav.wing.slats: f1_001
+      - ctr.nav.wing.sweep: f1_s001
+      - ctr.nav.wing.buo: f1_s001
+
+      - ctr.nav.str.rud: f1_s001
+      - ctr.nav.str.brake: f1_001
+      - ctr.nav.str.gear: bit
+
+      - ctr.nav.ers.launch: bit
+      - ctr.nav.ers.rel: bit
+
+      - ctr.env.door.main: bit
+      - ctr.env.door.drop: bit
+
+      - ctr.env.sw.starter: bit
+      - ctr.env.sw.horn: bit
+      - ctr.env.sw.ign1: bit
+      - ctr.env.sw.ign2: bit
+      - ctr.env.sw.fpump: bit
+      - ctr.env.sw.xfeed: bit

@@ -23,9 +23,12 @@ enum type_id_t {
 
 enum sfmt_id_t {
     sfmt_void,
-    sfmt_u1, //(uint8)uint
-    sfmt_u2, //(uint16)uint
+
+    sfmt_bit,
+
     sfmt_u4, //(uint32)uint
+    sfmt_u2, //(uint16)uint
+    sfmt_u1, //(uint8)uint
 
     sfmt_f4,      //float32
     sfmt_f2,      //float16

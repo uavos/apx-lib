@@ -10,21 +10,19 @@
       title: Rudder
     - name: col
       title: Collective
-    - name: str
-      title: Steering
 
 - name: engine
   title: Engine controls
   content:
     - name: thr
       title: Throttle
-      units: 1
+      units: 0..1
     - name: prop
       title: Prop pitch
       units: -1..+1
-    - name: mix
-      title: Mixture
-      units: 1
+    - name: choke
+      title: Choke
+      units: 0..1
     - name: tune
       title: Engine tuning
       units: -1..+1
@@ -43,32 +41,35 @@
   content:
     - name: flaps
       title: Flaps
-      units: 1
+      units: 0..1
     - name: airbrk
       title: Airbrakes
-      units: 1
+      units: 0..1
     - name: slats
       title: Wing slats
-      units: 1
+      units: 0..1
     - name: sweep
       title: Wing sweep
       units: -1..+1
-    - name: buoyancy
+    - name: buo
       title: Buoyancy
       units: -1..+1
 
-- name: brakes
-  title: Brakes system control
+- name: str
+  title: Steering controls
   content:
     - name: brake
       title: Brake
-      units: 1
-    - name: brakeL
-      title: Left brake
-      units: 1
-    - name: brakeR
-      title: Right brake
-      units: 1
+      units: 0..1
+    - name: gear
+      title: Landing gear
+      type: enum
+      units:
+        - down
+        - retract
+    - name: rud
+      title: Steering
+      units: -1..+1
 
 - name: ers
   title: Emergency Recovery System controls
