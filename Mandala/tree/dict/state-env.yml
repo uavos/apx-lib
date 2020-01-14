@@ -37,9 +37,9 @@
       title: Generator
     - name: rpm
       title: RPM sensor
-    - name: cas
+    - name: pt
       title: CAS
-    - name: pstatic
+    - name: ps
       title: Static pressure
     - name: gyro
       title: IMU gyros bias

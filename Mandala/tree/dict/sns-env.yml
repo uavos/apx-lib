@@ -100,6 +100,14 @@
 - name: gen
   title: Generator
   content:
+    - name: status
+      suffix: status
+      type: enum
+      units:
+        - idle
+        - free
+        - charge
+        - error
     - name: voltage
       suffix: voltage
       units: v
@@ -113,6 +121,14 @@
 - name: bat
   title: Battery
   content:
+    - name: status
+      suffix: status
+      type: enum
+      units:
+        - ok
+        - "off"
+        - charging
+        - error
     - name: voltage
       suffix: voltage
       units: v
@@ -125,18 +141,18 @@
     - name: capacity
       suffix: capacity
       units: A/h
+
+- name: pwr
+  title: Power distribution
+  content:
     - name: status
       suffix: status
       type: enum
       units:
         - ok
-        - "off"
-        - charging
+        - failsafe
+        - warning
         - error
-
-- name: pwr
-  title: Power distribution
-  content:
     - name: vsys
       title: System voltage
       units: v
@@ -191,46 +207,33 @@
 - name: ers
   title: ERS
   content:
-    - name: err
-      suffix: error
-      type: enum
-      units:
-        - ok
-        - error
-
-- name: button
-  title: Front panel switches
-  content:
-    - name: pwron
-      title: System power on
-      type: enum
-      units:
-        - "off"
-        - "on"
-    - name: shutdown
-      title: System shutdown
-      type: enum
-      units:
-        - "off"
-        - "on"
-    - name: starter
-      title: Engine starter
-      type: enum
-      units:
-        - "off"
-        - "on"
-    - name: safe
-      title: Safety switch
-      type: enum
-      units:
-        - "off"
-        - "on"
-    - name: ersdis
-      title: ERS disarm switch
+    - name: status
+      suffix: status
       type: enum
       units:
         - armed
         - disarmed
+        - "off"
+        - busy
+        - error
+
+- name: button
+  title: Front panel switches
+  type: enum
+  units:
+    - "off"
+    - "on"
+  content:
+    - name: pwron
+      title: System power on
+    - name: shutdown
+      title: System shutdown
+    - name: starter
+      title: Engine starter
+    - name: safe
+      title: Safety switch
+    - name: noers
+      title: ERS disable switch
 
 - name: vehicle
   title: Vehicle sensors

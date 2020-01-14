@@ -163,8 +163,8 @@ static constexpr const item_t items[] = {
     MBPORT(state::nav::status::touch::meta, status_touch, bit, bit),
 
     MBPORT(state::env::error::pwr::meta, error_power, bit, bit),
-    MBPORT(state::env::error::cas::meta, error_cas, bit, bit),
-    MBPORT(state::env::error::pstatic::meta, error_pstatic, bit, bit),
+    MBPORT(state::env::error::pt::meta, error_cas, bit, bit),
+    MBPORT(state::env::error::ps::meta, error_pstatic, bit, bit),
     MBPORT(state::env::error::gyro::meta, error_gyro, bit, bit),
     MBPORT(state::env::error::rpm::meta, error_rpm, bit, bit),
 
@@ -194,7 +194,7 @@ static constexpr const item_t items[] = {
 
     MBPORT(sns::env::button::shutdown::meta, sb_shutdown, bit, bit),
     MBPORT(state::env::error::ers::meta, sb_ers_err, bit, bit),
-    MBPORT(sns::env::button::ersdis::meta, sb_ers_disarm, bit, bit),
+    MBPORT(sns::env::button::noers::meta, sb_ers_disarm, bit, bit),
     MBPORT(state::env::error::eng::meta, sb_eng_err, bit, bit),
     MBPORT(state::env::error::bat::meta, sb_bat_err, bit, bit),
     MBPORT(state::env::error::gen::meta, sb_gen_err, bit, bit),
