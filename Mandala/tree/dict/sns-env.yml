@@ -40,14 +40,12 @@
     - name: iap
       title: Intake air box pressure IAP
       units: kPa
-    - name: fp
-      title: Fuel pressure
-      units: bar
 
     - name: tc
       title: Turbocharger
       type: enum
       units:
+        - unknown
         - "off"
         - active
         - warn
@@ -68,8 +66,9 @@
       title: Clutch status
       type: enum
       units:
-        - "off"
+        - unknown
         - "on"
+        - "off"
         - busy
 
 - name: prop
@@ -79,68 +78,79 @@
       suffix: RPM
       units: 1/min
 
+    - name: pitch
+      suffix: pitch position
+      units: -1..+1
+
     - name: thrust
       suffix: thrust
       units: "N"
 
-    - name: pitch
-      suffix: pitch position
-      units: -1..+1
+- name: gen
+  title: Generator
+  content:
+    - name: rpm
+      suffix: RPM
+      units: 1/min
+    - name: voltage
+      suffix: voltage
+      units: v
+    - name: current
+      suffix: current
+      units: A
+    - name: temp
+      suffix: temperature
+      units: C
+    - name: status
+      suffix: status
+      type: enum
+      units:
+        - unknown
+        - idle
+        - free
+        - ok
+        - error
 
 - name: fuel
   title: Fuel
   content:
     - name: capacity
-      title: Fuel capacity
+      suffix: capacity
       units: l
     - name: rate
-      title: Fuel flow rate
+      suffix: flow rate
       units: l/h
-
-- name: gen
-  title: Generator
-  content:
-    - name: status
-      suffix: status
-      type: enum
-      units:
-        - idle
-        - free
-        - charge
-        - error
-    - name: voltage
-      suffix: voltage
-      units: v
-    - name: current
-      suffix: current
-      units: A
     - name: temp
       suffix: temperature
       units: C
+    - name: ps
+      suffix: pressure
+      units: bar
 
 - name: bat
   title: Battery
   content:
-    - name: status
-      suffix: status
-      type: enum
-      units:
-        - ok
-        - "off"
-        - charging
-        - error
     - name: voltage
       suffix: voltage
       units: v
     - name: current
       suffix: current
       units: A
-    - name: temp
-      suffix: temperature
-      units: C
     - name: capacity
       suffix: capacity
       units: A/h
+    - name: temp
+      suffix: temperature
+      units: C
+    - name: status
+      suffix: status
+      type: enum
+      units:
+        - unknown
+        - ok
+        - discharging
+        - charging
+        - error
 
 - name: pwr
   title: Power distribution
@@ -149,10 +159,12 @@
       suffix: status
       type: enum
       units:
+        - unknown
         - ok
         - failsafe
         - warning
         - error
+
     - name: vsys
       title: System voltage
       units: v
@@ -165,6 +177,13 @@
       units: v
     - name: isrv
       title: Servo current
+      units: A
+
+    - name: vpld
+      title: Payload voltage
+      units: v
+    - name: ipld
+      title: Payload current
       units: A
 
 - name: com
@@ -187,6 +206,16 @@
       title: Modem current
       units: A
 
+    - name: status
+      title: Modem status
+      type: enum
+      units:
+        - unknown
+        - "off"
+        - connected
+        - busy
+        - warning
+
     - name: hdg
       title: Radio heading to transmitter
       units: deg
@@ -194,30 +223,42 @@
       title: Radio distance to transmitter
       units: m
 
-- name: pld
-  title: Payload sensors
-  content:
-    - name: voltage
-      title: Payload voltage
-      units: v
-    - name: current
-      title: Payload current
-      units: A
+    - name: roll
+      title: Antenna roll
+      units: deg
+    - name: pitch
+      title: Antenna pitch
+      units: deg
+    - name: yaw
+      title: Antenna yaw
+      units: deg
 
-- name: ers
-  title: ERS
+- name: sys
+  title: System sensors
   content:
-    - name: status
-      suffix: status
+    - name: rt
+      title: Room temperature
+      units: C
+    - name: ers
+      suffix: ERS status
       type: enum
       units:
+        - unknown
         - armed
         - disarmed
-        - "off"
         - busy
         - error
+    - name: gear
+      suffix: Landing gear
+      type: enum
+      units:
+        - down
+        - retracted
+    - name: fgear
+      suffix: Landing gear force
+      units: 0..1
 
-- name: button
+- name: btn
   title: Front panel switches
   type: enum
   units:
@@ -235,34 +276,69 @@
     - name: noers
       title: ERS disable switch
 
-- name: vehicle
-  title: Vehicle sensors
+- name: srv
+  title: Servo
   content:
-    - name: rt
-      title: Room temperature
-      units: C
-    - name: gear
-      suffix: Landing gear
+    - name: pos
+      title: Encoder position
+    - name: dpos
+      title: Delta position
+    - name: power
+      title: Power
+
+- name: cam
+  title: Camera sensors
+  content:
+    - name: roll
+      title: Cam roll
+      units: deg
+    - name: pitch
+      title: Cam pitch
+      units: deg
+    - name: yaw
+      title: Cam yaw
+      units: deg
+
+    - name: droll
+      title: Delta roll
+      units: deg
+    - name: dpitch
+      title: Delta pitch
+      units: deg
+    - name: dyaw
+      title: Delta yaw
+      units: deg
+
+    - name: fov
+      title: Cam field of view
+      units: deg
+
+    - name: range
+      title: Payload range
+      units: m
+
+- name: turret
+  title: Turret sensors
+  content:
+    - name: roll
+      title: Turret roll
+      units: deg
+    - name: pitch
+      title: Turret pitch
+      units: deg
+    - name: yaw
+      title: Turret yaw
+      units: deg
+
+    - name: status
+      title: Turret status
       type: enum
       units:
-        - down
-        - retracted
-    - name: fgear
-      suffix: Landing gear force
-      units: 0..1
+        - unknown
+        - "ready"
+        - "shooting"
+        - "reloading"
 
-- name: radar
-  title: Radar sensor
-  content:
-    - name: dist
-      title: Radar distance to target
-      units: m
-    - name: hdg
-      title: Radar heading to target
-      units: deg
-    - name: elv
-      title: Radar elevation to target
-      units: deg
-    - name: vel
-      title: Radar doppler velocity
-      units: m/s
+    - name: capacity
+      title: Payload capacity
+      type: byte

@@ -70,10 +70,14 @@
   content:
     - name: local
       title: Local data no uplink
-      descr: <local><uid><payload>
+      descr: <local><uid><data>
+    - name: payload
+      title: Payload data
+      descr: <payload><uid><data>
+
     - name: hid
       title: Human interface
-      descr: <hid><uid><payload>
+      descr: <hid><uid><data>
     - name: video
       title: Video data
 

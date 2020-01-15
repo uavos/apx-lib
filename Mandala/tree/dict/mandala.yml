@@ -41,12 +41,10 @@ uid_bits:
 
 inheritance:
   - type
-  - prec
   - units
 
 # defaults:
 type: float
-prec: 2
 
 # 4 classes
 content:
@@ -138,18 +136,18 @@ streams:
 
       - state.nav.status.mag: f1_s001
 
-      - state.nav.flight.altitude: f4
-      - state.nav.flight.airspeed: f2
-      - state.nav.flight.vspeed: f2
+      - state.nav.air.altitude: f4
+      - state.nav.air.airspeed: f2
+      - state.nav.air.vspeed: f2
       - state.nav.pos.course: f2
 
       - state.nav.ctr.rpm: f2
-      - state.nav.flight.agl: f2
-      - state.nav.flight.slip: f1_s01
-      - state.nav.flight.aoa: f1_s01
-      - state.nav.flight.venergy: f2
-      - state.nav.flight.ldratio: f2
-      - state.nav.flight.buo: f2
+      - state.nav.air.agl: f2
+      - state.nav.air.slip: f1_s01
+      - state.nav.air.aoa: f1_s01
+      - state.nav.air.venergy: f2
+      - state.nav.air.ldratio: f2
+      - state.nav.air.buo: f2
 
       - ctr.nav.stab.ail: f1_s001
       - ctr.nav.stab.elv: f1_s001

@@ -68,6 +68,8 @@ static constexpr const mandala::meta_t meta[] = {
 {% endfor %}
 }; // meta array
 
+{#
+
 // Default streams
 {% for s in data.streams %}
 // stream: {{ s.name }}: {{ s.title }}
@@ -87,7 +89,7 @@ static constexpr const mandala::stream_id_t streams[] = {
 { .name = "{{ s.name }}", .title = "{{ s.title }}", .content = stream_{{ s.name }} },
 {% endfor %}
 };
-
+#}
 }; // namespace
 
 {% endblock %}

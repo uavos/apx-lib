@@ -40,8 +40,8 @@
       suffix: temperature
       units: C
 
-- name: gnss
-  title: GNSS
+- name: gps
+  title: GPS
   content:
     - name: lat
       suffix: latitude
@@ -67,28 +67,31 @@
       title: UTC Time from 1970 1st Jan
       units: s
       type: dword
+    - name: temp
+      suffix: temperature
+      units: C
+
+    - name: status
+      suffix: status
+      type: enum
+      units:
+        - disabled
+        - ok
+        - busy
+        - warning
+        - spoofing
+        - critical
+
     - name: sv
       suffix: visible satellites
       type: word
     - name: su
       suffix: used satellites
       type: word
-    - name: temp
-      suffix: temperature
-      units: C
-      prec: 1
 
     - name: jam
       suffix: jamming level
       units: 0..1
-    - name: jams
-      suffix: jamming status
-      type: enum
-      units:
-        - disabled
-        - ok
-        - warning
-        - critical
 
 - name: pt
   title: Dynamic pressure
@@ -96,19 +99,15 @@
     - name: airspeed
       title: Airspeed
       units: m/s
-      prec: 1
+    - name: airspeed_d
+      title: Airspeed derivative
+      units: m/s2
     - name: temp
       title: Pitot probe temperature
       units: C
-      prec: 1
-    - name: vairspeed
-      title: Airspeed derivative
-      units: m/s2
-      prec: 1
     - name: raw
       suffix: value
       units: kPa
-      prec: 1
 
 - name: ps
   title: Static pressure
@@ -116,19 +115,15 @@
     - name: altitude
       title: Barometric altitude
       units: m
-      prec: 2
+    - name: altitude_d
+      title: Barometric altitude derivative
+      units: m/s
     - name: temp
       title: Altitude probe temperature
       units: C
-      prec: 1
-    - name: speed
-      title: Barometric altitude derivative
-      units: m/s
-      prec: 1
     - name: raw
       suffix: value
       units: kPa
-      prec: 1
 
 - name: air
   title: Aerodynamic sensors
@@ -136,19 +131,15 @@
     - name: slip
       title: Slip
       units: deg
-      prec: 1
     - name: aoa
       title: Angle of attack
       units: deg
-      prec: 1
     - name: temp
       title: Ambient air temperature
       units: C
-      prec: 1
     - name: buo
       title: Blimp ballonet pressure
       units: kPa
-      prec: 1
 
 - name: agl
   title: Altitude above ground sensors
@@ -160,6 +151,12 @@
       title: Laser AGL altitude
     - name: radio
       title: Radio AGL altitude
+    - name: ground
+      title: Ground
+      type: enum
+      units:
+        - "off"
+        - detected
 
 - name: rtk
   title: RTK
@@ -176,15 +173,14 @@
 
 - name: las
   title: Landing Assistance sensors
+  descr: Used for landing to a moving platform only.
   content:
     - name: lat
       title: Platform latitude
       units: deg
-      prec: 6
     - name: lon
       title: Platform longitude
       units: deg
-      prec: 6
     - name: hmsl
       title: Platform altitude
       units: m
@@ -192,15 +188,12 @@
     - name: vn
       title: Platform velocity north
       units: m/s
-      prec: 1
     - name: ve
       title: Platform velocity east
       units: m/s
-      prec: 1
     - name: vd
       title: Platform velocity down
       units: m/s
-      prec: 1
 
     - name: roll
       title: Platform roll
@@ -213,53 +206,86 @@
       units: deg
 
     - name: dx
-      title: Platform delta X
+      title: Relative distance X
       units: m
     - name: dy
-      title: Platform delta Y
+      title: Relative distance Y
       units: m
     - name: dz
-      title: Platform delta Z
-      units: m
-
-- name: dps
-  title: Differential positioning
-  content:
-    - name: dx
-      title: Local delta X
-      units: m
-    - name: dy
-      title: Local delta Y
-      units: m
-    - name: dz
-      title: Local delta Z
+      title: Relative distance Z
       units: m
 
     - name: vx
-      suffix: Local velocity X
+      title: Relative velocity X
       units: m/s
     - name: vy
-      suffix: Local velocity Y
+      title: Relative velocity Y
       units: m/s
     - name: vz
-      suffix: Local velocity Z
+      title: Relative velocity Z
       units: m/s
 
-- name: ils
-  title: Instrument Landing system
+- name: vps
+  title: Visual navigation
+  descr: Used for global position estimation and dead-reckoning.
   content:
+    - name: vx
+      title: Visual velocity X
+      units: m/s
+    - name: vy
+      title: Visual velocity Y
+      units: m/s
+    - name: vz
+      title: Visual velocity Z
+      units: m/s
+
+    - name: dx
+      title: Visual delta X
+      units: m
+    - name: dy
+      title: Visual delta Y
+      units: m
+    - name: dz
+      title: Visual delta Z
+      units: m
+
+    - name: roll
+      title: Visual roll
+      units: deg
+    - name: pitch
+      title: Visual pitch
+      units: deg
+    - name: yaw
+      title: Visual yaw
+      units: deg
+
+    - name: lat
+      title: Visual latitude
+      units: deg
+    - name: lon
+      title: Visual longitude
+      units: deg
+
+    - name: hmsl
+      title: Visual altitude MSL
+      units: m
+
+    - name: altitude
+      title: Visual altitude
+      units: m
+
+- name: tcas
+  title: Collision avoidance
+  content:
+    - name: dist
+      title: Distance to target
+      units: m
     - name: hdg
-      title: ILS heading to VOR1
+      title: Heading to target
       units: deg
-    - name: dme
-      title: ILS distance to VOR1
-      units: m
-    - name: rss
-      title: ILS signal strength
-      units: 0..1
-    - name: dhdg
-      title: ILS error heading
+    - name: elv
+      title: Elevation to target
       units: deg
-    - name: dalt
-      title: ILS error altitude
-      units: m
+    - name: vel
+      title: Velocity
+      units: m/s

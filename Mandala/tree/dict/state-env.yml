@@ -1,8 +1,8 @@
 - name: sys
-  title: System state
+  title: System
   content:
     - name: health
-      title: System health
+      suffix: health
       type: enum
       units:
         - "unknown"
@@ -10,7 +10,7 @@
         - "warning"
         - "critical"
     - name: time
-      title: System time
+      suffix: time
       type: dword
       units: s
     - name: uptime
@@ -18,205 +18,83 @@
       type: dword
       units: ms
 
-- name: error
-  title: System errors and warnings
-  type: enum
-  units:
-    - "ok"
-    - "error"
-  content:
-    - name: fatal
-      title: Fatal
-    - name: pwr
-      title: Power supply
-    - name: eng
-      title: Engine
-    - name: bat
-      title: Battery
-    - name: gen
-      title: Generator
-    - name: rpm
-      title: RPM sensor
-    - name: pt
-      title: CAS
-    - name: ps
-      title: Static pressure
-    - name: gyro
-      title: IMU gyros bias
-    - name: ers
-      title: ERS
-
-- name: pwr
-  title: Power state
-  content:
+    - name: ttl
+      title: Time to live
+      type: dword
+      units: s
     - name: energy
       title: Energy capacity
       units: 0..1
-    - name: rate
-      title: Energy rate
-      units: 1/sec
 
-- name: com
-  title: Datalink state
+    - name: corr
+      title: Correlator output
+      units: K
+
+- name: status
+  title: Submodules status
+  type: enum
+  units:
+    - "unknown"
+    - "ok"
+    - "error"
   content:
-    - name: rss
-      title: Datalink availability
-      units: 0..1
+    - name: eng
+      title: Engine
+    - name: rpm
+      title: RPM sensor
+    - name: gen
+      title: Generator
+    - name: bat
+      title: Battery
+    - name: pwr
+      title: Power
+
+    - name: pt
+      title: Dynamic pressure
+    - name: ps
+      title: Static pressure
+
+    - name: gyro
+      title: IMU gyro
+
+    - name: ers
+      title: ERS
+
     - name: uplink
       title: Uplink
-      type: enum
-      units:
-        - "lost"
-        - "available"
-    - name: period
-      title: downlink period
-      units: ms
-      type: word
-    - name: timestamp
-      title: downlink timestamp
-      units: ms
-      type: dword
 
-- name: ils
-  title: ILS status
-  type: enum
+- name: pld
+  title: Payload values
   content:
-    - name: armed
-      title: ILS
-      units:
-        - "off"
-        - "armed"
-    - name: approach
-      title: ILS approach
-      units:
-        - "lost"
-        - "available"
-    - name: offset
-      title: ILS offset
-      units:
-        - "lost"
-        - "available"
-    - name: platform
-      title: ILS platform
-      units:
-        - "lost"
-        - "available"
-
-- name: ats
-  title: ATS system state
-  content:
-    - name: roll
-      title: ATS attitude roll
+    - name: ats_roll
+      title: ATS roll
       units: deg
-    - name: pitch
-      title: ATS attitude pitch
+    - name: ats_pitch
+      title: ATS pitch
       units: deg
-    - name: yaw
-      title: ATS attitude yaw
+    - name: ats_yaw
+      title: ATS yaw
       units: deg
 
-    - name: eroll
-      title: ATS encoder roll
+    - name: cam_roll
+      title: Cam roll
       units: deg
-    - name: epitch
-      title: ATS encoder pitch
+    - name: cam_pitch
+      title: Cam pitch
       units: deg
-    - name: eyaw
-      title: ATS encoder yaw
-      units: deg
-
-- name: cam
-  title: Camera control system state
-  content:
-    - name: roll
-      title: Cam attitude roll
-      units: deg
-    - name: pitch
-      title: Cam attitude pitch
-      units: deg
-    - name: yaw
-      title: Cam attitude yaw
+    - name: cam_yaw
+      title: Cam yaw
       units: deg
 
-    - name: timestamp
-      title: Cam timestamp
-      units: ms
-      type: dword
-    - name: dist
-      title: Distance to tracking object
-      units: m
-
-- name: turret
-  title: Turret system state
-  content:
-    - name: roll
-      title: Turret attitude roll
+    - name: turret_roll
+      title: Turret roll
       units: deg
-    - name: pitch
-      title: Turret attitude pitch
+    - name: turret_pitch
+      title: Turret pitch
       units: deg
-    - name: yaw
-      title: Turret attitude yaw
+    - name: turret_yaw
+      title: Turret yaw
       units: deg
-
-    - name: eroll
-      title: Turret encoder roll
-      units: deg
-    - name: epitch
-      title: Turret encoder pitch
-      units: deg
-    - name: eyaw
-      title: Turret encoder yaw
-      units: deg
-
-- name: gcs
-  title: Ground Control state
-  content:
-    - name: lat
-      title: GCS latitude
-      units: deg
-    - name: lon
-      title: GCS latitude
-      units: deg
-    - name: hmsl
-      title: GCS altitude MSL
-      units: m
-
-    - name: vn
-      title: GCS velocity North
-      units: m/s
-    - name: ve
-      title: GCS velocity East
-      units: m/s
-    - name: vd
-      title: GCS velocity Down
-      units: m/s
-
-    - name: roll
-      title: GCS attitude roll
-      units: deg
-    - name: pitch
-      title: GCS attitude pitch
-      units: deg
-    - name: yaw
-      title: GCS attitude yaw
-      units: deg
-
-- name: meteo
-  title: Meteo data
-  content:
-    - name: wspd
-      title: wind speed
-      units: m/s
-    - name: whdg
-      title: wind direction to
-      units: deg
-    - name: temp
-      title: Ground outside air temperature
-      units: C
-    - name: altps
-      title: barometric altitude on ground level
-      units: m
 
 - name: usr
   title: User values
@@ -254,27 +132,76 @@
     - name: u16
       title: User value 16
 
-    - name: b1
+    - name: ub1
       title: User byte 1
       type: byte
-    - name: b2
+    - name: ub2
       title: User byte 2
       type: byte
-    - name: b3
+    - name: ub3
       title: User byte 3
       type: byte
-    - name: b4
+    - name: ub4
       title: User byte 4
       type: byte
-    - name: b5
+    - name: ub5
       title: User byte 5
       type: byte
-    - name: b6
+    - name: ub6
       title: User byte 6
       type: byte
-    - name: b7
+    - name: ub7
       title: User byte 7
       type: byte
-    - name: b8
+    - name: ub8
       title: User byte 8
       type: byte
+
+- name: haps
+  title: HAPS
+  content:
+    - name: shape
+      suffix: dihedral angle
+      units: deg
+    - name: cshape
+      suffix: cmd dihedral angle
+      units: deg
+
+    - name: roll
+      suffix: central roll
+      units: deg
+
+    - name: roll1
+      suffix: roll1
+      units: deg
+    - name: roll2
+      suffix: roll2
+      units: deg
+
+    - name: pitch1
+      suffix: pitch1
+      units: deg
+    - name: pitch2
+      suffix: pitch2
+      units: deg
+
+    - name: cpitch1
+      suffix: cmd pitch1
+      units: deg
+    - name: cpitch2
+      suffix: cmd pitch2
+      units: deg
+
+    - name: spd1
+      suffix: airspeed1
+      units: m/s
+    - name: spd2
+      suffix: airspeed2
+      units: m/s
+
+    - name: ail1
+      suffix: aileron1
+      units: -1..+1
+    - name: ail2
+      suffix: aileron2
+      units: -1..+1

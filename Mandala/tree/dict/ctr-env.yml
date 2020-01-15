@@ -46,6 +46,21 @@
     - name: xfeed
       title: Fuel crossfeed
 
+- name: ers
+  title: Emergency Recovery System controls
+  type: enum
+  content:
+    - name: launch
+      title: ERS
+      units:
+        - "off"
+        - "on"
+    - name: rel
+      title: Parachute
+      units:
+        - locked
+        - released
+
 - name: light
   title: Lighting
   type: enum
@@ -100,13 +115,8 @@
       type: enum
       units:
         - "off"
-        - "on"
-    - name: ashot
-      title: Series snapshots
-      type: enum
-      units:
-        - "off"
-        - "on"
+        - "single"
+        - "series"
 
 - name: ats
   title: ATS controls output
@@ -134,66 +144,73 @@
       title: Turret servo yaw
       units: -1..+1
 
-    - name: armed
+    - name: mode
       title: Turret
       type: enum
       units:
-        - "disarmed"
-        - "armed"
-    - name: shoot
-      title: Turret
-      type: enum
-      units:
-        - "standby"
+        - "off"
+        - "arm"
+        - "shoot"
         - "shooting"
-    - name: reload
-      title: Turret
-      type: enum
-      units:
-        - "reloaded"
-        - "reloading"
+        - "reload"
 
 - name: usr
   title: User controls
   content:
-    - name: ctr1
+    - name: u1
       title: User control 1
-    - name: ctr2
+    - name: u2
       title: User control 2
-    - name: ctr3
+    - name: u3
       title: User control 3
-    - name: ctr4
+    - name: u4
       title: User control 4
-    - name: ctr5
+    - name: u5
       title: User control 5
-    - name: ctr6
+    - name: u6
       title: User control 6
-    - name: ctr7
+    - name: u7
       title: User control 7
-    - name: ctr8
+    - name: u8
       title: User control 8
+    - name: u9
+      title: User control 9
+    - name: u10
+      title: User control 10
+    - name: u11
+      title: User control 11
+    - name: u12
+      title: User control 12
+    - name: u13
+      title: User control 13
+    - name: u14
+      title: User control 14
+    - name: u15
+      title: User control 15
+    - name: u16
+      title: User control 16
 
-    - name: cb1
+    - name: ub1
       type: byte
       title: User control byte 1
-    - name: cb2
+    - name: ub2
       type: byte
       title: User control byte 2
-    - name: cb3
+    - name: ub3
       type: byte
       title: User control byte 3
-    - name: cb4
+    - name: ub4
       type: byte
       title: User control byte 4
-    - name: cb5
+    - name: ub5
       type: byte
       title: User control byte 5
-    - name: cb6
+    - name: ub6
       type: byte
       title: User control byte 6
-    - name: cb7
+    - name: ub7
       type: byte
       title: User control byte 7
-    - name: cb8
+    - name: ub8
       type: byte
       title: User control byte 8

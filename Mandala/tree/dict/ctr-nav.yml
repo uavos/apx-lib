@@ -11,7 +11,7 @@
     - name: col
       title: Collective
 
-- name: engine
+- name: eng
   title: Engine controls
   content:
     - name: thr
@@ -70,18 +70,3 @@
     - name: rud
       title: Steering
       units: -1..+1
-
-- name: ers
-  title: Emergency Recovery System controls
-  type: enum
-  content:
-    - name: launch
-      title: ERS
-      units:
-        - "off"
-        - "on"
-    - name: rel
-      title: Parachute
-      units:
-        - locked
-        - released

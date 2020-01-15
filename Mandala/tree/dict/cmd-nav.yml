@@ -133,6 +133,103 @@
       title: RC yaw
       units: -1..+1
 
+- name: cam
+  title: Camera commanded values
+  content:
+    - name: zoom
+      title: Cam zoom level
+      units: 0..1
+    - name: focus
+      title: Cam focus
+      units: 0..1
+
+    - name: ch
+      title: Video channel
+      units: 0..255
+      type: byte
+
+    - name: lrf
+      title: Laser rangefinder
+      type: enum
+      units:
+        - "off"
+        - "on"
+
+    - name: PF
+      title: Picture flip
+      type: enum
+      units:
+        - "off"
+        - "on"
+    - name: NIR
+      title: NIR filter
+      type: enum
+      units:
+        - "off"
+        - "on"
+    - name: DSP
+      title: Display information
+      type: enum
+      units:
+        - "off"
+        - "on"
+    - name: FMI
+      title: Focus mode
+      type: enum
+      units:
+        - "auto"
+        - "infinity"
+    - name: FM
+      title: Focus type
+      type: enum
+      units:
+        - "auto"
+        - "manual"
+
+- name: gimbal
+  title: Gimbal
+  content:
+    - name: roll
+      suffix: cmd roll
+      units: deg
+    - name: pitch
+      suffix: cmd pitch
+      units: deg
+    - name: yaw
+      suffix: cmd yaw
+      units: deg
+
+    - name: broll
+      suffix: bias roll
+      units: deg/s
+    - name: bpitch
+      suffix: bias pitch
+      units: deg/s
+    - name: byaw
+      suffix: bias yaw
+      units: deg/s
+
+    - name: lat
+      suffix: tracking latitude
+      units: deg
+    - name: lon
+      suffix: tracking latitude
+      units: deg
+    - name: hmsl
+      suffix: tracking altitude MSL
+      units: m
+
+    - name: mode
+      title: Gimbal mode
+      type: enum
+      units:
+        - "off"
+        - "fixed"
+        - "stab"
+        - "pos"
+        - "speed"
+        - "target"
+
 - name: ats
   title: ATS commanded values
   content:
@@ -146,102 +243,15 @@
       title: Commanded ATS yaw
       units: deg
 
-- name: cam
-  title: Camera commanded values
-  content:
-    - name: mode
-      title: Cam mode
-      type: enum
-      units:
-        - "off"
-        - "fixed"
-        - "stab"
-        - "pos"
-        - "speed"
-        - "target"
-
-    - name: roll
-      title: Commanded cam roll
-      units: deg
-    - name: pitch
-      title: Commanded cam pitch
-      units: deg
-    - name: yaw
-      title: Commanded cam yaw
-      units: deg
-
-    - name: broll
-      title: Cam stability bias roll
+    - name: p
+      title: Commanded ATS roll rate
       units: deg/s
-    - name: bpitch
-      title: Cam stability bias pitch
+    - name: q
+      title: Commanded ATS pitch rate
       units: deg/s
-    - name: byaw
-      title: Cam stability bias yaw
+    - name: r
+      title: Commanded ATS yaw rate
       units: deg/s
-
-    - name: zoom
-      title: Cam zoom level
-      units: 0..1
-    - name: focus
-      title: Cam focus
-      units: 0..1
-
-    - name: ch
-      title: Video channel
-      units: 0..255
-      type: byte
-
-    - name: src
-      title: Camera source index
-      units: 0..255
-
-    - name: PF
-      title: picture flip
-      type: enum
-      units:
-        - "off"
-        - "on"
-    - name: NIR
-      title: NIR filter
-      type: enum
-      units:
-        - "off"
-        - "on"
-    - name: DSP
-      title: display information
-      type: enum
-      units:
-        - "off"
-        - "on"
-    - name: FMI
-      title: focus mode
-      type: enum
-      units:
-        - "auto"
-        - "infinity"
-    - name: FM
-      title: focus type
-      type: enum
-      units:
-        - "auto"
-        - "manual"
-    - name: laser
-      title: rangefinder
-      type: enum
-      units:
-        - "off"
-        - "on"
-
-    - name: lat
-      title: Tracking latitude
-      units: deg
-    - name: lon
-      title: Tracking latitude
-      units: deg
-    - name: hmsl
-      title: Tracking altitude MSL
-      units: m
 
 - name: turret
   title: Turret commanded values
@@ -265,6 +275,16 @@
     - name: yaw
       title: Commanded turret yaw
       units: deg
+
+    - name: p
+      title: Commanded turret roll rate
+      units: deg/s
+    - name: q
+      title: Commanded caturretm pitch rate
+      units: deg/s
+    - name: r
+      title: Commanded turret yaw rate
+      units: deg/s
 
     - name: broll
       title: Turret bias roll
