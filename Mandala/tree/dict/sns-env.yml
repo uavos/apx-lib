@@ -189,6 +189,16 @@
 - name: com
   title: Datalink sensors
   content:
+    - name: status
+      title: Modem status
+      type: enum
+      units:
+        - unknown
+        - "off"
+        - connected
+        - busy
+        - warning
+
     - name: rss
       title: Received signal strength
       units: 0..1
@@ -205,16 +215,6 @@
     - name: current
       title: Modem current
       units: A
-
-    - name: status
-      title: Modem status
-      type: enum
-      units:
-        - unknown
-        - "off"
-        - connected
-        - busy
-        - warning
 
     - name: hdg
       title: Radio heading to transmitter

@@ -11,16 +11,6 @@
       title: Commanded yaw
       units: deg
 
-    - name: lat
-      title: Commanded latitude
-      units: deg
-    - name: lon
-      title: Commanded latitude
-      units: deg
-    - name: hmsl
-      title: Commanded altitude MSL
-      units: m
-
     - name: course
       title: Commanded course
       units: deg
@@ -40,6 +30,16 @@
     - name: rpm
       title: Commanded RPM
       units: 1/m
+
+    - name: lat
+      title: Commanded latitude
+      units: deg
+    - name: lon
+      title: Commanded latitude
+      units: deg
+    - name: hmsl
+      title: Commanded altitude MSL
+      units: m
 
     - name: "n"
       title: Commanded position north
@@ -148,38 +148,49 @@
       units: 0..255
       type: byte
 
-    - name: lrf
-      title: Laser rangefinder
+    - name: range
+      title: Rangefinder
       type: enum
       units:
         - "off"
         - "on"
 
-    - name: PF
+    - name: shot
+      title: Shoting mode
+      type: enum
+      units:
+        - "off"
+        - "signle"
+        - "distance"
+        - "time"
+    - name: dshot
+      title: Shoting distance
+      type: word
+      units: m
+    - name: tshot
+      title: Shoting time
+      type: word
+      units: ms
+
+    - name: pf
       title: Picture flip
       type: enum
       units:
         - "off"
         - "on"
-    - name: NIR
+    - name: nir
       title: NIR filter
       type: enum
       units:
         - "off"
         - "on"
-    - name: DSP
-      title: Display information
-      type: enum
-      units:
-        - "off"
-        - "on"
-    - name: FMI
+    - name: fm
       title: Focus mode
       type: enum
       units:
         - "auto"
         - "infinity"
-    - name: FM
+    - name: ft
       title: Focus type
       type: enum
       units:
@@ -189,6 +200,18 @@
 - name: gimbal
   title: Gimbal
   content:
+    - name: mode
+      title: Gimbal mode
+      type: enum
+      units:
+        - "off"
+        - "stab"
+        - "pos"
+        - "speed"
+        - "target"
+        - "fixed"
+        - "track"
+
     - name: roll
       suffix: cmd roll
       units: deg
@@ -219,45 +242,43 @@
       suffix: tracking altitude MSL
       units: m
 
-    - name: mode
-      title: Gimbal mode
-      type: enum
-      units:
-        - "off"
-        - "fixed"
-        - "stab"
-        - "pos"
-        - "speed"
-        - "target"
-
 - name: ats
   title: ATS commanded values
   content:
+    - name: mode
+      title: ATS mode
+      type: enum
+      units:
+        - "off"
+        - "track"
+        - "manual"
+        - "search"
+
     - name: roll
-      title: Commanded ATS roll
+      title: ATS cmd roll
       units: deg
     - name: pitch
-      title: Commanded ATS pitch
+      title: ATS cmd pitch
       units: deg
     - name: yaw
-      title: Commanded ATS yaw
+      title: ATS cmd yaw
       units: deg
 
     - name: p
-      title: Commanded ATS roll rate
+      title: ATS cmd roll rate
       units: deg/s
     - name: q
-      title: Commanded ATS pitch rate
+      title: ATS cmd pitch rate
       units: deg/s
     - name: r
-      title: Commanded ATS yaw rate
+      title: ATS cmd yaw rate
       units: deg/s
 
 - name: turret
   title: Turret commanded values
   content:
     - name: mode
-      title: Turret control mode
+      title: Turret mode
       type: enum
       units:
         - "off"
@@ -267,23 +288,23 @@
         - "speed"
 
     - name: roll
-      title: Commanded turret roll
+      title: Turret cmd roll
       units: deg
     - name: pitch
-      title: Commanded turret pitch
+      title: Turret cmd pitch
       units: deg
     - name: yaw
-      title: Commanded turret yaw
+      title: Turret cmd yaw
       units: deg
 
     - name: p
-      title: Commanded turret roll rate
+      title: Turret cmd roll rate
       units: deg/s
     - name: q
-      title: Commanded caturretm pitch rate
+      title: Turret cmd pitch rate
       units: deg/s
     - name: r
-      title: Commanded turret yaw rate
+      title: Turret cmd yaw rate
       units: deg/s
 
     - name: broll

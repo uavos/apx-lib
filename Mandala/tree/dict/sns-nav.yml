@@ -173,38 +173,8 @@
 
 - name: las
   title: Landing Assistance sensors
-  descr: Used for landing to a moving platform only.
+  descr: Used for approach correction.
   content:
-    - name: lat
-      title: Platform latitude
-      units: deg
-    - name: lon
-      title: Platform longitude
-      units: deg
-    - name: hmsl
-      title: Platform altitude
-      units: m
-
-    - name: vn
-      title: Platform velocity north
-      units: m/s
-    - name: ve
-      title: Platform velocity east
-      units: m/s
-    - name: vd
-      title: Platform velocity down
-      units: m/s
-
-    - name: roll
-      title: Platform roll
-      units: deg
-    - name: pitch
-      title: Platform pitch
-      units: deg
-    - name: yaw
-      title: Platform yaw
-      units: deg
-
     - name: dx
       title: Relative distance X
       units: m
@@ -224,6 +194,49 @@
     - name: vz
       title: Relative velocity Z
       units: m/s
+
+    - name: status
+      suffix: status
+      type: enum
+      units:
+        - unknown
+        - ok
+        - holdon
+        - cancel
+
+- name: pfm
+  title: Platform
+  descr: Used for landing to a moving platform with las.
+  content:
+    - name: lat
+      suffix: latitude
+      units: deg
+    - name: lon
+      suffix: longitude
+      units: deg
+    - name: hmsl
+      suffix: altitude MSL
+      units: m
+
+    - name: vn
+      suffix: velocity north
+      units: m/s
+    - name: ve
+      suffix: velocity east
+      units: m/s
+    - name: vd
+      suffix: velocity down
+      units: m/s
+
+    - name: roll
+      suffix: roll
+      units: deg
+    - name: pitch
+      suffix: pitch
+      units: deg
+    - name: yaw
+      suffix: yaw
+      units: deg
 
 - name: vps
   title: Visual navigation

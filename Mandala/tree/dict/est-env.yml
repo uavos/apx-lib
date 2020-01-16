@@ -115,22 +115,6 @@
       title: User value 7
     - name: u8
       title: User value 8
-    - name: u9
-      title: User value 9
-    - name: u10
-      title: User value 10
-    - name: u11
-      title: User value 11
-    - name: u12
-      title: User value 12
-    - name: u13
-      title: User value 13
-    - name: u14
-      title: User value 14
-    - name: u15
-      title: User value 15
-    - name: u16
-      title: User value 16
 
     - name: ub1
       title: User byte 1

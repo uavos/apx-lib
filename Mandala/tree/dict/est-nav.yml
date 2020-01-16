@@ -33,15 +33,6 @@
 - name: pos
   title: Position
   content:
-    - name: status
-      title: Position status
-      type: enum
-      units:
-        - unavailable
-        - gps
-        - air
-        - ins
-
     - name: lat
       title: Latitude
       units: deg
@@ -50,16 +41,6 @@
       units: deg
     - name: hmsl
       title: Altitude MSL
-      units: m
-
-    - name: "n"
-      title: Local position north
-      units: m
-    - name: "e"
-      title: Local position east
-      units: m
-    - name: "d"
-      title: Local position down
       units: m
 
     - name: vn
@@ -71,6 +52,29 @@
     - name: vd
       title: Velocity down
       units: m/s
+
+    - name: "n"
+      title: Local position north
+      units: m
+    - name: "e"
+      title: Local position east
+      units: m
+    - name: "d"
+      title: Local position down
+      units: m
+
+- name: rel
+  title: Relative pos
+  content:
+    - name: dx
+      title: Delta X
+      units: m
+    - name: dy
+      title: Delta Y
+      units: m
+    - name: dz
+      title: Delta Z
+      units: m
 
     - name: vx
       title: Velocity X
@@ -92,30 +96,6 @@
       title: Acceleration Z
       units: m/s2
 
-    - name: course
-      title: Moving direction
-      units: deg
-
-    - name: gSpeed
-      title: Ground speed
-      units: m/s
-
-    - name: agl
-      title: Above Ground Level altitude
-      units: m
-    - name: agl_status
-      title: AGL status
-      type: enum
-      units:
-        - "unavailable"
-        - "available"
-    - name: landed
-      title: Landed
-      type: enum
-      units:
-        - "no"
-        - "yes"
-
 - name: air
   title: Aerodynamic parameters
   content:
@@ -134,6 +114,10 @@
       title: Airspeed derivative
       units: m/s^2
 
+    - name: agl
+      title: Above Ground Level altitude
+      units: m
+
     - name: slip
       title: Slip angle
       units: deg
@@ -141,13 +125,33 @@
       title: Angle of attack
       units: deg
 
-    - name: buo
-      title: Buoyancy
-      units: kPa
+- name: ref
+  title: Ref point
+  content:
+    - name: lat
+      title: Home latitude
+      units: deg
+    - name: lon
+      title: Home latitude
+      units: deg
+    - name: hmsl
+      title: Home altitude MSL
+      units: m
 
-- name: est
-  title: Estimated parameters
-  descr: Calculated data used for estimators and control loops
+    - name: altps
+      title: Barometric altitude on ground level
+      units: m
+
+    - name: hdg
+      title: Heading to home
+      units: deg
+    - name: dist
+      title: Distance to home
+      units: m
+
+- name: calc
+  title: Calculated parameters
+  descr: Data used by estimators and control loops
   content:
     - name: wspd
       title: wind speed
@@ -159,6 +163,15 @@
     - name: ktas
       title: CAS to TAS multiplier
       units: K
+
+    - name: course
+      title: Moving direction
+      units: deg
+
+    - name: speed
+      title: Ground speed
+      units: m/s
+
     - name: ld
       title: Glide ratio
 
@@ -177,16 +190,6 @@
 - name: ctr
   title: Control parameters
   content:
-    - name: dx
-      title: Delta X
-      units: m
-    - name: dy
-      title: Delta Y
-      units: m
-    - name: dz
-      title: Delta Z
-      units: m
-
     - name: delta
       title: General delta
       units: m
@@ -198,8 +201,8 @@
     - name: tdist
       title: Tangent alignment
       units: m
-    - name: tdist_d
-      title: Tangent alignment derivative
+    - name: tvel
+      title: Tangent alignment velocity
       units: m/s
 
     - name: radius
@@ -256,33 +259,35 @@
       title: Current point of interest
       type: word
 
-- name: home
-  title: Home point
+- name: status
+  title: Estimators status
   content:
-    - name: status
-      title: Home point status
+    - name: pos
+      title: Position
+      type: enum
+      units:
+        - unavailable
+        - gps
+        - air
+        - inertial
+
+    - name: agl
+      title: AGL status
+      type: enum
+      units:
+        - "unavailable"
+        - "available"
+
+    - name: ref
+      title: Ref point
       type: enum
       units:
         - "unavailable"
         - "initialized"
 
-    - name: lat
-      title: Home latitude
-      units: deg
-    - name: lon
-      title: Home latitude
-      units: deg
-    - name: hmsl
-      title: Home altitude MSL
-      units: m
-
-    - name: altps
-      title: Barometric altitude on ground level
-      units: m
-
-    - name: hdg
-      title: Heading to home
-      units: deg
-    - name: dist
-      title: Distance to home
-      units: m
+    - name: landed
+      title: Landed
+      type: enum
+      units:
+        - "no"
+        - "yes"
