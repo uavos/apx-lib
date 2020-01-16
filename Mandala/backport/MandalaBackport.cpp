@@ -1,9 +1,5 @@
 #include "MandalaBackport.h"
 
-#include <App/AppLog.h>
-#include <Dictionary/DictMandala.h>
-#include <Dictionary/MandalaIndex.h>
-
 using namespace mandala::backport;
 
 MandalaBackport::MandalaBackport()

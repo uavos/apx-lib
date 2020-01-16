@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Mandala/tree/MandalaMetaBase.h>
-#include <MandalaMetaTree.h>
+#include <Mandala/MandalaMetaBase.h>
+#include <Mandala/MandalaMetaTree.h>
 
 namespace mandala {
 namespace backport {

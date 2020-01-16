@@ -29,7 +29,6 @@
 {{ ind1 }}.title = "{{ title }}",
 {{ ind1 }}.descr = "{{ d.descr }}",
 {{ ind1 }}.units = "{{ units }}",
-{{ ind1 }}.alias = "{{ d.alias }}",
 {{ ind1 }}.path = "{{ path|join('.') }}",
 {{ ind1 }}.uid = 0x{{ '%0x' % uid }},
 {{ ind1 }}.level = {{ level }},
@@ -45,10 +44,10 @@
 {%- endmacro -%}
 
 {%- block content %}
-
+// Auto-generated file
 #pragma once
 
-#include <Mandala/tree/MandalaMetaBase.h>
+#include <Mandala/MandalaMetaBase.h>
 
 namespace mandala {
 {% set ind = ' '*indent_size %}

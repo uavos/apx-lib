@@ -17,6 +17,7 @@ Module {
                         [
                             FileInfo.cleanPath(product.sourceDirectory),
                             FileInfo.cleanPath(FileInfo.joinPaths(project.sourceDirectory, "../lib")),
+                            FileInfo.cleanPath(FileInfo.joinPaths(product.buildDirectory, "gensrc")),
                         ]
                 for(var i in rpath){
                     if(inp.indexOf(rpath[i]) == 0)

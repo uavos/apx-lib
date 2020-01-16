@@ -49,7 +49,6 @@ struct meta_t
     const char *title;
     const char *descr;
     const char *units;
-    const char *alias;
     const char *path;
 
     const uid_t uid : sizeof(uid_t) * 8;

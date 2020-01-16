@@ -16,11 +16,12 @@ Module {
 
     //input
     property var data
+    property string prefix
 
 
     //internal
     Depends { name: "cpp" }
-    cpp.includePaths: [FileInfo.joinPaths(product.buildDirectory,"gensrc")]
+    cpp.includePaths: [FileInfo.joinPaths(product.buildDirectory, "gensrc")]
 
     property string tool: FileInfo.joinPaths(path, "gensrc.py")
 
@@ -31,13 +32,19 @@ Module {
     Rule {
         inputsFromDependencies: ["gensrc.input"]
         inputs: ["gensrc.input"]
-        outputFileTags: ["h", "cpp", "c", "gensrc.output"]
+        outputFileTags: ["hpp", "cpp", "c", "gensrc.output"]
         outputArtifacts: {
             var a, list = []
             var tname = input.completeBaseName
+            var ftype = FileInfo.completeSuffix(tname)
             a = {}
-            a.fileTags = [ FileInfo.completeSuffix(tname), "gensrc.output" ]
-            a.filePath = FileInfo.joinPaths(product.buildDirectory, "gensrc", tname)
+            a.fileTags = [ "gensrc.output" ]
+            if(ftype.startsWith("h"))a.fileTags.push("hpp")
+            else a.fileTags.push(ftype)
+
+            a.filePath = FileInfo.joinPaths(product.buildDirectory, "gensrc", product.gensrc.prefix, tname)
+            console.info(product.gensrc.prefix)
+
             list.push(a)
             return list
         }
@@ -50,7 +57,7 @@ Module {
             args.push("--template")
             args.push(input.filePath)
             args.push("--dest")
-            args.push(FileInfo.joinPaths(product.buildDirectory, "gensrc"))
+            args.push(FileInfo.path(output.filePath))
             args.push("--data")
 
             args.push(JSON.stringify(product.gensrc.data))
