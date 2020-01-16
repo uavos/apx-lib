@@ -97,7 +97,7 @@
       units: m/s2
 
 - name: air
-  title: Aerodynamic parameters
+  title: Aerodynamic
   content:
     - name: altitude
       title: Flight altitude
@@ -139,7 +139,7 @@
       units: m
 
     - name: altps
-      title: Barometric altitude on ground level
+      title: Baro ground altitude
       units: m
 
     - name: hdg
@@ -174,6 +174,7 @@
 
     - name: ld
       title: Glide ratio
+      units: L/D
 
     - name: stab
       title: Stability
@@ -195,7 +196,7 @@
       units: m
 
     - name: thdg
-      title: Current tangent heading
+      title: Tangent heading
       units: deg
 
     - name: tdist
@@ -224,7 +225,7 @@
         - "hover"
 
     - name: loops
-      title: Number of remaining turns or loops
+      title: Remaining loops
       type: word
 
     - name: rpm
@@ -238,7 +239,7 @@
       title: Distance to waypoint
       units: m
     - name: hdg
-      title: Current waypoint heading
+      title: Waypoint heading
       units: deg
 
     - name: eta
@@ -247,16 +248,16 @@
       type: word
 
     - name: wpidx
-      title: Current waypoint
+      title: Selected waypoint
       type: word
     - name: rwidx
-      title: Current runway
+      title: Selected runway
       type: word
     - name: twidx
-      title: Current taxiway
+      title: Selected taxiway
       type: word
     - name: piidx
-      title: Current point of interest
+      title: Selected point of interest
       type: word
 
 - name: status
@@ -272,7 +273,7 @@
         - inertial
 
     - name: agl
-      title: AGL status
+      title: AGL
       type: enum
       units:
         - "unavailable"
@@ -285,9 +286,9 @@
         - "unavailable"
         - "initialized"
 
-    - name: landed
-      title: Landed
+    - name: ap
+      title: Autopilot
       type: enum
       units:
-        - "no"
-        - "yes"
+        - "flying"
+        - "landed"

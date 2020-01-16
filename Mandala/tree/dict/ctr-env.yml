@@ -8,7 +8,7 @@
     - name: ap
       suffix: Avionics
     - name: servo
-      suffix: Servo
+      suffix: servo
     - name: ignition
       suffix: Ignition
     - name: payload
@@ -47,16 +47,16 @@
       title: Fuel crossfeed
 
 - name: ers
-  title: Emergency Recovery System controls
+  title: Emergency Recovery System
   type: enum
   content:
     - name: launch
-      title: ERS
+      title: ERS launch
       units:
         - "off"
         - "on"
     - name: rel
-      title: Parachute
+      title: ERS release
       units:
         - locked
         - released
@@ -75,7 +75,7 @@
     - name: nav
       title: Navigation lights
     - name: strobe
-      title: Strobe light
+      title: Strobe lights
     - name: taxi
       title: Taxi lights
 
@@ -143,26 +143,26 @@
   title: ATS controls output
   content:
     - name: roll
-      title: ATS servo roll
+      title: ATS ctr roll
       units: -1..+1
     - name: pitch
-      title: ATS servo pitch
+      title: ATS ctr pitch
       units: -1..+1
     - name: yaw
-      title: ATS servo yaw
+      title: ATS ctr yaw
       units: -1..+1
 
 - name: turret
   title: Turret controls output
   content:
     - name: roll
-      title: Turret servo roll
+      title: Turret ctr roll
       units: -1..+1
     - name: pitch
-      title: Turret servo pitch
+      title: Turret ctr pitch
       units: -1..+1
     - name: yaw
-      title: Turret servo yaw
+      title: Turret ctr yaw
       units: -1..+1
 
     - name: mode
@@ -179,43 +179,43 @@
   title: User controls
   content:
     - name: u1
-      title: User control 1
+      title: User ctr 1
     - name: u2
-      title: User control 2
+      title: User ctr 2
     - name: u3
-      title: User control 3
+      title: User ctr 3
     - name: u4
-      title: User control 4
+      title: User ctr 4
     - name: u5
-      title: User control 5
+      title: User ctr 5
     - name: u6
-      title: User control 6
+      title: User ctr 6
     - name: u7
-      title: User control 7
+      title: User ctr 7
     - name: u8
-      title: User control 8
+      title: User ctr 8
 
     - name: ub1
       type: byte
-      title: User control byte 1
+      title: User ctr byte 1
     - name: ub2
       type: byte
-      title: User control byte 2
+      title: User ctr byte 2
     - name: ub3
       type: byte
-      title: User control byte 3
+      title: User ctr byte 3
     - name: ub4
       type: byte
-      title: User control byte 4
+      title: User ctr byte 4
     - name: ub5
       type: byte
-      title: User control byte 5
+      title: User ctr byte 5
     - name: ub6
       type: byte
-      title: User control byte 6
+      title: User ctr byte 6
     - name: ub7
       type: byte
-      title: User control byte 7
+      title: User ctr byte 7
     - name: ub8
       type: byte
-      title: User control byte 8
+      title: User ctr byte 8

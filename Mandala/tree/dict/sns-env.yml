@@ -1,24 +1,24 @@
 - name: eng
-  title: Engine sensors
+  title: Engine
 
   content:
     - name: rpm
-      title: Engine RPM
+      suffix: RPM
       units: 1/min
 
     - name: torque
-      title: Engine torque
+      suffix: torque
       units: "Nm"
 
     - name: temp
-      title: Engine temperature
+      suffix: temperature
       units: C
 
     - name: voltage
-      title: Engine ECU voltage
-      units: v
+      suffix: ECU voltage
+      units: V
     - name: current
-      title: Engine ECU current
+      suffix: ECU current
       units: A
 
     - name: ot
@@ -66,7 +66,6 @@
       title: Clutch status
       type: enum
       units:
-        - unknown
         - "on"
         - "off"
         - busy
@@ -94,7 +93,7 @@
       units: 1/min
     - name: voltage
       suffix: voltage
-      units: v
+      units: V
     - name: current
       suffix: current
       units: A
@@ -105,10 +104,9 @@
       suffix: status
       type: enum
       units:
-        - unknown
+        - ok
         - idle
         - free
-        - ok
         - error
 
 - name: fuel
@@ -132,7 +130,7 @@
   content:
     - name: voltage
       suffix: voltage
-      units: v
+      units: V
     - name: current
       suffix: current
       units: A
@@ -146,20 +144,18 @@
       suffix: status
       type: enum
       units:
-        - unknown
         - ok
         - discharging
         - charging
         - error
 
 - name: pwr
-  title: Power distribution
+  title: Power
   content:
     - name: status
       suffix: status
       type: enum
       units:
-        - unknown
         - ok
         - failsafe
         - warning
@@ -167,35 +163,34 @@
 
     - name: vsys
       title: System voltage
-      units: v
+      units: V
     - name: isys
       title: System current
       units: A
 
     - name: vsrv
       title: Servo voltage
-      units: v
+      units: V
     - name: isrv
       title: Servo current
       units: A
 
     - name: vpld
       title: Payload voltage
-      units: v
+      units: V
     - name: ipld
       title: Payload current
       units: A
 
 - name: com
-  title: Datalink sensors
+  title: Datalink
   content:
     - name: status
       title: Modem status
       type: enum
       units:
-        - unknown
-        - "off"
-        - connected
+        - ok
+        - mute
         - busy
         - warning
 
@@ -211,16 +206,16 @@
 
     - name: voltage
       title: Modem voltage
-      units: v
+      units: V
     - name: current
       title: Modem current
       units: A
 
     - name: hdg
-      title: Radio heading to transmitter
+      title: Radio heading
       units: deg
     - name: dme
-      title: Radio distance to transmitter
+      title: Radio distance
       units: m
 
     - name: roll
@@ -233,8 +228,8 @@
       title: Antenna yaw
       units: deg
 
-- name: sys
-  title: System sensors
+- name: status
+  title: Status sensors
   content:
     - name: rt
       title: Room temperature
@@ -243,8 +238,7 @@
       suffix: ERS status
       type: enum
       units:
-        - unknown
-        - armed
+        - ok
         - disarmed
         - busy
         - error
@@ -259,7 +253,7 @@
       units: 0..1
 
 - name: btn
-  title: Front panel switches
+  title: Buttons
   type: enum
   units:
     - "off"
@@ -281,10 +275,13 @@
   content:
     - name: pos
       title: Encoder position
+      units: -1..+1
     - name: dpos
       title: Delta position
+      units: -1..+1
     - name: power
       title: Power
+      units: -1..+1
 
 - name: cam
   title: Camera sensors
@@ -334,10 +331,9 @@
       title: Turret status
       type: enum
       units:
-        - unknown
-        - "ready"
-        - "shooting"
-        - "reloading"
+        - ready
+        - shooting
+        - reloading
 
     - name: capacity
       title: Payload capacity

@@ -75,8 +75,8 @@
       suffix: status
       type: enum
       units:
-        - disabled
         - ok
+        - disabled
         - busy
         - warning
         - spoofing
@@ -106,7 +106,7 @@
       title: Pitot probe temperature
       units: C
     - name: raw
-      suffix: value
+      title: Dynamic pressure
       units: kPa
 
 - name: ps
@@ -122,7 +122,7 @@
       title: Altitude probe temperature
       units: C
     - name: raw
-      suffix: value
+      title: Static pressure
       units: kPa
 
 - name: air
@@ -196,10 +196,9 @@
       units: m/s
 
     - name: status
-      suffix: status
+      title: LAS status
       type: enum
       units:
-        - unknown
         - ok
         - holdon
         - cancel

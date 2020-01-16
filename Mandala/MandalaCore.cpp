@@ -323,13 +323,13 @@ uint32_t MandalaCore::pack_byte_u1(void *buf, void *value_ptr)
     return sizeof(uint8_t);
 }
 //------------------------------------------------------------------------------
-uint32_t MandalaCore::pack_flag_(void *buf, void *value_ptr)
+uint32_t MandalaCore::pack_flag_u1(void *buf, void *value_ptr)
 {
     *((uint8_t *) buf) = *((_var_flag *) value_ptr);
     return sizeof(uint8_t);
 }
 //------------------------------------------------------------------------------
-uint32_t MandalaCore::pack_enum_(void *buf, void *value_ptr)
+uint32_t MandalaCore::pack_enum_u1(void *buf, void *value_ptr)
 {
     *((uint8_t *) buf) = *((_var_enum *) value_ptr);
     return sizeof(uint8_t);
@@ -550,13 +550,13 @@ uint32_t MandalaCore::unpack_float_f4(const void *buf, void *value_ptr)
     return 4;
 }
 //------------------------------------------------------------------------------
-uint32_t MandalaCore::unpack_flag_(const void *buf, void *value_ptr)
+uint32_t MandalaCore::unpack_flag_u1(const void *buf, void *value_ptr)
 {
     *((_var_flag *) value_ptr) = *((const uint8_t *) buf);
     return sizeof(uint8_t);
 }
 //------------------------------------------------------------------------------
-uint32_t MandalaCore::unpack_enum_(const void *buf, void *value_ptr)
+uint32_t MandalaCore::unpack_enum_u1(const void *buf, void *value_ptr)
 {
     *((_var_enum *) value_ptr) = *((const uint8_t *) buf);
     return sizeof(uint8_t);

@@ -46,10 +46,10 @@
       title: Airbrakes
       units: 0..1
     - name: slats
-      title: Wing slats
+      title: Slats
       units: 0..1
     - name: sweep
-      title: Wing sweep
+      title: Sweep
       units: -1..+1
     - name: buo
       title: Buoyancy

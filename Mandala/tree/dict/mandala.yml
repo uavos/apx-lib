@@ -6,32 +6,17 @@ descr: Vehicle core data manager and data structure.
 #
 # name:   short name of class/struct
 # title:  text title
-# descr:   text description
+# descr:  text description
 # units:  text units of measure
 # type:   data type
-# prec:   number precision, decimal points
 # suffix: make title from parent.title+suffix
 
-# Parameters are inherited from parent by child fields
-
-# Tree UID contains 4 levels of IDs (12 bits):
-# 0000CCTSSSSMMMMM
+# Tree UID contains 4 levels of IDs (11 bits):
 #
-#   4  classes      2 bits  [sns, ctr, state, cmd]
+#   4  classes      2 bits  [sns, ctr, est, cmd]
 #   2  types        1 bit   [nav, env]
 #   16 subsystems   4 bits
-#   32 fields       5 bits
-
-# Data flow:
-#
-#   |sensors|  ->  |state|  ->  |cmd|  ->  |ctr|
-#   |-----estimators-----|
-#                  |---navigators---|
-#                               |--controllers-|
-#                  |---------telemetry---------|
-#                               |----uplink----|
-
-# config for parsers
+#   16 fields       4 bits
 uid_base: 0x1000
 uid_bits:
   - 2
@@ -39,6 +24,16 @@ uid_bits:
   - 4
   - 4
 
+# Data flow:
+#
+#   |sensors|  ->  |est|  ->  |cmd|  ->  |ctr|
+#   |-----estimators---|
+#                  |--navigators--|
+#                             |--controllers-|
+#                  |---------telemetry-------|
+#                             |----uplink----|
+
+# Parameters are inherited from parent by child fields
 inheritance:
   - type
   - units

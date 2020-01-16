@@ -3,8 +3,6 @@
 #include <Mandala/tree/MandalaMetaBase.h>
 #include <MandalaMetaTree.h>
 
-#include <Mandala/MandalaIndexes.h>
-
 namespace mandala {
 namespace backport {
 
@@ -18,6 +16,7 @@ enum fmt_id_t {
     u2,
     u4,
     u1,
+    u10,
     u01,
     u001,
     bit
@@ -27,8 +26,19 @@ struct item_t
 {
     const meta_t &meta;
     const char *alias;
-    const fmt_id_t fmt_sd;
     const fmt_id_t fmt_hd;
+    const fmt_id_t fmt_sd;
+};
+
+class MandalaBackport
+{
+public:
+    explicit MandalaBackport();
+
+    //bool decode();
+
+private:
+    static constexpr const uint8_t &uid_base = 32;
 };
 
 #define MBPORT(a, b, c, d) \
@@ -62,11 +72,11 @@ static constexpr const item_t items[] = {
 
     MBPORT(est::nav::ctr::rpm::meta, rpm, u2, u2),
     MBPORT(est::nav::air::agl::meta, agl, f2, f2),
-    MBPORT(est::nav::air::slip::meta, slip, f2, f2),
-    MBPORT(est::nav::air::aoa::meta, attack, f2, f2),
+    MBPORT(est::nav::air::slip::meta, slip, f2, s01),
+    MBPORT(est::nav::air::aoa::meta, attack, f2, s01),
     MBPORT(est::nav::calc::venergy::meta, venergy, f2, f2),
     MBPORT(est::nav::calc::ld::meta, ldratio, f2, f2),
-    MBPORT(sns::nav::ps::raw::meta, buoyancy, f2, f2),
+    MBPORT(sns::nav::air::buo::meta, buoyancy, f2, f2),
 
     MBPORT(ctr::nav::stab::ail::meta, ctr_ailerons, f2, s001),
     MBPORT(ctr::nav::stab::elv::meta, ctr_elevator, f2, s001),
@@ -117,7 +127,7 @@ static constexpr const item_t items[] = {
 
     MBPORT(est::env::sys::energy::meta, fuel, f4, f2),
     MBPORT(sns::env::fuel::rate::meta, frate, f4, f2),
-    MBPORT(sns::env::com::rss::meta, rss, u001, u001), //convert to 0..1
+    MBPORT(sns::env::com::rss::meta, RSS, u001, u001), //convert to 0..1
 
     MBPORT(sns::env::pwr::vsys::meta, Ve, f2, f2),
     MBPORT(sns::env::pwr::vsrv::meta, Vs, f2, f2),
@@ -127,6 +137,14 @@ static constexpr const item_t items[] = {
     MBPORT(sns::env::pwr::isrv::meta, Is, u01, u01),
     MBPORT(sns::env::pwr::ipld::meta, Ip, u01, u01),
     MBPORT(sns::env::eng::current::meta, Im, u1, u1),
+
+    MBPORT(sns::nav::air::temp::meta, AT, s1, s1),
+    MBPORT(sns::env::status::rt::meta, RT, s1, s1),
+    MBPORT(sns::env::com::temp::meta, MT, s1, s1),
+    MBPORT(sns::env::eng::temp::meta, ET, u1, u1),
+    MBPORT(sns::env::eng::egt::meta, EGT, u10, u10),
+    MBPORT(sns::env::eng::ot::meta, OT, u1, u1),
+    MBPORT(sns::env::eng::op::meta, OP, u01, u01),
 
     MBPORT(meta_void, ilsb_armed, bit, bit),
     MBPORT(meta_void, ilsb_approach, bit, bit),
@@ -155,13 +173,14 @@ static constexpr const item_t items[] = {
     MBPORT(sns::nav::las::dy::meta, radar_dy, f2, f2),
     MBPORT(sns::nav::las::dz::meta, radar_dz, f2, f2),
 
+    MBPORT(cmd::nav::ctr::stage::meta, stage, u1, u1),
     MBPORT(cmd::nav::ctr::mode::meta, mode, u1, u1),
     MBPORT(cmd::nav::rc::ovr::meta, status_rc, bit, bit),
     MBPORT(est::nav::status::pos::meta, status_gps, bit, bit),
     MBPORT(est::nav::status::ref::meta, status_home, bit, bit),
     MBPORT(est::nav::status::agl::meta, status_agl, bit, bit),
     MBPORT(est::env::status::uplink::meta, status_modem, bit, bit),
-    MBPORT(est::nav::status::landed::meta, status_landed, bit, bit),
+    MBPORT(est::nav::status::ap::meta, status_landed, bit, bit),
     MBPORT(sns::nav::agl::ground::meta, status_touch, bit, bit),
 
     MBPORT(est::env::status::pwr::meta, error_power, bit, bit),
@@ -170,29 +189,29 @@ static constexpr const item_t items[] = {
     MBPORT(est::env::status::gyro::meta, error_gyro, bit, bit),
     MBPORT(est::env::status::rpm::meta, error_rpm, bit, bit),
 
-    MBPORT(meta_void, "cmode_dlhd", bit, bit),
-    MBPORT(cmd::nav::opt::thrcut::meta, "cmode_thrcut", bit, bit),
-    MBPORT(cmd::nav::opt::throvr::meta, "cmode_throvr", bit, bit),
-    MBPORT(est::nav::ctr::hover::meta, "cmode_hover", bit, bit),
-    MBPORT(cmd::nav::opt::hyaw::meta, "cmode_hyaw", bit, bit),
-    MBPORT(cmd::nav::opt::ahrs::meta, "cmode_ahrs", bit, bit),
-    MBPORT(cmd::nav::opt::nomag::meta, "cmode_nomag", bit, bit),
+    MBPORT(meta_void, cmode_dlhd, bit, bit),
+    MBPORT(cmd::nav::opt::thrcut::meta, cmode_thrcut, bit, bit),
+    MBPORT(cmd::nav::opt::throvr::meta, cmode_throvr, bit, bit),
+    MBPORT(est::nav::ctr::hover::meta, cmode_hover, bit, bit),
+    MBPORT(cmd::nav::opt::hyaw::meta, cmode_hyaw, bit, bit),
+    MBPORT(cmd::nav::opt::ahrs::meta, cmode_ahrs, bit, bit),
+    MBPORT(cmd::nav::opt::nomag::meta, cmode_nomag, bit, bit),
 
-    MBPORT(ctr::env::pwr::ap::meta, "power_ap", bit, bit),
-    MBPORT(ctr::env::pwr::servo::meta, "power_servo", bit, bit),
-    MBPORT(ctr::env::pwr::ignition::meta, "power_ignition", bit, bit),
-    MBPORT(ctr::env::pwr::payload::meta, "power_payload", bit, bit),
-    MBPORT(ctr::env::pwr::agl::meta, "power_agl", bit, bit),
-    MBPORT(ctr::env::pwr::xpdr::meta, "power_xpdr", bit, bit),
+    MBPORT(ctr::env::pwr::ap::meta, power_ap, bit, bit),
+    MBPORT(ctr::env::pwr::servo::meta, power_servo, bit, bit),
+    MBPORT(ctr::env::pwr::ignition::meta, power_ignition, bit, bit),
+    MBPORT(ctr::env::pwr::payload::meta, power_payload, bit, bit),
+    MBPORT(ctr::env::pwr::agl::meta, power_agl, bit, bit),
+    MBPORT(ctr::env::pwr::xpdr::meta, power_xpdr, bit, bit),
 
-    MBPORT(ctr::env::sw::starter::meta, "sw_starter", bit, bit),
-    MBPORT(ctr::env::light::nav::meta, "sw_lights", bit, bit),
-    MBPORT(ctr::env::light::taxi::meta, "sw_taxi", bit, bit),
-    MBPORT(ctr::env::pwr::ice::meta, "sw_ice", bit, bit),
-    MBPORT(ctr::env::usr::ub1::meta, "sw_sw1", bit, bit),
-    MBPORT(ctr::env::usr::ub2::meta, "sw_sw2", bit, bit),
-    MBPORT(ctr::env::usr::ub3::meta, "sw_sw3", bit, bit),
-    MBPORT(ctr::env::usr::ub4::meta, "sw_sw4", bit, bit),
+    MBPORT(ctr::env::sw::starter::meta, sw_starter, bit, bit),
+    MBPORT(ctr::env::light::nav::meta, sw_lights, bit, bit),
+    MBPORT(ctr::env::light::taxi::meta, sw_taxi, bit, bit),
+    MBPORT(ctr::env::pwr::ice::meta, sw_ice, bit, bit),
+    MBPORT(ctr::env::usr::ub1::meta, sw_sw1, bit, bit),
+    MBPORT(ctr::env::usr::ub2::meta, sw_sw2, bit, bit),
+    MBPORT(ctr::env::usr::ub3::meta, sw_sw3, bit, bit),
+    MBPORT(ctr::env::usr::ub4::meta, sw_sw4, bit, bit),
 
     MBPORT(sns::env::btn::shutdown::meta, sb_shutdown, bit, bit),
     MBPORT(est::env::status::ers::meta, sb_ers_err, bit, bit),
@@ -238,7 +257,13 @@ static constexpr const item_t items[] = {
     MBPORT(est::env::pld::cam_yaw::meta, cam_yaw, f4, f2),
     MBPORT(est::env::pld::turret_pitch::meta, turret_pitch, f4, f2),
     MBPORT(est::env::pld::turret_yaw::meta, turret_heading, f4, f2),
-    MBPORT(meta_void, turret, u1, u1),
+    MBPORT(meta_void, turret_armed, bit, bit),
+    MBPORT(meta_void, turret_shoot, bit, bit),
+    MBPORT(meta_void, turret_reload, bit, bit),
+    MBPORT(meta_void, turret_sw1, bit, bit),
+    MBPORT(meta_void, turret_sw2, bit, bit),
+    MBPORT(meta_void, turret_sw3, bit, bit),
+    MBPORT(meta_void, turret_sw4, bit, bit),
 
     MBPORT(est::env::usr::ub1::meta, userb_1, bit, bit),
     MBPORT(est::env::usr::ub2::meta, userb_2, bit, bit),

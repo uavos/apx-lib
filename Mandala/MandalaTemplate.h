@@ -28,7 +28,15 @@
 #define idxPAD 32 //start index for regular vars
 //-----------------------------------------------------------------------------
 // Var Type enum
-enum { vt_void = 0, vt_idx, vt_byte, vt_uint, vt_flag, vt_enum, vt_float, vt_vect, vt_point };
+enum { vt_void = 0,
+       vt_idx,
+       vt_byte,
+       vt_uint,
+       vt_flag,
+       vt_enum,
+       vt_float,
+       vt_vect,
+       vt_point };
 //=============================================================================
 // Physical constants
 #define EARTH_RATE 0.00007292115       // rotation rate of earth (rad/sec)
@@ -163,7 +171,7 @@ MVAR(float, ctr_engine, "engine tuning [0..1]", f2, u001)
 MVAR(float, ctr_sweep, "sweep [-1..0..1]", f2, s001)
 MVAR(float, ctr_buoyancy, "buoyancy [-1..0..1]", f2, s001)
 
-MVAR(flag, ctrb, "controls bitfield [on/off]", , )
+MVAR(flag, ctrb, "controls bitfield [on/off]", u1, u1)
 MBIT(ctrb, ers, "ERS on/off", 1)
 MBIT(ctrb, rel, "Parachute released/locked", 2)
 MBIT(ctrb, drp, "Drop-off open/locked", 4)
@@ -217,7 +225,7 @@ MVAR(float, OT, "oil temperature [C]", u1, u1)
 MVAR(float, OP, "oil pressure [atm]", u01, u01)
 
 //--------- Instrument Landing System --------------
-MVAR(flag, ilsb, "ILS bitfield [on/off]", , )
+MVAR(flag, ilsb, "ILS bitfield [on/off]", u1, u1)
 MBIT(ilsb, armed, "ILS armed/off", 1)
 MBIT(ilsb, approach, "ILS approach available/lost", 2)
 MBIT(ilsb, offset, "ILS offset available/lost", 4)
@@ -237,7 +245,7 @@ MVAR(vect, radar_dXYZ, "radar delta: dx,dy,dz [m]", f2, f2)
 
 //--------- STATUS FLAGS --------------
 MVAR(byte, stage, "maneuver stage", u1, u1)
-MVAR(enum, mode, "flight mode", , )
+MVAR(enum, mode, "flight mode", u1, u1)
 MBIT(mode, EMG, "Realtime control", 0)
 MBIT(mode, RPV, "Angles control", 1)
 MBIT(mode, UAV, "Heading control", 2)
@@ -248,7 +256,7 @@ MBIT(mode, TAXI, "Taxi", 6)
 MBIT(mode, TAKEOFF, "Takeoff", 7)
 MBIT(mode, LANDING, "Landing", 8)
 
-MVAR(flag, status, "AP status", , )
+MVAR(flag, status, "AP status", u1, u1)
 MBIT(status, rc, "RC on/off", 1)
 MBIT(status, gps, "GPS available/lost", 2)
 MBIT(status, home, "GPS initialized", 4)
@@ -257,14 +265,14 @@ MBIT(status, modem, "Uplink available/lost", 16)
 MBIT(status, landed, "Vehicle landed/flying", 32)
 MBIT(status, touch, "Landing gear touchdown/floating", 64)
 
-MVAR(flag, error, "AP generated errors", , )
+MVAR(flag, error, "AP generated errors", u1, u1)
 MBIT(error, power, "Power supply error/ok", 1)
 MBIT(error, cas, "CAS error/ok", 2)
 MBIT(error, pstatic, "Static pressure error/ok", 4)
 MBIT(error, gyro, "IMU gyros bias", 8)
 MBIT(error, rpm, "RPM sensor error/ok", 16)
 
-MVAR(flag, cmode, "AP operation options", , )
+MVAR(flag, cmode, "AP operation options", u1, u1)
 MBIT(cmode, dlhd, "High precision downstream on/off", 1)
 MBIT(cmode, thrcut, "Throttle cut on/off", 2)
 MBIT(cmode, throvr, "Throttle override on/off", 4)
@@ -275,7 +283,7 @@ MBIT(cmode, nomag, "Magnetometer blocked/on", 64)
 //MBIT(cmode,  glide,   "Glide mode on/off",                      128)
 
 //--------- POWER CONTROL --------------
-MVAR(flag, power, "power controls", , )
+MVAR(flag, power, "power controls", u1, u1)
 MBIT(power, ap, "Avionics on/off", 1)
 MBIT(power, servo, "Servo on/off", 2)
 MBIT(power, ignition, "Engine on/off", 4)
@@ -283,7 +291,7 @@ MBIT(power, payload, "Payload activated/off", 8)
 MBIT(power, agl, "AGL sensor on/off", 16)
 MBIT(power, xpdr, "XPDR on/off", 32)
 
-MVAR(flag, sw, "switch controls", , )
+MVAR(flag, sw, "switch controls", u1, u1)
 MBIT(sw, starter, "Starter on/off", 1)
 MBIT(sw, lights, "Lights on/off", 2)
 MBIT(sw, taxi, "Taxi lights on/off", 4)
@@ -293,7 +301,7 @@ MBIT(sw, sw2, "switch 2 on/off", 32)
 MBIT(sw, sw3, "switch 3 on/off", 64)
 MBIT(sw, sw4, "switch 4 on/off", 128)
 
-MVAR(flag, sb, "Event sensors [on/off]", , )
+MVAR(flag, sb, "Event sensors [on/off]", u1, u1)
 MBIT(sb, shutdown, "System shutdown/on", 1)
 MBIT(sb, ers_err, "ERS error/ok", 2)
 MBIT(sb, ers_disarm, "ERS disarmed/armed", 4)
@@ -306,7 +314,7 @@ MVAR(byte, wpidx, "current waypoint [0..255]", u1, u1)
 MVAR(byte, rwidx, "current runway [0..255]", u1, u1)
 MVAR(byte, twidx, "current taxiway [0..255]", u1, u1)
 MVAR(byte, piidx, "current point of interest [0..255]", u1, u1)
-MVAR(enum, midx, "mission index action", , )
+MVAR(enum, midx, "mission index action", u1, u1)
 MBIT(midx, inc, "Increment mission index", 0)
 MBIT(midx, dec, "Decrement mission index", 1)
 MVAR(float, tgHDG, "current tangent heading [deg]", f2, f2)
@@ -314,7 +322,7 @@ MVAR(float, turnR, "current circle radius [m]", f2, f2)
 MVAR(float, delta, "general delta (depends on mode) [m]", f2, f2)
 MVAR(byte, loops, "number of remaining turns or loops [0..255]", u1, u1)
 MVAR(uint, ETA, "estimated time of arrival [s]", u4, u4)
-MVAR(enum, mtype, "Mission maneuver type", , )
+MVAR(enum, mtype, "Mission maneuver type", u1, u1)
 MBIT(mtype, hdg, "Heading navigation", 0)
 MBIT(mtype, line, "Line navigation", 1)
 
@@ -326,7 +334,7 @@ MVAR(float, rwAdj, "runway displacement adjust [m]", s1, s1)
 MVAR(byte, gps_SV, "GPS Satellites visible [number]", u1, u1)
 MVAR(byte, gps_SU, "GPS Satellites used [number]", u1, u1)
 MVAR(byte, gps_jcw, "GPS CW Jamming level [0..255]", u1, u1)
-MVAR(enum, gps_jstate, "GPS Jamming", , )
+MVAR(enum, gps_jstate, "GPS Jamming", u1, u1)
 MBIT(gps_jstate, off, "disabled", 0)
 MBIT(gps_jstate, ok, "ok", 1)
 MBIT(gps_jstate, warn, "warning", 2)
@@ -340,7 +348,7 @@ MVAR(float, stab, "Stability [0..1]", f2, u001)
 //--------- payloads --------------
 MVAR(vect, cam_theta, "camera orientation: roll,pitch,yaw [deg]", f4, f2)
 MVAR(point, turret_att, "turret orientation: pitch,heading [deg]", f4, f2)
-MVAR(flag, turret, "turret controls bitfield [on/off]", , )
+MVAR(flag, turret, "turret controls bitfield [on/off]", u1, u1)
 MBIT(turret, armed, "turret armed/disarmed", 1)
 MBIT(turret, shoot, "turret shooting/standby", 2)
 MBIT(turret, reload, "turret reloading/reloaded", 4)
@@ -350,7 +358,7 @@ MBIT(turret, sw3, "turret switch3 on/off", 32)
 MBIT(turret, sw4, "turret switch4 on/off", 64)
 
 //--------- user --------------
-MVAR(flag, userb, "user bitfield [on/off]", , )
+MVAR(flag, userb, "user bitfield [on/off]", u1, u1)
 MBIT(userb, 1, "user bit 1", 1)
 MBIT(userb, 2, "user bit 2", 2)
 MBIT(userb, 3, "user bit 3", 4)
@@ -418,7 +426,7 @@ MVAR(float, rc_yaw, "RC yaw [-1..0..+1]", s001, s001)
 
 //--------- CAM CONTROL --------------
 MVAR(byte, cam_ch, "video channel [0..255]", u1, u1)
-MVAR(enum, cam_mode, "camera control mode", , )
+MVAR(enum, cam_mode, "camera control mode", u1, u1)
 MBIT(cam_mode, camoff, "camera off", 0)
 MBIT(cam_mode, stab, "gyro stabilization", 1)
 MBIT(cam_mode, position, "attitude position", 2)
@@ -430,7 +438,7 @@ MVAR(vect, camcmd_theta, "commanded camera orientation: roll,pitch,yaw [deg]", f
 MVAR(float, cam_zoom, "camera zoom level [0..1]", u001, u001)
 MVAR(float, cam_focus, "camera focus [0..1]", u001, u001)
 MVAR(vect, cambias_theta, "camera stability bias: roll,pitch,yaw [deg/s]", f4, f4)
-MVAR(flag, cam_opt, "camera options [on/off]", , )
+MVAR(flag, cam_opt, "camera options [on/off]", u1, u1)
 MBIT(cam_opt, PF, "picture flip on/off", 1)
 MBIT(cam_opt, NIR, "NIR filter on/off", 2)
 MBIT(cam_opt, DSP, "display information on/off", 4)
@@ -440,11 +448,11 @@ MBIT(cam_opt, laser, "rangefinder on/off", 32)
 MVAR(byte, cam_src, "camera source", u1, u1)
 MVAR(vect, cam_tpos, "camera tracking position: lat,lon,hmsl [deg,deg,m]", f4, f4)
 MVAR(vect, camctr_theta, "camera servo: roll,pitch,yaw [-1..0..+1]", f4, f4)
-MVAR(enum, cams, "camera shooting mode", , )
+MVAR(enum, cams, "camera shooting mode", u1, u1)
 MBIT(cams, idle, "no shooting", 0)
 MBIT(cams, shot, "single snapshot", 1)
 MBIT(cams, dshot, "distance triggered snapshots", 2)
-MVAR(flag, cam_ctrb, "camera controls bitfield [on/off]", , )
+MVAR(flag, cam_ctrb, "camera controls bitfield [on/off]", u1, u1)
 MBIT(cam_ctrb, shtr, "shutter trigger", 1)
 MBIT(cam_ctrb, arm, "arm auto focus", 2)
 MBIT(cam_ctrb, rec, "rec button", 4)
@@ -457,7 +465,7 @@ MVAR(uint, cam_timestamp, "timestamp [ms]", u4, u4) //must be last for gimbal
 //--------- TURRET CONTROL --------------
 MVAR(point, turretcmd_att, "commanded turret orientation: pitch,yaw [deg]", f4, f4)
 MVAR(vect, turretctr_theta, "turret servo: roll,pitch,yaw [-1..0..+1]", f4, f4)
-MVAR(enum, turret_mode, "turret mode", , )
+MVAR(enum, turret_mode, "turret mode", u1, u1)
 MBIT(turret_mode, gyro, "gyro stabilized", 0)
 MBIT(turret_mode, fixed, "relative encoded attitude", 1)
 MVAR(point, turretenc_att, "turret encoders: pitch,yaw [deg]", f4, f4)
@@ -466,7 +474,7 @@ MVAR(point, turretenc_att, "turret encoders: pitch,yaw [deg]", f4, f4)
 MVAR(point, atscmd_att, "commanded ATS orientation: pitch,yaw [deg]", f4, f4)
 MVAR(point, atsctr_att, "ATS servo: pitch,yaw [-1..0..+1]", f4, f4)
 MVAR(point, atsenc_att, "ATS encoders: pitch,yaw [deg]", f4, f4)
-MVAR(enum, ats_mode, "ATS mode", , )
+MVAR(enum, ats_mode, "ATS mode", u1, u1)
 MBIT(ats_mode, track, "track UAV", 0)
 MBIT(ats_mode, manual, "manual", 1)
 

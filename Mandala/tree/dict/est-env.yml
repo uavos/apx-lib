@@ -31,7 +31,7 @@
       units: K
 
 - name: status
-  title: Submodules status
+  title: Submodules
   type: enum
   units:
     - "unknown"
@@ -64,7 +64,7 @@
       title: Uplink
 
 - name: pld
-  title: Payload values
+  title: Payload
   content:
     - name: ats_roll
       title: ATS roll

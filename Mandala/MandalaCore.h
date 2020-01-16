@@ -139,8 +139,8 @@ public:
     uint32_t pack_point_f4(void *buf, void *value_ptr);
     uint32_t pack_point_u001(void *buf, void *value_ptr);
 
-    uint32_t pack_flag_(void *buf, void *value_ptr);
-    uint32_t pack_enum_(void *buf, void *value_ptr);
+    uint32_t pack_flag_u1(void *buf, void *value_ptr);
+    uint32_t pack_enum_u1(void *buf, void *value_ptr);
     uint32_t pack_byte_u1(void *buf, void *value_ptr);
     uint32_t pack_uint_u4(void *buf, void *value_ptr);
     uint32_t pack_uint_u2(void *buf, void *value_ptr);
@@ -170,8 +170,8 @@ public:
     uint32_t unpack_point_f4(const void *buf, void *value_ptr);
     uint32_t unpack_point_u001(const void *buf, void *value_ptr);
 
-    uint32_t unpack_flag_(const void *buf, void *value_ptr);
-    uint32_t unpack_enum_(const void *buf, void *value_ptr);
+    uint32_t unpack_flag_u1(const void *buf, void *value_ptr);
+    uint32_t unpack_enum_u1(const void *buf, void *value_ptr);
     uint32_t unpack_byte_u1(const void *buf, void *value_ptr);
     uint32_t unpack_uint_u4(const void *buf, void *value_ptr);
     uint32_t unpack_uint_u2(const void *buf, void *value_ptr);

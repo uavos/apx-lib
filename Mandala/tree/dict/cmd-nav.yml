@@ -1,55 +1,55 @@
 - name: reg
-  title: Commanded regulator values
+  title: Regulators
   content:
     - name: roll
-      title: Commanded roll
+      title: Cmd roll
       units: deg
     - name: pitch
-      title: Commanded pitch
+      title: Cmd pitch
       units: deg
     - name: yaw
-      title: Commanded yaw
+      title: Cmd yaw
       units: deg
 
     - name: course
-      title: Commanded course
+      title: Cmd course
       units: deg
     - name: altitude
-      title: Commanded altitude
+      title: Cmd altitude
       units: m
     - name: airspeed
-      title: Commanded airspeed
+      title: Cmd airspeed
       units: m/s
     - name: vspeed
-      title: Commanded vspeed
+      title: Cmd vspeed
       units: m/s
     - name: slip
-      title: Commanded slip
+      title: Cmd slip
       units: deg
 
     - name: rpm
-      title: Commanded RPM
+      title: Cmd RPM
       units: 1/m
 
     - name: lat
-      title: Commanded latitude
+      title: Cmd latitude
       units: deg
     - name: lon
-      title: Commanded latitude
+      title: Cmd latitude
       units: deg
     - name: hmsl
-      title: Commanded altitude MSL
+      title: Cmd altitude MSL
       units: m
 
     - name: "n"
-      title: Commanded position north
+      title: Cmd position north
       units: m
     - name: "e"
-      title: Commanded position east
+      title: Cmd position east
       units: m
 
 - name: ctr
-  title: Control commands
+  title: Procedures
   content:
     - name: mode
       title: Flight mode
@@ -66,7 +66,7 @@
         - LANDING
 
     - name: stage
-      title: Maneuver stage
+      title: Procedure stage
       type: byte
 
     - name: action
@@ -84,7 +84,7 @@
       units: m
 
 - name: opt
-  title: Control options
+  title: Options
   type: enum
   units:
     - "off"
@@ -112,7 +112,7 @@
         - "fixed"
 
 - name: rc
-  title: Realtime controls override
+  title: Realtime controls
   content:
     - name: ovr
       title: RC override
@@ -134,7 +134,7 @@
       units: -1..+1
 
 - name: cam
-  title: Camera commanded values
+  title: Camera
   content:
     - name: zoom
       title: Cam zoom level
