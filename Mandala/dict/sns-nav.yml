@@ -28,7 +28,7 @@
 
 - name: mag
   title: Magnetometer
-  units: a.u.
+  units: su
   content:
     - name: "x"
       suffix: "X"
@@ -91,7 +91,7 @@
 
     - name: jam
       suffix: jamming level
-      units: 0..1
+      units: u
 
 - name: pt
   title: Dynamic pressure
@@ -299,5 +299,5 @@
       title: Elevation to target
       units: deg
     - name: vel
-      title: Velocity
+      title: Velocity of target
       units: m/s

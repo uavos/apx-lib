@@ -1,6 +1,6 @@
 - name: stab
   title: Stability controls
-  units: -1..+1
+  units: su
   content:
     - name: ail
       title: Ailerons
@@ -16,19 +16,19 @@
   content:
     - name: thr
       title: Throttle
-      units: 0..1
+      units: u
     - name: prop
       title: Prop pitch
-      units: -1..+1
+      units: su
     - name: choke
       title: Choke
-      units: 0..1
+      units: u
     - name: tune
       title: Engine tuning
-      units: -1..+1
+      units: su
     - name: tvec
       title: Thrust vector
-      units: -1..+1
+      units: su
     - name: rev
       title: Thrust reverse
       type: enum
@@ -41,26 +41,26 @@
   content:
     - name: flaps
       title: Flaps
-      units: 0..1
+      units: u
     - name: airbrk
       title: Airbrakes
-      units: 0..1
+      units: u
     - name: slats
       title: Slats
-      units: 0..1
+      units: u
     - name: sweep
       title: Sweep
-      units: -1..+1
+      units: su
     - name: buo
       title: Buoyancy
-      units: -1..+1
+      units: su
 
 - name: str
   title: Steering controls
   content:
     - name: brake
       title: Brake
-      units: 0..1
+      units: u
     - name: gear
       title: Landing gear
       type: enum
@@ -69,4 +69,4 @@
         - retract
     - name: rud
       title: Steering
-      units: -1..+1
+      units: su

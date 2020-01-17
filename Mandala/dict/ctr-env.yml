@@ -96,13 +96,13 @@
   content:
     - name: roll
       suffix: ctr roll
-      units: -1..+1
+      units: su
     - name: pitch
       suffix: ctr pitch
-      units: -1..+1
+      units: su
     - name: yaw
       suffix: ctr yaw
-      units: -1..+1
+      units: su
 
     - name: rec
       suffix: record
@@ -144,26 +144,26 @@
   content:
     - name: roll
       title: ATS ctr roll
-      units: -1..+1
+      units: su
     - name: pitch
       title: ATS ctr pitch
-      units: -1..+1
+      units: su
     - name: yaw
       title: ATS ctr yaw
-      units: -1..+1
+      units: su
 
 - name: turret
   title: Turret controls output
   content:
     - name: roll
       title: Turret ctr roll
-      units: -1..+1
+      units: su
     - name: pitch
       title: Turret ctr pitch
-      units: -1..+1
+      units: su
     - name: yaw
       title: Turret ctr yaw
-      units: -1..+1
+      units: su
 
     - name: mode
       title: Turret

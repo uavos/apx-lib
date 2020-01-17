@@ -79,7 +79,7 @@
 
     - name: pitch
       suffix: pitch position
-      units: -1..+1
+      units: su
 
     - name: thrust
       suffix: thrust
@@ -196,7 +196,7 @@
 
     - name: rss
       title: Received signal strength
-      units: 0..1
+      units: u
     - name: snr
       title: Signal to noise ratio
       units: u
@@ -235,7 +235,7 @@
       title: Room temperature
       units: C
     - name: ers
-      suffix: ERS status
+      title: ERS status
       type: enum
       units:
         - ok
@@ -243,14 +243,14 @@
         - busy
         - error
     - name: gear
-      suffix: Landing gear
+      title: Landing gear
       type: enum
       units:
         - down
         - retracted
     - name: fgear
-      suffix: Landing gear force
-      units: 0..1
+      title: Landing gear force
+      units: u
 
 - name: btn
   title: Buttons
@@ -275,13 +275,13 @@
   content:
     - name: pos
       title: Encoder position
-      units: -1..+1
+      units: su
     - name: dpos
       title: Delta position
-      units: -1..+1
+      units: su
     - name: power
       title: Power
-      units: -1..+1
+      units: su
 
 - name: cam
   title: Camera sensors

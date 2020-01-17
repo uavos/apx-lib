@@ -14,9 +14,6 @@
     - name: course
       title: Cmd course
       units: deg
-    - name: altitude
-      title: Cmd altitude
-      units: m
     - name: airspeed
       title: Cmd airspeed
       units: m/s
@@ -29,8 +26,11 @@
 
     - name: rpm
       title: Cmd RPM
-      units: 1/m
+      units: 1/min
 
+- name: pos
+  title: Position
+  content:
     - name: lat
       title: Cmd latitude
       units: deg
@@ -41,11 +41,15 @@
       title: Cmd altitude MSL
       units: m
 
+    - name: altitude
+      title: Cmd altitude
+      units: m
+
     - name: "n"
-      title: Cmd position north
+      title: Cmd north
       units: m
     - name: "e"
-      title: Cmd position east
+      title: Cmd east
       units: m
 
 - name: ctr
@@ -122,30 +126,29 @@
         - "on"
     - name: roll
       title: RC roll
-      units: -1..+1
+      units: su
     - name: pitch
       title: RC pitch
-      units: -1..+1
+      units: su
     - name: throttle
       title: RC throttle
-      units: 0..1
+      units: u
     - name: yaw
       title: RC yaw
-      units: -1..+1
+      units: su
 
 - name: cam
   title: Camera
   content:
     - name: zoom
       title: Cam zoom level
-      units: 0..1
+      units: u
     - name: focus
       title: Cam focus
-      units: 0..1
+      units: u
 
     - name: ch
       title: Video channel
-      units: 0..255
       type: byte
 
     - name: range

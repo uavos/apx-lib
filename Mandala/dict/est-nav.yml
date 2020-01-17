@@ -112,7 +112,7 @@
       units: m/s
     - name: airspeed_d
       title: Airspeed derivative
-      units: m/s^2
+      units: m/s2
 
     - name: agl
       title: Above Ground Level altitude
@@ -178,7 +178,7 @@
 
     - name: stab
       title: Stability
-      units: 0..1
+      units: u
 
     - name: venergy
       title: Compensated variometer
@@ -186,7 +186,7 @@
 
     - name: mag
       title: Magnetometer magnitude
-      units: a.u.
+      units: su
 
 - name: ctr
   title: Control parameters

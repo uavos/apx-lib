@@ -44,7 +44,7 @@
 {%- endmacro -%}
 
 {%- block content %}
-// Auto-generated file
+// generated file
 #pragma once
 
 #include <Mandala/MandalaMetaBase.h>
@@ -53,9 +53,22 @@ namespace mandala {
 {% set ind = ' '*indent_size %}
 
 // uid bits by level (level 0=root)
+static constexpr const size_t uid_levels = {{ data.uid_bits|length }};
+
 static constexpr const uint8_t uid_bits[] = {
 {{ ind }}{% for i in data.uid_bits %}{{ i }},{% endfor %} // total {{ data.uid_bits|sum }} bits, {{ data.uid_bits|length }} levels
 };
+
+static constexpr const mandala::uid_t uid_mask[] = {
+{{ ind }}{% for i in data.uid_bits %}{% set mask = (2**(data.uid_bits[loop.index0+1:]|sum)*(2**(data.uid_bits[loop.index0])-1)) %}0x{{ '%0x' % mask }},{% endfor %}
+
+};
+
+static constexpr const uint8_t uid_shift[] = {
+{{ ind }}{% for i in data.uid_bits %}{{ data.uid_bits[loop.index0+1:]|sum }},{% endfor %}
+
+};
+
 static constexpr const mandala::uid_t uid_base = 0x{{ '%0x' % data.uid_base }};
 
 // flat array of all elements
