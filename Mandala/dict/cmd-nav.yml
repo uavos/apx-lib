@@ -52,7 +52,7 @@
       title: Cmd east
       units: m
 
-- name: ctr
+- name: op
   title: Procedures
   content:
     - name: mode
@@ -201,10 +201,10 @@
         - "manual"
 
 - name: gimbal
-  title: Gimbal
+  title: Gimbal cmd
   content:
     - name: mode
-      title: Gimbal mode
+      suffix: mode
       type: enum
       units:
         - "off"
@@ -246,10 +246,10 @@
       units: m
 
 - name: ats
-  title: ATS commanded values
+  title: ATS cmd
   content:
     - name: mode
-      title: ATS mode
+      suffix: mode
       type: enum
       units:
         - "off"
@@ -258,30 +258,30 @@
         - "search"
 
     - name: roll
-      title: ATS cmd roll
+      suffix: roll
       units: deg
     - name: pitch
-      title: ATS cmd pitch
+      suffix: pitch
       units: deg
     - name: yaw
-      title: ATS cmd yaw
+      suffix: yaw
       units: deg
 
     - name: p
-      title: ATS cmd roll rate
+      suffix: roll rate
       units: deg/s
     - name: q
-      title: ATS cmd pitch rate
+      suffix: pitch rate
       units: deg/s
     - name: r
-      title: ATS cmd yaw rate
+      suffix: yaw rate
       units: deg/s
 
 - name: turret
-  title: Turret commanded values
+  title: Turret cmd
   content:
     - name: mode
-      title: Turret mode
+      suffix: mode
       type: enum
       units:
         - "off"
@@ -291,31 +291,31 @@
         - "speed"
 
     - name: roll
-      title: Turret cmd roll
+      suffix: roll
       units: deg
     - name: pitch
-      title: Turret cmd pitch
+      suffix: pitch
       units: deg
     - name: yaw
-      title: Turret cmd yaw
+      suffix: yaw
       units: deg
 
     - name: p
-      title: Turret cmd roll rate
+      suffix: roll rate
       units: deg/s
     - name: q
-      title: Turret cmd pitch rate
+      suffix: pitch rate
       units: deg/s
     - name: r
-      title: Turret cmd yaw rate
+      suffix: yaw rate
       units: deg/s
 
     - name: broll
-      title: Turret bias roll
+      suffix: bias roll
       units: deg/s
     - name: bipitch
-      title: Turret bias pitch
+      suffix: bias pitch
       units: deg/s
     - name: byaw
-      title: Turret bias yaw
+      suffix: bias yaw
       units: deg/s

@@ -71,7 +71,7 @@ static constexpr const item_t items[] = {
     MBPORT(est::nav::calc::course::meta, course, f2, f2),
 
     MBPORT(est::nav::ctr::rpm::meta, rpm, u2, u2),
-    MBPORT(est::nav::air::agl::meta, agl, f2, f2),
+    MBPORT(est::nav::agl::altitude::meta, agl, f2, f2),
     MBPORT(est::nav::air::slip::meta, slip, f2, s01),
     MBPORT(est::nav::air::aoa::meta, attack, f2, s01),
     MBPORT(est::nav::calc::venergy::meta, venergy, f2, f2),
@@ -139,7 +139,7 @@ static constexpr const item_t items[] = {
     MBPORT(sns::env::eng::current::meta, Im, u1, u1),
 
     MBPORT(sns::nav::air::temp::meta, AT, s1, s1),
-    MBPORT(sns::env::status::rt::meta, RT, s1, s1),
+    MBPORT(sns::env::aux::rt::meta, RT, s1, s1),
     MBPORT(sns::env::com::temp::meta, MT, s1, s1),
     MBPORT(sns::env::eng::temp::meta, ET, u1, u1),
     MBPORT(sns::env::eng::egt::meta, EGT, u10, u10),
@@ -173,14 +173,14 @@ static constexpr const item_t items[] = {
     MBPORT(sns::nav::las::dy::meta, radar_dy, f2, f2),
     MBPORT(sns::nav::las::dz::meta, radar_dz, f2, f2),
 
-    MBPORT(cmd::nav::ctr::stage::meta, stage, u1, u1),
-    MBPORT(cmd::nav::ctr::mode::meta, mode, u1, u1),
+    MBPORT(cmd::nav::op::stage::meta, stage, u1, u1),
+    MBPORT(cmd::nav::op::mode::meta, mode, u1, u1),
     MBPORT(cmd::nav::rc::ovr::meta, status_rc, bit, bit),
-    MBPORT(est::nav::status::pos::meta, status_gps, bit, bit),
-    MBPORT(est::nav::status::ref::meta, status_home, bit, bit),
-    MBPORT(est::nav::status::agl::meta, status_agl, bit, bit),
+    MBPORT(est::nav::pos::status::meta, status_gps, bit, bit),
+    MBPORT(est::nav::ref::status::meta, status_home, bit, bit),
+    MBPORT(est::nav::agl::status::meta, status_agl, bit, bit),
     MBPORT(est::env::status::uplink::meta, status_modem, bit, bit),
-    MBPORT(est::nav::status::ap::meta, status_landed, bit, bit),
+    MBPORT(est::nav::air::status::meta, status_landed, bit, bit),
     MBPORT(sns::nav::agl::ground::meta, status_touch, bit, bit),
 
     MBPORT(est::env::status::pwr::meta, error_power, bit, bit),
@@ -236,7 +236,7 @@ static constexpr const item_t items[] = {
     MBPORT(est::nav::calc::whdg::meta, windHdg, f2, f2),
     MBPORT(est::nav::calc::ktas::meta, cas2tas, f2, u001),
 
-    MBPORT(cmd::nav::ctr::adj::meta, rwAdj, s1, s1),
+    MBPORT(cmd::nav::op::adj::meta, rwAdj, s1, s1),
 
     MBPORT(sns::nav::gps::sv::meta, gps_SV, u1, u1),
     MBPORT(sns::nav::gps::su::meta, gps_SU, u1, u1),
@@ -252,11 +252,11 @@ static constexpr const item_t items[] = {
 
     MBPORT(est::nav::calc::stab::meta, stab, f2, u001),
 
-    MBPORT(est::env::pld::cam_roll::meta, cam_roll, f4, f2),
-    MBPORT(est::env::pld::cam_pitch::meta, cam_pitch, f4, f2),
-    MBPORT(est::env::pld::cam_yaw::meta, cam_yaw, f4, f2),
-    MBPORT(est::env::pld::turret_pitch::meta, turret_pitch, f4, f2),
-    MBPORT(est::env::pld::turret_yaw::meta, turret_heading, f4, f2),
+    MBPORT(est::env::cam::roll::meta, cam_roll, f4, f2),
+    MBPORT(est::env::cam::pitch::meta, cam_pitch, f4, f2),
+    MBPORT(est::env::cam::yaw::meta, cam_yaw, f4, f2),
+    MBPORT(est::env::turret::pitch::meta, turret_pitch, f4, f2),
+    MBPORT(est::env::turret::yaw::meta, turret_heading, f4, f2),
     MBPORT(meta_void, turret_armed, bit, bit),
     MBPORT(meta_void, turret_shoot, bit, bit),
     MBPORT(meta_void, turret_reload, bit, bit),

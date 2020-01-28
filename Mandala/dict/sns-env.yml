@@ -228,20 +228,12 @@
       title: Antenna yaw
       units: deg
 
-- name: status
-  title: Status sensors
+- name: aux
+  title: Auxilary sensors
   content:
     - name: rt
       title: Room temperature
       units: C
-    - name: ers
-      title: ERS status
-      type: enum
-      units:
-        - ok
-        - disarmed
-        - busy
-        - error
     - name: gear
       title: Landing gear
       type: enum
@@ -251,6 +243,14 @@
     - name: fgear
       title: Landing gear force
       units: u
+    - name: ers
+      title: ERS status
+      type: enum
+      units:
+        - ok
+        - disarmed
+        - busy
+        - error
 
 - name: btn
   title: Buttons

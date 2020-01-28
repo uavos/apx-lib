@@ -31,11 +31,12 @@
       units: K
 
 - name: status
-  title: Submodules
+  title: Submodules status
   type: enum
   units:
     - "unknown"
     - "ok"
+    - "warning"
     - "error"
   content:
     - name: eng
@@ -63,38 +64,66 @@
     - name: uplink
       title: Uplink
 
-- name: pld
-  title: Payload
+- name: ats
+  title: ATS
   content:
-    - name: ats_roll
-      title: ATS roll
+    - name: roll
+      suffix: roll
       units: deg
-    - name: ats_pitch
-      title: ATS pitch
+    - name: pitch
+      suffix: pitch
       units: deg
-    - name: ats_yaw
-      title: ATS yaw
-      units: deg
-
-    - name: cam_roll
-      title: Cam roll
-      units: deg
-    - name: cam_pitch
-      title: Cam pitch
-      units: deg
-    - name: cam_yaw
-      title: Cam yaw
+    - name: yaw
+      suffix: yaw
       units: deg
 
-    - name: turret_roll
-      title: Turret roll
+- name: cam
+  title: Cam
+  descr: Camera axis est
+  content:
+    - name: roll
+      suffix: roll
       units: deg
-    - name: turret_pitch
-      title: Turret pitch
+    - name: pitch
+      suffix: pitch
       units: deg
-    - name: turret_yaw
-      title: Turret yaw
+    - name: yaw
+      suffix: yaw
       units: deg
+
+    - name: lat
+      suffix: latitude
+      units: deg
+    - name: lon
+      suffix: longitude
+      units: deg
+    - name: hmsl
+      suffix: altitude MSL
+      units: m
+
+- name: turret
+  title: Turret
+  descr: Turret axis est
+  content:
+    - name: roll
+      suffix: roll
+      units: deg
+    - name: pitch
+      suffix: pitch
+      units: deg
+    - name: yaw
+      suffix: yaw
+      units: deg
+
+    - name: lat
+      suffix: latitude
+      units: deg
+    - name: lon
+      suffix: longitude
+      units: deg
+    - name: hmsl
+      suffix: altitude MSL
+      units: m
 
 - name: usr
   title: User values

@@ -33,6 +33,15 @@
 - name: pos
   title: Position
   content:
+    - name: status
+      suffix: status
+      type: enum
+      units:
+        - unavailable
+        - gps
+        - air
+        - inertial
+
     - name: lat
       title: Latitude
       units: deg
@@ -99,6 +108,13 @@
 - name: air
   title: Aerodynamic
   content:
+    - name: status
+      suffix: status
+      type: enum
+      units:
+        - "flying"
+        - "landed"
+
     - name: altitude
       title: Flight altitude
       units: m
@@ -114,10 +130,6 @@
       title: Airspeed derivative
       units: m/s2
 
-    - name: agl
-      title: Above Ground Level altitude
-      units: m
-
     - name: slip
       title: Slip angle
       units: deg
@@ -125,9 +137,29 @@
       title: Angle of attack
       units: deg
 
+- name: agl
+  title: AGL
+  content:
+    - name: status
+      suffix: status
+      type: enum
+      units:
+        - "unavailable"
+        - "available"
+    - name: altitude
+      suffix: altitude
+      units: m
+
 - name: ref
   title: Ref point
   content:
+    - name: status
+      suffix: status
+      type: enum
+      units:
+        - "unavailable"
+        - "initialized"
+
     - name: lat
       title: Home latitude
       units: deg
@@ -259,36 +291,3 @@
     - name: piidx
       title: Selected point of interest
       type: word
-
-- name: status
-  title: Estimators status
-  content:
-    - name: pos
-      title: Position
-      type: enum
-      units:
-        - unavailable
-        - gps
-        - air
-        - inertial
-
-    - name: agl
-      title: AGL
-      type: enum
-      units:
-        - "unavailable"
-        - "available"
-
-    - name: ref
-      title: Ref point
-      type: enum
-      units:
-        - "unavailable"
-        - "initialized"
-
-    - name: ap
-      title: Autopilot
-      type: enum
-      units:
-        - "flying"
-        - "landed"

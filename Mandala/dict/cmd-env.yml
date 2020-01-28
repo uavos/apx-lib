@@ -62,8 +62,8 @@
 - name: redundancy
   title: Redundancy management
   content:
-    - name: active
-      title: Autopilot active flag
+    - name: alive
+      title: Autopilot alive flag
 
 - name: stream
   title: Special streams and wrappers

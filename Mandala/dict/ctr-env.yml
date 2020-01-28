@@ -21,10 +21,10 @@
       suffix: Satcom
     - name: rfamp
       suffix: RF amplifier
-    - name: ils
-      suffix: ILS
     - name: ice
       suffix: Anti-ice
+    - name: las
+      suffix: Landing Assistance
 
 - name: sw
   title: Switches
