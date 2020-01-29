@@ -177,7 +177,7 @@ static constexpr const item_t items[] = {
     MBPORT(cmd::nav::op::stage::meta, stage, u1, u1),
     MBPORT(cmd::nav::op::mode::meta, mode, u1, u1),
     MBPORT(cmd::nav::rc::ovr::meta, status_rc, bit, bit),
-    MBPORT(est::nav::pos::status::meta, status_gps, bit, bit),
+    MBPORT(est::env::status::gps::meta, status_gps, bit, bit),
     MBPORT(est::nav::ref::status::meta, status_home, bit, bit),
     MBPORT(est::nav::agl::status::meta, status_agl, bit, bit),
     MBPORT(est::env::status::uplink::meta, status_modem, bit, bit),
@@ -187,8 +187,8 @@ static constexpr const item_t items[] = {
     MBPORT(est::env::status::pwr::meta, error_power, berr, berr),
     MBPORT(est::env::status::pt::meta, error_cas, berr, berr),
     MBPORT(est::env::status::ps::meta, error_pstatic, berr, berr),
-    MBPORT(est::env::status::gyro::meta, error_gyro, berr, berr),
-    MBPORT(est::env::status::rpm::meta, error_rpm, berr, berr),
+    MBPORT(est::env::status::imu::meta, error_gyro, berr, berr),
+    MBPORT(est::env::status::eng::meta, error_rpm, berr, berr),
 
     MBPORT(meta_void, cmode_dlhd, bit, bit),
     MBPORT(cmd::nav::opt::thrcut::meta, cmode_thrcut, bit, bit),
@@ -217,7 +217,7 @@ static constexpr const item_t items[] = {
     MBPORT(sns::env::btn::shutdown::meta, sb_shutdown, bit, bit),
     MBPORT(est::env::status::ers::meta, sb_ers_err, berr, berr),
     MBPORT(sns::env::btn::noers::meta, sb_ers_disarm, bit, bit),
-    MBPORT(est::env::status::eng::meta, sb_eng_err, berr, berr),
+    MBPORT(meta_void, sb_eng_err, berr, berr),
     MBPORT(est::env::status::bat::meta, sb_bat_err, berr, berr),
     MBPORT(est::env::status::gen::meta, sb_gen_err, berr, berr),
 

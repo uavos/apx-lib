@@ -33,15 +33,6 @@
 - name: pos
   title: Position
   content:
-    - name: status
-      suffix: status
-      type: enum
-      units:
-        - unavailable
-        - gps
-        - air
-        - inertial
-
     - name: lat
       title: Latitude
       units: deg

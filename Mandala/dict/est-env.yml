@@ -41,8 +41,6 @@
   content:
     - name: eng
       title: Engine
-    - name: rpm
-      title: RPM sensor
     - name: gen
       title: Generator
     - name: bat
@@ -50,19 +48,21 @@
     - name: pwr
       title: Power
 
+    - name: gps
+      title: GPS
+
     - name: pt
       title: Dynamic pressure
     - name: ps
       title: Static pressure
-
-    - name: gyro
-      title: IMU gyro
-
-    - name: ers
-      title: ERS
+    - name: imu
+      title: IMU
 
     - name: uplink
       title: Uplink
+
+    - name: ers
+      title: ERS
 
 - name: ats
   title: ATS
