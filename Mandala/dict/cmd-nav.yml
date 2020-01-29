@@ -17,9 +17,14 @@
     - name: airspeed
       title: Cmd airspeed
       units: m/s
+
+    - name: altitude
+      title: Cmd altitude
+      units: m
     - name: vspeed
       title: Cmd vspeed
       units: m/s
+
     - name: slip
       title: Cmd slip
       units: deg
@@ -39,10 +44,6 @@
       units: deg
     - name: hmsl
       title: Cmd altitude MSL
-      units: m
-
-    - name: altitude
-      title: Cmd altitude
       units: m
 
     - name: "n"
@@ -104,10 +105,10 @@
         - gps
         - inertial
     - name: nomag
-      title: Magnetometer
+      title: Block magnetometer
       units:
-        - "on"
-        - "blocked"
+        - "no"
+        - "yes"
     - name: hyaw
       title: Hover yaw
       type: enum
@@ -130,7 +131,7 @@
     - name: pitch
       title: RC pitch
       units: su
-    - name: throttle
+    - name: thr
       title: RC throttle
       units: u
     - name: yaw

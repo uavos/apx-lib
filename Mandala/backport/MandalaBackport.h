@@ -19,7 +19,8 @@ enum fmt_id_t {
     u10,
     u01,
     u001,
-    bit
+    bit,
+    berr,
 };
 
 struct item_t
@@ -112,7 +113,7 @@ static constexpr const item_t items[] = {
     MBPORT(cmd::nav::pos::e::meta, cmd_east, f2, f2),
     MBPORT(cmd::nav::reg::course::meta, cmd_course, f2, f2),
     MBPORT(cmd::nav::reg::rpm::meta, cmd_rpm, u2, u2),
-    MBPORT(cmd::nav::pos::altitude::meta, cmd_altitude, f2, f2),
+    MBPORT(cmd::nav::reg::altitude::meta, cmd_altitude, f2, f2),
     MBPORT(cmd::nav::reg::airspeed::meta, cmd_airspeed, f2, f2),
     MBPORT(cmd::nav::reg::vspeed::meta, cmd_vspeed, f2, s01),
     MBPORT(cmd::nav::reg::slip::meta, cmd_slip, f2, s1),
@@ -183,11 +184,11 @@ static constexpr const item_t items[] = {
     MBPORT(est::nav::air::status::meta, status_landed, bit, bit),
     MBPORT(sns::nav::agl::ground::meta, status_touch, bit, bit),
 
-    MBPORT(est::env::status::pwr::meta, error_power, bit, bit),
-    MBPORT(est::env::status::pt::meta, error_cas, bit, bit),
-    MBPORT(est::env::status::ps::meta, error_pstatic, bit, bit),
-    MBPORT(est::env::status::gyro::meta, error_gyro, bit, bit),
-    MBPORT(est::env::status::rpm::meta, error_rpm, bit, bit),
+    MBPORT(est::env::status::pwr::meta, error_power, berr, berr),
+    MBPORT(est::env::status::pt::meta, error_cas, berr, berr),
+    MBPORT(est::env::status::ps::meta, error_pstatic, berr, berr),
+    MBPORT(est::env::status::gyro::meta, error_gyro, berr, berr),
+    MBPORT(est::env::status::rpm::meta, error_rpm, berr, berr),
 
     MBPORT(meta_void, cmode_dlhd, bit, bit),
     MBPORT(cmd::nav::opt::thrcut::meta, cmode_thrcut, bit, bit),
@@ -214,11 +215,11 @@ static constexpr const item_t items[] = {
     MBPORT(ctr::env::usr::ub4::meta, sw_sw4, bit, bit),
 
     MBPORT(sns::env::btn::shutdown::meta, sb_shutdown, bit, bit),
-    MBPORT(est::env::status::ers::meta, sb_ers_err, bit, bit),
+    MBPORT(est::env::status::ers::meta, sb_ers_err, berr, berr),
     MBPORT(sns::env::btn::noers::meta, sb_ers_disarm, bit, bit),
-    MBPORT(est::env::status::eng::meta, sb_eng_err, bit, bit),
-    MBPORT(est::env::status::bat::meta, sb_bat_err, bit, bit),
-    MBPORT(est::env::status::gen::meta, sb_gen_err, bit, bit),
+    MBPORT(est::env::status::eng::meta, sb_eng_err, berr, berr),
+    MBPORT(est::env::status::bat::meta, sb_bat_err, berr, berr),
+    MBPORT(est::env::status::gen::meta, sb_gen_err, berr, berr),
 
     MBPORT(est::nav::wpt::wpidx::meta, wpidx, u1, u1),
     MBPORT(est::nav::wpt::rwidx::meta, rwidx, u1, u1),
@@ -323,7 +324,7 @@ static constexpr const item_t items[] = {
     MBPORT(cmd::nav::rc::ovr::meta, rc_override, u1, u1),
     MBPORT(cmd::nav::rc::roll::meta, rc_roll, s001, s001),
     MBPORT(cmd::nav::rc::pitch::meta, rc_pitch, s001, s001),
-    MBPORT(cmd::nav::rc::throttle::meta, rc_throttle, u001, u001),
+    MBPORT(cmd::nav::rc::thr::meta, rc_throttle, u001, u001),
     MBPORT(cmd::nav::rc::yaw::meta, rc_yaw, s001, s001),
 
     MBPORT(cmd::nav::cam::ch::meta, cam_ch, u1, u1),
