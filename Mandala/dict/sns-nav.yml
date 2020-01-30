@@ -99,7 +99,7 @@
     - name: airspeed
       title: Airspeed
       units: m/s
-    - name: airspeed_d
+    - name: acc
       title: Airspeed derivative
       units: m/s2
     - name: temp
@@ -115,7 +115,7 @@
     - name: altitude
       title: Barometric altitude
       units: m
-    - name: altitude_d
+    - name: vspeed
       title: Barometric altitude derivative
       units: m/s
     - name: temp

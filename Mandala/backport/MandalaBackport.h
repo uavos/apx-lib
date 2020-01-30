@@ -85,7 +85,7 @@ static constexpr const item_t items[] = {
     MBPORT(ctr::nav::stab::rud::meta, ctr_rudder, f2, s001),
     MBPORT(ctr::nav::stab::col::meta, ctr_collective, f2, s001),
 
-    MBPORT(ctr::nav::str::str::meta, ctr_steering, f2, s001),
+    MBPORT(ctr::nav::str::rud::meta, ctr_steering, f2, s001),
     MBPORT(ctr::nav::wing::airbrk::meta, ctr_airbrk, f2, u001),
     MBPORT(ctr::nav::wing::flaps::meta, ctr_flaps, u001, u001),
     MBPORT(ctr::nav::str::brake::meta, ctr_brake, f2, u001),
@@ -98,7 +98,7 @@ static constexpr const item_t items[] = {
     MBPORT(ctr::env::ers::rel::meta, ctrb_rel, bit, bit),
     MBPORT(ctr::env::door::drop::meta, ctrb_drp, bit, bit),
     MBPORT(ctr::env::sw::fpump::meta, ctrb_pump, bit, bit),
-    MBPORT(ctr::env::sw::starter::meta, ctrb_starter, bit, bit),
+    MBPORT(sns::env::btn::starter::meta, ctrb_starter, bit, bit),
     MBPORT(ctr::env::sw::horn::meta, ctrb_horn, bit, bit),
     MBPORT(ctr::nav::eng::rev::meta, ctrb_rev, bit, bit),
     MBPORT(ctr::nav::str::gear::meta, ctrb_gear, bit, bit),
@@ -299,8 +299,8 @@ static constexpr const item_t items[] = {
 
     MBPORT(est::nav::pos::n::meta, pos_north, f4, f4),
     MBPORT(est::nav::pos::e::meta, pos_east, f4, f4),
-    MBPORT(est::nav::pos::vn::meta, vel_north, f4, f4),
-    MBPORT(est::nav::pos::ve::meta, vel_east, f4, f4),
+    MBPORT(meta_void, vel_north, f4, f4),
+    MBPORT(meta_void, vel_east, f4, f4),
     MBPORT(est::nav::ref::hdg::meta, homeHDG, f4, f4),
     MBPORT(est::nav::ref::dist::meta, dHome, f4, f4),
     MBPORT(est::nav::wpt::dist::meta, dWPT, f4, f4),
@@ -317,8 +317,8 @@ static constexpr const item_t items[] = {
     MBPORT(meta_void, dl_timestamp, u4, u4),
 
     MBPORT(sns::nav::ps::altitude::meta, altps, f4, f4),
-    MBPORT(sns::nav::ps::altitude_d::meta, vario, f4, f4),
-    MBPORT(sns::nav::pt::airspeed_d::meta, vcas, f4, f4),
+    MBPORT(sns::nav::ps::vspeed::meta, vario, f4, f4),
+    MBPORT(sns::nav::pt::acc::meta, vcas, f4, f4),
     MBPORT(meta_void, denergy, f4, f4),
 
     MBPORT(cmd::nav::rc::ovr::meta, rc_override, u1, u1),
