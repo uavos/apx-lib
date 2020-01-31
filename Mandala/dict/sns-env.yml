@@ -22,10 +22,10 @@
       units: A
 
     - name: ot
-      title: Oil temperature OT
+      title: Oil temperature
       units: C
     - name: egt
-      title: Exhaust temperature EGT
+      title: Exhaust temperature
       units: C
     - name: egtd
       title: Exhaust delta temperature
@@ -38,7 +38,7 @@
       title: Mainfold air pressure
       units: Pa
     - name: iap
-      title: Intake air box pressure IAP
+      title: Intake air box pressure
       units: kPa
 
     - name: tc
