@@ -68,16 +68,16 @@
     - "off"
     - "on"
   content:
+    - name: nav
+      title: Navigation lights
+    - name: taxi
+      title: Taxi lights
     - name: beacon
       title: Beacon light
     - name: landing
       title: Landing lights
-    - name: nav
-      title: Navigation lights
     - name: strobe
       title: Strobe lights
-    - name: taxi
-      title: Taxi lights
 
 - name: door
   title: Doors and latches
