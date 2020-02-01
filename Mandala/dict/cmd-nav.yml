@@ -1,5 +1,5 @@
-- name: reg
-  title: Regulators
+- name: att
+  title: Attitide regulators
   content:
     - name: roll
       title: Cmd roll
@@ -11,9 +11,33 @@
       title: Cmd yaw
       units: deg
 
+- name: pos
+  title: Position regulators
+  content:
+    - name: lat
+      title: Cmd latitude
+      units: deg
+    - name: lon
+      title: Cmd latitude
+      units: deg
+    - name: hmsl
+      title: Cmd altitude MSL
+      units: m
+
     - name: course
       title: Cmd course
       units: deg
+
+    - name: "n"
+      title: Cmd north
+      units: m
+    - name: "e"
+      title: Cmd east
+      units: m
+
+- name: air
+  title: Aerodynamic regulators
+  content:
     - name: airspeed
       title: Cmd airspeed
       units: m/s
@@ -29,29 +53,12 @@
       title: Cmd slip
       units: deg
 
+- name: aux
+  title: Auxilary regulators
+  content:
     - name: rpm
       title: Cmd RPM
       units: 1/min
-
-- name: pos
-  title: Position
-  content:
-    - name: lat
-      title: Cmd latitude
-      units: deg
-    - name: lon
-      title: Cmd latitude
-      units: deg
-    - name: hmsl
-      title: Cmd altitude MSL
-      units: m
-
-    - name: "n"
-      title: Cmd north
-      units: m
-    - name: "e"
-      title: Cmd east
-      units: m
 
 - name: op
   title: Procedures

@@ -63,6 +63,14 @@
       title: Local position down
       units: m
 
+    - name: course
+      title: Moving direction
+      units: deg
+
+    - name: speed
+      title: Ground speed
+      units: m/s
+
 - name: rel
   title: Relative pos
   content:
@@ -96,6 +104,50 @@
       title: Acceleration Z
       units: m/s2
 
+- name: ref
+  title: Ref point
+  content:
+    - name: status
+      suffix: status
+      type: enum
+      units:
+        - "unavailable"
+        - "initialized"
+
+    - name: lat
+      title: Home latitude
+      units: deg
+    - name: lon
+      title: Home latitude
+      units: deg
+    - name: hmsl
+      title: Home altitude MSL
+      units: m
+
+    - name: altps
+      title: Baro ground altitude
+      units: m
+
+    - name: hdg
+      title: Heading to home
+      units: deg
+    - name: dist
+      title: Distance to home
+      units: m
+
+- name: agl
+  title: AGL
+  content:
+    - name: status
+      suffix: status
+      type: enum
+      units:
+        - "unavailable"
+        - "available"
+    - name: altitude
+      suffix: altitude
+      units: m
+
 - name: air
   title: Aerodynamic
   content:
@@ -128,73 +180,9 @@
       title: Angle of attack
       units: deg
 
-- name: agl
-  title: AGL
+- name: tecs
+  title: TECS parameters
   content:
-    - name: status
-      suffix: status
-      type: enum
-      units:
-        - "unavailable"
-        - "available"
-    - name: altitude
-      suffix: altitude
-      units: m
-
-- name: ref
-  title: Ref point
-  content:
-    - name: status
-      suffix: status
-      type: enum
-      units:
-        - "unavailable"
-        - "initialized"
-
-    - name: lat
-      title: Home latitude
-      units: deg
-    - name: lon
-      title: Home latitude
-      units: deg
-    - name: hmsl
-      title: Home altitude MSL
-      units: m
-
-    - name: altps
-      title: Baro ground altitude
-      units: m
-
-    - name: hdg
-      title: Heading to home
-      units: deg
-    - name: dist
-      title: Distance to home
-      units: m
-
-- name: calc
-  title: Calculated parameters
-  descr: Data used by estimators and control loops
-  content:
-    - name: wspd
-      title: wind speed
-      units: m/s
-    - name: whdg
-      title: wind direction to
-      units: deg
-
-    - name: ktas
-      title: CAS to TAS multiplier
-      units: K
-
-    - name: course
-      title: Moving direction
-      units: deg
-
-    - name: speed
-      title: Ground speed
-      units: m/s
-
     - name: ld
       title: Glide ratio
       units: L/D
@@ -203,9 +191,23 @@
       title: Stability
       units: u
 
-    - name: venergy
+    - name: vse
       title: Compensated variometer
       units: m/s
+
+    - name: ktas
+      title: CAS to TAS multiplier
+      units: K
+
+- name: aux
+  title: Auxilary parameters
+  content:
+    - name: wspd
+      title: Wind speed
+      units: m/s
+    - name: whdg
+      title: Wind direction to
+      units: deg
 
     - name: mag
       title: Magnetometer magnitude
