@@ -71,7 +71,7 @@ static constexpr const item_t items[] = {
     MBPORT(est::nav::air::vspeed::meta, vspeed, f2, f2),
     MBPORT(est::nav::pos::course::meta, course, f2, f2),
 
-    MBPORT(est::nav::ctr::rpm::meta, rpm, u2, u2),
+    MBPORT(sns::env::eng::rpm::meta, rpm, u2, u2),
     MBPORT(est::nav::agl::altitude::meta, agl, f2, f2),
     MBPORT(est::nav::air::slip::meta, slip, f2, s01),
     MBPORT(est::nav::air::aoa::meta, attack, f2, s01),

@@ -253,10 +253,6 @@
       title: Remaining loops
       type: word
 
-    - name: rpm
-      title: Governor RPM
-      units: m
-
 - name: wpt
   title: Mission navigation
   content:

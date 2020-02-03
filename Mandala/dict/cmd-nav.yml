@@ -124,7 +124,7 @@
         - "fixed"
 
 - name: rc
-  title: Realtime controls
+  title: Pilot Override
   content:
     - name: ovr
       title: RC override
@@ -224,13 +224,13 @@
         - "track"
 
     - name: roll
-      suffix: cmd roll
+      suffix: roll
       units: deg
     - name: pitch
-      suffix: cmd pitch
+      suffix: pitch
       units: deg
     - name: yaw
-      suffix: cmd yaw
+      suffix: yaw
       units: deg
 
     - name: broll
@@ -244,13 +244,13 @@
       units: deg/s
 
     - name: lat
-      suffix: tracking latitude
+      suffix: latitude
       units: deg
     - name: lon
-      suffix: tracking latitude
+      suffix: latitude
       units: deg
     - name: hmsl
-      suffix: tracking altitude MSL
+      suffix: altitude MSL
       units: m
 
 - name: ats
