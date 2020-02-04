@@ -79,11 +79,11 @@ static constexpr const item_t items[] = {
     MBPORT(est::nav::tecs::ld::meta, ldratio, f2, f2),
     MBPORT(sns::nav::air::buo::meta, buoyancy, f2, f2),
 
-    MBPORT(ctr::nav::stab::ail::meta, ctr_ailerons, f2, s001),
-    MBPORT(ctr::nav::stab::elv::meta, ctr_elevator, f2, s001),
+    MBPORT(ctr::nav::att::ail::meta, ctr_ailerons, f2, s001),
+    MBPORT(ctr::nav::att::elv::meta, ctr_elevator, f2, s001),
     MBPORT(ctr::nav::eng::thr::meta, ctr_throttle, f2, u001),
-    MBPORT(ctr::nav::stab::rud::meta, ctr_rudder, f2, s001),
-    MBPORT(ctr::nav::stab::col::meta, ctr_collective, f2, s001),
+    MBPORT(ctr::nav::att::rud::meta, ctr_rudder, f2, s001),
+    MBPORT(ctr::nav::att::col::meta, ctr_collective, f2, s001),
 
     MBPORT(ctr::nav::str::rud::meta, ctr_steering, f2, s001),
     MBPORT(ctr::nav::wing::airbrk::meta, ctr_airbrk, f2, u001),

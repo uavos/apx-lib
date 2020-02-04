@@ -1,5 +1,5 @@
-- name: stab
-  title: Stability controls
+- name: att
+  title: Attitude controls
   units: su
   content:
     - name: ail
