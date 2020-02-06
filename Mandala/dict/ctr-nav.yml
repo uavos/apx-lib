@@ -29,8 +29,27 @@
     - name: tvec
       title: Thrust vector
       units: su
-    - name: rev
-      title: Thrust reverse
+
+    - name: starter
+      title: Engine starter
+      type: enum
+      units:
+        - "off"
+        - "on"
+    - name: ign1
+      title: Ignition 1
+      type: enum
+      units:
+        - "off"
+        - "on"
+    - name: ign2
+      title: Ignition 2
+      type: enum
+      units:
+        - "off"
+        - "on"
+    - name: fpump
+      title: Fuel pump
       type: enum
       units:
         - "off"

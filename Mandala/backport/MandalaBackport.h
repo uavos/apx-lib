@@ -97,10 +97,10 @@ static constexpr const item_t items[] = {
     MBPORT(ctr::env::ers::launch::meta, ctrb_ers, bit, bit),
     MBPORT(ctr::env::ers::rel::meta, ctrb_rel, bit, bit),
     MBPORT(ctr::env::door::drop::meta, ctrb_drp, bit, bit),
-    MBPORT(ctr::env::sw::fpump::meta, ctrb_pump, bit, bit),
+    MBPORT(ctr::nav::eng::fpump::meta, ctrb_pump, bit, bit),
     MBPORT(sns::env::btn::starter::meta, ctrb_starter, bit, bit),
-    MBPORT(ctr::env::sw::horn::meta, ctrb_horn, bit, bit),
-    MBPORT(ctr::nav::eng::rev::meta, ctrb_rev, bit, bit),
+    MBPORT(ctr::env::aux::horn::meta, ctrb_horn, bit, bit),
+    MBPORT(meta_void, ctrb_rev, bit, bit),
     MBPORT(ctr::nav::str::gear::meta, ctrb_gear, bit, bit),
 
     MBPORT(meta_void, ctr_brakeL, f2, u001),
@@ -205,7 +205,7 @@ static constexpr const item_t items[] = {
     MBPORT(ctr::env::pwr::agl::meta, power_agl, bit, bit),
     MBPORT(ctr::env::pwr::xpdr::meta, power_xpdr, bit, bit),
 
-    MBPORT(ctr::env::sw::starter::meta, sw_starter, bit, bit),
+    MBPORT(ctr::nav::eng::starter::meta, sw_starter, bit, bit),
     MBPORT(ctr::env::light::nav::meta, sw_lights, bit, bit),
     MBPORT(ctr::env::light::taxi::meta, sw_taxi, bit, bit),
     MBPORT(ctr::env::pwr::ice::meta, sw_ice, bit, bit),

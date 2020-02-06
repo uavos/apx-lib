@@ -26,28 +26,22 @@
     - name: las
       suffix: Landing Assistance
 
-- name: sw
-  title: Switches
+- name: aux
+  title: Auxilary
   type: enum
   units:
     - "off"
     - "on"
   content:
-    - name: starter
-      title: Engine starter
     - name: horn
-      title: Engine horn signal
-    - name: ign1
-      title: Ignition 1
-    - name: ign2
-      title: Ignition 2
-    - name: fpump
-      title: Fuel pump
-    - name: xfeed
-      title: Fuel crossfeed
+      title: Horn signal
+      type: enum
+      units:
+        - "off"
+        - "on"
 
 - name: ers
-  title: Emergency Recovery System
+  title: Emergency Recovery
   type: enum
   content:
     - name: launch
@@ -140,7 +134,7 @@
       type: byte
 
 - name: ats
-  title: ATS controls output
+  title: ATS controls
   content:
     - name: roll
       title: ATS ctr roll
@@ -153,7 +147,7 @@
       units: su
 
 - name: turret
-  title: Turret controls output
+  title: Turret controls
   content:
     - name: roll
       title: Turret ctr roll
@@ -166,7 +160,7 @@
       units: su
 
     - name: mode
-      title: Turret
+      title: Turret mode
       type: enum
       units:
         - "off"
