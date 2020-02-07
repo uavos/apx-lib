@@ -353,7 +353,7 @@ static constexpr const item_t items[] = {
     MBPORT(ctr::env::cam::pitch::meta, camctr_pitch, f4, f4),
     MBPORT(ctr::env::cam::yaw::meta, camctr_yaw, f4, f4),
 
-    MBPORT(cmd::nav::cam::shot::meta, cams, u1, u1),
+    MBPORT(cmd::nav::cam::mode::meta, cams, u1, u1),
     MBPORT(ctr::env::cam::shot::meta, cam_ctrb_shtr, bit, bit),
     MBPORT(ctr::env::cam::arm::meta, cam_ctrb_arm, bit, bit),
     MBPORT(ctr::env::cam::rec::meta, cam_ctrb_rec, bit, bit),

@@ -166,7 +166,7 @@
         - "off"
         - "on"
 
-    - name: shot
+    - name: mode
       title: Shoting mode
       type: enum
       units:

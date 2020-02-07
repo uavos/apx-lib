@@ -159,8 +159,8 @@
       title: Turret ctr yaw
       units: su
 
-    - name: mode
-      title: Turret mode
+    - name: op
+      title: Turret op
       type: enum
       units:
         - "off"

@@ -43,6 +43,26 @@
 {%- endfor -%}
 {%- endmacro -%}
 
+{%- macro mandala_enum_expand(d, indent=0, path=[]) -%}
+{% set ind = ' '*indent*indent_size %}
+{% set ind1 = ' '*(indent+1)*indent_size %}
+{% set path = path+[d.name] %}
+
+{%- if d.content -%}
+{% for i in d.content %}
+{{ mandala_enum_expand(i, indent, path) }}
+{%- endfor -%}
+{%- else -%}
+{% if d.type == 'enum' %}
+{{ ind }}// {{ path|join('.') }}
+{% for i in d.units %}
+{{ ind }}{{ path[-2:]|join('_') }}_{{ i }} = {{ loop.index0 }},
+{% endfor %}
+
+{% endif %}
+{%- endif -%}
+{%- endmacro -%}
+
 {%- block content %}
 // generated file
 #pragma once
@@ -70,6 +90,7 @@ static constexpr const uint8_t uid_shift[] = {
 };
 
 static constexpr const mandala::uid_t uid_base = 0x{{ '%0x' % data.uid_base }};
+static constexpr const mandala::uid_t uid_nmt = 0x{{ '%0x' % (data.uid_base+(2**(data.uid_bits|sum)-1)) }};
 
 // flat array of all elements
 static constexpr const mandala::meta_t meta[] = {
@@ -79,6 +100,13 @@ static constexpr const mandala::meta_t meta[] = {
 {{ mandala_meta_expand(i, 1, [], 0, data.uid_base+loop.index0*uid_mul) }}
 {% endfor %}
 }; // meta array
+
+// constants
+typedef enum {
+{% for i in data.content %}
+{{ mandala_enum_expand(i, 1, []) }}
+{% endfor %}
+} constants_t;
 
 {#
 
@@ -102,6 +130,6 @@ static constexpr const mandala::stream_id_t streams[] = {
 {% endfor %}
 };
 #}
-}; // namespace
+}; // namespace mandala
 
 {% endblock %}

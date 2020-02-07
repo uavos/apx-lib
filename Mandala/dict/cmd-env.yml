@@ -21,17 +21,17 @@
       descr: <squawk><uid><data...>
     - name: uplink
       title: Data packet from GCS to vehicle
-      descr: <squawk><uid><data...>
+      descr: <squawk><uid><data...> or <empty> for heartbeat
 
 - name: telemetry
   title: Telemetry packed stream
   content:
-    - name: format
-      title: Telemetry data format feed
-      descr: <packing format feed...>
     - name: data
       title: Telemetry data stream
       descr: <format_mn><time><packed data...>
+    - name: format
+      title: Telemetry data format feed
+      descr: <packing format feed...>
     - name: stream
       title: Telemetry stream request/select
     - name: request
@@ -41,10 +41,10 @@
 - name: mission
   title: Mission data
   content:
-    - name: info
-      title: Mission information
     - name: data
       title: Mission data
+    - name: info
+      title: Mission information
 
 - name: vcp
   title: Virtual comm port data
@@ -55,9 +55,6 @@
     - name: tx
       title: Transmit VCP serial data
       descr: <port_id><data...>
-    - name: can
-      title: Auxilary CAN port message
-      descr: <port_id><ID32 b31=IDE><data...>
 
 - name: redundancy
   title: Redundancy management
