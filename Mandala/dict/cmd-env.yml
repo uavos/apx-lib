@@ -55,6 +55,12 @@
     - name: tx
       title: Transmit VCP serial data
       descr: <port_id><data...>
+    # - name: can_rx
+    #   title: Received AUX CAN message
+    #   descr: <port_id><ID32 b31=IDE><data...>
+    # - name: can_tx
+    #   title: Transmit AUX CAN message
+    #   descr: <port_id><ID32 b31=IDE><data...>
 
 - name: redundancy
   title: Redundancy management
@@ -99,3 +105,15 @@
       title: Right wing data
     - name: center
       title: Center wing data
+
+- name: sim
+  title: Simulator data
+  content:
+    - name: ctr
+      title: Controls assignments
+    - name: display
+      title: Visualization
+
+- name: nmt
+  title: Network Management
+  uid: uid_max

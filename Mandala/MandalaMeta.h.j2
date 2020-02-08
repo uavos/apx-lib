@@ -30,10 +30,10 @@
 {{ ind1 }}.descr = "{{ d.descr }}",
 {{ ind1 }}.units = "{{ units }}",
 {{ ind1 }}.path = "{{ path|join('.') }}",
-{{ ind1 }}.uid = 0x{{ '%0x' % uid }},
+{{ ind1 }}.uid = {% if d.uid is defined %}{{ d.uid }}{% else %}0x{{ '%0x' % uid }}{% endif %},
 {{ ind1 }}.level = {{ level }},
-{{ ind1 }}.group = {% if d.content is defined %}1{% else %}0{% endif %},
-{{ ind1 }}.type_id = type_{{ d.type }},
+{{ ind1 }}.group = {% if level<(data.uid_bits|length-1) %}1{% else %}0{% endif %},
+{{ ind1 }}.type_id = type_{% if d.content is defined %}void{% else %}{{ d.type }}{% endif %},
 {{ ind }}},
 {% set _dummy = ns.path_uid.update({path|join('.'):uid}) %}
 {% set uid_pow = data.uid_bits[level+2:]|sum %}
@@ -89,9 +89,9 @@ static constexpr const uint8_t uid_shift[] = {
 
 };
 
-// valid UID range is [uid_base...uid_nmt]
+// valid UID range is [uid_base...uid_max]
 static constexpr const mandala::uid_t uid_base = 0x{{ '%0x' % data.uid_base }};
-static constexpr const mandala::uid_t uid_nmt = 0x{{ '%0x' % (data.uid_base+(2**(data.uid_bits|sum)-1)) }};
+static constexpr const mandala::uid_t uid_max = 0x{{ '%0x' % (data.uid_base+(2**(data.uid_bits|sum)-1)) }}; 
 
 // flat array of all elements
 static constexpr const mandala::meta_t meta[] = {

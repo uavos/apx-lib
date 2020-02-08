@@ -14,6 +14,7 @@ typedef uint8_t byte_t;
 typedef uint8_t enum_t;
 
 enum type_id_t {
+    type_void,
     type_float,
     type_dword,
     type_word,
