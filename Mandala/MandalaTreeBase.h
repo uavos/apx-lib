@@ -57,12 +57,12 @@ public:
         return stream::unpack<_Tree::meta.sfmt>(buf, m_value);
     }*/
 
-    constexpr inline size_t copy_to(void *buf) const
+    inline size_t copy_to(void *buf) const
     {
         memcpy(buf, &m_value, sizeof(_DataType));
         return sizeof(_DataType);
     }
-    constexpr inline size_t copy_from(const void *buf)
+    inline size_t copy_from(const void *buf)
     {
         memcpy(&m_value, buf, sizeof(_DataType));
         return sizeof(_DataType);
