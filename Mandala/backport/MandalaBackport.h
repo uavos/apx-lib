@@ -35,12 +35,6 @@ struct item_t
     const uint16_t id_msb;
 };
 
-class MandalaBackport
-{
-public:
-    explicit MandalaBackport();
-};
-
 #define MBITEM(a, b, c, d) \
     { \
         a, #b, c, d, 0 \

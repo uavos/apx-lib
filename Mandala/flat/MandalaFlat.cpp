@@ -20,7 +20,7 @@
  * Floor, Boston, MA 02110-1301, USA.
  *
  */
-#include "Mandala.h"
+#include "MandalaFlat.h"
 //#include "time_ms.h"
 #include <cmath>
 #include <ctype.h>

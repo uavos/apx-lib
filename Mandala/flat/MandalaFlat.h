@@ -20,8 +20,7 @@
  * Floor, Boston, MA 02110-1301, USA.
  *
  */
-#ifndef MANDALA_H
-#define MANDALA_H
+#pragma once
 //=============================================================================
 //#include <dmsg.h>
 #include <cmath>
@@ -146,5 +145,3 @@ private:
     _var_vect rotate_s;
     _var_vect rotate_DC[3];
 };
-//=============================================================================
-#endif // MANDALA_H
