@@ -124,25 +124,25 @@
         - "fixed"
 
 - name: rc
-  title: Pilot Override
+  title: RC
   content:
     - name: ovr
-      title: RC override
+      suffix: override
       type: enum
       units:
         - "off"
         - "on"
     - name: roll
-      title: RC roll
+      suffix: roll
       units: su
     - name: pitch
-      title: RC pitch
+      suffix: pitch
       units: su
     - name: thr
-      title: RC throttle
+      suffix: throttle
       units: u
     - name: yaw
-      title: RC yaw
+      suffix: yaw
       units: su
 
 - name: cam
