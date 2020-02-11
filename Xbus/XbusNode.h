@@ -5,8 +5,8 @@
 namespace xbus {
 namespace node {
 
-typedef std::array<uint8_t, 12> guid_t; //global unique node id
-typedef uint8_t cmd_t;                  //service command
+typedef uint8_t guid_t[12]; //global unique node id
+typedef uint8_t cmd_t;      //service command
 
 // system service commands (service packets)
 typedef enum {
@@ -52,9 +52,9 @@ typedef enum {
 } comands_loader_t;
 
 // Node identification information
-typedef std::array<char, 16> name_t;     //device name string
-typedef std::array<char, 16> version_t;  //fw version string
-typedef std::array<char, 16> hardware_t; //device hardware string
+typedef char name_t[16];     //device name string
+typedef char version_t[16];  //fw version string
+typedef char hardware_t[16]; //device hardware string
 
 typedef struct
 {
@@ -82,27 +82,27 @@ struct Ident
 
     static inline uint16_t psize()
     {
-        return std::tuple_size<name_t>() + std::tuple_size<version_t>()
-               + std::tuple_size<hardware_t>() + sizeof(flags_t);
+        return sizeof(name_t) + sizeof(version_t)
+               + sizeof(hardware_t) + sizeof(flags_t);
     }
     inline void read(XbusStreamReader *s)
     {
-        *s >> name;
-        *s >> version;
-        *s >> hardware;
+        s->read(name, sizeof(name));
+        s->read(version, sizeof(version));
+        s->read(hardware, sizeof(hardware));
         *s >> flags.raw;
     }
     inline void write(XbusStreamWriter *s) const
     {
-        *s << name;
-        *s << version;
-        *s << hardware;
+        s->write(name, sizeof(name));
+        s->write(version, sizeof(version));
+        s->write(hardware, sizeof(hardware));
         *s << flags.raw;
     }
 };
 
 // Node status
-typedef std::array<uint8_t, 16> dump_t; //error dump or information dump
+typedef uint8_t dump_t[16]; //error dump or information dump
 
 struct Status
 {
@@ -118,12 +118,12 @@ struct Status
 
     static inline uint16_t psize()
     {
-        return std::tuple_size<name_t>() + sizeof(uint16_t) * 2 + sizeof(uint8_t) * 5
-               + std::tuple_size<dump_t>();
+        return sizeof(name_t) + sizeof(uint16_t) * 2 + sizeof(uint8_t) * 5
+               + sizeof(dump_t);
     }
     inline void read(XbusStreamReader *s)
     {
-        *s >> name;
+        s->read(name, sizeof(name));
         vbat = s->read<uint16_t, float>() / 1000.0f;
         ibat = s->read<uint16_t, float>() / 1000.0f;
         *s >> err_cnt;
@@ -131,11 +131,11 @@ struct Status
         *s >> can_adr;
         *s >> can_err;
         *s >> load;
-        *s >> dump;
+        s->read(dump, sizeof(dump));
     }
     inline void write(XbusStreamWriter *s) const
     {
-        *s << name;
+        s->write(name, sizeof(name));
         s->write<uint16_t>(vbat * 1000.0f);
         s->write<uint16_t>(ibat * 1000.0f);
         *s << err_cnt;
@@ -143,7 +143,7 @@ struct Status
         *s << can_adr;
         *s << can_err;
         *s << load;
-        *s << dump;
+        s->write(dump, sizeof(dump));
     }
 };
 

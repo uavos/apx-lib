@@ -8,17 +8,18 @@ namespace blackbox {
 
 // Node blackbox read-write
 
-typedef enum { bbr_hdr = 0, bbr_data } commands_t;
+typedef enum { bbr_hdr = 0,
+               bbr_data } commands_t;
 
 struct Header
 {
     uint32_t magic;
     uint32_t uptime;
     uint32_t oncnt;
-    std::array<uint32_t, 3> evtcnt;
+    uint32_t evtcnt[3];
     uint32_t rec_size;   //blocks
     uint32_t block_size; //bytes
-    std::array<uint8_t, 32 - 20 - 4 - 4> padding;
+    uint8_t padding[32 - 20 - 4 - 4];
     uint32_t crc;
 
     static inline uint16_t psize()
@@ -30,10 +31,10 @@ struct Header
         *s >> magic;
         *s >> uptime;
         *s >> oncnt;
-        *s >> evtcnt;
+        s->read(evtcnt, sizeof(evtcnt));
         *s >> rec_size;
         *s >> block_size;
-        *s >> padding;
+        s->read(padding, sizeof(padding));
         *s >> crc;
     }
     inline void write(XbusStreamWriter *s) const
@@ -41,10 +42,10 @@ struct Header
         *s << magic;
         *s << uptime;
         *s << oncnt;
-        *s << evtcnt;
+        s->write(evtcnt, sizeof(evtcnt));
         *s << rec_size;
         *s << block_size;
-        *s << padding;
+        s->write(padding, sizeof(padding));
         *s << crc;
     }
 };

@@ -2,8 +2,8 @@
 #include <inttypes.h>
 #include <sys/types.h>
 
-#include <array>
-#include <string>
+#include <cstring>
+#include <type_traits>
 
 #include "endian.h"
 
@@ -32,17 +32,14 @@ public:
     template<typename _T, typename _Tin>
     void write(const _Tin data);
 
-    template<class _T, size_t _Size>
-    void write(const std::array<_T, _Size> &data);
+    void write(const void *src, size_t size)
+    {
+        memcpy(&msg[pos], src, size);
+        pos += size;
+    }
 
     template<typename _T>
     inline void operator<<(const _T data)
-    {
-        write<_T>(data);
-    }
-
-    template<class _T, size_t _Size>
-    inline void operator<<(const std::array<_T, _Size> &data)
     {
         write<_T>(data);
     }
@@ -84,7 +81,7 @@ void XbusStreamWriter::set_data(_T &buf, _Tin data)
         break;
 
     default:
-        assert(false);
+        return;
     }
 
     memcpy(&msg[pos], &buf, sizeof(buf));
@@ -115,15 +112,7 @@ void XbusStreamWriter::write(const _Tin data)
         break;
 
     default:
-        assert(false);
+        return;
     }
     pos += sizeof(_T);
-}
-
-template<class _T, size_t _Size>
-void XbusStreamWriter::write(const std::array<_T, _Size> &data)
-{
-    for (auto &v : data) {
-        *this << v;
-    }
 }

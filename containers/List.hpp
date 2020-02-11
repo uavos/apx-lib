@@ -7,6 +7,7 @@
 #pragma once
 
 #include <cinttypes>
+#include <cstddef>
 
 template<class T>
 class ListNode

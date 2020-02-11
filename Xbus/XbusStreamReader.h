@@ -2,8 +2,8 @@
 #include <inttypes.h>
 #include <sys/types.h>
 
-#include <array>
 #include <cstring>
+#include <type_traits>
 
 #include "endian.h"
 
@@ -25,8 +25,18 @@ public:
     template<typename _T>
     void read(_T &data);
 
-    template<class _T, size_t _Size>
-    void read(std::array<_T, _Size> &data);
+    void read(void *dest, size_t size)
+    {
+        size_t t = tail();
+        if (size > t) {
+            pos += t;
+            return;
+        }
+        if (size <= 0)
+            return;
+        memcpy(dest, &msg[pos], size);
+        pos += size;
+    }
 
     template<typename _T, typename _Tout>
     inline _Tout read()
@@ -45,12 +55,6 @@ public:
 
     template<typename _T>
     inline void operator>>(_T &data)
-    {
-        read(data);
-    }
-
-    template<class _T, size_t _Size>
-    inline void operator>>(std::array<_T, _Size> &data)
     {
         read(data);
     }
@@ -100,7 +104,7 @@ void XbusStreamReader::get_data(_T &buf, _Tout &data)
         break;
 
     default:
-        assert(false);
+        return;
     }
 
     if (std::is_floating_point<_Tout>::value) {
@@ -141,15 +145,7 @@ void XbusStreamReader::read(_T &data)
         break;
 
     default:
-        assert(false);
+        return;
     }
     pos += sizeof(_T);
-}
-
-template<class _T, size_t _Size>
-void XbusStreamReader::read(std::array<_T, _Size> &data)
-{
-    for (auto &v : data) {
-        *this >> v;
-    }
 }
