@@ -11,12 +11,12 @@
 
 using namespace xbus;
 
-bool CanReader::push_message(uint32_t extid, const uint8_t *data, uint8_t cnt)
+bool CanReader::push_message(const CanID &cid, const uint8_t *data, uint8_t cnt)
 {
     for (;;) {
-        if (!(extid & (1 << 31)))
+        if (cid.std)
             break;
-        extid &= ~(1 << 31);
+        uint32_t extid = cid.id;
         if (extid & XCAN_NAD_MASK)
             break;
         const uint8_t src_adr = src_address(extid);
@@ -51,17 +51,17 @@ bool CanReader::push_message(uint32_t extid, const uint8_t *data, uint8_t cnt)
                 break;
             }
             //whole msg received - extract rest from pool if any
-            XbusStreamWriter stream(_rxdata);
-            stream << pid(extid);
             if (!ecnt) {
                 //short msg, one frame only
-                if (cnt > 0) {
-                    memcpy(stream.data(), data, cnt);
-                    stream.reset(stream.position() + cnt);
-                }
                 pool.remove(pool_msgid); //remove if any from pool
                 error = false;
-                packetReceived(src_adr, stream.buf(), stream.position());
+                if (cnt > 0) {
+                    XbusStreamWriter &stream = *getRxStream(cnt + sizeof(xbus::pid_t));
+                    stream << pid(extid);
+                    memcpy(stream.data(), data, cnt);
+                    stream.reset(stream.position() + cnt);
+                    packetReceived(src_adr);
+                }
                 break;
             }
             if (cnt == 0) {
@@ -70,6 +70,8 @@ bool CanReader::push_message(uint32_t extid, const uint8_t *data, uint8_t cnt)
                 break;
             }
             //copy payloads from pool
+            XbusStreamWriter &stream = *getRxStream(XCAN_PACKET_MAX_SIZE);
+            stream << pid(extid);
             rcnt = pool.pop(pool_msgid, stream.data(), XCAN_PACKET_MAX_SIZE - stream.position());
             if (rcnt == 0)
                 break;
@@ -85,7 +87,7 @@ bool CanReader::push_message(uint32_t extid, const uint8_t *data, uint8_t cnt)
             memcpy(stream.data(), data, cnt);
             stream.reset(stream.position() + cnt);
             error = false;
-            packetReceived(src_adr, stream.buf(), stream.position());
+            packetReceived(src_adr);
             break;
 
         } while (0);
@@ -108,8 +110,10 @@ xbus::pid_t CanReader::pid(uint32_t extid) const
 
 void CanReader::sendAddressing()
 {
-    uint32_t extid = (1 << 31) | XCAN_SRC(nodeId()) | XCAN_PRI_MASK | XCAN_END_MASK | XCAN_NAD_MASK;
-    sendAddressingResponse(extid);
+    CanID cid;
+    cid.raw = 0;
+    cid.id = XCAN_SRC(nodeId()) | XCAN_PRI_MASK | XCAN_END_MASK | XCAN_NAD_MASK;
+    sendAddressingResponse(cid);
 }
 
 // Pool

@@ -18,13 +18,15 @@ bool CanWriter::sendPacket(uint8_t src_addr, const void *data, size_t size)
         return true;
     xbus::pid_t pid = stream.read<xbus::pid_t>();
 
-    uint32_t extid = XCAN_SRC(src_addr) | XCAN_PID(pid) | XCAN_PRI_MASK | (1 << 31);
+    CanID cid;
+    cid.id = XCAN_SRC(src_addr) | XCAN_PID(pid) | XCAN_PRI_MASK;
 
     size = stream.tail();
     const uint8_t *buf = static_cast<const uint8_t *>(stream.data());
 
     if (size <= 8) {
-        return sendMessage(extid | XCAN_END_MASK, buf, size);
+        cid.id |= XCAN_END_MASK;
+        return sendMessage(cid, buf, size);
     }
 
     //multi-frame
@@ -37,7 +39,10 @@ bool CanWriter::sendPacket(uint8_t src_addr, const void *data, size_t size)
             dtc = size;
             ext |= XCAN_END_MASK;
         }
-        if (!sendMessage(extid | ext, buf, dtc))
+        CanID cid_part;
+        cid_part.raw = cid.raw;
+        cid_part.id |= ext;
+        if (!sendMessage(cid_part, buf, dtc))
             return false;
         size -= dtc;
         buf += dtc;

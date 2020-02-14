@@ -7,7 +7,7 @@ namespace xbus {
 typedef uint16_t pid_t;
 
 enum {
-    size_packet_max = 1024,
+    size_packet_max = 512,
 };
 
 } // namespace xbus

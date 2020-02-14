@@ -8,11 +8,12 @@
 
 #include <cstdint>
 
+#include "CanMsg.h"
 #include <Xbus/XbusPacket.h>
 #include <common/do_not_copy.h>
 
 #ifndef XCAN_PACKET_MAX_SIZE
-#define XCAN_PACKET_MAX_SIZE 1024
+#define XCAN_PACKET_MAX_SIZE xbus::size_packet_max
 #endif
 
 #ifndef XCAN_POOL_SIZE
@@ -30,12 +31,12 @@ public:
      *        - check extid address space
      *        - put message to pool and check if the packet can be assembled
      *        - call virtual method packetReceived when whole packet is received
-     * @param extid can ID of the message, MSB=EXTID (Extended ID indication).
+     * @param cid can ID of the message
      * @param data Pointer to the message payload.
      * @param cnt number of payload bytes.
      * @return Returns false if message is not accepted.
      */
-    bool push_message(uint32_t extid, const uint8_t *data, uint8_t cnt);
+    bool push_message(const CanID &cid, const uint8_t *data, uint8_t cnt);
 
 private:
     /**
@@ -76,10 +77,15 @@ private:
 
     Pool pool;
 
-    //pid is prepended
-    uint8_t _rxdata[XCAN_PACKET_MAX_SIZE];
-
 protected:
+    /**
+     * @brief virtual method to get output data stream.
+     * @note can be used to set lock mutex, etc.
+     * @param size of data pending to be published.
+     * @return Returns local node address, must be non zero.
+     */
+    virtual XbusStreamWriter *getRxStream(size_t size) = 0;
+
     /**
      * @brief virtual method to get the local node address value.
      * @note can be set automatically for proper addressing.
@@ -100,13 +106,13 @@ protected:
      * @param data packet payload data.
      * @param cnt packet payload size.
      */
-    virtual void packetReceived(uint8_t src_addr, const uint8_t *data, uint16_t cnt) = 0;
+    virtual void packetReceived(uint8_t src_addr) = 0;
 
     /**
      * @brief virtual method is called to send simple zero payload can message when addressing.
      * @param extid can ID of the message, MSB=EXTID (Extended ID indication).
      */
-    virtual void sendAddressingResponse(uint32_t extid) = 0;
+    virtual void sendAddressingResponse(const CanID &cid) = 0;
 
     /**
      * @brief virtual method is called to indicate error.

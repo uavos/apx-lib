@@ -8,6 +8,7 @@
 
 #include <cstdint>
 
+#include "CanMsg.h"
 #include <Xbus/XbusPacket.h>
 #include <common/do_not_copy.h>
 
@@ -26,16 +27,15 @@ public:
      */
     bool sendPacket(uint8_t src_addr, const void *data, size_t size);
 
-private:
 protected:
     /**
      * @brief virtual method is called to send simple zero payload can message when addressing.
-     * @param extid can ID of the message, MSB=EXTID (Extended ID indication).
+     * @param cid can ID of the message
      * @param data payload data.
      * @param dlc payload size.
      * @return Returns false on error.
      */
-    virtual bool sendMessage(uint32_t extid, const uint8_t *data, uint8_t dlc) = 0;
+    virtual bool sendMessage(const CanID &cid, const uint8_t *data, uint8_t dlc) = 0;
 };
 
 } // namespace xbus
