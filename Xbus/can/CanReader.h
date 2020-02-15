@@ -12,12 +12,8 @@
 #include <Xbus/XbusPacket.h>
 #include <common/do_not_copy.h>
 
-#ifndef XCAN_PACKET_MAX_SIZE
-#define XCAN_PACKET_MAX_SIZE xbus::size_packet_max
-#endif
-
 #ifndef XCAN_POOL_SIZE
-#define XCAN_POOL_SIZE (XCAN_PACKET_MAX_SIZE / 8)
+#define XCAN_POOL_SIZE (xbus::size_packet_max / 8)
 #endif
 
 namespace xbus {

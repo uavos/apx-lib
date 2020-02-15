@@ -70,9 +70,9 @@ bool CanReader::push_message(const CanID &cid, const uint8_t *data, uint8_t cnt)
                 break;
             }
             //copy payloads from pool
-            XbusStreamWriter &stream = *getRxStream(XCAN_PACKET_MAX_SIZE);
+            XbusStreamWriter &stream = *getRxStream(xbus::size_packet_max);
             stream << pid(extid);
-            rcnt = pool.pop(pool_msgid, stream.data(), XCAN_PACKET_MAX_SIZE - stream.position());
+            rcnt = pool.pop(pool_msgid, stream.data(), xbus::size_packet_max - stream.position());
             if (rcnt == 0)
                 break;
 
@@ -81,11 +81,10 @@ bool CanReader::push_message(const CanID &cid, const uint8_t *data, uint8_t cnt)
                 break; // corrupted, or repeated tail
             }
             //copy tail
-            if ((rcnt + cnt) > XCAN_PACKET_MAX_SIZE)
+            if ((rcnt + cnt) > xbus::size_packet_max)
                 break;
             stream.reset(stream.position() + rcnt);
-            memcpy(stream.data(), data, cnt);
-            stream.reset(stream.position() + cnt);
+            stream.write(data, cnt);
             error = false;
             packetReceived(src_adr);
             break;
