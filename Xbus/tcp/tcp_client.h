@@ -2,7 +2,7 @@
 #ifndef tcp_client_H
 #define tcp_client_H
 //=============================================================
-#include <common/ApxSimpleFifoBuffer.h>
+#include <containers/QueueBuffer.h>
 #include <inttypes.h>
 #include <netinet/in.h>
 #include <termios.h>
@@ -40,7 +40,7 @@ protected:
         char server[64];
     } host;
 
-    ApxSimpleFifoBuffer<4096> tx_fifo;
+    QueueBuffer<4096> tx_fifo;
     uint8_t tx_packet[1024];
 
     virtual bool connect_task();

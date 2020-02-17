@@ -11,13 +11,15 @@ enum {
     size_block = 256,
 };
 
+typedef uint8_t crc_t;
+
 typedef struct
 {
     uint32_t start_address;
-    uint32_t size;   // available size in bytes
-    uint8_t xor_crc; // all file data XORed
+    uint32_t size; // available size in bytes
+    crc_t xor_crc; // all file data XORed
 
-    static inline uint16_t psize() { return sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint8_t); }
+    static inline uint16_t psize() { return sizeof(uint32_t) + sizeof(uint32_t) + sizeof(crc_t); }
     inline void read(XbusStreamReader *s)
     {
         *s >> start_address;
