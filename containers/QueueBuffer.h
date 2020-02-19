@@ -21,13 +21,14 @@ public:
 
     inline bool empty() const { return _size == 0; }
     inline const T *read_ptr() const { return buf + _tail; }
+    inline T *write_ptr() const { return buf + _head; }
 
-    size_t write(const T &v)
+    bool write(const T &v)
     {
         return write(&v, sizeof(T));
     }
 
-    virtual size_t write(const void *src, size_t sz)
+    size_t write(const void *src, size_t sz)
     {
         if (space() < sz)
             return 0;
@@ -69,7 +70,7 @@ public:
     }
 
     //packet support
-    virtual size_t write_packet(const void *src, size_t sz)
+    size_t write_packet(const void *src, size_t sz)
     {
         if (space() < (sz + 2))
             return 0;

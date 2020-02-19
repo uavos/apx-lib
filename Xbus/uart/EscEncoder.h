@@ -2,8 +2,10 @@
 
 #include <containers/QueueBuffer.h>
 
+#include "SerialCodec.h"
+
 template<size_t _buf_size, typename T = uint8_t>
-class EscWriter : private QueueBuffer<_buf_size, T>
+class EscEncoder : private QueueBuffer<_buf_size, T>, public SerialEncoder
 {
 public:
     using QueueBuffer<_buf_size, T>::reset;
@@ -12,23 +14,24 @@ public:
     using QueueBuffer<_buf_size, T>::empty;
     using QueueBuffer<_buf_size, T>::total;
     using QueueBuffer<_buf_size, T>::tail;
+    using QueueBuffer<_buf_size, T>::head;
     using QueueBuffer<_buf_size, T>::read_ptr;
     using QueueBuffer<_buf_size, T>::skip_read;
 
     //write and encode data to fifo
-    size_t encode(const void *src, size_t sz)
+    size_t encode(const void *src, size_t sz) override
     {
         if (space() < (sz + 2 + 2 + 1)) //estimate
             return 0;
         size_t head_s = head();
         do {
-            uint8_t crc = 0;
             if (!write(0x55))
                 break;
             if (!write(0x01))
                 break;
 
             const T *buf = static_cast<const T *>(src);
+            uint8_t crc = 0;
             size_t cnt = sz;
             while (cnt > 0) {
                 T v = *buf++;
@@ -56,9 +59,21 @@ public:
         return 0;
     }
 
+    inline size_t read_encoded(void *dest, size_t sz) override
+    {
+        return QueueBuffer<_buf_size, T>::read(dest, sz);
+    }
+    inline size_t size() override
+    {
+        return QueueBuffer<_buf_size, T>::size();
+    }
+    inline void reset() override
+    {
+        QueueBuffer<_buf_size, T>::reset();
+    }
+
 private:
     using QueueBuffer<_buf_size, T>::space;
-    using QueueBuffer<_buf_size, T>::head;
     using QueueBuffer<_buf_size, T>::pop_head;
     using QueueBuffer<_buf_size, T>::write;
 };

@@ -124,7 +124,7 @@ CanReader::Pool::Pool()
 
 bool CanReader::Pool::push(uint16_t msgid, uint16_t ext, const uint8_t *data)
 {
-    int i;
+    size_t i;
     for (i = 0; (i < XCAN_POOL_SIZE) && (_msgid[i]); i++)
         ; //find emty slot
     if (i >= XCAN_POOL_SIZE)
@@ -138,14 +138,14 @@ bool CanReader::Pool::push(uint16_t msgid, uint16_t ext, const uint8_t *data)
 }
 void CanReader::Pool::remove(uint16_t msgid)
 {
-    for (int i = 0; i < XCAN_POOL_SIZE; ++i)
+    for (size_t i = 0; i < XCAN_POOL_SIZE; ++i)
         if (_msgid[i] == msgid)
             _msgid[i] = 0;
 }
 bool CanReader::Pool::checkTimeout(void)
 {
     bool to = false;
-    for (int i = 0; i < XCAN_POOL_SIZE; ++i) {
+    for (size_t i = 0; i < XCAN_POOL_SIZE; ++i) {
         if (_msgid[i] && (!(_to[i]--))) {
             remove(_msgid[i]);
             to = true;
@@ -164,7 +164,7 @@ void CanReader::Pool::updateTimeout(uint16_t msgid)
 uint16_t CanReader::Pool::pop(uint16_t msgid, uint8_t *data, uint16_t size)
 {
     uint16_t rcnt = 0;
-    for (int i = 0; i < XCAN_POOL_SIZE; ++i) {
+    for (size_t i = 0; i < XCAN_POOL_SIZE; ++i) {
         if (_msgid[i] != msgid)
             continue;
         uint32_t pos = (_ext[i] & 255) << 3;

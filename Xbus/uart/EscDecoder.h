@@ -2,15 +2,18 @@
 
 #include <containers/QueueBuffer.h>
 
+#include "SerialCodec.h"
+
 template<size_t _buf_size, typename T = uint8_t>
-class EscReader : private QueueBuffer<_buf_size, T>
+class EscDecoder : private QueueBuffer<_buf_size, T>, public SerialDecoder
 {
 public:
     using QueueBuffer<_buf_size, T>::size;
+    using QueueBuffer<_buf_size, T>::empty;
     using QueueBuffer<_buf_size, T>::read_packet;
 
     //decode ESC encoded data and write packet to fifo
-    size_t decode(const void *src, size_t sz)
+    size_t decode(const void *src, size_t sz) override
     {
         if (sz == 0)
             return 0;
@@ -91,6 +94,19 @@ public:
             pop_head(_head_s);
         }
         return sz; //always accept all bytes
+    }
+
+    inline size_t read_decoded(void *dest, size_t sz) override
+    {
+        return QueueBuffer<_buf_size, T>::read_packet(dest, sz);
+    }
+    inline size_t size() override
+    {
+        return QueueBuffer<_buf_size, T>::size();
+    }
+    inline void reset() override
+    {
+        QueueBuffer<_buf_size, T>::reset();
     }
 
 private:
