@@ -87,7 +87,7 @@ private:
     {
         if (_rcnt == 0) {
             _head_s = head();
-            if (!write_packet_cnt(0))
+            if (!write_word(0))
                 return false;
         }
         if (!write(c))
@@ -111,7 +111,7 @@ private:
         //frame received...
         size_t h = head();
         pop_head(_head_s);
-        write_packet_cnt(_rcnt - 1);
+        write_word(_rcnt - 1);
         push_head(h);
         restart();
     }
@@ -121,5 +121,5 @@ private:
     using QueueBuffer<_buf_size, T>::pop_head;
     using QueueBuffer<_buf_size, T>::pop_one;
     using QueueBuffer<_buf_size, T>::write;
-    using QueueBuffer<_buf_size, T>::write_packet_cnt;
+    using QueueBuffer<_buf_size, T>::write_word;
 };

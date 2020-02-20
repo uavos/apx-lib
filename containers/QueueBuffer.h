@@ -1,41 +1,59 @@
 #pragma once
 
+#include <common/do_not_copy.h>
 #include <cstdint>
 #include <cstring>
 
-template<size_t _buf_size, typename T = uint8_t>
-class QueueBufferT
+class QueueBufferBase : public do_not_copy
 {
 public:
-    explicit QueueBufferT(T *_buf)
-        : buf(_buf)
+    explicit QueueBufferBase(size_t size)
+        : _total(size)
     {}
-
-    virtual void reset() { _head = _tail = _size = 0; }
 
     inline size_t size() const { return _size; }
     inline size_t head() const { return _head; }
     inline size_t tail() const { return _tail; }
-    inline size_t total() const { return _buf_size; }
-    inline size_t space() const { return _buf_size - _size; }
-
+    inline size_t total() const { return _total; }
+    inline size_t space() const { return _total - _size; }
     inline bool empty() const { return _size == 0; }
+
+    virtual size_t write(const void *src, size_t sz) = 0;
+    virtual size_t read(void *dest, size_t sz) = 0;
+
+    inline void reset() { _head = _tail = _size = 0; }
+
+    //packet support
+    virtual size_t write_packet(const void *src, size_t sz) = 0;
+    virtual size_t read_packet(void *dest, size_t sz) = 0;
+
+protected:
+    size_t _head{0};
+    size_t _tail{0};
+    size_t _size{0};
+    const size_t _total;
+};
+
+template<size_t _buf_size, typename T = uint8_t>
+class QueueBufferT : public QueueBufferBase
+{
+public:
+    explicit QueueBufferT(T *_buf)
+        : QueueBufferBase(_buf_size)
+        , buf(_buf)
+    {}
+
     inline const T *read_ptr() const { return buf + _tail; }
     inline T *write_ptr() const { return buf + _head; }
 
-    bool write(const T &v)
-    {
-        return write(&v, sizeof(T));
-    }
-
-    size_t write(const void *src, size_t sz)
+    size_t write(const void *src, size_t sz) override
     {
         if (space() < sz)
             return 0;
         if (sz == 1) {
             buf[_head] = *static_cast<const T *>(src);
         } else {
-            size_t cnt1 = _buf_size - _head;
+            size_t cnt1 = _total - _head;
             if (cnt1 > sz)
                 cnt1 = sz;
             memcpy(buf + _head, static_cast<const T *>(src), cnt1 * sizeof(T));
@@ -48,7 +66,7 @@ public:
         return sz;
     }
 
-    size_t read(void *dest, size_t sz)
+    size_t read(void *dest, size_t sz) override
     {
         if (_size == 0)
             return 0;
@@ -57,7 +75,7 @@ public:
         if (sz == 1) {
             *static_cast<T *>(dest) = buf[_tail];
         } else {
-            size_t cnt1 = _buf_size - _tail;
+            size_t cnt1 = _total - _tail;
             if (cnt1 > sz)
                 cnt1 = sz;
             memcpy(static_cast<T *>(dest), read_ptr(), cnt1 * sizeof(T));
@@ -70,16 +88,16 @@ public:
     }
 
     //packet support
-    size_t write_packet(const void *src, size_t sz)
+    size_t write_packet(const void *src, size_t sz) override
     {
         if (space() < (sz + 2))
             return 0;
-        write_packet_cnt(sz);
+        write_word(sz);
         write(src, sz);
         return sz;
     }
 
-    size_t read_packet(void *dest, size_t sz)
+    size_t read_packet(void *dest, size_t sz) override
     {
         if (empty())
             return 0;
@@ -97,10 +115,22 @@ public:
         return 0;
     }
 
+    // write specific types
+    bool write(const T &v)
+    {
+        return write(&v, sizeof(T));
+    }
+    size_t write_word(uint16_t cnt)
+    {
+        if (space() < 2)
+            return 0;
+        return write(&cnt, 2);
+    }
+
     // DMA fifo support
     bool push_head(size_t pos)
     {
-        size_t sz = pos >= _head ? pos - _head : _buf_size - _head + pos;
+        size_t sz = pos >= _head ? pos - _head : _total - _head + pos;
         if (space() < sz)
             return false;
         _head = pos;
@@ -111,11 +141,11 @@ public:
     // cancel write
     void pop_head(size_t pos)
     {
-        if (pos == _head && _size == _buf_size) {
+        if (pos == _head && _size == _total) {
             reset();
             return;
         }
-        size_t sz = pos <= _head ? _head - pos : _buf_size - pos + _head;
+        size_t sz = pos <= _head ? _head - pos : _total - pos + _head;
         _head = pos;
         _size -= sz;
     }
@@ -123,7 +153,7 @@ public:
     // LIFO
     const T &pop_one()
     {
-        _head = _head > 0 ? _head - 1 : _buf_size - 1;
+        _head = _head > 0 ? _head - 1 : _total - 1;
         _size--;
         return buf[_head];
     }
@@ -138,33 +168,22 @@ public:
 protected:
     T *buf;
 
-    size_t _head{0};
-    size_t _tail{0};
-    size_t _size{0};
-
     void advance(size_t &v, size_t sz) const
     {
         v += sz;
-        if (v >= _buf_size)
-            v -= _buf_size;
-    }
-
-    size_t write_packet_cnt(uint16_t cnt)
-    {
-        if (space() < 2)
-            return 0;
-        return write(&cnt, 2);
+        if (v >= _total)
+            v -= _total;
     }
 };
 
-template<size_t _buf_size, typename T = uint8_t>
-class QueueBuffer : public QueueBufferT<_buf_size, T>
+template<size_t _total, typename T = uint8_t>
+class QueueBuffer : public QueueBufferT<_total, T>
 {
 public:
     explicit QueueBuffer()
-        : QueueBufferT<_buf_size, T>(m_buf)
+        : QueueBufferT<_total, T>(m_buf)
     {}
 
 private:
-    T m_buf[_buf_size];
+    T m_buf[_total];
 };
