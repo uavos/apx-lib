@@ -10,13 +10,8 @@
 class XbusStreamWriter
 {
 public:
-    explicit XbusStreamWriter(uint8_t *p)
-        : msg(p)
-        , pos(0)
-
-    {}
-    explicit XbusStreamWriter(uint8_t &p)
-        : msg(&p)
+    explicit XbusStreamWriter(void *p)
+        : msg(static_cast<uint8_t *>(p))
         , pos(0)
 
     {}

@@ -27,6 +27,47 @@ public:
     virtual size_t write_packet(const void *src, size_t sz) = 0;
     virtual size_t read_packet(void *dest, size_t sz) = 0;
 
+    size_t write_word(uint16_t cnt)
+    {
+        if (space() < 2)
+            return 0;
+        return write(&cnt, 2);
+    }
+
+    // cancel write
+    void pop_head(size_t pos)
+    {
+        if (pos == _head && _size == _total) {
+            reset();
+            return;
+        }
+        size_t sz = pos <= _head ? _head - pos : _total - pos + _head;
+        _head = pos;
+        _size -= sz;
+    }
+    bool push_head(size_t pos)
+    {
+        size_t sz = pos >= _head ? pos - _head : _total - _head + pos;
+        if (space() < sz)
+            return false;
+        _head = pos;
+        _size += sz;
+        return false;
+    }
+
+    // read adjust
+    void skip_read(size_t sz)
+    {
+        advance(&_tail, sz);
+        _size -= sz;
+    }
+    void advance(size_t *v, size_t sz) const
+    {
+        *v += sz;
+        if (*v >= _total)
+            *v -= _total;
+    }
+
 protected:
     size_t _head{0};
     size_t _tail{0};
@@ -61,7 +102,7 @@ public:
             if (cnt2 > 0)
                 memcpy(buf, static_cast<const T *>(src) + cnt1, cnt2 * sizeof(T));
         }
-        advance(_head, sz);
+        advance(&_head, sz);
         _size += sz;
         return sz;
     }
@@ -115,39 +156,17 @@ public:
         return 0;
     }
 
-    // write specific types
+    // specific types
     bool write(const T &v)
     {
-        return write(&v, sizeof(T));
-    }
-    size_t write_word(uint16_t cnt)
-    {
-        if (space() < 2)
-            return 0;
-        return write(&cnt, 2);
+        return write(&v, 1);
     }
 
-    // DMA fifo support
-    bool push_head(size_t pos)
+    const T &read_one()
     {
-        size_t sz = pos >= _head ? pos - _head : _total - _head + pos;
-        if (space() < sz)
-            return false;
-        _head = pos;
-        _size += sz;
-        return false;
-    }
-
-    // cancel write
-    void pop_head(size_t pos)
-    {
-        if (pos == _head && _size == _total) {
-            reset();
-            return;
-        }
-        size_t sz = pos <= _head ? _head - pos : _total - pos + _head;
-        _head = pos;
-        _size -= sz;
+        size_t i = _tail;
+        skip_read(1);
+        return buf[i];
     }
 
     // LIFO
@@ -158,22 +177,8 @@ public:
         return buf[_head];
     }
 
-    // read adjust
-    void skip_read(size_t sz)
-    {
-        advance(_tail, sz);
-        _size -= sz;
-    }
-
 protected:
     T *buf;
-
-    void advance(size_t &v, size_t sz) const
-    {
-        v += sz;
-        if (v >= _total)
-            v -= _total;
-    }
 };
 
 template<size_t _total, typename T = uint8_t>

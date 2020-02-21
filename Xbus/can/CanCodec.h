@@ -11,11 +11,6 @@
 #include "CanMsg.h"
 #include <Xbus/XbusPacket.h>
 #include <common/do_not_copy.h>
-#include <containers/QueueBuffer.h>
-
-#ifndef XCAN_POOL_SIZE
-#define XCAN_POOL_SIZE (xbus::size_packet_max / 8) //64
-#endif
 
 namespace xbus {
 
@@ -33,73 +28,34 @@ public:
      * @param cnt number of payload bytes.
      * @return Returns false if message is not accepted.
      */
-    bool push_message(const CanID &cid, const uint8_t *data, uint8_t cnt);
-
-private:
-    /**
-     * @brief Extract sender address from can ID.
-     * @param extid can ID of the received message.
-     * @return Returns sender address.
-     */
-    uint8_t src_address(uint32_t extid) const;
+    bool push_message(const CanMsg &msg);
 
     /**
-     * @brief Extract xbus packet id from can ID.
-     * @param extid can ID of the received message.
-     * @return Returns packet id.
+     * @brief Process rx messages timeouts
+     * @note must be called periodically [10ms].
      */
-    xbus::pid_t pid(uint32_t extid) const;
+    void rx_timeout_task();
 
     /**
-     * @brief Prepare and send addressing packet.
+     * @brief Send packet splitting to multiframe messages if necessary.
+     *        Calls virtual method sendMessage to send messages.
+     * @param src_addr address of sender.
+     * @param data packet payload data.
+     * @param size packet payload size.
+     * @return Returns false on error.
      */
-    void sendAddressing();
+    bool send_packet(uint8_t src_addr, const void *data, size_t size);
 
-    class Pool
-    {
-    public:
-        Pool();
-        bool push(uint16_t msgid, uint16_t ext, const uint8_t *data);
-        uint16_t pop(uint16_t msgid, QueueBufferBase &queue);
-        void remove(uint16_t msgid); //msgid = (src_address:H|pid:L)
-        bool checkTimeout(void);
-        void updateTimeout(uint16_t msgid); //msgid = (src_address:H|pid:L)
-
-        struct Item // 10 bytes
-        {
-            uint8_t data[8];
-            uint8_t prev;
-            uint8_t next;
-        } __attribute__((packed));
-        struct Tree // 4 bytes
-        {
-            uint16_t pid;
-            uint8_t head;
-            uint8_t to;
-        } __attribute__((packed));
-
-        Tree tree[16];                         // pids simulaneously [64 bytes]
-        Item items[xbus::size_packet_max / 8]; //64 slots [640 bytes]
-        uint8_t free;                          //index of free item
-
-    private:
-        //13 bytes each item
-        uint16_t _ext[XCAN_POOL_SIZE];    // frames left
-        uint16_t _msgid[XCAN_POOL_SIZE];  // message id
-        uint8_t _data[XCAN_POOL_SIZE][8]; // payload
-        uint8_t _to[XCAN_POOL_SIZE];      // timeouts
-    };
-
-    Pool pool; // 832 bytes
-
-    uint8_t rx_header[4];
-
-    //QueueBuffer<xbus::size_packet_max> tx_queue;
+    /**
+     * @brief Reads available packets to buffer.
+     * @param dest destination buffer pointer.
+     * @param sz destination buffer size
+     * @param src_id pointer to store source node id for packet.
+     * @return Returns number of bytes read.
+     */
+    size_t read_packet(void *dest, size_t sz, uint8_t *src_id);
 
 protected:
-    //packets: <src_node_id_8><packet>
-    QueueBuffer<xbus::size_packet_max> rx_queue;
-
     /**
      * @brief virtual method to get the local node address value.
      * @note can be set automatically for proper addressing.
@@ -115,22 +71,76 @@ protected:
 
     /**
      * @brief virtual method is called when packet is available for read.
-     * @param pid packet id extracted from multipart stream.
-     * @param data packet payload data.
-     * @param cnt packet payload size.
      */
-    virtual void packetReceived() = 0;
-
-    /**
-     * @brief virtual method is called to send simple zero payload can message when addressing.
-     * @param extid can ID of the message, MSB=EXTID (Extended ID indication).
-     */
-    virtual void sendAddressingResponse(const CanID &cid) = 0;
+    virtual void rx_done() = 0;
 
     /**
      * @brief virtual method is called to indicate error.
      */
-    virtual void streamError() = 0;
+    virtual void rx_error() = 0;
+
+    /**
+     * @brief virtual method is called to send can message
+     * @param cid CanID of the message
+     * @param data payload data.
+     * @param dlc payload size.
+     * @return Returns false on error.
+     */
+    virtual bool send_message(const CanMsg &msg) = 0;
+
+private:
+    /**
+     * @brief Prepare and send addressing packet.
+     */
+    void sendAddressing();
+
+    CanMsg txmsg;
+
+    class Pool
+    {
+    public:
+        Pool();
+
+        typedef uint16_t mid_t; // src_address:H | pid:L
+
+        bool push(mid_t mid, size_t seq_idx, const uint8_t *data, uint8_t dlc);
+        size_t read_packet(void *dest, size_t sz, uint8_t *src_id);
+        bool timeout();
+
+        size_t space() const; //return number of free slots for debug
+
+    private:
+        static constexpr const uint8_t size_items = 2 * (xbus::size_packet_max / 8);
+        static constexpr const uint8_t size_tree = 16;
+        static constexpr const uint8_t max_idx = 0xFF;
+        static constexpr const uint8_t max_seq_idx = size_items;
+
+        struct Item // 9 bytes
+        {
+            uint8_t next;
+            uint8_t data[8];
+        } __attribute__((packed));
+        struct Tree // 4 bytes
+        {
+            mid_t mid;
+            uint8_t head;
+            struct
+            {
+                uint8_t to : 4;  // timeout
+                uint8_t dlc : 4; // last msg dlc, >0 means tree is done, =0xF means zero length
+            };
+        } __attribute__((packed));
+
+        Tree tree[size_tree];   // pids simulaneously [64 bytes]
+        Item items[size_items]; // message data slots
+        uint8_t free;           // index of free item
+
+        void push(const uint8_t *data);
+        void remove(mid_t mid);
+        void remove(Tree &t);
+        size_t read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_id);
+    };
+    Pool pool; // 832 bytes
 };
 
 } // namespace xbus
