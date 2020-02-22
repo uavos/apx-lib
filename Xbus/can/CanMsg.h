@@ -10,22 +10,17 @@
 
 namespace xbus {
 
-struct CanID
+struct CanMsg
 {
     union {
         uint32_t raw;
         struct
         {
             uint32_t id : 27;
-            uint32_t std : 1; // 1= standard ID (11 bit)
+            uint32_t ext : 1; // 0= standard ID (11 bit), 1= extended (29 bit)
             uint32_t dlc : 4; // data length code
         };
-    };
-} __attribute__((packed));
-
-struct CanMsg
-{
-    CanID cid;
+    } hdr;
     uint8_t data[8];
 } __attribute__((packed));
 

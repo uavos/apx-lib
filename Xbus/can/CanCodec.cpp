@@ -31,9 +31,9 @@ void CanCodec::rx_timeout_task()
 bool CanCodec::push_message(const CanMsg &msg)
 {
     for (;;) {
-        if (msg.cid.std)
+        if (!msg.hdr.ext)
             break;
-        uint32_t extid = msg.cid.id;
+        uint32_t extid = msg.hdr.id;
         if (extid & XCAN_NAD_MASK)
             break;
         const uint8_t src_adr = (extid & XCAN_SRC_MASK) >> XCAN_SRC_SHIFT;
@@ -51,7 +51,7 @@ bool CanCodec::push_message(const CanMsg &msg)
         uint16_t mid = extid >> XCAN_PID_SHIFT; //src_address|var_idx
         uint16_t ext = extid & (XCAN_CNT_MASK | XCAN_END_MASK);
         uint16_t seq_idx = (ext & XCAN_CNT_MASK) >> XCAN_CNT_SHIFT;
-        uint8_t dlc = msg.cid.dlc;
+        uint8_t dlc = msg.hdr.dlc;
 
         if (!(ext & XCAN_END_MASK)) {
             // msg part received
@@ -74,8 +74,9 @@ bool CanCodec::push_message(const CanMsg &msg)
 
 void CanCodec::sendAddressing()
 {
-    txmsg.cid.raw = 0;
-    txmsg.cid.id = XCAN_SRC(nodeId()) | XCAN_PRI_MASK | XCAN_END_MASK | XCAN_NAD_MASK;
+    txmsg.hdr.raw = 0;
+    txmsg.hdr.ext = 1;
+    txmsg.hdr.id = XCAN_SRC(nodeId()) | XCAN_PRI_MASK | XCAN_END_MASK | XCAN_NAD_MASK;
     send_message(txmsg);
 }
 
@@ -273,11 +274,12 @@ bool CanCodec::send_packet(uint8_t src_addr, const void *data, size_t size)
     uint32_t extid = XCAN_SRC(src_addr) | XCAN_PID(pid) | XCAN_PRI_MASK;
     size = stream.tail();
 
-    txmsg.cid.raw = 0;
+    txmsg.hdr.raw = 0;
+    txmsg.hdr.ext = 1;
 
     if (size <= 8) {
-        txmsg.cid.id = extid | XCAN_END_MASK;
-        txmsg.cid.dlc = size;
+        txmsg.hdr.id = extid | XCAN_END_MASK;
+        txmsg.hdr.dlc = size;
         if (size > 0)
             memcpy(txmsg.data, stream.data(), size);
         return send_message(txmsg);
@@ -294,8 +296,8 @@ bool CanCodec::send_packet(uint8_t src_addr, const void *data, size_t size)
             dlc = size;
             ext |= XCAN_END_MASK;
         }
-        txmsg.cid.id = extid | ext;
-        txmsg.cid.dlc = dlc;
+        txmsg.hdr.id = extid | ext;
+        txmsg.hdr.dlc = dlc;
         if (dlc > 0)
             memcpy(txmsg.data, src, dlc);
         if (!send_message(txmsg))
