@@ -215,7 +215,7 @@ size_t CanCodec::Pool::read_packet(void *dest, size_t sz, uint8_t *src_id)
 size_t CanCodec::Pool::read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_id)
 {
     XbusStreamWriter stream(dest);
-    stream.write<xbus::pid_t>(t.mid & (XCAN_PID_MASK >> XCAN_PID_SHIFT));
+    stream.write<xbus::pid8_t>(t.mid & (XCAN_PID_MASK >> XCAN_PID_SHIFT));
     *src_id = t.mid & (XCAN_SRC_MASK >> XCAN_PID_SHIFT);
 
     for (uint8_t next = t.head;;) {
@@ -266,10 +266,11 @@ size_t CanCodec::Pool::space() const
 
 bool CanCodec::send_packet(uint8_t src_addr, const void *data, size_t size)
 {
-    XbusStreamReader stream(data, size);
-    if (stream.tail() < sizeof(xbus::pid_t))
+    if (size < sizeof(xbus::pid8_t))
         return true;
-    xbus::pid_t pid = stream.read<xbus::pid_t>();
+    XbusStreamReader stream(data, size);
+    xbus::pid8_t pid;
+    stream >> pid;
 
     uint32_t extid = XCAN_SRC(src_addr) | XCAN_PID(pid) | XCAN_PRI_MASK;
     size = stream.tail();
