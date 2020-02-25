@@ -17,6 +17,18 @@ namespace xbus {
 class CanCodec : public do_not_copy
 {
 public:
+    enum ErrorType {
+        PacketAvailable = 0,
+        MsgAccepted,
+        MsgDropped,
+
+        ErrorDLC,
+        ErrorSlotsOverflow,
+        ErrorTreeOverflow,
+        ErrorSeqIdx,
+        ErrorOrphan,
+    };
+
     /**
      * @brief Push message to pool and process it.
      *        It does:
@@ -28,13 +40,7 @@ public:
      * @param cnt number of payload bytes.
      * @return Returns false if message is not accepted.
      */
-    bool push_message(const CanMsg &msg);
-
-    /**
-     * @brief Process rx messages timeouts
-     * @note must be called periodically [10ms].
-     */
-    void rx_timeout_task();
+    ErrorType push_message(const CanMsg &msg);
 
     /**
      * @brief Send packet splitting to multiframe messages if necessary.
@@ -55,6 +61,8 @@ public:
      */
     size_t read_packet(void *dest, size_t sz, uint8_t *src_id);
 
+    void report_status();
+
 protected:
     /**
      * @brief virtual method to get the local node address value.
@@ -68,16 +76,6 @@ protected:
      * @note called automatically for proper addressing. Must change nodeId.
      */
     virtual void updateNodeId() = 0;
-
-    /**
-     * @brief virtual method is called when packet is available for read.
-     */
-    virtual void rx_done() = 0;
-
-    /**
-     * @brief virtual method is called to indicate error.
-     */
-    virtual void rx_error() = 0;
 
     /**
      * @brief virtual method is called to send can message
@@ -103,15 +101,17 @@ private:
 
         typedef uint16_t mid_t; // src_address:H | pid:L
 
-        bool push(mid_t mid, size_t seq_idx, const uint8_t *data, uint8_t dlc);
+        ErrorType push(mid_t mid, size_t seq_idx, const uint8_t *data, uint8_t dlc);
         size_t read_packet(void *dest, size_t sz, uint8_t *src_id);
         bool timeout();
 
         size_t space() const; //return number of free slots for debug
 
+        void report_status();
+
     private:
-        static constexpr const uint8_t size_items = 2 * (xbus::size_packet_max / 8);
-        static constexpr const uint8_t size_tree = 16;
+        static constexpr const uint8_t size_items = (xbus::size_packet_max / 8);
+        static constexpr const uint8_t size_trees = 16; // pids simulaneously [64 bytes]
         static constexpr const uint8_t max_idx = 0xFF;
         static constexpr const uint8_t max_seq_idx = size_items;
 
@@ -131,7 +131,7 @@ private:
             };
         } __attribute__((packed));
 
-        Tree tree[size_tree];   // pids simulaneously [64 bytes]
+        Tree trees[size_trees];
         Item items[size_items]; // message data slots
         uint8_t free;           // index of free item
 

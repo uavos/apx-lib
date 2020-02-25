@@ -9,11 +9,15 @@
 
 #include <cstring>
 
-#ifdef CAN_CODEC_DEBUG
+#ifdef XCAN_CODEC_DEBUG
 #include <platform/log.h>
 #define debug(...) apxdebug(__VA_ARGS__)
 #define MODULE_NAME "cc"
+#else
+#define debug(...)
 #endif
+
+#define XCAN_CODEC_TIMEOUT 7 // number of valid packets to remove old orphans
 
 using namespace xbus;
 
@@ -21,14 +25,13 @@ size_t CanCodec::read_packet(void *dest, size_t sz, uint8_t *src_id)
 {
     return pool.read_packet(dest, sz, src_id);
 }
-void CanCodec::rx_timeout_task()
+
+void CanCodec::report_status()
 {
-    if (pool.timeout()) {
-        rx_error();
-    }
+    pool.report_status();
 }
 
-bool CanCodec::push_message(const CanMsg &msg)
+CanCodec::ErrorType CanCodec::push_message(const CanMsg &msg)
 {
     for (;;) {
         if (!msg.hdr.ext)
@@ -56,24 +59,23 @@ bool CanCodec::push_message(const CanMsg &msg)
         if (!(ext & XCAN_END_MASK)) {
             // msg part received
             if (dlc != 8) {
-                rx_error();
-                return true; //error - size<8, but multipart middle msg
+                return ErrorDLC; //error - size<8, but multipart middle msg
             }
             return pool.push(mid, seq_idx, msg.data, 0);
         }
         // whole packet received
-        if (pool.push(mid, seq_idx, msg.data, dlc ? dlc : 0xF)) {
-            rx_done();
-            return true;
-        }
-        rx_error();
-        return true;
+        ErrorType rv = pool.push(mid, seq_idx, msg.data, dlc ? dlc : 0xF);
+        if (rv != MsgAccepted)
+            return rv;
+        pool.timeout();
+        return PacketAvailable;
     }
-    return false;
+    return MsgDropped;
 }
 
 void CanCodec::sendAddressing()
 {
+    debug("%X", nodeId());
     txmsg.hdr.raw = 0;
     txmsg.hdr.ext = 1;
     txmsg.hdr.id = XCAN_SRC(nodeId()) | XCAN_PRI_MASK | XCAN_END_MASK | XCAN_NAD_MASK;
@@ -85,10 +87,10 @@ void CanCodec::sendAddressing()
 CanCodec::Pool::Pool()
 {
     // clear pool
-    memset(tree, 0, sizeof(tree));
+    memset(trees, 0, sizeof(trees));
     memset(items, 0, sizeof(items));
     // all trees are available
-    for (auto &t : tree) {
+    for (auto &t : trees) {
         t.head = max_idx;
     }
     // build chain of free items
@@ -101,34 +103,36 @@ CanCodec::Pool::Pool()
     free = 0;
 }
 
-bool CanCodec::Pool::push(mid_t mid, size_t seq_idx, const uint8_t *data, uint8_t dlc)
+CanCodec::ErrorType CanCodec::Pool::push(mid_t mid, size_t seq_idx, const uint8_t *data, uint8_t dlc)
 {
     //debug("%X %d %d", mid, seq_idx, dlc);
     // find free item
     if (free == max_idx || seq_idx >= max_seq_idx) {
         // pool overflow
+        timeout();
         remove(mid);
-        return false;
+        return ErrorSlotsOverflow;
     }
     if (seq_idx == 0) {
         remove(mid);
         // find empty tree
-        for (auto &t : tree) {
+        for (auto &t : trees) {
             if (t.head != max_idx)
                 continue;
             t.mid = mid;
-            t.to = 10;
+            t.to = XCAN_CODEC_TIMEOUT;
             t.dlc = dlc;
             t.head = free;
             //debug("new %X", mid);
             push(data);
-            return true;
+            return MsgAccepted;
         }
         // no empty tree available
-        return false;
+        timeout();
+        return ErrorTreeOverflow;
     }
     // find existing tree
-    for (auto &t : tree) {
+    for (auto &t : trees) {
         if (t.head == max_idx)
             continue;
         if (t.mid != mid)
@@ -144,22 +148,24 @@ bool CanCodec::Pool::push(mid_t mid, size_t seq_idx, const uint8_t *data, uint8_
             if (i.next == max_idx) {
                 if (seq_idx != 0)
                     break; // gap between tail and msg
-                t.to = 10;
+                t.to = XCAN_CODEC_TIMEOUT;
                 t.dlc = dlc;
                 i.next = free;
                 //debug("next %X (%d)", mid, i.next);
                 push(data);
-                return true;
+                return MsgAccepted;
             }
             next = i.next;
         }
         // stream error
         //debug("err %X %d", mid, seq_idx);
         remove(mid);
-        return false;
+        return ErrorSeqIdx;
     }
     // mid part received but no tree is working - drop msg
-    return false;
+    remove(mid);
+    timeout();
+    return ErrorOrphan;
 }
 void CanCodec::Pool::push(const uint8_t *data)
 {
@@ -172,7 +178,7 @@ void CanCodec::Pool::push(const uint8_t *data)
 
 void CanCodec::Pool::remove(mid_t mid)
 {
-    for (auto &t : tree) {
+    for (auto &t : trees) {
         if (t.head == max_idx)
             continue;
         if (t.mid != mid)
@@ -184,23 +190,41 @@ void CanCodec::Pool::remove(mid_t mid)
 }
 void CanCodec::Pool::remove(Tree &t)
 {
-    //debug("space: %d/%d", space(), size_items);
-    // iterate and release all tree items
-    //debug("%X", t.mid);
+    // release all tree items
     while (t.head != max_idx) {
         uint8_t idx = t.head;
         Item &i = items[idx];
-        //debug("%d %d %d", idx, i.next, free);
         t.head = i.next;
         i.next = free;
         free = idx;
     }
-    //debug("space: %d/%d", space(), size_items);
+}
+void CanCodec::Pool::report_status()
+{
+#ifdef XCAN_CODEC_DEBUG
+    size_t tcnt = 0;
+    for (auto const &t : trees) {
+        if (t.head != max_idx)
+            tcnt++;
+    }
+    size_t scnt = space();
+    if (scnt < 100 || tcnt > 2) {
+        debug("slots: %d/%d", space(), size_items);
+        debug("trees: %d/%d", tcnt, size_trees);
+    }
+#endif
+}
+size_t CanCodec::Pool::space() const
+{
+    size_t cnt = 0;
+    for (uint8_t i = free; i != max_idx; i = items[i].next)
+        cnt++;
+    return cnt;
 }
 
 size_t CanCodec::Pool::read_packet(void *dest, size_t sz, uint8_t *src_id)
 {
-    for (auto &t : tree) {
+    for (auto &t : trees) {
         if (t.head == max_idx)
             continue;
         if (!t.dlc)
@@ -210,7 +234,7 @@ size_t CanCodec::Pool::read_packet(void *dest, size_t sz, uint8_t *src_id)
         if (cnt > 0)
             return cnt;
     }
-    return false;
+    return 0;
 }
 size_t CanCodec::Pool::read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_id)
 {
@@ -242,12 +266,13 @@ size_t CanCodec::Pool::read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_
 bool CanCodec::Pool::timeout()
 {
     bool rv = false;
-    for (auto &t : tree) {
+    for (auto &t : trees) {
         if (t.head == max_idx)
             continue;
         if (t.dlc) // finished msg
             continue;
         if (t.to == 0) {
+            debug("%X", t.mid);
             remove(t);
             rv = true;
             continue;
@@ -255,13 +280,6 @@ bool CanCodec::Pool::timeout()
         t.to--;
     }
     return rv;
-}
-size_t CanCodec::Pool::space() const
-{
-    size_t cnt = 0;
-    for (uint8_t i = free; i != max_idx; i = items[i].next)
-        cnt++;
-    return cnt;
 }
 
 bool CanCodec::send_packet(uint8_t src_addr, const void *data, size_t size)
