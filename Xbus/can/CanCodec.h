@@ -29,16 +29,16 @@ public:
         ErrorOrphan,
     };
 
+    // unique id of the message <src|pid>
+    typedef uint16_t pool_id_t;
+
     /**
-     * @brief Push message to pool and process it.
+     * @brief Push message to pool and process it. Must be EXTID message.
      *        It does:
      *        - check extid address space
      *        - put message to pool and check if the packet can be assembled
-     *        - call virtual method packetReceived when whole packet is received
-     * @param cid can ID of the message
-     * @param data Pointer to the message payload.
-     * @param cnt number of payload bytes.
-     * @return Returns false if message is not accepted.
+     * @param msg CAN message
+     * @return Returns ErrorType
      */
     ErrorType push_message(const CanMsg &msg);
 
@@ -61,7 +61,33 @@ public:
      */
     size_t read_packet(void *dest, size_t sz, uint8_t *src_id);
 
-    void report_status();
+    /**
+     * @brief Reads mid from msg id. mid is used as ID in pool.
+     * @param extid is CAN message EXT ID.
+     * @return Returns <src_address|var_idx>.
+     */
+    static pool_id_t extid_to_mid(const uint32_t extid);
+
+    /**
+     * @brief Reads pid from pool id.
+     * @param mid is pool ID.
+     * @return Returns xbus::pid_t.
+     */
+    static xbus::pid8_t mid_to_pid(const pool_id_t mid);
+
+    /**
+     * @brief Reads stc_id from msg id.
+     * @param mid is pool ID.
+     * @return Returns src node address.
+     */
+    static xbus::pid8_t mid_to_src(const pool_id_t mid);
+
+    /**
+     * @brief Reads pid from CAN EXTID.
+     * @param extid is CAN message EXT ID.
+     * @return Returns xbus::pid_t.
+     */
+    static xbus::pid8_t extid_to_pid(const uint32_t extid);
 
 protected:
     /**
@@ -94,14 +120,14 @@ private:
 
     CanMsg txmsg;
 
+protected:
     class Pool
     {
     public:
         Pool();
+        void init();
 
-        typedef uint16_t mid_t; // src_address:H | pid:L
-
-        ErrorType push(mid_t mid, size_t seq_idx, const uint8_t *data, uint8_t dlc);
+        ErrorType push(pool_id_t mid, size_t seq_idx, const uint8_t *data, uint8_t dlc);
         size_t read_packet(void *dest, size_t sz, uint8_t *src_id);
         bool timeout();
 
@@ -122,7 +148,7 @@ private:
         } __attribute__((packed));
         struct Tree // 4 bytes
         {
-            mid_t mid;
+            pool_id_t mid;
             uint8_t head;
             struct
             {
@@ -136,7 +162,7 @@ private:
         uint8_t free;           // index of free item
 
         void push(const uint8_t *data);
-        void remove(mid_t mid);
+        void remove(pool_id_t mid);
         void remove(Tree &t);
         size_t read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_id);
     };

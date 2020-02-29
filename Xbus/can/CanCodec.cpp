@@ -26,37 +26,30 @@ size_t CanCodec::read_packet(void *dest, size_t sz, uint8_t *src_id)
     return pool.read_packet(dest, sz, src_id);
 }
 
-void CanCodec::report_status()
-{
-    pool.report_status();
-}
-
 CanCodec::ErrorType CanCodec::push_message(const CanMsg &msg)
 {
-    for (;;) {
-        if (!msg.hdr.ext)
-            break;
+    do {
         uint32_t extid = msg.hdr.id;
-        if (extid & XCAN_NAD_MASK)
+        if (extid & XCAN_NAD_MASK) // addressing packet
             break;
-        const uint8_t src_adr = (extid & XCAN_SRC_MASK) >> XCAN_SRC_SHIFT;
-        uint8_t node_address = nodeId();
-        if (src_adr == 0) {
+
+        const pool_id_t mid = extid_to_mid(extid); //src_address|var_idx
+        const uint8_t src = mid_to_src(mid);
+
+        if (src == 0) {
             sendAddressing();
             break;
         }
-        if (src_adr == node_address) {
+        if (src == nodeId()) {
             updateNodeId();
             sendAddressing();
             break;
         }
         //process message
-        uint16_t mid = extid >> XCAN_PID_SHIFT; //src_address|var_idx
-        uint16_t ext = extid & (XCAN_CNT_MASK | XCAN_END_MASK);
-        uint16_t seq_idx = (ext & XCAN_CNT_MASK) >> XCAN_CNT_SHIFT;
+        uint16_t seq_idx = (extid & XCAN_CNT_MASK) >> XCAN_CNT_SHIFT;
         uint8_t dlc = msg.hdr.dlc;
 
-        if (!(ext & XCAN_END_MASK)) {
+        if (!(extid & XCAN_END_MASK)) {
             // msg part received
             if (dlc != 8) {
                 return ErrorDLC; //error - size<8, but multipart middle msg
@@ -69,8 +62,25 @@ CanCodec::ErrorType CanCodec::push_message(const CanMsg &msg)
             return rv;
         pool.timeout();
         return PacketAvailable;
-    }
+    } while (0);
     return MsgDropped;
+}
+
+CanCodec::pool_id_t CanCodec::extid_to_mid(const uint32_t extid)
+{
+    return extid >> XCAN_PID_SHIFT; //src_address|var_idx
+}
+xbus::pid8_t CanCodec::mid_to_pid(const CanCodec::pool_id_t mid)
+{
+    return mid & (XCAN_PID_MASK >> XCAN_PID_SHIFT);
+}
+xbus::pid8_t CanCodec::mid_to_src(const CanCodec::pool_id_t mid)
+{
+    return (mid & (XCAN_SRC_MASK >> XCAN_PID_SHIFT)) >> (XCAN_SRC_SHIFT - XCAN_PID_SHIFT);
+}
+xbus::pid8_t CanCodec::extid_to_pid(const uint32_t extid)
+{
+    return mid_to_pid(extid_to_mid(extid));
 }
 
 void CanCodec::sendAddressing()
@@ -85,6 +95,10 @@ void CanCodec::sendAddressing()
 // Pool
 
 CanCodec::Pool::Pool()
+{
+    init();
+}
+void CanCodec::Pool::init()
 {
     // clear pool
     memset(trees, 0, sizeof(trees));
@@ -103,7 +117,7 @@ CanCodec::Pool::Pool()
     free = 0;
 }
 
-CanCodec::ErrorType CanCodec::Pool::push(mid_t mid, size_t seq_idx, const uint8_t *data, uint8_t dlc)
+CanCodec::ErrorType CanCodec::Pool::push(pool_id_t mid, size_t seq_idx, const uint8_t *data, uint8_t dlc)
 {
     //debug("%X %d %d", mid, seq_idx, dlc);
     // find free item
@@ -176,7 +190,7 @@ void CanCodec::Pool::push(const uint8_t *data)
     memcpy(i.data, data, 8);
 }
 
-void CanCodec::Pool::remove(mid_t mid)
+void CanCodec::Pool::remove(pool_id_t mid)
 {
     for (auto &t : trees) {
         if (t.head == max_idx)
@@ -239,8 +253,8 @@ size_t CanCodec::Pool::read_packet(void *dest, size_t sz, uint8_t *src_id)
 size_t CanCodec::Pool::read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_id)
 {
     XbusStreamWriter stream(dest);
-    stream.write<xbus::pid8_t>(t.mid & (XCAN_PID_MASK >> XCAN_PID_SHIFT));
-    *src_id = t.mid & (XCAN_SRC_MASK >> XCAN_PID_SHIFT);
+    stream << CanCodec::mid_to_pid(t.mid);
+    *src_id = CanCodec::mid_to_src(t.mid);
 
     for (uint8_t next = t.head;;) {
         Item &i = items[next];
