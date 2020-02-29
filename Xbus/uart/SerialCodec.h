@@ -27,8 +27,18 @@ public:
 class SerialDecoder : public SerialCodec
 {
 public:
+    enum ErrorType {
+        PacketAvailable = 0,
+        DataAccepted,
+        DataDropped,
+
+        ErrorOverflow,
+        ErrorSize,
+        ErrorCRC,
+    };
+
     // decode encoded data and write packet to buffer
-    virtual size_t decode(const void *src, size_t sz) = 0;
+    virtual ErrorType decode(const void *src, size_t sz) = 0;
 
     // read decoded data from buffer
     virtual size_t read_decoded(void *dest, size_t sz) = 0;

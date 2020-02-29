@@ -11,29 +11,37 @@ public:
     using QueueBuffer<_buf_size, T>::head;
 
     //write and encode data to fifo
-    size_t decode(const void *src, size_t sz) override
+    ErrorType decode(const void *src, size_t sz) override
     {
         if (sz == 0)
-            return 0;
+            return DataDropped;
         //restore fifo with partially read packet
         if (_rcnt > 0) {
             push_head(_head_pending_s);
         }
 
+        ErrorType ret = DataAccepted;
         const T *ptr = static_cast<const T *>(src);
         size_t cnt = sz;
         while (cnt--) {
             T c = *ptr++;
             if (c == _esc) {
                 //packet delimiter
-                check_packet();
+                ret = check_packet();
                 continue;
             }
             if (_copy != 0) {
-                write_decoded_byte(c);
+                if (!write_decoded_byte(c)) {
+                    error();
+                    return ErrorOverflow;
+                }
             } else {
-                if (_code != 0xFF)
-                    write_decoded_byte(_esc);
+                if (_code != 0xFF) {
+                    if (!write_decoded_byte(_esc)) {
+                        error();
+                        return ErrorOverflow;
+                    }
+                }
                 _copy = _code = c;
             }
             _copy--;
@@ -43,7 +51,7 @@ public:
             _head_pending_s = head();
             pop_head(_head_s);
         }
-        return sz; //always accept all bytes
+        return ret; //always accept all bytes
     }
 
     inline size_t read_decoded(void *dest, size_t sz) override
@@ -96,17 +104,17 @@ private:
         _rcnt++;
         return true;
     }
-    inline void check_packet()
+    inline ErrorType check_packet()
     {
         if (_rcnt <= 1) { //no data
             error();
-            return;
+            return ErrorSize;
         }
         T v_crc = pop_one();
         _crc ^= v_crc;
         if (_crc != v_crc) {
             error();
-            return;
+            return ErrorCRC;
         }
         //frame received...
         size_t h = head();
@@ -114,6 +122,7 @@ private:
         write_word(_rcnt - 1);
         push_head(h);
         restart();
+        return PacketAvailable;
     }
 
     using QueueBuffer<_buf_size, T>::space;
