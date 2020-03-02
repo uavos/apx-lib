@@ -122,7 +122,7 @@ private:
         write_word(_rcnt - 1);
         push_head(h);
         restart();
-        return PacketAvailable;
+        return DataAccepted;
     }
 
     using QueueBuffer<_buf_size, T>::space;

@@ -28,7 +28,6 @@ class SerialDecoder : public SerialCodec
 {
 public:
     enum ErrorType {
-        PacketAvailable = 0,
         DataAccepted,
         DataDropped,
 

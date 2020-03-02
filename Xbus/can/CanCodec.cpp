@@ -26,7 +26,7 @@ size_t CanCodec::read_packet(void *dest, size_t sz, uint8_t *src_id)
     return pool.read_packet(dest, sz, src_id);
 }
 
-CanCodec::ErrorType CanCodec::push_message(const CanMsg &msg)
+CanCodec::ErrorType CanCodec::push_message(const xcan_msg_t &msg)
 {
     do {
         uint32_t extid = msg.hdr.id;

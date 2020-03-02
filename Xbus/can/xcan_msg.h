@@ -6,11 +6,10 @@
 
 #pragma once
 
-#include <cstdint>
+#include <common/visibility.h>
+#include <sys/types.h>
 
-namespace xbus {
-
-struct CanMsg
+begin_packed_struct struct xcan_msg_t
 {
     union {
         uint32_t raw;
@@ -22,6 +21,4 @@ struct CanMsg
         };
     } hdr;
     uint8_t data[8];
-} __attribute__((packed));
-
-}; // namespace xbus
+} end_packed_struct;

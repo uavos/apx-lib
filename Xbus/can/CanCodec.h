@@ -8,7 +8,7 @@
 
 #include <cstdint>
 
-#include "CanMsg.h"
+#include "xcan_msg.h"
 #include <Xbus/XbusPacket.h>
 #include <common/do_not_copy.h>
 
@@ -40,7 +40,7 @@ public:
      * @param msg CAN message
      * @return Returns ErrorType
      */
-    ErrorType push_message(const CanMsg &msg);
+    ErrorType push_message(const xcan_msg_t &msg);
 
     /**
      * @brief Send packet splitting to multiframe messages if necessary.
@@ -110,7 +110,7 @@ protected:
      * @param dlc payload size.
      * @return Returns false on error.
      */
-    virtual bool send_message(const CanMsg &msg) = 0;
+    virtual bool send_message(const xcan_msg_t &msg) = 0;
 
 private:
     /**
@@ -118,7 +118,7 @@ private:
      */
     void sendAddressing();
 
-    CanMsg txmsg;
+    xcan_msg_t txmsg;
 
 protected:
     class Pool
