@@ -43,7 +43,7 @@ Module {
             else a.fileTags.push(ftype)
 
             a.filePath = FileInfo.joinPaths(product.buildDirectory, "gensrc", product.gensrc.prefix, tname)
-            console.info(product.gensrc.prefix)
+            //console.info(product.gensrc.prefix)
 
             list.push(a)
             return list
