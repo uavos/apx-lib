@@ -116,4 +116,43 @@
 
 - name: nmt
   title: Network Management
-  uid: uid_max
+  uid: uid_nmt
+  content:
+    - name: search
+      title: Search nodes
+      descr: Broadcast request [<node uid>]
+    - name: ident
+      title: Node identification
+      descr: <node ident>
+
+    - name: ack
+      title: Acknowledge request
+      descr: <crc16> of the request <pid><sn><data>
+
+    - name: msg
+      title: Text message
+      descr: <type:info|warn|err> <string>
+
+    - name: reboot
+      title: System reboot
+      descr: [<type:fw|ldr>]
+
+    - name: file
+      title: File operations
+      descr: <fop> [<data>]
+
+    - name: upd
+      title: Update parameter
+      descr: <param_id> <data>
+
+    - name: debug
+      title: Debug data
+      descr: <data>
+
+    - name: status
+      title: Node status
+      descr: <node status>
+
+    - name: cmd
+      title: Node specific command
+      descr: <cmd> [<data>]

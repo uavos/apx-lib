@@ -1,36 +1,33 @@
 #pragma once
-#include <inttypes.h>
-#include <sys/types.h>
 
 #include <cstring>
 #include <type_traits>
 
+#include "XbusStream.h"
 #include "endian.h"
 
-class XbusStreamWriter
+class XbusStreamWriter : public XbusStream
 {
 public:
-    explicit XbusStreamWriter(void *p)
-        : msg(static_cast<uint8_t *>(p))
-        , pos(0)
-
+    explicit XbusStreamWriter(void *p, size_t size)
+        : XbusStream(size)
+        , _buf(static_cast<uint8_t *>(p))
     {}
 
-    inline void reset(uint16_t new_pos = 0) { pos = new_pos; }
-    inline uint16_t position() const { return pos; }
-    inline uint8_t *buf() const { return msg; }
-    inline uint8_t *data() const { return &(msg[pos]); }
-
-    //template<typename _T>
-    //void write(const _T data);
+    inline uint8_t *buffer() const { return _buf; }
+    inline uint8_t *ptr() const { return &(_buf[_pos]); }
 
     template<typename _T, typename _Tin>
-    void write(const _Tin data);
+    size_t write(const _Tin data);
 
-    void write(const void *src, size_t size)
+    size_t write(const void *src, size_t sz)
     {
-        memcpy(&msg[pos], src, size);
-        pos += size;
+        size_t t = available();
+        if (sz > t)
+            sz = t;
+        memcpy(&_buf[_pos], src, sz);
+        _pos += sz;
+        return sz;
     }
 
     template<typename _T>
@@ -40,11 +37,10 @@ public:
     }
 
 private:
-    uint8_t *msg;
-    uint16_t pos;
+    uint8_t *_buf;
 
     template<typename _T, typename _Tin>
-    inline void set_data(_T &buf, _Tin data);
+    inline void _set_data(_T &buf, _Tin data);
 };
 
 // implementation
@@ -52,62 +48,69 @@ private:
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
 template<typename _T, typename _Tin>
-void XbusStreamWriter::set_data(_T &buf, _Tin data)
+void XbusStreamWriter::_set_data(_T &src, _Tin data)
 {
     if (std::is_floating_point<_Tin>::value) {
-        buf = *static_cast<const _T *>(static_cast<const void *>(&data));
+        src = *static_cast<const _T *>(static_cast<const void *>(&data));
     } else {
-        buf = data;
+        src = data;
     }
 
     // htoleXX functions may be empty macros,
     // switch will be optimized-out
     switch (sizeof(_T)) {
     case 2:
-        buf = htole16(buf);
+        src = htole16(src);
         break;
 
     case 4:
-        buf = htole32(buf);
+        src = htole32(src);
         break;
 
     case 8:
-        buf = htole64(buf);
+        src = htole64(src);
         break;
 
     default:
         return;
     }
 
-    memcpy(&msg[pos], &buf, sizeof(buf));
+    memcpy(&_buf[_pos], &src, sizeof(src));
 }
 #pragma GCC diagnostic pop
 
 template<typename _T, typename _Tin>
-void XbusStreamWriter::write(const _Tin data)
+size_t XbusStreamWriter::write(const _Tin data)
 {
+    static_assert(!(std::is_pointer<_Tin>::value || std::is_pointer<_T>::value), "can't stream pointer");
+
+    if ((_pos + sizeof(_T)) > _size) {
+        return 0;
+    }
+
     switch (sizeof(_T)) {
     case 1:
-        msg[pos] = static_cast<_T>(data);
+        _buf[_pos] = static_cast<_T>(data);
         break;
 
     case 2:
         uint16_t data_le16;
-        set_data(data_le16, static_cast<_T>(data));
+        _set_data(data_le16, static_cast<_T>(data));
         break;
 
     case 4:
         uint32_t data_le32;
-        set_data(data_le32, static_cast<_T>(data));
+        _set_data(data_le32, static_cast<_T>(data));
         break;
 
     case 8:
         uint64_t data_le64;
-        set_data(data_le64, static_cast<_T>(data));
+        _set_data(data_le64, static_cast<_T>(data));
         break;
 
     default:
-        return;
+        return 0;
     }
-    pos += sizeof(_T);
+    _pos += sizeof(_T);
+    return sizeof(_T);
 }

@@ -53,6 +53,7 @@ struct meta_t
     const char *path;
 
     const uid_t uid : sizeof(uid_t) * 8;
+    const uid_t mask : sizeof(uid_t) * 8;
     const uint8_t level : 3;
     const bool group : 1;
     const type_id_t type_id : 4;

@@ -8,7 +8,10 @@ namespace mandala {
 template<typename _Tree>
 struct tree_base_t
 {
-    static constexpr mandala::uid_t uid() { return _Tree::uid; }
+    static constexpr bool match(uid_t uid)
+    {
+        return (uid & _Tree::meta.mask) == _Tree::meta.uid;
+    }
 };
 
 template<typename _Tree>

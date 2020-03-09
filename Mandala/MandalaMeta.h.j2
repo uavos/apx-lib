@@ -30,7 +30,8 @@
 {{ ind1 }}.descr = "{{ d.descr }}",
 {{ ind1 }}.units = "{{ units }}",
 {{ ind1 }}.path = "{{ path|join('.') }}",
-{{ ind1 }}.uid = {% if d.uid is defined %}{{ d.uid }}{% else %}0x{{ '%0x' % uid }}{% endif %},
+{{ ind1 }}.uid = {% if d.uid is defined %}{{ d.uid }}{% else %}0x{{ '%0x' % (uid) }}{% endif %},
+{{ ind1 }}.mask = 0x{{ '%0x' % (2**(data.uid_bits|sum)-1-(2**(data.uid_bits[level+1:]|sum)-1)+data.uid_base) }},
 {{ ind1 }}.level = {{ level }},
 {{ ind1 }}.group = {% if level<(data.uid_bits|length-1) %}1{% else %}0{% endif %},
 {{ ind1 }}.type_id = type_{% if d.content is defined %}void{% else %}{{ d.type }}{% endif %},
@@ -79,10 +80,10 @@ static constexpr const uint8_t uid_bits[] = {
 {{ ind }}{% for i in data.uid_bits %}{{ i }},{% endfor %} // total {{ data.uid_bits|sum }} bits, {{ data.uid_bits|length }} levels
 };
 
-static constexpr const mandala::uid_t uid_mask[] = {
+/*static constexpr const mandala::uid_t uid_level_mask[] = {
 {{ ind }}{% for i in data.uid_bits %}{% set mask = (2**(data.uid_bits[loop.index0+1:]|sum)*(2**(data.uid_bits[loop.index0])-1)) %}0x{{ '%0x' % mask }},{% endfor %}
 
-};
+};*/
 
 static constexpr const uint8_t uid_shift[] = {
 {{ ind }}{% for i in data.uid_bits %}{{ data.uid_bits[loop.index0+1:]|sum }},{% endfor %}
@@ -92,6 +93,9 @@ static constexpr const uint8_t uid_shift[] = {
 // valid UID range is [uid_base...uid_max]
 static constexpr const mandala::uid_t uid_base = 0x{{ '%0x' % data.uid_base }};
 static constexpr const mandala::uid_t uid_max = 0x{{ '%0x' % (data.uid_base+(2**(data.uid_bits|sum)-1)) }}; 
+
+// NMT uses the last group
+static constexpr const mandala::uid_t uid_nmt = 0x{{ '%0x' % (data.uid_base+(2**(data.uid_bits|sum)-1-(2**(data.uid_bits[-1])-1))) }}; 
 
 // flat array of all elements
 static constexpr const mandala::meta_t meta[] = {

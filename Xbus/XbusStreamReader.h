@@ -1,41 +1,37 @@
 #pragma once
-#include <inttypes.h>
-#include <sys/types.h>
 
 #include <cstring>
 #include <type_traits>
 
+#include "XbusStream.h"
 #include "endian.h"
 
-class XbusStreamReader
+class XbusStreamReader : public XbusStream
 {
 public:
-    explicit XbusStreamReader(const void *p, uint16_t size = 0)
-        : msg(static_cast<const uint8_t *>(p))
-        , pos(0)
-        , len(size)
+    explicit XbusStreamReader(const void *p, size_t size)
+        : XbusStream(size)
+        , _buf(static_cast<const uint8_t *>(p))
 
     {}
 
-    inline void reset(uint16_t new_pos = 0) { pos = new_pos; }
-    inline uint16_t position() const { return pos; }
-    inline uint16_t tail() const { return len > pos ? len - pos : 0; }
-    inline const uint8_t *data() const { return &(msg[len > pos ? pos : (len - 1)]); }
+    inline void discard() { _pos = _size; }
+    inline const uint8_t *buffer() const { return _buf; }
+    inline const uint8_t *ptr() const { return &(_buf[_pos]); }
 
     template<typename _T>
     void read(_T &data);
 
-    void read(void *dest, size_t size)
+    size_t read(void *dest, size_t sz)
     {
-        size_t t = tail();
-        if (size > t) {
-            pos += t;
-            return;
-        }
-        if (size <= 0)
-            return;
-        memcpy(dest, &msg[pos], size);
-        pos += size;
+        if (!sz)
+            return 0;
+        size_t t = available();
+        if (sz > t)
+            sz = t;
+        memcpy(dest, &_buf[_pos], sz);
+        _pos += sz;
+        return sz;
     }
 
     template<typename _T, typename _Tout>
@@ -60,47 +56,30 @@ public:
     }
 
 private:
-    const uint8_t *msg;
-    uint16_t pos;
-    uint16_t len;
+    const uint8_t *_buf;
 
     template<typename _T, typename _Tout>
-    inline void get_data(_T &buf, _Tout &data);
+    inline void _get_data(_T &buf, _Tout &data);
 };
 
 // implementation
 
 template<typename _T, typename _Tout>
-void XbusStreamReader::get_data(_T &buf, _Tout &data)
+void XbusStreamReader::_get_data(_T &src, _Tout &data)
 {
-    memcpy(&buf, &msg[pos], sizeof(_T));
-
-    // message is trimmed - bzero tail
-    if (len > 0 && pos + sizeof(_T) > len) {
-        union {
-            _T d;
-            uint8_t u8[sizeof(_T)];
-        } bz;
-
-        size_t toclean = (pos + sizeof(_T)) - len;
-        size_t start_pos = sizeof(_T) - toclean;
-
-        bz.d = buf;
-        memset(&bz.u8[start_pos], 0, toclean);
-        buf = bz.d;
-    }
+    memcpy(&src, &_buf[_pos], sizeof(_T));
 
     switch (sizeof(_T)) {
     case 2:
-        buf = le16toh(buf);
+        src = le16toh(src);
         break;
 
     case 4:
-        buf = le32toh(buf);
+        src = le32toh(src);
         break;
 
     case 8:
-        buf = le64toh(buf);
+        src = le64toh(src);
         break;
 
     default:
@@ -108,44 +87,43 @@ void XbusStreamReader::get_data(_T &buf, _Tout &data)
     }
 
     if (std::is_floating_point<_Tout>::value) {
-        data = *static_cast<_Tout *>(static_cast<void *>(&buf));
+        data = *static_cast<_Tout *>(static_cast<void *>(&src));
     } else {
-        data = buf;
+        data = src;
     }
 }
 
 template<typename _T>
 void XbusStreamReader::read(_T &data)
 {
-    // message is trimmed - fill with zeroes
-    if (len > 0 && pos >= len) {
+    if ((_pos + sizeof(_T)) > _size) {
+        _pos = _size;
         data = 0;
-        pos += sizeof(_T);
         return;
     }
 
     switch (sizeof(_T)) {
     case 1:
-        data = msg[pos];
+        data = _buf[_pos];
         break;
 
     case 2:
         uint16_t data_le16;
-        get_data(data_le16, data);
+        _get_data(data_le16, data);
         break;
 
     case 4:
         uint32_t data_le32;
-        get_data(data_le32, data);
+        _get_data(data_le32, data);
         break;
 
     case 8:
         uint64_t data_le64;
-        get_data(data_le64, data);
+        _get_data(data_le64, data);
         break;
 
     default:
         return;
     }
-    pos += sizeof(_T);
+    _pos += sizeof(_T);
 }

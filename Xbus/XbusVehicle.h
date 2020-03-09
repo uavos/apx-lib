@@ -17,9 +17,9 @@ typedef uint8_t vclass_t;
 
 typedef enum {
     VEHICLE_CLASS_LIST
-} vclasses_t;
+} vclass_e;
 
-struct Ident
+typedef struct
 {
     callsign_t callsign;
     vuid_t vuid;
@@ -43,7 +43,7 @@ struct Ident
         s->write(vuid, sizeof(vuid));
         *s << vclass;
     }
-};
+} ident_s;
 
 // Vehicle transponder data
 typedef float lat_t;
@@ -53,7 +53,7 @@ typedef uint16_t speed_t;
 typedef int16_t course_t;
 typedef uint8_t mode_t;
 
-struct Xpdr
+typedef struct
 {
     lat_t lat;
     lon_t lon;
@@ -90,7 +90,7 @@ struct Xpdr
         s->write<course_t, float>(course * (32768.0f / 180.0f));
         *s << mode;
     }
-};
+} xpdr_s;
 
 } // namespace vehicle
 } // namespace xbus
