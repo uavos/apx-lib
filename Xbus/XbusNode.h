@@ -16,51 +16,39 @@ typedef uint16_t crc_t;
 //---------------------------
 namespace ident {
 
-typedef char name_t[16];     //device name string
-typedef char version_t[16];  //fw version string
-typedef char hardware_t[16]; //device hardware string
-
 typedef struct
 {
-    name_t name;
-    version_t version;
-    hardware_t hardware;
-
-    uint32_t hash; // dict hash
-
+    uint32_t format; // protocol format
+    uint32_t hash;   // structure hash
     union {
         struct
         {
-            uint32_t dict : 1;   //set if dict available
-            uint32_t reconf : 1; //set if conf was reset
-            uint32_t loader : 1; //set if loader is running
+            uint32_t files : 4;  //number of files
             uint32_t busy : 1;   //set to postpone gcs requests
+            uint32_t reconf : 1; //set if conf was reset
         } bits;
         uint32_t raw;
     } flags;
 
     static inline uint16_t psize()
     {
-        return sizeof(name_t) + sizeof(version_t)
-               + sizeof(hardware_t) + sizeof(flags.raw);
+        return sizeof(uint32_t) * 3;
     }
     inline void read(XbusStreamReader *s)
     {
-        s->read(name, sizeof(name));
-        s->read(version, sizeof(version));
-        s->read(hardware, sizeof(hardware));
+        *s >> format;
         *s >> hash;
         *s >> flags.raw;
     }
     inline void write(XbusStreamWriter *s) const
     {
-        s->write(name, sizeof(name));
-        s->write(version, sizeof(version));
-        s->write(hardware, sizeof(hardware));
+        *s << format;
         *s << hash;
         *s << flags.raw;
     }
 } ident_s;
+
+static constexpr const size_t strings_count = 3;
 
 }; // namespace ident
 
@@ -85,13 +73,13 @@ typedef uint8_t type_t;
 namespace file {
 
 typedef enum {
-    ls,    // re: <names>
-    info,  // q: <name> re: <name><fd><size>
-    ropen, // q: <name> re: <name><fd><size>
-    wopen, // q: <name> re: <name><fd><size>
-    close, // q: <fd> re: <fd>
-    read,  // q: <fd> re: <fd><offset><data>
-    write, // q: <fd><offset><data> re: <fd>
+    re,    // re: <op><payload>
+    info,  // q: <name> re: <name><size>
+    ropen, // q: <name> re: <name><size>
+    wopen, // q: <name> re: <name><size>
+    close, // q: <name> re: <name><size>
+    read,  // q: <name><offset> re: <name><offset><data>
+    write, // q: <name><offset><data> re: <name>
     abort, // re: <name>
 } op_e;
 
@@ -136,7 +124,7 @@ typedef struct
 } hdr_s;
 
 // name, descr, units
-static constexpr const size_t field_strings_count = 3;
+static constexpr const size_t strings_count = 3;
 
 }; // namespace dict
 

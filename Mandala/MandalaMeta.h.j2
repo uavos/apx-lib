@@ -30,7 +30,7 @@
 {{ ind1 }}.descr = "{{ d.descr }}",
 {{ ind1 }}.units = "{{ units }}",
 {{ ind1 }}.path = "{{ path|join('.') }}",
-{{ ind1 }}.uid = {% if d.uid is defined %}{{ d.uid }}{% else %}0x{{ '%0x' % (uid) }}{% endif %},
+{{ ind1 }}.uid = 0x{{ '%0x' % (uid) }},
 {{ ind1 }}.mask = 0x{{ '%0x' % (2**(data.uid_bits|sum)-1-(2**(data.uid_bits[level+1:]|sum)-1)+data.uid_base) }},
 {{ ind1 }}.level = {{ level }},
 {{ ind1 }}.group = {% if level<(data.uid_bits|length-1) %}1{% else %}0{% endif %},
@@ -40,7 +40,9 @@
 {% set uid_pow = data.uid_bits[level+2:]|sum %}
 {% set uid_mul = 2**uid_pow %}
 {% for i in d.content %}
+{%- if i.reserved is undefined -%}
 {{ mandala_meta_expand(i, indent, path, level+1, uid+loop.index0*uid_mul, d) }}
+{%- endif -%}
 {%- endfor -%}
 {%- endmacro -%}
 
@@ -93,9 +95,6 @@ static constexpr const uint8_t uid_shift[] = {
 // valid UID range is [uid_base...uid_max]
 static constexpr const mandala::uid_t uid_base = 0x{{ '%0x' % data.uid_base }};
 static constexpr const mandala::uid_t uid_max = 0x{{ '%0x' % (data.uid_base+(2**(data.uid_bits|sum)-1)) }}; 
-
-// NMT uses the last group
-static constexpr const mandala::uid_t uid_nmt = 0x{{ '%0x' % (data.uid_base+(2**(data.uid_bits|sum)-1-(2**(data.uid_bits[-1])-1))) }}; 
 
 // flat array of all elements
 static constexpr const mandala::meta_t meta[] = {

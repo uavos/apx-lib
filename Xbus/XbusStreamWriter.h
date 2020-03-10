@@ -30,6 +30,16 @@ public:
         return sz;
     }
 
+    size_t write_string(const char *s)
+    {
+        size_t sz = strnlen(s, available()) + 1;
+        if (sz <= 0 || sz >= available())
+            return 0;
+        memcpy(&_buf[_pos], s, sz);
+        _pos += sz;
+        return sz;
+    }
+
     template<typename _T>
     inline void operator<<(const _T data)
     {

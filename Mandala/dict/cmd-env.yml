@@ -114,16 +114,22 @@
     - name: display
       title: Visualization
 
+- reserved: a
+- reserved: b
+- reserved: c
+- reserved: d
+- reserved: e
+
 - name: nmt
   title: Network Management
-  uid: uid_nmt
   content:
     - name: search
       title: Search nodes
       descr: Broadcast request
+
     - name: ident
       title: Node identification
-      descr: <node ident>
+      descr: <ident><strings:name+version+hardware><filenames>
 
     - name: ack
       title: Acknowledge request

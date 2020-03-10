@@ -34,6 +34,18 @@ public:
         return sz;
     }
 
+    const char *read_string(size_t max_size)
+    {
+        if (available() <= 1)
+            return nullptr;
+        const char *s = reinterpret_cast<const char *>(ptr());
+        size_t len = strnlen(s, max_size);
+        if (len > max_size)
+            return nullptr;
+        reset(pos() + len + 1);
+        return s;
+    }
+
     template<typename _T, typename _Tout>
     inline _Tout read()
     {

@@ -10,7 +10,7 @@ struct tree_base_t
 {
     static constexpr bool match(uid_t uid)
     {
-        return (uid & _Tree::meta.mask) == _Tree::meta.uid;
+        return (uid & _Tree::meta.mask) == _Tree::uid;
     }
 };
 
@@ -33,7 +33,7 @@ template<typename _DataType, typename _Tree>
 class tree_value_t : public tree_base_t<_Tree>
 {
 public:
-    constexpr operator _DataType() const { return m_value; }
+    /*constexpr operator _DataType() const { return m_value; }
 
     constexpr const _DataType &get() const { return m_value; }
 
@@ -43,7 +43,7 @@ public:
             return false;
         m_value = v;
         return true;
-    }
+    }*/
 
     /*explicit field_t() {}
     field_t(const field_t &) = delete;
@@ -60,7 +60,7 @@ public:
         return stream::unpack<_Tree::meta.sfmt>(buf, m_value);
     }*/
 
-    inline size_t copy_to(void *buf) const
+    /*inline size_t copy_to(void *buf) const
     {
         memcpy(buf, &m_value, sizeof(_DataType));
         return sizeof(_DataType);
@@ -69,10 +69,10 @@ public:
     {
         memcpy(&m_value, buf, sizeof(_DataType));
         return sizeof(_DataType);
-    }
+    }*/
 
 protected:
-    _DataType m_value{};
+    //_DataType m_value{};
 };
 
 }; // namespace mandala

@@ -2,13 +2,14 @@
 
 {% set ns = namespace(meta_id=0) %}
 
-{%- macro constants_expand(d, indent) -%}
+{%- macro constants_expand(d, indent, level, uid) -%}
 {% set ind = ' '*indent*indent_size %}
 {{ ind }}typedef {{ d.type }}_t type_t;
 {{ ind }}static constexpr const meta_t &meta{ mandala::meta[{{ ns.meta_id }}]  };
+{{ ind }}static constexpr const uid_t uid{meta.uid};
 {%- endmacro -%}
 
-{%- macro mandala_expand(d, indent=0, level=0) -%}
+{%- macro mandala_expand(d, indent=0, level=0, uid=0) -%}
 {% set ind = ' '*indent*indent_size %}
 {% if d.content is defined %}
 {% set pub = 'tree_'+level|string+'_t<'+d.name+'>' %}
@@ -17,10 +18,14 @@
 {% endif %}
 {{ ind }}struct {{ d.name }}: public {{ pub }}
 {{ ind }}{
-{{ constants_expand(d, indent+1) }}
+{{ constants_expand(d, indent+1, level+1, uid) }}
 {% set ns.meta_id = ns.meta_id+1 %}
+{% set uid_pow = data.uid_bits[level+2:]|sum %}
+{% set uid_mul = 2**uid_pow %}
 {% for i in d.content %}
-{{ mandala_expand(i, indent+1, level+1) }}
+{% if i.reserved is undefined %}
+{{ mandala_expand(i, indent+1, level+1, uid+loop.index0*uid_mul) }}
+{% endif %}
 {% endfor %}
 {{ ind }}};
 {%- endmacro -%}
@@ -36,7 +41,9 @@
 namespace mandala {
 
 {% for i in data.content %}
-{{ mandala_expand(i) }}
+{% set uid_pow = data.uid_bits[1:]|sum %}
+{% set uid_mul = 2**uid_pow %}
+{{ mandala_expand(i, 0, 0, data.uid_base+loop.index0*uid_mul) }}
 {% endfor %}
 
 }; // namespace
