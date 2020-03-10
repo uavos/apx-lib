@@ -73,21 +73,21 @@ public:
      * @param mid is pool ID.
      * @return Returns xbus::pid_t.
      */
-    static xbus::pid8_t mid_to_pid(const pool_id_t mid);
+    static xbus::pid_t mid_to_pid(const pool_id_t mid);
 
     /**
      * @brief Reads stc_id from msg id.
      * @param mid is pool ID.
      * @return Returns src node address.
      */
-    static xbus::pid8_t mid_to_src(const pool_id_t mid);
+    static xbus::pid_t mid_to_src(const pool_id_t mid);
 
     /**
      * @brief Reads pid from CAN EXTID.
      * @param extid is CAN message EXT ID.
      * @return Returns xbus::pid_t.
      */
-    static xbus::pid8_t extid_to_pid(const uint32_t extid);
+    static xbus::pid_t extid_to_pid(const uint32_t extid);
 
 protected:
     /**

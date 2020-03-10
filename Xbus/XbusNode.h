@@ -1,4 +1,6 @@
 #pragma once
+
+#include "XbusPacket.h"
 #include "XbusStreamReader.h"
 #include "XbusStreamWriter.h"
 
@@ -6,7 +8,6 @@ namespace xbus {
 namespace node {
 
 typedef uint8_t guid_t[12]; //global unique node id
-typedef uint8_t cmd_t;      //service command
 
 typedef uint16_t crc_t;
 
@@ -33,7 +34,7 @@ typedef struct
             uint32_t dict : 1;   //set if dict available
             uint32_t reconf : 1; //set if conf was reset
             uint32_t loader : 1; //set if loader is running
-            uint32_t reboot : 1; //set if reboot requested
+            uint32_t busy : 1;   //set to postpone gcs requests
         } bits;
         uint32_t raw;
     } flags;

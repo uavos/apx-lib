@@ -70,15 +70,15 @@ CanCodec::pool_id_t CanCodec::extid_to_mid(const uint32_t extid)
 {
     return extid >> XCAN_PID_SHIFT; //src_address|var_idx
 }
-xbus::pid8_t CanCodec::mid_to_pid(const CanCodec::pool_id_t mid)
+xbus::pid_t CanCodec::mid_to_pid(const CanCodec::pool_id_t mid)
 {
     return mid & (XCAN_PID_MASK >> XCAN_PID_SHIFT);
 }
-xbus::pid8_t CanCodec::mid_to_src(const CanCodec::pool_id_t mid)
+xbus::pid_t CanCodec::mid_to_src(const CanCodec::pool_id_t mid)
 {
     return (mid & (XCAN_SRC_MASK >> XCAN_PID_SHIFT)) >> (XCAN_SRC_SHIFT - XCAN_PID_SHIFT);
 }
-xbus::pid8_t CanCodec::extid_to_pid(const uint32_t extid)
+xbus::pid_t CanCodec::extid_to_pid(const uint32_t extid)
 {
     return mid_to_pid(extid_to_mid(extid));
 }
@@ -252,7 +252,7 @@ size_t CanCodec::Pool::read_packet(void *dest, size_t sz, uint8_t *src_id)
 }
 size_t CanCodec::Pool::read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_id)
 {
-    XbusStreamWriter stream(dest);
+    XbusStreamWriter stream(dest, sz);
     stream << CanCodec::mid_to_pid(t.mid);
     *src_id = CanCodec::mid_to_src(t.mid);
 
@@ -260,7 +260,7 @@ size_t CanCodec::Pool::read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_
         Item &i = items[next];
         next = i.next;
         if (next != max_idx) {
-            if ((stream.position() + 8u) > sz)
+            if ((stream.pos() + 8u) > sz)
                 break;
             stream.write(i.data, 8);
             continue;
@@ -268,14 +268,14 @@ size_t CanCodec::Pool::read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_
         //final
         uint8_t dlc = t.dlc;
         if (dlc <= 8) {
-            if ((stream.position() + dlc) > sz)
+            if ((stream.pos() + dlc) > sz)
                 break;
             stream.write(i.data, dlc);
         }
         break;
     }
     remove(t); //release buffers
-    return stream.position();
+    return stream.pos();
 }
 bool CanCodec::Pool::timeout()
 {
@@ -298,14 +298,14 @@ bool CanCodec::Pool::timeout()
 
 bool CanCodec::send_packet(uint8_t src_addr, const void *data, size_t size)
 {
-    if (size < sizeof(xbus::pid8_t))
+    if (size < sizeof(xbus::pid_t))
         return true;
     XbusStreamReader stream(data, size);
-    xbus::pid8_t pid;
+    xbus::pid_t pid;
     stream >> pid;
 
     uint32_t extid = XCAN_SRC(src_addr) | XCAN_PID(pid) | XCAN_PRI_MASK;
-    size = stream.tail();
+    size = stream.available();
 
     txmsg.hdr.raw = 0;
     txmsg.hdr.ext = 1;
@@ -314,12 +314,12 @@ bool CanCodec::send_packet(uint8_t src_addr, const void *data, size_t size)
         txmsg.hdr.id = extid | XCAN_END_MASK;
         txmsg.hdr.dlc = size;
         if (size > 0)
-            memcpy(txmsg.data, stream.data(), size);
+            memcpy(txmsg.data, stream.ptr(), size);
         return send_message(txmsg);
     }
 
     //multi-frame
-    const uint8_t *src = static_cast<const uint8_t *>(stream.data());
+    const uint8_t *src = static_cast<const uint8_t *>(stream.ptr());
     uint32_t ext = 0;
     while (size > 0) {
         uint8_t dlc;

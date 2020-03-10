@@ -30,7 +30,7 @@ Module {
         fileTags: ["gensrc.input"]
     }
     Rule {
-        inputsFromDependencies: ["gensrc.input"]
+        //inputsFromDependencies: ["gensrc.input"]
         inputs: ["gensrc.input"]
         outputFileTags: ["hpp", "cpp", "c", "gensrc.output"]
         outputArtifacts: {

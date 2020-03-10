@@ -120,7 +120,7 @@
   content:
     - name: search
       title: Search nodes
-      descr: Broadcast request [<node uid>]
+      descr: Broadcast request
     - name: ident
       title: Node identification
       descr: <node ident>
@@ -135,7 +135,7 @@
 
     - name: reboot
       title: System reboot
-      descr: [<type:fw|ldr>]
+      descr: <type:fw|ldr>
 
     - name: file
       title: File operations
