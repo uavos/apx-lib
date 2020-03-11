@@ -30,6 +30,8 @@ typedef struct
         uint32_t raw;
     } flags;
 
+    // strings: name, version, hardware, [files]
+
     static inline uint16_t psize()
     {
         return sizeof(uint32_t) * 3;
@@ -48,9 +50,86 @@ typedef struct
     }
 } ident_s;
 
-static constexpr const size_t strings_count = 3;
-
 }; // namespace ident
+
+//---------------------------
+// reboot
+//---------------------------
+namespace reboot {
+
+enum type_e : uint8_t {
+    firmware = 0x5A,
+    loader = 0xA5,
+};
+
+}; // namespace reboot
+
+//---------------------------
+// file
+//---------------------------
+namespace file {
+
+enum op_e : uint8_t {
+    idle,
+    info,  // re: <info_s>
+    ropen, // re: <info_s>
+    wopen, // re: <info_s>
+    close, // re: <info_s>
+    read,  // q: <offset> re: <offset><data>
+    write, // q: <offset><data> re: <offset><size><hash>
+    abort, // re: <info_s>
+};
+// all op requests prepended with <name> string
+
+static constexpr const uint8_t reply_op_mask = 0x80;
+
+typedef uint8_t fd_t;
+typedef uint32_t offset_t;
+typedef uint32_t size_t;
+typedef uint32_t time_t;
+typedef uint32_t hash_t;
+
+typedef struct
+{
+    size_t size;     // file size
+    time_t time;     // modified time
+    hash_t hash;     // contents hash
+    offset_t offset; // start offset when available
+
+    union {
+        struct
+        {
+            uint32_t readable : 1; // readable
+            uint32_t writable : 1; // writable
+            uint32_t oread : 1;    // opened for read
+            uint32_t owrite : 1;   // opened for write
+        } bits;
+        uint32_t raw;
+    } flags;
+
+    static inline uint16_t psize()
+    {
+        return sizeof(size) + sizeof(time) + sizeof(hash) + sizeof(offset) + sizeof(flags.raw);
+    }
+    inline void read(XbusStreamReader *s)
+    {
+        *s >> size;
+        *s >> time;
+        *s >> hash;
+        *s >> offset;
+        *s >> flags.raw;
+    }
+    inline void write(XbusStreamWriter *s) const
+    {
+        *s << size;
+        *s << time;
+        *s << hash;
+        *s << offset;
+        *s << flags.raw;
+    }
+} info_s;
+
+}; // namespace file
 
 //---------------------------
 // msg
@@ -66,30 +145,6 @@ typedef enum {
 typedef uint8_t type_t;
 
 }; // namespace msg
-
-//---------------------------
-// file
-//---------------------------
-namespace file {
-
-typedef enum {
-    re,    // re: <op><payload>
-    info,  // q: <name> re: <name><size>
-    ropen, // q: <name> re: <name><size>
-    wopen, // q: <name> re: <name><size>
-    close, // q: <name> re: <name><size>
-    read,  // q: <name><offset> re: <name><offset><data>
-    write, // q: <name><offset><data> re: <name>
-    abort, // re: <name>
-} op_e;
-
-typedef uint8_t op_t;
-typedef uint8_t fd_t;
-typedef uint32_t offset_t;
-typedef uint32_t size_t;
-
-}; // namespace file
-
 //---------------------------
 // dict
 //---------------------------

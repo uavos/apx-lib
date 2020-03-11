@@ -135,17 +135,21 @@
       title: Acknowledge request
       descr: <crc16> of the request <pid><sn><data>
 
-    - name: msg
-      title: Text message
-      descr: <type:info|warn|err> <string>
+    - name: nack
+      title: Extend request timeout
+      descr: <crc16><msec16>
+
+    - name: file
+      title: File operations
+      descr: <fop> [<data>]
 
     - name: reboot
       title: System reboot
       descr: <type:fw|ldr>
 
-    - name: file
-      title: File operations
-      descr: <fop> [<data>]
+    - name: msg
+      title: Text message
+      descr: <type:info|warn|err> <string>
 
     - name: upd
       title: Update parameter

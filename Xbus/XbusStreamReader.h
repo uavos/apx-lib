@@ -36,12 +36,16 @@ public:
 
     const char *read_string(size_t max_size)
     {
-        if (available() <= 1)
+        if (available() <= 1) {
+            reset(size());
             return nullptr;
+        }
         const char *s = reinterpret_cast<const char *>(ptr());
         size_t len = strnlen(s, max_size);
-        if (len > max_size)
+        if (len > max_size) {
+            reset(size());
             return nullptr;
+        }
         reset(pos() + len + 1);
         return s;
     }
@@ -101,7 +105,7 @@ void XbusStreamReader::_get_data(_T &src, _Tout &data)
     if (std::is_floating_point<_Tout>::value) {
         data = *static_cast<_Tout *>(static_cast<void *>(&src));
     } else {
-        data = src;
+        data = static_cast<_Tout>(src);
     }
 }
 
@@ -110,13 +114,13 @@ void XbusStreamReader::read(_T &data)
 {
     if ((_pos + sizeof(_T)) > _size) {
         _pos = _size;
-        data = 0;
+        data = {};
         return;
     }
 
     switch (sizeof(_T)) {
     case 1:
-        data = _buf[_pos];
+        data = static_cast<_T>(_buf[_pos]);
         break;
 
     case 2:
