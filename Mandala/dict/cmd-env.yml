@@ -12,7 +12,7 @@
   content:
     - name: ident
       title: Vehicle Identification
-      descr: <ident data>
+      descr: <squawk><ident>
     - name: xpdr
       title: Transponder data from vehicle
       descr: <squawk><xpdr data>

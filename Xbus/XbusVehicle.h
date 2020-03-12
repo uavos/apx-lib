@@ -2,46 +2,41 @@
 #include "XbusStreamReader.h"
 #include "XbusStreamWriter.h"
 
-#define VEHICLE_CLASS_LIST \
-    UAV, GCU, UGV, USV, SAT, RELAY
-
 namespace xbus {
 namespace vehicle {
 
 typedef uint16_t squawk_t;
 
 // Vehicle IDENT
-typedef char callsign_t[16];
-typedef uint8_t vuid_t[12]; //global unique vehicle id
-typedef uint8_t vclass_t;
-
-typedef enum {
-    VEHICLE_CLASS_LIST
-} vclass_e;
+typedef uint8_t uid_t[12]; //global unique vehicle id
 
 typedef struct
 {
-    callsign_t callsign;
-    vuid_t vuid;
-    vclass_t vclass;
+    uid_t uid;
+
+    union {
+        struct
+        {
+            uint32_t gcs : 1; // set if Ground Control
+        } bits;
+        uint32_t raw;
+    } flags;
+
+    // strings: callsign
 
     static inline uint16_t psize()
     {
-        return sizeof(callsign_t)
-               + sizeof(vuid_t)
-               + sizeof(vclass_t);
+        return sizeof(uid_t) + sizeof(flags.raw);
     }
     inline void read(XbusStreamReader *s)
     {
-        s->read(callsign, sizeof(callsign));
-        s->read(vuid, sizeof(vuid));
-        *s >> vclass;
+        s->read(uid, sizeof(uid));
+        *s >> flags.raw;
     }
     inline void write(XbusStreamWriter *s) const
     {
-        s->write(callsign, sizeof(callsign));
-        s->write(vuid, sizeof(vuid));
-        *s << vclass;
+        s->write(uid, sizeof(uid));
+        *s << flags.raw;
     }
 } ident_s;
 
