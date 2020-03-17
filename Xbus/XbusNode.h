@@ -152,7 +152,7 @@ namespace dict {
 
 typedef uint16_t fid_t;
 
-typedef enum {
+enum type_e : uint8_t {
     group = 0,
     command,
     option = 4,
@@ -161,12 +161,12 @@ typedef enum {
     uid,
     real,
     string,
-} type_e;
+};
 
 // field descriptor packed into dict array
 typedef struct
 {
-    type_e type : 4;
+    uint8_t type : 4;
     uint8_t array : 4; // >0 if array
     uint8_t group;     // group idx
     //strings 0-terminated appended
