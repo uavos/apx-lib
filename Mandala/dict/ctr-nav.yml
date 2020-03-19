@@ -32,25 +32,25 @@
 
     - name: starter
       title: Engine starter
-      type: enum
+      type: option
       units:
         - "off"
         - "on"
     - name: ign1
       title: Ignition 1
-      type: enum
+      type: option
       units:
         - "off"
         - "on"
     - name: ign2
       title: Ignition 2
-      type: enum
+      type: option
       units:
         - "off"
         - "on"
     - name: fpump
       title: Fuel pump
-      type: enum
+      type: option
       units:
         - "off"
         - "on"
@@ -82,7 +82,7 @@
       units: u
     - name: gear
       title: Landing gear
-      type: enum
+      type: option
       units:
         - down
         - retract

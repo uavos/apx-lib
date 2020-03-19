@@ -8,14 +8,10 @@
 {% set path = path+[d.name] %}
 {% set meta = path|join('::') %}
 
-{%- if d.units is defined -%}
+{%- if d.units is string -%}
 {% set units = d.units %}
 {% else %}
-{% set units = '' %}
-{%- endif -%}
-
-{%- if d.type == 'enum' -%}
-{% set units = units|join(',') %}
+{% set units = d.units|default([])|join(',') %}
 {%- endif -%}
 
 {%- if d.suffix is defined -%}
@@ -56,7 +52,7 @@
 {{ mandala_enum_expand(i, indent, path) }}
 {%- endfor -%}
 {%- else -%}
-{% if d.type == 'enum' %}
+{% if d.type == 'option' %}
 {{ ind }}// {{ path|join('.') }}
 {% for i in d.units %}
 {{ ind }}{{ path[-2:]|join('_') }}_{{ i }} = {{ loop.index0 }},

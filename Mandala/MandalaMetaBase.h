@@ -7,19 +7,19 @@ namespace mandala {
 
 typedef uint16_t uid_t;
 
-typedef float float_t;
+typedef float real_t;
 typedef uint32_t dword_t;
 typedef uint16_t word_t;
 typedef uint8_t byte_t;
-typedef uint8_t enum_t;
+typedef uint8_t option_t;
 
 enum type_id_t {
     type_void,
-    type_float,
+    type_real,
     type_dword,
     type_word,
     type_byte,
-    type_enum,
+    type_option,
 };
 
 enum sfmt_id_t {

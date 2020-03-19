@@ -10,6 +10,7 @@ namespace node {
 typedef uint8_t guid_t[12]; //global unique node id
 
 typedef uint16_t crc_t;
+typedef uint32_t hash_t;
 
 //---------------------------
 // ident
@@ -19,7 +20,7 @@ namespace ident {
 typedef struct
 {
     uint32_t format; // protocol format
-    uint32_t hash;   // structure hash
+    hash_t hash;     // structure hash
     union {
         struct
         {
@@ -34,7 +35,7 @@ typedef struct
 
     static inline uint16_t psize()
     {
-        return sizeof(uint32_t) * 3;
+        return sizeof(uint32_t) * 2 + sizeof(hash_t);
     }
     inline void read(XbusStreamReader *s)
     {
@@ -87,7 +88,6 @@ typedef uint8_t fd_t;
 typedef uint32_t offset_t;
 typedef uint32_t size_t;
 typedef uint32_t time_t;
-typedef uint32_t hash_t;
 
 typedef struct
 {
@@ -145,22 +145,32 @@ typedef enum {
 typedef uint8_t type_t;
 
 }; // namespace msg
+
 //---------------------------
 // dict
 //---------------------------
-namespace dict {
+namespace conf {
 
 typedef uint16_t fid_t;
+
+typedef uint8_t option_t;
+typedef float real_t;
+typedef uint8_t byte_t;
+typedef uint16_t word_t;
+typedef uint32_t dword_t;
+typedef char string_t[16];
+typedef char text_t[64];
 
 enum type_e : uint8_t {
     group = 0,
     command,
     option = 4,
+    real,
     byte,
     word,
-    uid,
-    real,
+    dword,
     string,
+    text,
 };
 
 // field descriptor packed into dict array
@@ -169,19 +179,40 @@ typedef struct
     uint8_t type : 4;
     uint8_t array : 4; // >0 if array
     uint8_t group;     // group idx
-    //strings 0-terminated appended
+
+    // field strings: name, descr, units
+    // group strings: name, title, descr
+    // command strings: name, title
+
 } field_s;
 
-typedef struct
+static constexpr size_t size(type_e type)
 {
-    uint32_t hash; // dict hash
-    uint16_t size; // number of fields
-} hdr_s;
+    switch (type) {
+    case group:
+    case command:
+        return 0;
+    case option:
+        return sizeof(option_t);
+    case real:
+        return sizeof(real_t);
+    case byte:
+        return sizeof(byte_t);
+    case word:
+        return sizeof(word_t);
+    case dword:
+        return sizeof(dword_t);
+    case string:
+        return sizeof(string_t);
+    case text:
+        return sizeof(text_t);
+    }
+}
 
-// name, descr, units
-static constexpr const size_t strings_count = 3;
+// dict array content:
+// <hash><fields array>
 
-}; // namespace dict
+}; // namespace conf
 
 } // namespace node
 } // namespace xbus

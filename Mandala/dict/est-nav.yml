@@ -109,7 +109,7 @@
   content:
     - name: status
       suffix: status
-      type: enum
+      type: option
       units:
         - "unavailable"
         - "initialized"
@@ -140,7 +140,7 @@
   content:
     - name: status
       suffix: status
-      type: enum
+      type: option
       units:
         - "unavailable"
         - "available"
@@ -153,7 +153,7 @@
   content:
     - name: status
       suffix: status
-      type: enum
+      type: option
       units:
         - "flying"
         - "landed"
@@ -237,14 +237,14 @@
 
     - name: mtype
       title: Mission maneuver type
-      type: enum
+      type: option
       units:
         - hdg
         - line
 
     - name: hover
       title: Stabilization mode
-      type: enum
+      type: option
       units:
         - "normal"
         - "hover"

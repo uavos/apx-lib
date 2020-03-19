@@ -109,7 +109,7 @@ uint32_t CRC_32(const void *data, size_t sz, uint32_t crc, const uint32_t poly)
     while (sz--) {
         uint32_t v = *buf++;
         uint32_t i = v ^ ((crc) &0x000000FF);
-        for (uint32_t j = 8; j > 0; j--) {
+        for (int j = 8; j > 0; j--) {
             if (i & 1)
                 i = (i >> 1) ^ poly;
             else

@@ -36,15 +36,19 @@ public:
 
     const char *read_string(size_t max_size)
     {
-        if (available() <= 1) {
-            reset(size());
+        if (available() < 1) {
             return nullptr;
         }
         const char *s = reinterpret_cast<const char *>(ptr());
         size_t len = strnlen(s, max_size);
-        if (len > max_size) {
-            reset(size());
+        if (len > max_size)
             return nullptr;
+        //check ASCII
+        const uint8_t *c = reinterpret_cast<const uint8_t *>(s);
+        while (*c) {
+            const uint8_t &v = *c++;
+            if (v < 32 || v >= 127)
+                return nullptr;
         }
         reset(pos() + len + 1);
         return s;

@@ -73,7 +73,7 @@
 
     - name: status
       suffix: status
-      type: enum
+      type: option
       units:
         - ok
         - disabled
@@ -153,7 +153,7 @@
       title: Radio AGL altitude
     - name: ground
       title: Ground
-      type: enum
+      type: option
       units:
         - "off"
         - detected
@@ -197,7 +197,7 @@
 
     - name: status
       title: LAS status
-      type: enum
+      type: option
       units:
         - ok
         - holdon

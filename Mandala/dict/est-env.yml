@@ -3,7 +3,7 @@
   content:
     - name: health
       suffix: health
-      type: enum
+      type: option
       units:
         - "unknown"
         - "normal"
@@ -32,7 +32,7 @@
 
 - name: status
   title: Submodules status
-  type: enum
+  type: option
   units:
     - "unknown"
     - "ok"

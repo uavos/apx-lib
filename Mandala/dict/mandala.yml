@@ -39,7 +39,7 @@ inheritance:
   - units
 
 # defaults:
-type: float
+type: real
 
 # 4 classes
 content:

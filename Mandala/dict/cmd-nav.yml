@@ -65,7 +65,7 @@
   content:
     - name: mode
       title: Flight mode
-      type: enum
+      type: option
       units:
         - EMG
         - RPV
@@ -83,7 +83,7 @@
 
     - name: action
       title: Procedure action
-      type: enum
+      type: option
       units:
         - idle
         - next
@@ -97,7 +97,7 @@
 
 - name: opt
   title: Options
-  type: enum
+  type: option
   units:
     - "off"
     - "on"
@@ -118,7 +118,7 @@
         - "yes"
     - name: hyaw
       title: Hover yaw
-      type: enum
+      type: option
       units:
         - "compensated"
         - "fixed"
@@ -128,7 +128,7 @@
   content:
     - name: ovr
       suffix: override
-      type: enum
+      type: option
       units:
         - "off"
         - "on"
@@ -161,14 +161,14 @@
 
     - name: range
       title: Rangefinder
-      type: enum
+      type: option
       units:
         - "off"
         - "on"
 
     - name: mode
       title: Shoting mode
-      type: enum
+      type: option
       units:
         - "off"
         - "signle"
@@ -185,25 +185,25 @@
 
     - name: pf
       title: Picture flip
-      type: enum
+      type: option
       units:
         - "off"
         - "on"
     - name: nir
       title: NIR filter
-      type: enum
+      type: option
       units:
         - "off"
         - "on"
     - name: fm
       title: Focus mode
-      type: enum
+      type: option
       units:
         - "auto"
         - "infinity"
     - name: ft
       title: Focus type
-      type: enum
+      type: option
       units:
         - "auto"
         - "manual"
@@ -213,7 +213,7 @@
   content:
     - name: mode
       suffix: mode
-      type: enum
+      type: option
       units:
         - "off"
         - "stab"
@@ -258,7 +258,7 @@
   content:
     - name: mode
       suffix: mode
-      type: enum
+      type: option
       units:
         - "off"
         - "track"
@@ -290,7 +290,7 @@
   content:
     - name: mode
       suffix: mode
-      type: enum
+      type: option
       units:
         - "off"
         - "fixed"

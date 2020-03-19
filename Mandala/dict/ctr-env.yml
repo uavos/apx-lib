@@ -1,6 +1,6 @@
 - name: pwr
   title: Power
-  type: enum
+  type: option
   units:
     - "off"
     - "on"
@@ -28,21 +28,21 @@
 
 - name: aux
   title: Auxilary
-  type: enum
+  type: option
   units:
     - "off"
     - "on"
   content:
     - name: horn
       title: Horn signal
-      type: enum
+      type: option
       units:
         - "off"
         - "on"
 
 - name: ers
   title: Emergency Recovery
-  type: enum
+  type: option
   content:
     - name: launch
       title: ERS launch
@@ -57,7 +57,7 @@
 
 - name: light
   title: Lighting
-  type: enum
+  type: option
   units:
     - "off"
     - "on"
@@ -75,7 +75,7 @@
 
 - name: door
   title: Doors and latches
-  type: enum
+  type: option
   units:
     - "locked"
     - "open"
@@ -100,32 +100,32 @@
 
     - name: rec
       suffix: record
-      type: enum
+      type: option
       units:
         - "off"
         - "on"
     - name: shot
       suffix: shot
-      type: enum
+      type: option
       units:
         - "off"
         - "single"
         - "series"
     - name: arm
       suffix: arm focus
-      type: enum
+      type: option
       units:
         - "off"
         - "on"
     - name: zin
       suffix: zoom in
-      type: enum
+      type: option
       units:
         - "off"
         - "on"
     - name: zout
       suffix: zoom out
-      type: enum
+      type: option
       units:
         - "off"
         - "on"
@@ -161,7 +161,7 @@
 
     - name: op
       title: Turret op
-      type: enum
+      type: option
       units:
         - "off"
         - "arm"

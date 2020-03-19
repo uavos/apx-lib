@@ -43,7 +43,7 @@
 
     - name: tc
       title: Turbocharger
-      type: enum
+      type: option
       units:
         - unknown
         - "off"
@@ -64,7 +64,7 @@
 
     - name: clutch
       title: Clutch status
-      type: enum
+      type: option
       units:
         - "on"
         - "off"
@@ -102,7 +102,7 @@
       units: C
     - name: status
       suffix: status
-      type: enum
+      type: option
       units:
         - ok
         - idle
@@ -142,7 +142,7 @@
       units: C
     - name: status
       suffix: status
-      type: enum
+      type: option
       units:
         - ok
         - discharging
@@ -154,7 +154,7 @@
   content:
     - name: status
       suffix: status
-      type: enum
+      type: option
       units:
         - ok
         - failsafe
@@ -187,7 +187,7 @@
   content:
     - name: status
       title: Modem status
-      type: enum
+      type: option
       units:
         - ok
         - mute
@@ -236,7 +236,7 @@
       units: C
     - name: gear
       title: Landing gear
-      type: enum
+      type: option
       units:
         - down
         - retracted
@@ -245,7 +245,7 @@
       units: u
     - name: ers
       title: ERS status
-      type: enum
+      type: option
       units:
         - ok
         - disarmed
@@ -254,7 +254,7 @@
 
 - name: btn
   title: Buttons
-  type: enum
+  type: option
   units:
     - "off"
     - "on"
@@ -329,7 +329,7 @@
 
     - name: status
       title: Turret status
-      type: enum
+      type: option
       units:
         - ready
         - shooting
