@@ -160,6 +160,7 @@ typedef uint16_t word_t;
 typedef uint32_t dword_t;
 typedef char string_t[16];
 typedef char text_t[64];
+typedef uint16_t mandala_t;
 
 enum type_e : uint8_t {
     group = 0,
@@ -169,6 +170,7 @@ enum type_e : uint8_t {
     byte,
     word,
     dword,
+    mandala,
     string,
     text,
 };
@@ -186,7 +188,7 @@ typedef struct
 
 } field_s;
 
-static constexpr size_t size(type_e type)
+/*static constexpr size_t size(type_e type)
 {
     switch (type) {
     case group:
@@ -206,8 +208,10 @@ static constexpr size_t size(type_e type)
         return sizeof(string_t);
     case text:
         return sizeof(text_t);
+    case mandala:
+        return sizeof(mandala_t);
     }
-}
+}*/
 
 // dict array content:
 // <hash><fields array>
