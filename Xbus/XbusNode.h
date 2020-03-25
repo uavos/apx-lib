@@ -187,36 +187,60 @@ typedef struct
     // command strings: name, title
 
 } field_s;
-
-/*static constexpr size_t size(type_e type)
-{
-    switch (type) {
-    case group:
-    case command:
-        return 0;
-    case option:
-        return sizeof(option_t);
-    case real:
-        return sizeof(real_t);
-    case byte:
-        return sizeof(byte_t);
-    case word:
-        return sizeof(word_t);
-    case dword:
-        return sizeof(dword_t);
-    case string:
-        return sizeof(string_t);
-    case text:
-        return sizeof(text_t);
-    case mandala:
-        return sizeof(mandala_t);
-    }
-}*/
-
 // dict array content:
 // <hash><fields array>
-
 }; // namespace conf
+
+//---------------------------
+// ack
+//---------------------------
+namespace ack {
+
+enum ack_e : uint8_t {
+    ack_ok = 0,
+    ack_fail,
+    ack_extend,
+};
+
+}; // namespace ack
+
+//---------------------------
+// status
+//---------------------------
+namespace status {
+
+typedef struct
+{
+    struct
+    {
+        uint8_t can;
+        uint8_t uart;
+        uint8_t seq;
+        uint8_t cnt;
+    } err;
+
+    static inline uint16_t psize()
+    {
+        return sizeof(uint8_t) * 4;
+    }
+    inline void read(XbusStreamReader *s)
+    {
+        *s >> err.can;
+        *s >> err.uart;
+        *s >> err.seq;
+        *s >> err.cnt;
+    }
+    inline void write(XbusStreamWriter *s) const
+    {
+        *s << err.can;
+        *s << err.uart;
+        *s << err.seq;
+        *s << err.cnt;
+    }
+
+} status_s;
+
+}; // namespace status
 
 } // namespace node
 } // namespace xbus

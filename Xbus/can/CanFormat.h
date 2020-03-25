@@ -6,23 +6,39 @@
 
 #pragma once
 
-#define XCAN_SRC_SHIFT 20 //source address
-#define XCAN_SRC_MASK (255 << XCAN_SRC_SHIFT)
-#define XCAN_SRC(n) (((n) << XCAN_SRC_SHIFT) & XCAN_SRC_MASK)
+#include <common/visibility.h>
+#include <sys/types.h>
 
-#define XCAN_PID_SHIFT 12 //packet id
-#define XCAN_PID_MASK (255 << XCAN_PID_SHIFT)
-#define XCAN_PID(n) (((n) << XCAN_PID_SHIFT) & XCAN_PID_MASK)
+#include <Xbus/XbusPacket.h>
 
-#define XCAN_NAD_SHIFT 11 //node addressing marker
-#define XCAN_NAD_MASK (1 << XCAN_NAD_SHIFT)
+namespace xbus {
+namespace can {
 
-#define XCAN_END_SHIFT 10 //end marker
-#define XCAN_END_MASK (1 << XCAN_END_SHIFT)
+enum frm_e : uint8_t {
+    frm_single,
+    frm_seq0,
+    frm_seq1,
+    frm_end
+};
 
-#define XCAN_CNT_SHIFT 0 //multipart counter (256*8=2048 bytes max)
-#define XCAN_CNT_MASK (255 << XCAN_CNT_SHIFT)
-#define XCAN_CNT(n) (((n) << XCAN_CNT_SHIFT) & XCAN_CNT_MASK)
+typedef uint32_t extid_t;
 
-#define XCAN_PRI_SHIFT 28 //priority bit (lowest)
-#define XCAN_PRI_MASK (1 << XCAN_PRI_SHIFT)
+// EXTID format [29 bits]
+#pragma pack(1)
+union extid_s {
+    uint32_t raw;
+
+    struct // 29 bits
+    {
+        uint8_t frm : 2;   // 0 = single, 1,2 = toggle seq, 3 = end transfer
+        uint16_t pid : 16; // packet identifier
+        uint8_t src : 7;   // source node address
+        uint8_t net : 4;   // [0,15] network id
+    };
+};
+#pragma pack()
+
+static constexpr const extid_t mf_id_mask = ((1 << 29) - 1) & (~((1 << 2) - 1));
+
+} // namespace can
+} // namespace xbus

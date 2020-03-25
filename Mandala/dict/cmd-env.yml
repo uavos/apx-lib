@@ -129,31 +129,27 @@
 
     - name: ident
       title: Node identification
-      descr: <ident><strings:name+version+hardware><filenames>
+      descr: <ident_s><strings:name+version+hardware><filenames>
 
     - name: ack
       title: Acknowledge request
-      descr: <crc16> of the request <pid><sn><data>
-
-    - name: nack
-      title: Extend request timeout
-      descr: <crc16><msec16>
+      descr: <pid_s><result_e>[<time_ms_16>]
 
     - name: file
       title: File operations
-      descr: <fop> [<data>]
+      descr: <name><fop_e> [<data>]
 
     - name: reboot
       title: System reboot
-      descr: <type:fw|ldr>
+      descr: <type_e>
 
     - name: msg
       title: Text message
-      descr: <type:info|warn|err> <string>
+      descr: <type_e><string>
 
     - name: upd
       title: Update parameter
-      descr: <param_id> <data>
+      descr: <fid_t><data>
 
     - name: debug
       title: Debug data
@@ -161,7 +157,7 @@
 
     - name: status
       title: Node status
-      descr: <node status>
+      descr: <status_s>
 
     - name: cmd
       title: Node specific command

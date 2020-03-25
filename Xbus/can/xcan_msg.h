@@ -9,16 +9,16 @@
 #include <common/visibility.h>
 #include <sys/types.h>
 
-begin_packed_struct struct xcan_msg_t
+#pragma pack(1)
+struct xcan_msg_s
 {
-    union {
-        uint32_t raw;
-        struct
-        {
-            uint32_t id : 27;
-            uint32_t ext : 1; // 0= standard ID (11 bit), 1= extended (29 bit)
-            uint32_t dlc : 4; // data length code
-        };
-    } hdr;
+    uint32_t id;
+    struct
+    {
+        uint8_t dlc : 4; // data length code
+        uint8_t ext : 1; // 0= standard ID (11 bit), 1= extended (29 bit)
+        uint8_t _rsv : 3;
+    };
     uint8_t data[8];
-} end_packed_struct;
+};
+#pragma pack()

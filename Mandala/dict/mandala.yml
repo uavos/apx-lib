@@ -17,7 +17,7 @@ descr: Vehicle core data manager and data structure.
 #   2  types        1 bit   [nav, env]
 #   16 subsystems   4 bits
 #   16 fields       4 bits
-uid_base: 0x0800
+uid_base: 0x0000
 uid_bits:
   - 2
   - 1
