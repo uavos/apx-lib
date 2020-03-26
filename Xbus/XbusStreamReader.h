@@ -47,6 +47,10 @@ public:
         const uint8_t *c = reinterpret_cast<const uint8_t *>(s);
         while (*c) {
             const uint8_t &v = *c++;
+            if (v == '\n')
+                continue;
+            if (v == '\r')
+                continue;
             if (v < 32 || v >= 127)
                 return nullptr;
         }

@@ -15,10 +15,10 @@ namespace xbus {
 namespace can {
 
 enum frm_e : uint8_t {
-    frm_single,
-    frm_seq0,
-    frm_seq1,
-    frm_end
+    frm_seq_max = 4,
+    frm_end = 5,
+    frm_start = 6,
+    frm_single = 7,
 };
 
 typedef uint32_t extid_t;
@@ -30,15 +30,15 @@ union extid_s {
 
     struct // 29 bits
     {
-        uint8_t frm : 2;   // 0 = single, 1,2 = toggle seq, 3 = end transfer
+        uint8_t frm : 3;   // frame id
         uint16_t pid : 16; // packet identifier
         uint8_t src : 7;   // source node address
-        uint8_t net : 4;   // [0,15] network id
+        uint8_t net : 3;   // [0,7] network id
     };
 };
 #pragma pack()
 
-static constexpr const extid_t mf_id_mask = ((1 << 29) - 1) & (~((1 << 2) - 1));
+static constexpr const extid_t mf_id_mask = ((1 << 29) - 1) & (~((1 << 3) - 1));
 
 } // namespace can
 } // namespace xbus

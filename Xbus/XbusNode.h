@@ -136,13 +136,11 @@ typedef struct
 //---------------------------
 namespace msg {
 
-typedef enum {
+enum type_e : uint8_t {
     info,
     warn,
     err,
-} type_e;
-
-typedef uint8_t type_t;
+};
 
 }; // namespace msg
 
@@ -201,6 +199,8 @@ enum ack_e : uint8_t {
     ack_fail,
     ack_extend,
 };
+
+typedef uint16_t timeout_t;
 
 }; // namespace ack
 

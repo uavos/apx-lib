@@ -9,6 +9,8 @@
 
 #include <cstring>
 
+#define XCAN_CODEC_DEBUG
+
 #ifdef XCAN_CODEC_DEBUG
 #include <platform/log.h>
 #define debug(...) apxdebug(__VA_ARGS__)
@@ -32,49 +34,51 @@ void Pool::init()
     memset(items, 0, sizeof(items));
     // all trees are available
     for (auto &t : trees) {
-        t.head = max_idx;
+        t.head.store(max_idx);
     }
     // build chain of free items
     uint8_t idx = 0;
     for (auto &i : items) {
-        i.next = ++idx;
+        i.next.store(++idx);
     }
-    items[size_items - 1].next = max_idx;
+    items[size_items - 1].next.store(max_idx);
     // index of first free item
-    free = 0;
+    free.store(0);
 }
 
 ErrorType Pool::push(const extid_s &extid, const uint8_t *data, uint8_t dlc)
 {
-    //debug("%X %d %d", mid, seq_idx, dlc);
+    //debug("%d %d", extid.frm, dlc);
     // find free item
-    if (free == max_idx) {
+    if (free.load() == max_idx) {
         // pool overflow
         timeout();
         remove(extid);
         return ErrorSlotsOverflow;
     }
-    frm_e frm = static_cast<frm_e>(extid.frm);
-    switch (frm) {
-    case frm_single:
-        return push_new(extid, data, dlc > 0 ? dlc : 0x0F);
-    case frm_seq0:
-    case frm_seq1:
-        if (dlc != 8)
-            return ErrorDLC; //error - size<8, but multipart middle msg
-        return push_next(extid, data, dlc);
+    ErrorType rv = MsgDropped;
+    switch (extid.frm) {
     case frm_end:
         if (dlc == 0)
             return ErrorDLC; //error - size=0, but multipart end msg
-        else {
-            ErrorType rv = push_next(extid, data, dlc);
-            if (rv != MsgAccepted)
-                return rv;
-            timeout();
-            return PacketAvailable;
-        }
+        rv = push_next(extid, data, dlc);
+        if (rv != MsgAccepted)
+            break;
+        timeout();
+        return PacketAvailable;
+
+    case frm_start:
+        if (dlc != 8)
+            return ErrorDLC; //error - size<8, but multipart msg
+        return push_new(extid, data, 0);
+    case frm_single:
+        return push_new(extid, data, dlc > 0 ? dlc : 0x0F);
+    default: // sequence
+        if (dlc != 8)
+            return ErrorDLC; //error - size<8, but multipart middle msg
+        return push_next(extid, data, 0);
     }
-    return MsgDropped;
+    return rv;
 }
 
 ErrorType Pool::push_new(const extid_s &extid, const uint8_t *data, uint8_t dlc)
@@ -83,77 +87,110 @@ ErrorType Pool::push_new(const extid_s &extid, const uint8_t *data, uint8_t dlc)
     remove(extid);
     // find empty tree
     for (auto &t : trees) {
-        if (t.head != max_idx)
+        if (t.head.load() != max_idx)
             continue;
         t.extid.raw = extid.raw;
         t.to = XCAN_CODEC_TIMEOUT;
-        t.dlc = dlc;
-        t.head = free;
+        t.dlc.store(dlc);
+        t.head.store(free.load());
         //debug("new %X", mid);
         push(data);
+        if (dlc)
+            return PacketAvailable;
+        t.extid.frm = 0;
         return MsgAccepted;
     }
     // no empty tree available
     timeout();
     return ErrorTreeOverflow;
 }
+
 ErrorType Pool::push_next(const extid_s &extid, const uint8_t *data, uint8_t dlc)
 {
     // find existing tree and append message
+    ErrorType rv = ErrorOrphan;
     for (auto &t : trees) {
-        if (t.head == max_idx)
+        if (t.head.load() == max_idx)
             continue;
-        if (t.dlc)
+        if (t.dlc.load())
             continue;
         if ((t.extid.raw ^ extid.raw) & mf_id_mask)
             continue;
         // tree found - check sequence
-        if (t.extid.frm == extid.frm)
-            return MsgDropped; //repeated
-        // append msg to tree
-        uint8_t next = t.head;
-        uint8_t cnt = 0;
-        while (cnt < max_seq_idx) {
-            Item &i = items[next];
-            //debug("%d %d", t.head, i.next);
-            cnt++;
-            if (i.next == max_idx) { // tail
-                t.to = XCAN_CODEC_TIMEOUT;
-                t.dlc = dlc;
-                t.extid.frm = extid.frm; // seqX check
-                i.next = free;
-                //debug("next %X (%d)", mid, i.next);
-                push(data);
-                return MsgAccepted;
+        uint8_t t_frm;
+        if (dlc == 0) {
+            t_frm = t.extid.frm;
+            uint8_t frm = extid.frm;
+            if (frm != t_frm) {
+                //drop repeated msgs
+                t_frm = t_frm > 0 ? t_frm - 1 : frm_seq_max;
+                if (frm != t_frm) {
+                    debug("frm %d %d", t.extid.frm, extid.frm);
+                    rv = ErrorOrphan;
+                    break; //orphan
+                }
+                return MsgDropped; //repeated
             }
-            next = i.next;
         }
-        // stream error
-        //debug("err %X %d", mid, seq_idx);
-        remove(extid);
-        return ErrorSeqIdx;
+        rv = push_next(t, data);
+        if (rv != MsgAccepted)
+            break;
+
+        t.dlc.store(dlc);
+        if (dlc)
+            return PacketAvailable;
+
+        t_frm++; // seqX check
+        if (t_frm > frm_seq_max)
+            t.extid.frm = 0;
+        else
+            t.extid.frm = t_frm;
+        return MsgAccepted;
     }
-    // mid part received but no tree is working - drop msg
+    // part received but no tree is working
+    debug("orph %d", extid.frm);
     remove(extid);
     timeout();
-    return ErrorOrphan;
+    return rv;
 }
 
+ErrorType Pool::push_next(Tree &t, const uint8_t *data)
+{
+    // append msg to tree
+    uint8_t next = t.head.load();
+    uint8_t cnt = 0;
+    while (cnt < max_seq_idx) {
+        Item &i = items[next];
+        //debug("%d %d", t.head, i.next);
+        cnt++;
+        if (i.next.load() == max_idx) { // tail
+            t.to = XCAN_CODEC_TIMEOUT;
+            i.next.store(free.load());
+            //debug("next %X (%d)", mid, i.next);
+            push(data);
+            return MsgAccepted;
+        }
+        next = i.next.load();
+    }
+    // stream error
+    //debug("err %X %d", mid, seq_idx);
+    return ErrorSeqIdx;
+}
 void Pool::push(const uint8_t *data)
 {
-    Item &i = items[free];
+    Item &i = items[free.load()];
     //debug("%d %d", free, i.next);
     free = i.next;
-    i.next = max_idx;
+    i.next.store(max_idx);
     memcpy(i.data, data, 8);
 }
 
 void Pool::remove(const extid_s &extid)
 {
     for (auto &t : trees) {
-        if (t.head == max_idx) // free slot
+        if (t.head.load() == max_idx) // free slot
             continue;
-        if (t.dlc) // finished msg
+        if (t.dlc.load()) // finished msg
             continue;
         if ((t.extid.raw ^ extid.raw) & mf_id_mask)
             continue;
@@ -163,12 +200,12 @@ void Pool::remove(const extid_s &extid)
 void Pool::remove(Tree &t)
 {
     // release all tree items
-    while (t.head != max_idx) {
-        uint8_t idx = t.head;
+    while (t.head.load() != max_idx) {
+        uint8_t idx = t.head.load();
         Item &i = items[idx];
-        t.head = i.next;
-        i.next = free;
-        free = idx;
+        t.head.store(i.next.load());
+        i.next.store(free.load());
+        free.store(idx);
     }
 }
 void Pool::report_status()
@@ -176,7 +213,7 @@ void Pool::report_status()
 #ifdef XCAN_CODEC_DEBUG
     size_t tcnt = 0;
     for (auto const &t : trees) {
-        if (t.head != max_idx)
+        if (t.head.load() != max_idx)
             tcnt++;
     }
     size_t scnt = space();
@@ -189,7 +226,7 @@ void Pool::report_status()
 size_t Pool::space() const
 {
     size_t cnt = 0;
-    for (uint8_t i = free; i != max_idx; i = items[i].next)
+    for (uint8_t i = free.load(); i != max_idx; i = items[i].next.load())
         cnt++;
     return cnt;
 }
@@ -197,9 +234,9 @@ size_t Pool::space() const
 size_t Pool::read_packet(void *dest, size_t sz, uint8_t *src_id)
 {
     for (auto &t : trees) {
-        if (t.head == max_idx)
+        if (t.head.load() == max_idx)
             continue;
-        if (!t.dlc)
+        if (!t.dlc.load())
             continue;
         // finished msg found in tree t
         size_t cnt = read_packet(t, dest, sz, src_id);
@@ -213,11 +250,11 @@ size_t Pool::read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_id)
     *src_id = t.extid.src;
 
     XbusStreamWriter stream(dest, sz);
-    stream << t.extid.pid;
+    stream.write<xbus::pid_raw_t>(t.extid.pid);
 
-    for (uint8_t next = t.head;;) {
+    for (uint8_t next = t.head.load();;) {
         Item &i = items[next];
-        next = i.next;
+        next = i.next.load();
         if (next != max_idx) {
             if ((stream.pos() + 8u) > sz)
                 break;
@@ -225,7 +262,7 @@ size_t Pool::read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_id)
             continue;
         }
         //final
-        uint8_t dlc = t.dlc;
+        uint8_t dlc = t.dlc.load();
         if (dlc <= 8) {
             if ((stream.pos() + dlc) > sz)
                 break;
@@ -240,12 +277,12 @@ bool Pool::timeout()
 {
     bool rv = false;
     for (auto &t : trees) {
-        if (t.head == max_idx)
+        if (t.head.load() == max_idx)
             continue;
-        if (t.dlc) // finished msg
+        if (t.dlc.load()) // finished msg
             continue;
         if (t.to == 0) {
-            debug("%X", t.mid);
+            debug("%X", t.extid);
             remove(t);
             rv = true;
             continue;

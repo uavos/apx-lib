@@ -133,7 +133,7 @@
 
     - name: ack
       title: Acknowledge request
-      descr: <pid_s><result_e>[<time_ms_16>]
+      descr: <pid_s><result_e>[<timeout_t>]
 
     - name: file
       title: File operations
