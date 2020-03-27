@@ -51,6 +51,8 @@ public:
                 continue;
             if (v == '\r')
                 continue;
+            if (v == '\t')
+                continue;
             if (v < 32 || v >= 127)
                 return nullptr;
         }

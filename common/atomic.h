@@ -122,6 +122,13 @@ public:
 
 private:
     T _value;
+
+private:
+    // Disallow copy construction and move assignment
+    atomic(const atomic &) = delete;
+    atomic &operator=(const atomic &) = delete;
+    atomic(atomic &&) = delete;
+    atomic &operator=(atomic &&) = delete;
 };
 
 } // namespace apx

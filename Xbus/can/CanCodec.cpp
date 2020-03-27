@@ -9,6 +9,7 @@
 
 #include <modules/node/Node.h>
 
+#include <crc/crc.h>
 #include <cstring>
 
 #define XCAN_CODEC_DEBUG
@@ -30,31 +31,33 @@ Codec::Codec()
 
 size_t Codec::read_packet(void *dest, size_t sz, uint8_t *src_id)
 {
-    size_t cnt = pool.read_packet(dest, sz, src_id);
-    if (cnt <= (sizeof(xbus::pid_raw_t) + 8))
-        return cnt;
-    if (!check_crc(dest, cnt))
-        return 0;
-    return cnt - sizeof(xbus::node::crc_t);
+    for (;;) {
+        lock_push(true);
+        size_t cnt = pool.read_packet(dest, sz, src_id);
+        lock_push(false);
+        if (cnt <= (sizeof(xbus::pid_raw_t) + 8))
+            return cnt;
+        cnt = check_crc(dest, cnt);
+        if (cnt)
+            return cnt;
+    }
 }
-bool Codec::check_crc(void *dest, size_t sz)
+size_t Codec::check_crc(void *dest, size_t sz)
 {
-    return true;
-    if (sz < (sizeof(xbus::pid_s) + sizeof(xbus::node::crc_t))) {
-        debug("no crc %d", sz);
-        return false;
-    }
     sz -= sizeof(xbus::node::crc_t);
-    xbus::node::crc_t crc;
     const uint8_t *p = static_cast<const uint8_t *>(dest) + sz;
-    crc = *p++;
-    crc |= *p << 8;
-    xbus::node::crc_t v = Node::get_crc(dest, sz);
+    xbus::node::crc_t crc = p[0] | (p[1] << 8);
+    xbus::node::crc_t v = get_crc(dest, sz);
     if (v != crc) {
-        debug("crc err: %X (%X)", v, crc);
-        return false;
+        debug("crc err: %X (%X) %d", v, crc, sz);
+        return 0;
     }
-    return true;
+    return sz;
+}
+xbus::node::crc_t Codec::get_crc(const void *src, size_t sz)
+{
+    //return CRC_8XOR(src, sz, 0);
+    return Node::get_crc(src, sz);
 }
 
 ErrorType Codec::push_message(const xcan_msg_s &msg)
@@ -116,7 +119,7 @@ bool Codec::send_packet(const void *data, size_t size)
     }
 
     //multi-frame
-    xbus::node::crc_t crc = Node::get_crc(data, size);
+    xbus::node::crc_t crc = get_crc(data, size);
     cnt += sizeof(xbus::node::crc_t);
     const uint8_t *src = static_cast<const uint8_t *>(stream.ptr());
     uint8_t frm = frm_start;

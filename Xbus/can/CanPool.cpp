@@ -34,23 +34,23 @@ void Pool::init()
     memset(items, 0, sizeof(items));
     // all trees are available
     for (auto &t : trees) {
-        t.head.store(max_idx);
+        t.head = max_idx;
     }
     // build chain of free items
     uint8_t idx = 0;
     for (auto &i : items) {
-        i.next.store(++idx);
+        i.next = ++idx;
     }
-    items[size_items - 1].next.store(max_idx);
+    items[size_items - 1].next = max_idx;
     // index of first free item
-    free.store(0);
+    free = 0;
 }
 
 ErrorType Pool::push(const extid_s &extid, const uint8_t *data, uint8_t dlc)
 {
     //debug("%d %d", extid.frm, dlc);
     // find free item
-    if (free.load() == max_idx) {
+    if (free == max_idx) {
         // pool overflow
         timeout();
         remove(extid);
@@ -87,12 +87,12 @@ ErrorType Pool::push_new(const extid_s &extid, const uint8_t *data, uint8_t dlc)
     remove(extid);
     // find empty tree
     for (auto &t : trees) {
-        if (t.head.load() != max_idx)
+        if (t.head != max_idx)
             continue;
         t.extid.raw = extid.raw;
         t.to = XCAN_CODEC_TIMEOUT;
-        t.dlc.store(dlc);
-        t.head.store(free.load());
+        t.dlc = dlc;
+        t.head = free;
         //debug("new %X", mid);
         push(data);
         if (dlc)
@@ -110,9 +110,9 @@ ErrorType Pool::push_next(const extid_s &extid, const uint8_t *data, uint8_t dlc
     // find existing tree and append message
     ErrorType rv = ErrorOrphan;
     for (auto &t : trees) {
-        if (t.head.load() == max_idx)
+        if (t.head == max_idx)
             continue;
-        if (t.dlc.load())
+        if (t.dlc)
             continue;
         if ((t.extid.raw ^ extid.raw) & mf_id_mask)
             continue;
@@ -136,9 +136,10 @@ ErrorType Pool::push_next(const extid_s &extid, const uint8_t *data, uint8_t dlc
         if (rv != MsgAccepted)
             break;
 
-        t.dlc.store(dlc);
-        if (dlc)
+        if (dlc) {
+            t.dlc = dlc;
             return PacketAvailable;
+        }
 
         t_frm++; // seqX check
         if (t_frm > frm_seq_max)
@@ -157,20 +158,20 @@ ErrorType Pool::push_next(const extid_s &extid, const uint8_t *data, uint8_t dlc
 ErrorType Pool::push_next(Tree &t, const uint8_t *data)
 {
     // append msg to tree
-    uint8_t next = t.head.load();
+    uint8_t next = t.head;
     uint8_t cnt = 0;
     while (cnt < max_seq_idx) {
         Item &i = items[next];
         //debug("%d %d", t.head, i.next);
         cnt++;
-        if (i.next.load() == max_idx) { // tail
+        if (i.next == max_idx) { // tail
             t.to = XCAN_CODEC_TIMEOUT;
-            i.next.store(free.load());
+            i.next = free;
             //debug("next %X (%d)", mid, i.next);
             push(data);
             return MsgAccepted;
         }
-        next = i.next.load();
+        next = i.next;
     }
     // stream error
     //debug("err %X %d", mid, seq_idx);
@@ -178,19 +179,19 @@ ErrorType Pool::push_next(Tree &t, const uint8_t *data)
 }
 void Pool::push(const uint8_t *data)
 {
-    Item &i = items[free.load()];
+    Item &i = items[free];
     //debug("%d %d", free, i.next);
     free = i.next;
-    i.next.store(max_idx);
+    i.next = max_idx;
     memcpy(i.data, data, 8);
 }
 
 void Pool::remove(const extid_s &extid)
 {
     for (auto &t : trees) {
-        if (t.head.load() == max_idx) // free slot
+        if (t.head == max_idx) // free slot
             continue;
-        if (t.dlc.load()) // finished msg
+        if (t.dlc) // finished msg
             continue;
         if ((t.extid.raw ^ extid.raw) & mf_id_mask)
             continue;
@@ -200,12 +201,12 @@ void Pool::remove(const extid_s &extid)
 void Pool::remove(Tree &t)
 {
     // release all tree items
-    while (t.head.load() != max_idx) {
-        uint8_t idx = t.head.load();
+    while (t.head != max_idx) {
+        uint8_t idx = t.head;
         Item &i = items[idx];
-        t.head.store(i.next.load());
-        i.next.store(free.load());
-        free.store(idx);
+        t.head = i.next;
+        i.next = free;
+        free = idx;
     }
 }
 void Pool::report_status()
@@ -213,7 +214,7 @@ void Pool::report_status()
 #ifdef XCAN_CODEC_DEBUG
     size_t tcnt = 0;
     for (auto const &t : trees) {
-        if (t.head.load() != max_idx)
+        if (t.head != max_idx)
             tcnt++;
     }
     size_t scnt = space();
@@ -226,7 +227,7 @@ void Pool::report_status()
 size_t Pool::space() const
 {
     size_t cnt = 0;
-    for (uint8_t i = free.load(); i != max_idx; i = items[i].next.load())
+    for (uint8_t i = free; i != max_idx; i = items[i].next)
         cnt++;
     return cnt;
 }
@@ -234,9 +235,9 @@ size_t Pool::space() const
 size_t Pool::read_packet(void *dest, size_t sz, uint8_t *src_id)
 {
     for (auto &t : trees) {
-        if (t.head.load() == max_idx)
+        if (t.head == max_idx)
             continue;
-        if (!t.dlc.load())
+        if (!t.dlc)
             continue;
         // finished msg found in tree t
         size_t cnt = read_packet(t, dest, sz, src_id);
@@ -252,9 +253,9 @@ size_t Pool::read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_id)
     XbusStreamWriter stream(dest, sz);
     stream.write<xbus::pid_raw_t>(t.extid.pid);
 
-    for (uint8_t next = t.head.load();;) {
+    for (uint8_t next = t.head;;) {
         Item &i = items[next];
-        next = i.next.load();
+        next = i.next;
         if (next != max_idx) {
             if ((stream.pos() + 8u) > sz)
                 break;
@@ -262,7 +263,7 @@ size_t Pool::read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_id)
             continue;
         }
         //final
-        uint8_t dlc = t.dlc.load();
+        uint8_t dlc = t.dlc;
         if (dlc <= 8) {
             if ((stream.pos() + dlc) > sz)
                 break;
@@ -277,9 +278,9 @@ bool Pool::timeout()
 {
     bool rv = false;
     for (auto &t : trees) {
-        if (t.head.load() == max_idx)
+        if (t.head == max_idx)
             continue;
-        if (t.dlc.load()) // finished msg
+        if (t.dlc) // finished msg
             continue;
         if (t.to == 0) {
             debug("%X", t.extid);

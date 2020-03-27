@@ -209,15 +209,28 @@ typedef uint16_t timeout_t;
 //---------------------------
 namespace status {
 
+enum type_e : uint8_t {
+    silent = 0, // no additional reports, jist <status_s>
+    errors,     // additional text messages
+    mem,        // report memory usage
+    debug,      // report debug raw data
+};
+
 typedef struct
 {
     struct
     {
         uint8_t can;
         uint8_t uart;
-        uint8_t seq;
-        uint8_t cnt;
+        uint8_t hw;
+        uint8_t _rsv[5];
     } err;
+    struct
+    {
+        uint8_t rx;
+        uint8_t tx;
+        uint8_t _rsv[6];
+    } cnt;
 
     static inline uint16_t psize()
     {
@@ -227,15 +240,21 @@ typedef struct
     {
         *s >> err.can;
         *s >> err.uart;
-        *s >> err.seq;
-        *s >> err.cnt;
+        *s >> err.hw;
+        s->read(err._rsv, sizeof(err._rsv));
+        *s >> cnt.rx;
+        *s >> cnt.tx;
+        s->read(cnt._rsv, sizeof(cnt._rsv));
     }
     inline void write(XbusStreamWriter *s) const
     {
         *s << err.can;
         *s << err.uart;
-        *s << err.seq;
-        *s << err.cnt;
+        *s << err.hw;
+        s->write(err._rsv, sizeof(err._rsv));
+        *s << cnt.rx;
+        *s << cnt.tx;
+        s->write(cnt._rsv, sizeof(cnt._rsv));
     }
 
 } status_s;

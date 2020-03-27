@@ -10,6 +10,7 @@
 
 #include "CanPool.h"
 
+#include <Xbus/XbusNode.h>
 #include <Xbus/XbusPacket.h>
 #include <common/do_not_copy.h>
 
@@ -65,6 +66,8 @@ protected:
      */
     virtual bool send_message(const xcan_msg_s &msg) = 0;
 
+    virtual void lock_push(bool locked) = 0;
+
 private:
     /**
      * @brief Prepare and send addressing packet.
@@ -73,7 +76,8 @@ private:
 
     xcan_msg_s txmsg;
 
-    bool check_crc(void *dest, size_t sz);
+    size_t check_crc(void *dest, size_t sz);
+    static xbus::node::crc_t get_crc(const void *src, size_t sz);
 
 protected:
     Pool pool; // 832 bytes

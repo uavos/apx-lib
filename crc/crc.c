@@ -21,8 +21,9 @@ uint16_t CRC_16_IBM(const void *data, size_t sz, uint16_t crc)
     return crc;
 }
 //==============================================================================
-uint8_t CRC_8XOR(const uint8_t *buf, size_t sz, uint8_t crc)
+uint8_t CRC_8XOR(const void *data, size_t sz, uint8_t crc)
 {
+    const uint8_t *buf = (const uint8_t *) data;
     while (sz--)
         crc ^= *buf++;
     return crc;
