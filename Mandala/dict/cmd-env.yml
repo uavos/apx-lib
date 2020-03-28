@@ -157,8 +157,8 @@
 
     - name: status
       title: Node status
-      descr: <status_s>
+      descr: <type_e> re:<status_s>
 
-    - name: cmd
+    - name: usr
       title: Node specific command
-      descr: <cmd> [<data>]
+      descr: <cmd_s> [<data>]

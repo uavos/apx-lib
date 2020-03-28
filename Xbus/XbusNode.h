@@ -210,10 +210,10 @@ typedef uint16_t timeout_t;
 namespace status {
 
 enum type_e : uint8_t {
-    silent = 0, // no additional reports, jist <status_s>
-    errors,     // additional text messages
-    mem,        // report memory usage
-    debug,      // report debug raw data
+    stats = 0, // no additional reports, jist <status_s>
+    errors,    // additional text messages
+    mem,       // report memory usage
+    debug,     // report debug raw data
 };
 
 typedef struct
@@ -260,6 +260,15 @@ typedef struct
 } status_s;
 
 }; // namespace status
+
+//---------------------------
+// usr
+//---------------------------
+namespace usr {
+
+typedef uint8_t cmd_t;
+
+}; // namespace usr
 
 } // namespace node
 } // namespace xbus
