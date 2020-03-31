@@ -28,7 +28,7 @@ enum fmt_id_t {
 
 struct item_t
 {
-    const meta_t &meta;
+    const meta_s &meta;
     const char *alias;
     const fmt_id_t fmt_hd;
     const fmt_id_t fmt_sd;
@@ -49,7 +49,7 @@ struct item_t
 
 static constexpr const uint8_t uid_base = 32;
 
-static constexpr const meta_t meta_void = cmd::env::dict::search::meta;
+static constexpr const meta_s meta_void = cmd::env::dict::search::meta;
 
 typedef enum {
     MBSTREAM(service, "Service packet <node_sn>,<cmd>,<data..>", = 0),

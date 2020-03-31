@@ -5,7 +5,7 @@
 {%- macro constants_expand(d, indent, level, uid) -%}
 {% set ind = ' '*indent*indent_size %}
 {{ ind }}typedef {{ d.type }}_t type_t;
-{{ ind }}static constexpr const meta_t &meta{ mandala::meta[{{ ns.meta_id }}]  };
+{{ ind }}static constexpr const meta_s &meta{ mandala::meta[{{ ns.meta_id }}]  };
 {{ ind }}static constexpr const uid_t uid{meta.uid};
 {%- endmacro -%}
 

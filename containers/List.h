@@ -1,9 +1,3 @@
-/**
- * @file List.hpp
- *
- * An intrusive linked list.
- */
-
 #pragma once
 
 #include <cinttypes>
@@ -24,43 +18,41 @@ template<class T>
 class List
 {
 public:
-    void add(T newNode)
+    void add(T node)
     {
-        newNode->setSibling(getHead());
-        _head = newNode;
+        if (!_head) {
+            _head = node;
+            return;
+        }
+        for (T i = _head;;) {
+            T s = i->getSibling();
+            if (!s) {
+                i->setSibling(node);
+                return;
+            }
+            i = s;
+        }
     }
 
-    bool remove(T removeNode)
+    bool remove(T node)
     {
-        if (removeNode == nullptr) {
+        if (node == nullptr || _head == nullptr) {
             return false;
         }
 
-        // base case
-        if (removeNode == _head) {
-            if (_head != nullptr) {
-                _head = _head->getSibling();
-            }
+        if (node == _head) {
+            _head = _head->getSibling();
+        }
 
+        for (T i = _head;;) {
+            T s = i->getSibling();
+            if (!s)
+                return false;
+            if (s != node)
+                continue;
+            i->setSibling(s->getSibling());
             return true;
         }
-
-        for (T node = getHead(); node != nullptr; node = node->getSibling()) {
-            // is sibling the node to remove?
-            if (node->getSibling() == removeNode) {
-                // replace sibling
-                if (node->getSibling() != nullptr) {
-                    node->setSibling(node->getSibling()->getSibling());
-
-                } else {
-                    node->setSibling(nullptr);
-                }
-
-                return true;
-            }
-        }
-
-        return false;
     }
 
     struct Iterator
@@ -83,43 +75,29 @@ public:
         }
     };
 
-    Iterator begin() const { return Iterator(getHead()); }
-    Iterator end() const { return Iterator(nullptr); }
+    inline Iterator begin() const
+    {
+        return Iterator(_head);
+    }
+    inline Iterator end() const
+    {
+        return Iterator(nullptr);
+    }
 
-    const T getHead() const { return _head; }
-
-    bool empty() const { return getHead() == nullptr; }
+    inline bool empty() const
+    {
+        return _head == nullptr;
+    }
 
     size_t size() const
     {
         size_t sz = 0;
 
-        for (auto node = getHead(); node != nullptr; node = node->getSibling()) {
+        for (auto node = _head; node != nullptr; node = node->getSibling()) {
             sz++;
         }
 
         return sz;
-    }
-
-    void deleteNode(T node)
-    {
-        if (remove(node)) {
-            // only delete if node was successfully removed
-            delete node;
-        }
-    }
-
-    void clear()
-    {
-        auto node = getHead();
-
-        while (node != nullptr) {
-            auto next = node->getSibling();
-            delete node;
-            node = next;
-        }
-
-        _head = nullptr;
     }
 
 protected:

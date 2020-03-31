@@ -3,6 +3,8 @@
 #include <cinttypes>
 #include <sys/types.h>
 
+#include <Xbus/XbusPacket.h>
+
 namespace mandala {
 
 typedef uint16_t uid_t;
@@ -13,16 +15,51 @@ typedef uint16_t word_t;
 typedef uint8_t byte_t;
 typedef uint8_t option_t;
 
-enum type_id_t {
+enum type_id_e {
     type_void,
     type_real,
     type_dword,
     type_word,
     type_byte,
     type_option,
+
+    // special format cases
+    type_vec3 = 8,
 };
 
-enum sfmt_id_t {
+// Data Specifier [1 byte] - first byte after pid for mandala data transfers
+
+#pragma pack(1)
+union dspec_s {
+    uint8_t _raw;
+
+    struct
+    {
+        type_id_e type : 4; // data format
+        uint8_t sub : 4;    // sub system index
+    };
+
+    explicit dspec_s()
+        : _raw(0)
+    {}
+
+    static constexpr inline uint16_t psize()
+    {
+        return sizeof(uint8_t);
+    }
+    inline void read(XbusStreamReader *s)
+    {
+        *s >> _raw;
+    }
+    inline void write(XbusStreamWriter *s) const
+    {
+        *s << _raw;
+    }
+};
+static_assert(sizeof(dspec_s) == 1, "dspec_s size error");
+#pragma pack()
+
+enum sfmt_id_e {
     sfmt_void,
 
     sfmt_bit,
@@ -44,7 +81,7 @@ enum sfmt_id_t {
 
 };
 
-struct meta_t
+struct meta_s
 {
     const char *name;
     const char *title;
@@ -56,20 +93,20 @@ struct meta_t
     const uid_t mask : sizeof(uid_t) * 8;
     const uint8_t level : 3;
     const bool group : 1;
-    const type_id_t type_id : 4;
+    const type_id_e type_id : 4;
 };
 
-struct stream_item_t
+struct stream_item_s
 {
     const uid_t uid : sizeof(uid_t) * 8;
-    const sfmt_id_t sfmt : 4;
+    const sfmt_id_e sfmt : 4;
 };
 
-struct stream_id_t
+struct stream_id_s
 {
     const char *name;
     const char *title;
-    const stream_item_t *content;
+    const stream_item_s *content;
 };
 
 }; // namespace mandala

@@ -93,7 +93,7 @@ static constexpr const mandala::uid_t uid_base = 0x{{ '%0x' % data.uid_base }};
 static constexpr const mandala::uid_t uid_max = 0x{{ '%0x' % (data.uid_base+(2**(data.uid_bits|sum)-1)) }}; 
 
 // flat array of all elements
-static constexpr const mandala::meta_t meta[] = {
+static constexpr const mandala::meta_s meta[] = {
 {% for i in data.content %}
 {% set uid_pow = data.uid_bits[1:]|sum %}
 {% set uid_mul = 2**uid_pow %}
