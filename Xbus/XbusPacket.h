@@ -12,12 +12,14 @@ typedef uint16_t pid_raw_t;
 
 constexpr const size_t size_packet_max = 512;
 
-enum pri_e : uint8_t {
-    pri_primary = 0,
+enum pri_e {
+    pri_none = 0,
+    pri_primary,
     pri_secondary,
     pri_failsafe,
+    pri_auxilary,
 
-    pri_gcs = 5,      // command from gcs
+    pri_gcs = 5,      // data packet from gcs
     pri_response = 6, // response not request
     pri_request = 7,  // request not response
 };
@@ -31,7 +33,7 @@ union pid_s {
     {
         uint16_t uid : 11; // dictionary
 
-        uint8_t pri : 3; // [0,7] sub index, 1=request not response
+        pri_e pri : 3;   // [0,7] sub index, 1=request not response
         uint8_t seq : 2; // sequence counter
     };
 
@@ -39,7 +41,7 @@ union pid_s {
         : _raw(0)
     {}
 
-    explicit pid_s(uint16_t _uid, uint8_t _pri, uint8_t _seq)
+    explicit pid_s(uint16_t _uid, pri_e _pri, uint8_t _seq)
         : uid(_uid)
         , pri(_pri)
         , seq(_seq)
@@ -58,18 +60,20 @@ union pid_s {
         *s << _raw;
     }
 
-    // Disallow copy construction and move assignment
-    pid_s(const pid_s &pid) { _raw = pid._raw; }
-    pid_s &operator=(const pid_s &pid)
+    constexpr pid_s(const pid_raw_t &v)
+        : _raw(v)
+    {}
+    constexpr pid_s(const pid_s &v)
+        : _raw(v._raw)
+    {}
+    constexpr pid_s &operator=(const pid_raw_t &v)
     {
-        _raw = pid._raw;
+        _raw = v;
         return *this;
     }
-
-    pid_s(pid_s &&) = delete;
-    pid_s &operator=(pid_s &&) = delete;
+    constexpr bool match(const pid_s &v) const { return uid == v.uid && pri == v.pri; }
 };
-static_assert(sizeof(pid_s) == 2, "pid_s size error");
+static_assert(sizeof(pid_s) == sizeof(pid_raw_t), "pid_s size error");
 #pragma pack()
 
 } // namespace xbus

@@ -30,16 +30,16 @@ enum type_id_e {
 // Data Specifier [1 byte] - first byte after pid for mandala data transfers
 
 #pragma pack(1)
-union dspec_s {
+union spec_s {
     uint8_t _raw;
 
     struct
     {
         type_id_e type : 4; // data format
-        uint8_t sub : 4;    // sub system index
+        uint8_t _rsv : 4;   //
     };
 
-    explicit dspec_s()
+    explicit spec_s()
         : _raw(0)
     {}
 
@@ -56,7 +56,7 @@ union dspec_s {
         *s << _raw;
     }
 };
-static_assert(sizeof(dspec_s) == 1, "dspec_s size error");
+static_assert(sizeof(spec_s) == 1, "dspec_s size error");
 #pragma pack()
 
 enum sfmt_id_e {

@@ -158,9 +158,9 @@ typedef uint16_t word_t;
 typedef uint32_t dword_t;
 typedef char string_t[16];
 typedef char text_t[64];
-typedef uint16_t mandala_t;
+typedef xbus::pid_raw_t bind_t;
 
-enum type_e : uint8_t {
+enum type_e {
     group = 0,
     command,
     option = 4,
@@ -168,7 +168,7 @@ enum type_e : uint8_t {
     byte,
     word,
     dword,
-    mandala,
+    bind,
     string,
     text,
 };
@@ -176,7 +176,7 @@ enum type_e : uint8_t {
 // field descriptor packed into dict array
 typedef struct
 {
-    uint8_t type : 4;
+    type_e type : 4;
     uint8_t array : 4; // >0 if array
     uint8_t group;     // group idx
 
