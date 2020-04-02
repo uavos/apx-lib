@@ -20,18 +20,28 @@ class List
 public:
     void add(T node)
     {
+        node->setSibling(nullptr);
         if (!_head) {
             _head = node;
             return;
         }
-        for (T i = _head;;) {
-            T s = i->getSibling();
-            if (!s) {
-                i->setSibling(node);
-                return;
-            }
-            i = s;
+        for (auto i : *this) {
+            if (i->getSibling())
+                continue;
+            i->setSibling(node);
+            return;
         }
+    }
+
+    void insert(T node, T after)
+    {
+        if (!after) {
+            node->setSibling(_head);
+            _head = node;
+            return;
+        }
+        node->setSibling(after->getSibling());
+        after->setSibling(node);
     }
 
     bool remove(T node)
@@ -42,17 +52,16 @@ public:
 
         if (node == _head) {
             _head = _head->getSibling();
-        }
-
-        for (T i = _head;;) {
-            T s = i->getSibling();
-            if (!s)
-                return false;
-            if (s != node)
-                continue;
-            i->setSibling(s->getSibling());
             return true;
         }
+
+        for (auto i : *this) {
+            if (i->getSibling() != node)
+                continue;
+            i->setSibling(node->getSibling());
+            return true;
+        }
+        return false;
     }
 
     struct Iterator

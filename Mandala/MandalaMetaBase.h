@@ -23,8 +23,10 @@ enum type_id_e {
     type_byte,
     type_option,
 
-    // special format cases
-    type_vec3 = 8,
+    // bundle formats
+    type_bundle = 10,
+    type_vec2 = type_bundle,
+    type_vec3,
 };
 
 // Data Specifier [1 byte] - first byte after pid for mandala data transfers
@@ -56,7 +58,7 @@ union spec_s {
         *s << _raw;
     }
 };
-static_assert(sizeof(spec_s) == 1, "dspec_s size error");
+static_assert(sizeof(spec_s) == spec_s::psize() && sizeof(spec_s) == sizeof(spec_s::_raw), "spec_s size error");
 #pragma pack()
 
 enum sfmt_id_e {

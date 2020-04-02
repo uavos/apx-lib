@@ -19,7 +19,6 @@ enum pri_e {
     pri_failsafe,
     pri_auxilary,
 
-    pri_gcs = 5,      // data packet from gcs
     pri_response = 6, // response not request
     pri_request = 7,  // request not response
 };
@@ -41,10 +40,11 @@ union pid_s {
         : _raw(0)
     {}
 
-    explicit pid_s(uint16_t _uid, pri_e _pri, uint8_t _seq)
+    // constructor to make mandala binding uid
+    constexpr explicit pid_s(uint16_t _uid, pri_e _pri)
         : uid(_uid)
         , pri(_pri)
-        , seq(_seq)
+        , seq(2) // indicates valid uid (_raw!=0)
     {}
 
     static constexpr inline uint16_t psize()
