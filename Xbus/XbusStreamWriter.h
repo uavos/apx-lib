@@ -9,10 +9,22 @@
 class XbusStreamWriter : public XbusStream
 {
 public:
+    explicit XbusStreamWriter()
+        : XbusStream(0)
+        , _buf(nullptr)
+    {}
+
     explicit XbusStreamWriter(void *p, size_t size)
         : XbusStream(size)
         , _buf(static_cast<uint8_t *>(p))
     {}
+
+    void init(void *p, size_t size)
+    {
+        _buf = static_cast<uint8_t *>(p);
+        _size = size;
+        reset();
+    }
 
     inline uint8_t *buffer() const { return _buf; }
     inline uint8_t *ptr() const { return &(_buf[_pos]); }
