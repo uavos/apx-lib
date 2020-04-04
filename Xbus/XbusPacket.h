@@ -21,6 +21,7 @@ enum pri_e {
 
     pri_response = 6, // response not request
     pri_request = 7,  // request not response
+    pri_dynamic = 7,  // configured priority for pubs
 };
 
 // Packet identifier [16 bits]
@@ -71,7 +72,7 @@ union pid_s {
         _raw = v;
         return *this;
     }
-    constexpr bool match(const pid_s &v) const { return uid == v.uid && pri == v.pri; }
+    constexpr bool match(const pid_s &v) const { return uid == v.uid; }
 };
 static_assert(sizeof(pid_s) == sizeof(pid_raw_t), "pid_s size error");
 #pragma pack()
