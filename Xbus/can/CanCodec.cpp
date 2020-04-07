@@ -7,9 +7,6 @@
 #include "CanCodec.h"
 #include "CanFormat.h"
 
-#include <modules/node/Node.h>
-
-#include <crc/crc.h>
 #include <cstring>
 
 #define XCAN_CODEC_DEBUG
@@ -53,11 +50,6 @@ size_t Codec::check_crc(void *dest, size_t sz)
         return 0;
     }
     return sz;
-}
-xbus::node::crc_t Codec::get_crc(const void *src, size_t sz)
-{
-    //return CRC_8XOR(src, sz, 0);
-    return Node::get_crc(src, sz);
 }
 
 ErrorType Codec::push_message(const xcan_msg_s &msg)

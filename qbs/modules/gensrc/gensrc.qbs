@@ -66,7 +66,7 @@ Module {
             cmd.description = "Parsing "+input.fileName
             cmd.highlight = "codegen"
             cmd.stdoutFilterFunction=function(s){
-                return ""
+                return s //""
             }
             commands.push(cmd)
 
