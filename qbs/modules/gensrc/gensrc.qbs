@@ -10,6 +10,8 @@
 ****************************************************************************/
 
 import qbs.FileInfo
+import qbs.TextFile
+import qbs.File
 
 Module {
     id: _module
@@ -60,7 +62,12 @@ Module {
             args.push(FileInfo.path(output.filePath))
             args.push("--data")
 
-            args.push(JSON.stringify(product.gensrc.data))
+            var fname = FileInfo.joinPaths(product.buildDirectory, input.fileName+".json")
+            args.push(fname)
+            File.makePath(FileInfo.path(fname))
+            var f = TextFile(fname, TextFile.WriteOnly)
+            f.write(JSON.stringify(product.gensrc.data,0,2))
+            f.close()
 
             cmd = new Command("python", args);
             cmd.description = "Parsing "+input.fileName
