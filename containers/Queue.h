@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 template<class T>
-class IntrusiveQueue
+class Queue
 {
 public:
     bool empty() const { return _head == nullptr; }
@@ -15,7 +15,7 @@ public:
     {
         size_t sz = 0;
 
-        for (auto node = front(); node != nullptr; node = node->next_intrusive_queue_node()) {
+        for (auto node = front(); node != nullptr; node = node->next_queue_node()) {
             sz++;
         }
 
@@ -25,7 +25,7 @@ public:
     void push(T newNode)
     {
         // error, node already queued or already inserted
-        if ((newNode->next_intrusive_queue_node() != nullptr) || (newNode == _tail)) {
+        if ((newNode->next_queue_node() != nullptr) || (newNode == _tail)) {
             return;
         }
 
@@ -34,7 +34,7 @@ public:
         }
 
         if (_tail != nullptr) {
-            _tail->set_next_intrusive_queue_node(newNode);
+            _tail->set_next_queue_node(newNode);
         }
 
         _tail = newNode;
@@ -46,7 +46,7 @@ public:
 
         if (!empty()) {
             if (_head != _tail) {
-                _head = _head->next_intrusive_queue_node();
+                _head = _head->next_queue_node();
 
             } else {
                 // only one item left
@@ -55,7 +55,7 @@ public:
             }
 
             // clear next in popped (in might be re-inserted later)
-            ret->set_next_intrusive_queue_node(nullptr);
+            ret->set_next_queue_node(nullptr);
         }
 
         return ret;
@@ -65,8 +65,8 @@ public:
     {
         // base case
         if (removeNode == _head) {
-            if (_head->next_intrusive_queue_node() != nullptr) {
-                _head = _head->next_intrusive_queue_node();
+            if (_head->next_queue_node() != nullptr) {
+                _head = _head->next_queue_node();
 
             } else {
                 _head = nullptr;
@@ -75,15 +75,15 @@ public:
             return true;
         }
 
-        for (T node = _head; node != nullptr; node = node->next_intrusive_queue_node()) {
+        for (T node = _head; node != nullptr; node = node->next_queue_node()) {
             // is sibling the node to remove?
-            if (node->next_intrusive_queue_node() == removeNode) {
+            if (node->next_queue_node() == removeNode) {
                 // replace sibling
-                if (node->next_intrusive_queue_node() != nullptr) {
-                    node->set_next_intrusive_queue_node(node->next_intrusive_queue_node()->next_intrusive_queue_node());
+                if (node->next_queue_node() != nullptr) {
+                    node->set_next_queue_node(node->next_queue_node()->next_queue_node());
 
                 } else {
-                    node->set_next_intrusive_queue_node(nullptr);
+                    node->set_next_queue_node(nullptr);
                 }
 
                 return true;
@@ -106,7 +106,7 @@ public:
         Iterator &operator++()
         {
             if (node) {
-                node = node->next_intrusive_queue_node();
+                node = node->next_queue_node();
             };
 
             return *this;
@@ -122,13 +122,13 @@ private:
 };
 
 template<class T>
-class IntrusiveQueueNode
+class QueueNode
 {
 private:
-    friend IntrusiveQueue<T>;
+    friend Queue<T>;
 
-    T next_intrusive_queue_node() const { return _next_intrusive_queue_node; }
-    void set_next_intrusive_queue_node(T new_next) { _next_intrusive_queue_node = new_next; }
+    T next_queue_node() const { return _next_queue_node; }
+    void set_next_queue_node(T new_next) { _next_queue_node = new_next; }
 
-    T _next_intrusive_queue_node{nullptr};
+    T _next_queue_node{nullptr};
 };
