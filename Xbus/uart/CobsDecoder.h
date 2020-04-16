@@ -91,7 +91,7 @@ private:
         }
         restart();
     }
-    inline bool write_decoded_byte(const T &c)
+    bool write_decoded_byte(const T &c)
     {
         if (_rcnt == 0) {
             _head_s = head();
