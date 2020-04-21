@@ -15,7 +15,10 @@ typedef uint16_t word_t;
 typedef uint8_t byte_t;
 typedef uint8_t option_t;
 
+typedef uint32_t raw_t;
+
 enum type_id_e {
+    // integral formats [max 7]
     type_void,
     type_real,
     type_dword,
@@ -28,6 +31,24 @@ enum type_id_e {
     type_vec2 = type_bundle,
     type_vec3,
 };
+
+static constexpr size_t type_size(type_id_e type)
+{
+    switch (type) {
+    default:
+        return 0;
+    case type_real:
+        return sizeof(real_t);
+    case type_dword:
+        return sizeof(dword_t);
+    case type_word:
+        return sizeof(word_t);
+    case type_byte:
+        return sizeof(byte_t);
+    case type_option:
+        return sizeof(option_t);
+    }
+}
 
 // Data Specifier [1 byte] - first byte after pid for mandala data transfers
 

@@ -27,6 +27,10 @@ public:
             T c = *ptr++;
             if (c == _esc) {
                 //packet delimiter
+                if (_copy) {
+                    error();
+                    return ErrorSize;
+                }
                 ret = check_packet();
                 continue;
             }

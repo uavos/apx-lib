@@ -11,6 +11,21 @@
     - name: temp
       suffix: temperature
       units: C
+    - name: health
+      suffix: health
+      type: byte
+      units: u
+    - name: clip
+      suffix: clip count
+      type: byte
+      units: u
+    - name: vib
+      suffix: vibration
+      type: byte
+      units: "%"
+    - name: coning
+      suffix: coning vibration
+      units: rad^2
 
 - name: acc
   title: Accelerometer
@@ -25,6 +40,16 @@
     - name: temp
       suffix: temperature
       units: C
+    - name: health
+      suffix: health
+      type: byte
+      units: u
+    - name: clip
+      suffix: clip count
+      type: byte
+      units: u
+    - name: vib
+      suffix: vibration metric
 
 - name: mag
   title: Magnetometer
@@ -39,6 +64,16 @@
     - name: temp
       suffix: temperature
       units: C
+    - name: health
+      suffix: health
+      type: byte
+      units: u
+    - name: clip
+      suffix: clip count
+      type: byte
+      units: u
+    - name: vib
+      suffix: vibration metric
 
 - name: gps
   title: GPS
