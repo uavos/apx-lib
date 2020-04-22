@@ -32,7 +32,70 @@ enum type_id_e {
     type_vec3,
 };
 
-static constexpr size_t type_size(type_id_e type)
+template<typename T>
+T read(type_id_e type, XbusStreamReader &stream)
+{
+    switch (type) {
+    default:
+        return T();
+    case type_real:
+        return stream.read<real_t, T>();
+    case type_dword:
+        return stream.read<dword_t, T>();
+    case type_word:
+        return stream.read<word_t, T>();
+    case type_byte:
+        return stream.read<byte_t, T>();
+    case type_option:
+        return stream.read<option_t, T>();
+    }
+}
+
+template<typename T>
+void write(const T &v, type_id_e type, XbusStreamWriter &stream)
+{
+    switch (type) {
+    default:
+        return stream.write<T>(v);
+    case type_real:
+        return stream.write<real_t, T>(v);
+    case type_dword:
+        return stream.write<dword_t, T>(v);
+    case type_word:
+        return stream.write<word_t, T>(v);
+    case type_byte:
+        return stream.write<byte_t, T>(v);
+    case type_option:
+        return stream.write<option_t, T>(v);
+    }
+}
+
+/*template<type_id_e>
+struct type_id
+{};
+
+template<>
+struct type_id<type_real>
+{
+    typedef real_t type;
+};
+
+template<>
+struct type_id<type_dword>
+{
+    typedef dword_t type;
+};*/
+
+/*template<type_id_e>
+struct rtype
+{};
+
+real_t read(rtype<type_real>, XbusStreamReader &stream)
+{
+    return stream.read<real_t>();
+}*/
+
+constexpr size_t type_size(type_id_e type)
 {
     switch (type) {
     default:

@@ -1,6 +1,8 @@
 #include "TelemetryDecoder.h"
 #include <crc/crc.h>
 
+#include "TelemetryValueUnpack.h"
+
 using namespace xbus::telemetry;
 
 TelemetryDecoder::TelemetryDecoder()
@@ -24,11 +26,8 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
 
     uint8_t &h = _hash.byte[seq & 3];
     if (h != hdr.feed_hash) {
-        if (h) {
-            _hash.hash = 0;
-            _hash_valid = 0;
-            _slots_cnt = 0;
-        }
+        if (h)
+            reset_fmt();
         h = hdr.feed_hash;
         _hash_valid++;
     } else if (!_is_hash_valid())
@@ -41,6 +40,8 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
     }
     _set_feed_fmt(hdr.feed_fmt);
 
+    _valid = false;
+
     if (!_is_hash_valid())
         return false;
 
@@ -48,15 +49,17 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
         return false;
 
     // fmt looks consistent
-    if (decode_values(stream))
-        return true;
+    _valid = true;
+    return decode_values(stream);
+}
 
-    // error in values pack
+void TelemetryDecoder::reset_fmt()
+{
     _hash.hash = 0;
     _hash_valid = 0;
     _slots_cnt = 0;
-
-    return false;
+    _valid = false;
+    memset(_slots.data, 0, sizeof(_slots.data));
 }
 
 void TelemetryDecoder::_set_feed_fmt(uint8_t v)
@@ -138,10 +141,48 @@ uint8_t TelemetryDecoder::rate_hz()
 
 bool TelemetryDecoder::decode_values(XbusStreamReader &stream)
 {
-    for (size_t i = 0; i < dec_slots_size; ++i) {
+    if (stream.available() == 0)
+        return false;
+
+    uint8_t code = 0;
+    uint8_t code_bit = 0x80;
+
+    bool upd = false;
+    for (size_t i = 0; i < _slots_cnt; ++i) {
         auto const &f = _slots.fields[i];
         if (!f.pid._raw)
             break;
+
+        if (code_bit == 0x80) {
+            code = stream.read<uint8_t>();
+            code_bit = 1;
+        } else
+            code_bit <<= 1;
+
+        if (!(code & code_bit))
+            continue;
+
+        if (stream.available() == 0) {
+            //reset_fmt();
+            return false;
+        }
+
+        dec_data_s &d = _slots.data[i];
+        mandala::type_id_e type;
+        size_t sz = unpack_value(stream.ptr(), &d.value, &type, f.fmt, stream.available());
+        if (!sz)
+            break;
+        stream.reset(stream.pos() + sz);
+        d.type = type;
+        d.upd = true;
+        upd = true;
+        if (stream.available() == 0)
+            break;
     }
-    return stream.available() == 0;
+
+    if (stream.available() != 0) {
+        //reset_fmt();
+        return false;
+    }
+    return upd;
 }

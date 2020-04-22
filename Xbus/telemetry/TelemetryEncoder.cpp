@@ -136,17 +136,32 @@ uint8_t TelemetryEncoder::_get_feed_fmt()
 
 void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint8_t seq)
 {
+    uint8_t *code = stream.ptr();
+    uint8_t code_bit = 0x80;
+
     for (size_t i = 0; i < enc_slots_size; ++i) {
         auto const &f = _slots.fields[i];
         if (!f.pid._raw)
             break;
+
+        if (code_bit == 0x80) {
+            code = stream.ptr();
+            stream.write<uint8_t>(0);
+            code_bit = 1;
+        } else
+            code_bit <<= 1;
+
         enc_data_s &d = _slots.data[i];
-        if (d.upd) {
+        if (d.upd && (f.pid.seq & seq) == 0) {
             d.upd = false;
             size_t sz = pack_value(&d.value, &d.buf, d.type, f.fmt);
             if (sz) {
                 stream.write(&d.buf, sz);
+                *code |= code_bit;
             }
         }
+    }
+    if (code == (stream.ptr() - 1)) {
+        stream.reset(stream.pos() - 1);
     }
 }

@@ -97,17 +97,10 @@ size_t pack_value(const T &v, void *dest)
     return sizeof(T);
 }
 
-static uint32_t float_to_f32(const float &f)
-{
-    if (isnan(f))
-        return 0;
-    return *static_cast<const uint32_t *>(static_cast<const void *>(&f));
-}
-
 static uint16_t float_to_f16(const float &v)
 {
     //IEEE 754r
-    uint32_t x = float_to_f32(v);
+    uint32_t x = isnan(v) ? 0 : *static_cast<const uint32_t *>(static_cast<const void *>(&v));
     uint32_t xs, xe, xm;
     uint16_t hs, he, hm;
     uint16_t hp; // = static_cast<uint16_t *>(buf);
@@ -153,6 +146,8 @@ static uint16_t float_to_f16(const float &v)
     }
     return hp;
 }
+
+// pack method
 
 size_t pack_value(const void *src, void *dest, mandala::type_id_e type, fmt_e fmt)
 {
