@@ -14,7 +14,7 @@ namespace telemetry {
 template<typename T>
 inline const T &limit(const T &v, const T &vmin, const T &vmax)
 {
-    return v < vmin ? vmin : v > vmax ? vmax : v;
+    return v < vmin ? vmin : (v > vmax ? vmax : v);
 }
 
 template<typename T>
@@ -150,6 +150,13 @@ static uint16_t float_to_f16(const float &v)
     }
     return hp;
 }
+static int16_t float_to_rad(const float &v)
+{
+    const float span = (float) M_PI;
+    const float dspan = span * 2.f;
+    const float a = v - std::floor(v / dspan + 0.5f) * dspan;
+    return a * (32768.f / (float) M_PI);
+}
 
 // pack method
 
@@ -178,6 +185,11 @@ size_t pack_value(const void *src, void *dest, mandala::type_id_e type, fmt_e fm
     case fmt_f16: {
         const mandala::real_t &v = raw_value<mandala::real_t>(src, type);
         return pack_value(float_to_f16(v), dest);
+    }
+
+    case fmt_rad: {
+        const mandala::real_t &v = raw_value<mandala::real_t>(src, type);
+        return pack_value(float_to_rad(v), dest);
     }
 
     case fmt_sbyte: {

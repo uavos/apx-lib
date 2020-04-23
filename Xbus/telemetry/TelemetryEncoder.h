@@ -8,6 +8,8 @@ namespace telemetry {
 
 static constexpr const size_t enc_slots_size{128};
 
+typedef void (*enc_codec_f)();
+
 #pragma pack(1)
 typedef struct
 {
@@ -22,8 +24,8 @@ typedef struct
     field_s fields[enc_slots_size];
     uint8_t crc_cobs;
     enc_flags_s flags[enc_slots_size];
-    mandala::raw_t value[enc_slots_size]; // raw value
-    mandala::raw_t buf[enc_slots_size];   // packed value
+    mandala::raw_t value[enc_slots_size];  // raw value
+    mandala::raw_t packed[enc_slots_size]; // packed value
 } enc_slots_s;
 //static_assert(sizeof(enc_slots_s) == 12 * enc_slots_size + 1, "size error");
 #pragma pack()
@@ -44,6 +46,7 @@ public:
 
 private:
     xbus::telemetry::enc_slots_s _slots;
+    uint16_t _slots_cnt{0};
 
     xbus::telemetry::hash_s _hash;
 

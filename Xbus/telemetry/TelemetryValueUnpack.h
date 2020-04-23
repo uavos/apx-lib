@@ -61,6 +61,11 @@ static float float_from_f16(const uint16_t &v)
     return isnan(f) ? 0.f : f;
 }
 
+static float float_from_rad(const int16_t &v)
+{
+    return v / (32768.f / (float) M_PI);
+}
+
 // unpack method
 
 size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e fmt, size_t size)
@@ -86,6 +91,13 @@ size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e
         if (!unpack_value<mandala::word_t>(src, dest, size))
             break;
         *static_cast<mandala::real_t *>(dest) = float_from_f16(*static_cast<uint16_t *>(dest));
+        return sizeof(mandala::word_t);
+
+    case fmt_rad:
+        *type = mandala::type_real;
+        if (!unpack_value<mandala::word_t>(src, dest, size))
+            break;
+        *static_cast<mandala::real_t *>(dest) = float_from_rad(*static_cast<int16_t *>(dest));
         return sizeof(mandala::word_t);
 
     case fmt_sbyte:

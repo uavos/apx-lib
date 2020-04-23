@@ -153,8 +153,6 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream)
     bool upd = false;
     for (size_t i = 0; i < _slots_cnt; ++i) {
         auto const &f = _slots.fields[i];
-        if (!f.fmt)
-            break;
 
         if (!cnt)
             break;
@@ -190,7 +188,7 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream)
     }
 
     if (stream.available() != 0 || cnt != 0) {
-        reset_fmt();
+        //reset_fmt();
         return false;
     }
     return upd;
