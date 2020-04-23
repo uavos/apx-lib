@@ -86,7 +86,7 @@ size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e
         if (!unpack_value<mandala::word_t>(src, dest, size))
             break;
         *static_cast<mandala::real_t *>(dest) = float_from_f16(*static_cast<uint16_t *>(dest));
-        return sizeof(mandala::real_t);
+        return sizeof(mandala::word_t);
 
     case fmt_sbyte:
         *type = mandala::type_real;
@@ -96,39 +96,39 @@ size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e
         if (!unpack_value<int8_t, mandala::real_t>(src, dest, size))
             break;
         *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) * 10.f;
-        return sizeof(mandala::real_t);
+        return sizeof(int8_t);
     case fmt_sbyte_01:
         *type = mandala::type_real;
         if (!unpack_value<int8_t, mandala::real_t>(src, dest, size))
             break;
         *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) / 10.f;
-        return sizeof(mandala::real_t);
+        return sizeof(int8_t);
     case fmt_sbyte_001:
         *type = mandala::type_real;
         if (!unpack_value<int8_t, mandala::real_t>(src, dest, size))
             break;
         *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) / 100.f;
-        return sizeof(mandala::real_t);
+        return sizeof(int8_t);
 
     case fmt_byte_10:
         *type = mandala::type_dword;
         if (!unpack_value<uint8_t, mandala::dword_t>(src, dest, size))
             break;
         *static_cast<mandala::dword_t *>(dest) = *static_cast<mandala::dword_t *>(dest) * 10;
-        return sizeof(mandala::dword_t);
+        return sizeof(uint8_t);
 
     case fmt_byte_01:
         *type = mandala::type_real;
         if (!unpack_value<uint8_t, mandala::real_t>(src, dest, size))
             break;
         *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) / 10.f;
-        return sizeof(mandala::real_t);
+        return sizeof(uint8_t);
     case fmt_byte_001:
         *type = mandala::type_real;
         if (!unpack_value<uint8_t, mandala::real_t>(src, dest, size))
             break;
         *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) / 100.f;
-        return sizeof(mandala::real_t);
+        return sizeof(uint8_t);
     }
     return 0;
 }

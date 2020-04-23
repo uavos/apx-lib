@@ -14,17 +14,17 @@ typedef struct
     mandala::type_id_e type : 4; // value format
     uint8_t _rsv : 3;            // reserved
     bool upd : 1;                // value updated
-    mandala::raw_t value;        // value
-} dec_data_s;
+} dec_flags_s;
+#pragma pack()
 
 typedef struct
 {
     field_s fields[dec_slots_size];
-    uint8_t crc_xor;
-    dec_data_s data[dec_slots_size];
+    uint8_t crc_cobs_dummy;
+    dec_flags_s flags[dec_slots_size];
+    mandala::raw_t value[dec_slots_size]; // value
 } dec_slot_s;
-static_assert(sizeof(dec_slot_s) == 8 * dec_slots_size + 1, "size error");
-#pragma pack()
+//static_assert(sizeof(dec_slot_s) == 8 * dec_slots_size + 1, "size error");
 
 } // namespace telemetry
 } // namespace xbus
@@ -42,6 +42,7 @@ public:
 
     xbus::telemetry::dec_slot_s &dec_slots() { return _slots; }
     uint16_t slots_cnt() { return _slots_cnt; }
+    uint16_t fmt_cnt() { return _fmt_pos; }
 
 protected:
     xbus::telemetry::dec_slot_s _slots;

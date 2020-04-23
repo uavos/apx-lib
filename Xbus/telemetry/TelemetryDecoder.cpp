@@ -59,7 +59,8 @@ void TelemetryDecoder::reset_fmt()
     _hash_valid = 0;
     _slots_cnt = 0;
     _valid = false;
-    memset(_slots.data, 0, sizeof(_slots.data));
+    memset(_slots.flags, 0, sizeof(_slots.flags));
+    memset(_slots.value, 0, sizeof(_slots.value));
 }
 
 void TelemetryDecoder::_set_feed_fmt(uint8_t v)
@@ -105,14 +106,15 @@ void TelemetryDecoder::_set_feed_fmt(uint8_t v)
         _cobs_code = 0;
         return;
     }
+    bool skip = false;
     if (_cobs_copy == 0) {
-        bool skip = _cobs_code == 0xFF;
+        skip = _cobs_code == 0xFF;
         _cobs_copy = _cobs_code = v;
-        if (skip)
-            v = 0;
+        v = 0;
     }
     _cobs_copy--;
-    if (v == 0)
+
+    if (skip)
         return;
 
     if (buf[_fmt_pos] != v) {
@@ -144,13 +146,17 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream)
     if (stream.available() == 0)
         return false;
 
+    uint8_t cnt = stream.read<uint8_t>();
     uint8_t code = 0;
     uint8_t code_bit = 0x80;
 
     bool upd = false;
     for (size_t i = 0; i < _slots_cnt; ++i) {
         auto const &f = _slots.fields[i];
-        if (!f.pid._raw)
+        if (!f.fmt)
+            break;
+
+        if (!cnt)
             break;
 
         if (code_bit == 0x80) {
@@ -159,29 +165,32 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream)
         } else
             code_bit <<= 1;
 
+        if (stream.available() == 0)
+            break;
+
         if (!(code & code_bit))
             continue;
 
-        if (stream.available() == 0) {
-            //reset_fmt();
-            return false;
-        }
-
-        dec_data_s &d = _slots.data[i];
+        auto &value = _slots.value[i];
         mandala::type_id_e type;
-        size_t sz = unpack_value(stream.ptr(), &d.value, &type, f.fmt, stream.available());
-        if (!sz)
+        size_t sz = unpack_value(stream.ptr(), &value, &type, f.fmt, stream.available());
+        if (!sz || sz > stream.available())
             break;
         stream.reset(stream.pos() + sz);
-        d.type = type;
-        d.upd = true;
+
+        auto &flags = _slots.flags[i];
+        flags.type = type;
+        flags.upd = true;
         upd = true;
-        if (stream.available() == 0)
+
+        cnt--;
+
+        if (stream.available() == 0 || cnt == 0)
             break;
     }
 
-    if (stream.available() != 0) {
-        //reset_fmt();
+    if (stream.available() != 0 || cnt != 0) {
+        reset_fmt();
         return false;
     }
     return upd;

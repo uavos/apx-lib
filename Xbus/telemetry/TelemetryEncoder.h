@@ -14,17 +14,18 @@ typedef struct
     mandala::type_id_e type : 4; // raw value format
     uint8_t _rsv : 3;            // reserved
     bool upd : 1;                // raw value updated
-    mandala::raw_t value;        // raw value
-    mandala::raw_t buf;          // packed value
-} enc_data_s;
+} enc_flags_s;
+#pragma pack()
 
 typedef struct
 {
     field_s fields[enc_slots_size];
-    uint8_t crc_xor;
-    enc_data_s data[enc_slots_size];
-} enc_slot_s;
-static_assert(sizeof(enc_slot_s) == 12 * enc_slots_size + 1, "size error");
+    uint8_t crc_cobs;
+    enc_flags_s flags[enc_slots_size];
+    mandala::raw_t value[enc_slots_size]; // raw value
+    mandala::raw_t buf[enc_slots_size];   // packed value
+} enc_slots_s;
+//static_assert(sizeof(enc_slots_s) == 12 * enc_slots_size + 1, "size error");
 #pragma pack()
 
 } // namespace telemetry
@@ -42,7 +43,7 @@ public:
     bool update(const xbus::pid_s &pid, const mandala::spec_s &spec, XbusStreamReader &stream);
 
 private:
-    xbus::telemetry::enc_slot_s _slots;
+    xbus::telemetry::enc_slots_s _slots;
 
     xbus::telemetry::hash_s _hash;
 

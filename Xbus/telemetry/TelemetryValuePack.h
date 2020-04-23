@@ -24,38 +24,42 @@ struct rtype
 template<typename Tin>
 int8_t cast_value(rtype<int8_t>, const Tin &v)
 {
-    return static_cast<int8_t>(limit<int32_t>(v, -127, 128));
+    int8_t ret = limit<int32_t>(v, -127, 128);
+    return ret;
 }
 
 template<typename Tin>
 uint8_t cast_value(rtype<uint8_t>, const Tin &v)
 {
-    return static_cast<uint8_t>(limit<int32_t>(v, 0, 255));
+    uint8_t ret = limit<int32_t>(v, 0, 255);
+    return ret;
 }
 
 template<typename Tin>
 uint16_t cast_value(rtype<uint16_t>, const Tin &v)
 {
-    return static_cast<uint16_t>(limit<int32_t>(v, 0, 65535));
+    uint16_t ret = limit<int32_t>(v, 0, 65535);
+    return ret;
 }
 
 template<typename Tin>
 uint32_t cast_value(rtype<uint32_t>, const Tin &v)
 {
-    return static_cast<uint32_t>(v < 0 ? 0 : v);
+    uint32_t ret = v < 0 ? 0 : v;
+    return ret;
 }
 
 template<typename Tin>
 float cast_value(rtype<float>, const Tin &v)
 {
-    float ret = static_cast<float>(v);
+    float ret = v;
     return isnan(ret) ? 0 : ret;
 }
 
 template<typename Tin>
 int32_t cast_value(rtype<int32_t>, const Tin &v)
 {
-    return static_cast<int32_t>(v);
+    return v;
 }
 
 template<typename T, typename Tin>

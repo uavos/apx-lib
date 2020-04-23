@@ -16,11 +16,14 @@ void TelemetryEncoder::add(const field_s &field)
 {
     for (size_t i = 0; i < enc_slots_size; ++i) {
         auto &f = _slots.fields[i];
-        if (f.pid._raw)
+        if (f.fmt)
             continue;
+
         // found empty slot
         f = field;
-        memset(&_slots.data[i], 0, sizeof(*_slots.data));
+        memset(&(_slots.flags[i]), 0, sizeof(*_slots.flags));
+        memset(&(_slots.value[i]), 0, sizeof(*_slots.value));
+        memset(&(_slots.buf[i]), 0, sizeof(*_slots.buf));
         _update_feeds();
 
         return;
@@ -32,7 +35,7 @@ bool TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spe
     // called by MandalaDataBroker
     for (size_t i = 0; i < enc_slots_size; ++i) {
         auto const &f = _slots.fields[i];
-        if (!f.pid._raw)
+        if (!f.fmt)
             break;
         if (f.pid.uid != pid.uid)
             continue;
@@ -49,13 +52,15 @@ void TelemetryEncoder::_set_data(size_t n, const mandala::spec_s &spec, XbusStre
     mandala::raw_t v = 0;
     stream.read(&v, mandala::type_size(spec.type));
 
-    auto &d = _slots.data[n];
+    auto &value = _slots.value[n];
 
-    if (d.value == v)
+    if (value == v)
         return;
-    d.value = v;
-    d.type = spec.type;
-    d.upd = 1;
+    value = v;
+
+    auto &flags = _slots.flags[n];
+    flags.type = spec.type;
+    flags.upd = true;
 }
 
 bool TelemetryEncoder::encode(XbusStreamWriter &stream, uint8_t seq, xbus::telemetry::rate_e rate)
@@ -78,7 +83,7 @@ void TelemetryEncoder::_update_feeds()
 {
     uint16_t size = 0;
     for (auto &f : _slots.fields) {
-        if (!f.pid._raw)
+        if (!f.fmt)
             break;
         size += sizeof(f);
     }
@@ -89,10 +94,10 @@ void TelemetryEncoder::_update_feeds()
     _hash.byte[3] = vhash >> 24;
 
     //fields fmt feed
-    uint8_t crc_xor = 0;
+    uint8_t crc_cobs = 0;
     for (size_t i = 0; i < size; ++i)
-        crc_xor ^= reinterpret_cast<const uint8_t *>(_slots.fields)[i];
-    _slots.crc_xor = crc_xor;
+        crc_cobs ^= reinterpret_cast<const uint8_t *>(_slots.fields)[i];
+    _slots.crc_cobs = crc_cobs;
 
     _fmt_size = size; // append crc
     _fmt_pos = _fmt_size;
@@ -116,7 +121,7 @@ uint8_t TelemetryEncoder::_get_feed_fmt()
         //find and return code, relpos of zero
         _cobs_code = 1;
         for (uint16_t i = _fmt_pos; i <= _fmt_size; ++i) {
-            uint8_t v = i < _fmt_size ? buf[i] : _slots.crc_xor;
+            uint8_t v = i < _fmt_size ? buf[i] : _slots.crc_cobs;
             if (v == 0)
                 break;
             _cobs_code++;
@@ -125,7 +130,7 @@ uint8_t TelemetryEncoder::_get_feed_fmt()
         }
         return _cobs_code;
     }
-    uint8_t v = _fmt_pos == _fmt_size ? _slots.crc_xor : buf[_fmt_pos];
+    uint8_t v = _fmt_pos == _fmt_size ? _slots.crc_cobs : buf[_fmt_pos];
     _fmt_pos++;
     _cobs_code--;
     if (_cobs_code == 0) {
@@ -136,12 +141,16 @@ uint8_t TelemetryEncoder::_get_feed_fmt()
 
 void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint8_t seq)
 {
+    uint8_t *code_cnt = stream.ptr();
+    stream.write<uint8_t>(0);
+
+    size_t pos_s = stream.pos();
     uint8_t *code = stream.ptr();
     uint8_t code_bit = 0x80;
 
     for (size_t i = 0; i < enc_slots_size; ++i) {
         auto const &f = _slots.fields[i];
-        if (!f.pid._raw)
+        if (!f.fmt)
             break;
 
         if (code_bit == 0x80) {
@@ -151,17 +160,20 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint8_t seq)
         } else
             code_bit <<= 1;
 
-        enc_data_s &d = _slots.data[i];
-        if (d.upd && (f.pid.seq & seq) == 0) {
-            d.upd = false;
-            size_t sz = pack_value(&d.value, &d.buf, d.type, f.fmt);
+        auto &flags = _slots.flags[i];
+        if (flags.upd && (f.pid.seq & seq) == 0) {
+            flags.upd = false;
+
+            auto &value = _slots.value[i];
+            auto &buf = _slots.buf[i];
+            size_t sz = xbus::telemetry::pack_value(&value, &buf, flags.type, f.fmt);
             if (sz) {
-                stream.write(&d.buf, sz);
-                *code |= code_bit;
+                stream.write(&buf, sz);
+                (*code) |= code_bit;
+                (*code_cnt)++;
+                pos_s = stream.pos();
             }
         }
     }
-    if (code == (stream.ptr() - 1)) {
-        stream.reset(stream.pos() - 1);
-    }
+    stream.reset(pos_s);
 }

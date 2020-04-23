@@ -11,6 +11,7 @@ namespace telemetry {
 
 // data element format descriptor
 enum fmt_e {
+    fmt_none,
 
     //raw
     fmt_real,
@@ -31,6 +32,28 @@ enum fmt_e {
     fmt_byte_10,   // unsigned/10
     fmt_byte_01,   // unsigned*10
     fmt_byte_001,  // unsigned*100
+};
+
+enum class cap_e {
+    bit,
+    byte,
+    word,
+    dword,
+};
+
+enum class span_e {
+    real,
+    uint,
+
+    sint, // float from signed integer
+    f16,  // float 16 bits
+    rad,  // radians -PI..+PI
+    rad2, // radians -PI/2..+PI/2
+    u,    // units 0..1
+    su,   // signed units -1..+1
+    u10,  // 10's
+    u01,  // 0.1's
+    u001, // 0.01's
 };
 
 typedef struct
