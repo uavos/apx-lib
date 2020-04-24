@@ -6,7 +6,7 @@
 namespace xbus {
 namespace telemetry {
 
-static constexpr const size_t enc_slots_size{128};
+static constexpr const size_t enc_slots_size{220};
 
 typedef void (*enc_codec_f)();
 
@@ -38,11 +38,15 @@ class TelemetryEncoder
 public:
     explicit TelemetryEncoder();
 
-    void add(const xbus::telemetry::field_s &field);
+    bool add(const xbus::telemetry::field_s &field);
 
-    bool encode(XbusStreamWriter &stream, uint8_t seq, xbus::telemetry::rate_e rate);
+    bool encode(XbusStreamWriter &stream, uint8_t seq, uint16_t ts);
+    void encode_format(XbusStreamWriter &stream, uint8_t part);
 
     bool update(const xbus::pid_s &pid, const mandala::spec_s &spec, XbusStreamReader &stream);
+
+    xbus::telemetry::enc_slots_s &enc_slots() { return _slots; }
+    uint16_t slots_cnt() { return _slots_cnt; }
 
 private:
     xbus::telemetry::enc_slots_s _slots;

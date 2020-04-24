@@ -6,7 +6,6 @@ ApxSharedLibModule {
             "common",
             "Xbus", 
             "Mandala", 
-            "mathlib", 
         ]
     }
 }

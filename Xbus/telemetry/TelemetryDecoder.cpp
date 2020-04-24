@@ -18,16 +18,18 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
     xbus::telemetry::stream_s hdr;
     hdr.read(&stream);
 
-    uint8_t seq = static_cast<uint8_t>(hdr.spec.seq << 2) | pid.seq;
-    bool seq_ok = (seq - _seq) == 1;
+    uint8_t seq = pid.seq; // | static_cast<uint8_t>(hdr.spec.seq << 2);
+    uint8_t dseq = (seq - _seq) & 3;
     _seq = seq;
+    bool seq_ok = dseq == 1;
 
-    _rate = hdr.spec.rate;
+    _dts = hdr.ts - _ts;
+    _ts = hdr.ts;
 
     uint8_t &h = _hash.byte[seq & 3];
     if (h != hdr.feed_hash) {
         if (h)
-            reset_fmt();
+            reset();
         h = hdr.feed_hash;
         _hash_valid++;
     } else if (!_is_hash_valid())
@@ -53,14 +55,38 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
     return decode_values(stream);
 }
 
-void TelemetryDecoder::reset_fmt()
+float TelemetryDecoder::rate()
 {
-    _hash.hash = 0;
-    _hash_valid = 0;
+    if (_dts > 100 || _dts == 0)
+        return 0;
+    return 10.f / _dts;
+}
+
+void TelemetryDecoder::reset(bool reset_hash)
+{
+    if (reset_hash) {
+        _hash.hash = 0;
+        _hash_valid = 0;
+    }
     _slots_cnt = 0;
     _valid = false;
     memset(_slots.flags, 0, sizeof(_slots.flags));
     memset(_slots.value, 0, sizeof(_slots.value));
+}
+
+uint32_t TelemetryDecoder::get_hash(size_t sz)
+{
+    return CRC_32_APX(_slots.fields, sz, 0);
+}
+bool TelemetryDecoder::check_hash(size_t sz)
+{
+    uint32_t vhash = get_hash(sz);
+    if (!_is_hash_valid() || vhash != _hash.hash)
+        return false;
+    // fmt array ok
+    _slots_cnt = sz / sizeof(field_s);
+    _valid = true;
+    return true;
 }
 
 void TelemetryDecoder::_set_feed_fmt(uint8_t v)
@@ -89,11 +115,9 @@ void TelemetryDecoder::_set_feed_fmt(uint8_t v)
                 break;
             buf[--_fmt_pos] = 0;
             // check hash
-            uint32_t vhash = CRC_32_APX(_slots.fields, _fmt_pos, 0);
-            if (!_is_hash_valid() || vhash != _hash.hash)
+            if (!check_hash(_fmt_pos))
                 break;
             // fmt array ok
-            _slots_cnt = _fmt_pos / sizeof(field_s);
             _fmt_pos = 0;
             _cobs_code = 0;
             return;
@@ -123,22 +147,6 @@ void TelemetryDecoder::_set_feed_fmt(uint8_t v)
             _slots_cnt = 0;
     }
     _fmt_pos++;
-}
-
-uint8_t TelemetryDecoder::rate_hz()
-{
-    switch (_rate) {
-    default:
-        return 0;
-    case rate_10Hz:
-        return 10;
-    case rate_5Hz:
-        return 5;
-    case rate_1Hz:
-        return 1;
-    case rate_ts:
-        return 0;
-    }
 }
 
 bool TelemetryDecoder::decode_values(XbusStreamReader &stream)
@@ -188,8 +196,53 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream)
     }
 
     if (stream.available() != 0 || cnt != 0) {
-        //reset_fmt();
+        reset();
         return false;
     }
     return upd;
+}
+
+bool TelemetryDecoder::decode_format(uint8_t part, uint8_t parts, XbusStreamReader &stream)
+{
+    if (part == 0) {
+        //prepend hash on first part
+        uint32_t hash;
+        stream >> hash;
+        if (hash != _hash.hash)
+            reset();
+        _hash.hash = hash;
+        _hash_valid = sizeof(hash);
+    }
+    uint8_t *ptr = reinterpret_cast<uint8_t *>(_slots.fields);
+    size_t pos = part * fmt_block_size;
+    size_t sz = stream.available();
+    bool is_final = (part + 1) == parts;
+    do {
+        if (is_final && stream.available() > fmt_block_size)
+            break;
+        if (!is_final && stream.available() != fmt_block_size)
+            break;
+        if ((pos + sz) > sizeof(_slots.fields))
+            break;
+        stream.read(ptr + pos, sz);
+        if (is_final) {
+            pos += sz;
+            if (pos % sizeof(field_s)) {
+                break;
+            }
+            if (check_hash(pos))
+                return true;
+        }
+        // mid part
+        if (_slots_cnt == 0)
+            return true;
+
+        if (check_hash(_slots_cnt * sizeof(*_slots.fields)))
+            return true;
+        reset(false);
+        return true;
+    } while (0);
+    // error
+    reset();
+    return false;
 }

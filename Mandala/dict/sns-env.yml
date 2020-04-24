@@ -4,7 +4,7 @@
   content:
     - name: rpm
       suffix: RPM
-      units: 1/min
+      units: rpm
 
     - name: torque
       suffix: torque
@@ -56,7 +56,7 @@
   content:
     - name: rpm
       suffix: RPM
-      units: 1/min
+      units: rpm
 
     - name: temp
       suffix: temperature
@@ -75,7 +75,7 @@
   content:
     - name: rpm
       suffix: RPM
-      units: 1/min
+      units: rpm
 
     - name: pitch
       suffix: pitch position
@@ -90,7 +90,7 @@
   content:
     - name: rpm
       suffix: RPM
-      units: 1/min
+      units: rpm
     - name: voltage
       suffix: voltage
       units: V

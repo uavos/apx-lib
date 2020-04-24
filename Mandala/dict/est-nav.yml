@@ -96,13 +96,13 @@
 
     - name: ax
       title: Acceleration X
-      units: m/s2
+      units: m/s^2
     - name: ay
       title: Acceleration Y
-      units: m/s2
+      units: m/s^2
     - name: az
       title: Acceleration Z
-      units: m/s2
+      units: m/s^2
 
 - name: ref
   title: Ref point
@@ -171,7 +171,7 @@
       units: m/s
     - name: airspeed_d
       title: Airspeed derivative
-      units: m/s2
+      units: m/s^2
 
     - name: slip
       title: Slip angle

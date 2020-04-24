@@ -58,7 +58,7 @@
   content:
     - name: rpm
       title: Cmd RPM
-      units: 1/min
+      units: rpm
 
 - name: op
   title: Procedures

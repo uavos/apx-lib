@@ -20,8 +20,8 @@ enum fmt_e {
     fmt_byte,
 
     //packed bitfields
-    fmt_bit,  // one bit
-    fmt_bit4, // nibble
+    fmt_bit, // one bit
+    fmt_opt, // 4 bits
 
     //packed real numbers
     fmt_f16,       // float16
@@ -34,6 +34,8 @@ enum fmt_e {
     fmt_byte_001,  // unsigned*100
     fmt_rad,       // radians -PI..+PI
     fmt_rad2,      // radians -PI/2..+PI/2
+    fmt_byte_u,    // units 0..1
+    fmt_sbyte_u,   // signed units -1..+1
 };
 
 typedef struct
@@ -50,40 +52,28 @@ typedef union {
 } hash_s;
 static_assert(sizeof(hash_s) == 4, "size error");
 
-enum rate_e {
-    rate_10Hz,
-    rate_5Hz,
-    rate_1Hz,
-    rate_ts, // timestamp_32 follows
-};
+static constexpr const size_t fmt_block_size = 64;
 
 // stream header
 typedef struct
 {
-    union {
-        uint8_t _raw;
-        struct
-        {
-            uint8_t seq : 6; // sequence MSB[2,7] (+pid.seq LSB[0,1])
-            rate_e rate : 2;
-        };
-    } spec;
+    uint16_t ts;       // timestamp [100's of ms]
     uint8_t feed_hash; // dataset structure hash_32 (pid.seq = byte no)
     uint8_t feed_fmt;  // dataset format COBS encoded feed
 
     static constexpr inline uint16_t psize()
     {
-        return 3;
+        return 4;
     }
     inline void read(XbusStreamReader *s)
     {
-        *s >> spec._raw;
+        *s >> ts;
         *s >> feed_hash;
         *s >> feed_fmt;
     }
     inline void write(XbusStreamWriter *s) const
     {
-        *s << spec._raw;
+        *s << ts;
         *s << feed_hash;
         *s << feed_fmt;
     }

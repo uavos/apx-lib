@@ -157,6 +157,13 @@ static int16_t float_to_rad(const float &v)
     const float a = v - std::floor(v / dspan + 0.5f) * dspan;
     return a * (32768.f / (float) M_PI);
 }
+static int16_t float_to_rad2(const float &v)
+{
+    const float span = (float) M_PI / 2.f;
+    const float dspan = span * 2.f;
+    const float a = v - std::floor(v / dspan + 0.5f) * dspan;
+    return a * (32768.f / (float) M_PI);
+}
 
 // pack method
 
@@ -187,11 +194,6 @@ size_t pack_value(const void *src, void *dest, mandala::type_id_e type, fmt_e fm
         return pack_value(float_to_f16(v), dest);
     }
 
-    case fmt_rad: {
-        const mandala::real_t &v = raw_value<mandala::real_t>(src, type);
-        return pack_value(float_to_rad(v), dest);
-    }
-
     case fmt_sbyte: {
         const int8_t &v = raw_value<int8_t>(src, type);
         return pack_value(v, dest);
@@ -218,6 +220,24 @@ size_t pack_value(const void *src, void *dest, mandala::type_id_e type, fmt_e fm
     }
     case fmt_byte_001: {
         const uint8_t &v = cast_value<uint8_t>(raw_value<float>(src, type) * 100.f);
+        return pack_value(v, dest);
+    }
+
+    case fmt_rad: {
+        const mandala::real_t &v = raw_value<mandala::real_t>(src, type);
+        return pack_value(float_to_rad(v), dest);
+    }
+    case fmt_rad2: {
+        const mandala::real_t &v = raw_value<mandala::real_t>(src, type);
+        return pack_value(float_to_rad2(v), dest);
+    }
+
+    case fmt_byte_u: {
+        const uint8_t &v = cast_value<uint8_t>(raw_value<float>(src, type) * 255.f);
+        return pack_value(v, dest);
+    }
+    case fmt_sbyte_u: {
+        const int8_t &v = cast_value<int8_t>(raw_value<float>(src, type) * 127.f);
         return pack_value(v, dest);
     }
     }

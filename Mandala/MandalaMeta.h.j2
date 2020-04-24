@@ -1,6 +1,7 @@
 {%- extends 'Mandala.j2' %}
 
 {% set ns = namespace(path_uid={}) %}
+{% set all_units = namespace(value=[]) %}
 
 {%- macro mandala_meta_expand(d, indent=0, path=[], level=0, uid=0, parent=0) -%}
 {% set ind = ' '*indent*indent_size %}
@@ -20,6 +21,12 @@
 {% set title = d.title %}
 {%- endif -%}
 
+{%- if d.units and d.type != 'option' -%}
+{% set units_id = 'units_' + d.units|replace('/','p')|replace('%','percent')|replace('^2','_sq') %}
+{% else %}
+{% set units_id = 'units_none' %}
+{%- endif -%}
+
 {{ ind }}{
 {{ ind1 }}.name = "{{ d.name }}",
 {{ ind1 }}.title = "{{ title }}",
@@ -31,6 +38,7 @@
 {{ ind1 }}.level = {{ level }},
 {{ ind1 }}.group = {% if level<(data.uid_bits|length-1) %}1{% else %}0{% endif %},
 {{ ind1 }}.type_id = type_{% if d.content is defined %}void{% else %}{{ d.type }}{% endif %},
+{{ ind1 }}.units_id = {{ units_id }},
 {{ ind }}},
 {% set _dummy = ns.path_uid.update({path|join('.'):uid}) %}
 {% set uid_pow = data.uid_bits[level+2:]|sum %}
@@ -62,6 +70,18 @@
 {%- endif -%}
 {%- endmacro -%}
 
+{# collect units #}
+{%- macro collect_units(d) -%}
+{%- if d.content -%}
+{% for i in d.content %}
+{{ collect_units(i) }}
+{%- endfor -%}
+{%- elif d.units and d.type != 'option' -%}
+{% set all_units.value = all_units.value + [d.units|replace('/','p')|replace('%','percent')|replace('^2','_sq')] -%}
+{%- endif -%}
+{%- endmacro -%}
+
+
 {%- block content %}
 // generated file
 #pragma once
@@ -91,6 +111,19 @@ static constexpr const uint8_t uid_shift[] = {
 // valid UID range is [uid_base...uid_max]
 static constexpr const mandala::uid_t uid_base = 0x{{ '%0x' % data.uid_base }};
 static constexpr const mandala::uid_t uid_max = 0x{{ '%0x' % (data.uid_base+(2**(data.uid_bits|sum)-1)) }}; 
+
+{% for i in data.content %}
+{{ collect_units(i) }}
+{% endfor %}
+{% set all_units.value = all_units.value|list|unique|sort -%}
+
+// enum of all used units
+enum units_e {
+{{ ind }}units_none,
+{% for i in all_units.value %}
+{{ ind }}units_{{ i }},
+{% endfor %}
+};
 
 // flat array of all elements
 static constexpr const mandala::meta_s meta[] = {

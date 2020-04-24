@@ -180,6 +180,7 @@ struct meta_s
     const uint8_t level : 3;
     const bool group : 1;
     const type_id_e type_id : 4;
+    const uint8_t units_id;
 };
 
 struct stream_item_s

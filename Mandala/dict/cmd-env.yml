@@ -30,8 +30,8 @@
       title: Telemetry data stream
       descr: <format_mn><time><packed data...>
     - name: format
-      title: Telemetry data format feed
-      descr: <packing format feed...>
+      title: Telemetry data format array
+      descr: req <part>, re <part><parts_cnt><format feed block 256 bytes>
     - name: stream
       title: Telemetry stream request/select
     - name: request

@@ -12,10 +12,20 @@ TelemetryEncoder::TelemetryEncoder()
     _update_feeds();
 }
 
-void TelemetryEncoder::add(const field_s &field)
+bool TelemetryEncoder::add(const field_s &field)
 {
     if (_slots_cnt >= enc_slots_size)
-        return;
+        return false;
+
+    // find dups
+    for (size_t i = 0; i < _slots_cnt; ++i) {
+        auto const &f = _slots.fields[i];
+        if (f.pid.uid != field.pid.uid)
+            continue;
+        if (f.pid.pri != field.pid.pri)
+            continue;
+        return false;
+    }
 
     auto &f = _slots.fields[_slots_cnt];
 
@@ -28,6 +38,7 @@ void TelemetryEncoder::add(const field_s &field)
     _slots_cnt++;
 
     _update_feeds();
+    return true;
 }
 
 bool TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spec, XbusStreamReader &stream)
@@ -61,11 +72,10 @@ void TelemetryEncoder::_set_data(size_t n, const mandala::spec_s &spec, XbusStre
     flags.upd = true;
 }
 
-bool TelemetryEncoder::encode(XbusStreamWriter &stream, uint8_t seq, xbus::telemetry::rate_e rate)
+bool TelemetryEncoder::encode(XbusStreamWriter &stream, uint8_t seq, uint16_t ts)
 {
     stream_s hdr;
-    hdr.spec.seq = seq >> 2;
-    hdr.spec.rate = rate;
+    hdr.ts = ts;
 
     hdr.feed_hash = _hash.byte[seq & 3];
     hdr.feed_fmt = _get_feed_fmt();
@@ -180,4 +190,29 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint8_t seq)
         }
     }
     stream.reset(pos_s);
+}
+
+void TelemetryEncoder::encode_format(XbusStreamWriter &stream, uint8_t part)
+{
+    size_t size = _slots_cnt * sizeof(*_slots.fields);
+
+    uint8_t parts = size / fmt_block_size;
+    if (size % fmt_block_size)
+        parts++;
+
+    const uint8_t *ptr = reinterpret_cast<const uint8_t *>(_slots.fields);
+    size_t sz = part < parts ? size - (part * fmt_block_size) : 0;
+    if (sz > fmt_block_size)
+        sz = fmt_block_size;
+
+    stream << part;
+    stream << parts;
+
+    if (part == 0) {
+        //prepend hash on first part
+        stream << _hash.hash;
+    }
+
+    if (sz > 0)
+        stream.write(ptr + part * fmt_block_size, sz);
 }

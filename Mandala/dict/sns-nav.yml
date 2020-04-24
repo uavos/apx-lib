@@ -29,7 +29,7 @@
 
 - name: acc
   title: Accelerometer
-  units: m/s2
+  units: m/s^2
   content:
     - name: "x"
       suffix: "X"
@@ -136,7 +136,7 @@
       units: m/s
     - name: acc
       title: Airspeed derivative
-      units: m/s2
+      units: m/s^2
     - name: temp
       title: Pitot probe temperature
       units: C
