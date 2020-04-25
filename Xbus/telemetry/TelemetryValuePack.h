@@ -75,7 +75,7 @@ T raw_value(const void *src, mandala::type_id_e type)
 {
     switch (type) {
     default:
-        return *static_cast<const T *>(src);
+        return *static_cast<const mandala::raw_t *>(src);
     case mandala::type_real:
         return cast_value<T>(*static_cast<const mandala::real_t *>(src));
     case mandala::type_dword:
@@ -184,6 +184,7 @@ size_t pack_value(const void *src, void *dest, mandala::type_id_e type, fmt_e fm
         const mandala::word_t &v = raw_value<mandala::word_t>(src, type);
         return pack_value(v, dest);
     }
+    case fmt_opt:
     case fmt_byte: {
         const mandala::byte_t &v = raw_value<mandala::byte_t>(src, type);
         return pack_value(v, dest);

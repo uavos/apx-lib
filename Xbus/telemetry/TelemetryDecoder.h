@@ -6,8 +6,6 @@
 namespace xbus {
 namespace telemetry {
 
-static constexpr const size_t dec_slots_size{220};
-
 #pragma pack(1)
 typedef struct
 {
@@ -19,12 +17,12 @@ typedef struct
 
 typedef struct
 {
-    field_s fields[dec_slots_size];
+    field_s fields[slots_size];
     uint8_t crc_cobs_dummy;
-    dec_flags_s flags[dec_slots_size];
-    mandala::raw_t value[dec_slots_size]; // value
+    dec_flags_s flags[slots_size];
+    mandala::raw_t value[slots_size]; // value
 } dec_slots_s;
-//static_assert(sizeof(dec_slot_s) == 8 * dec_slots_size + 1, "size error");
+//static_assert(sizeof(dec_slot_s) == 8 * slots_size + 1, "size error");
 
 } // namespace telemetry
 } // namespace xbus

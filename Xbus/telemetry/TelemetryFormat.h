@@ -54,6 +54,8 @@ static_assert(sizeof(hash_s) == 4, "size error");
 
 static constexpr const size_t fmt_block_size = 64;
 
+static constexpr const size_t slots_size{220};
+
 // stream header
 typedef struct
 {

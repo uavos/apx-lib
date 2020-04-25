@@ -86,6 +86,7 @@ size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e
     case fmt_word:
         *type = mandala::type_word;
         return unpack_value<mandala::word_t>(src, dest, size);
+    case fmt_opt:
     case fmt_byte:
         *type = mandala::type_byte;
         return unpack_value<mandala::byte_t>(src, dest, size);
