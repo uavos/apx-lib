@@ -38,7 +38,7 @@ public:
 
     bool add(const xbus::telemetry::field_s &field);
 
-    bool encode(XbusStreamWriter &stream, uint8_t seq, uint16_t ts);
+    bool encode(XbusStreamWriter &stream, uint32_t seq, uint16_t ts);
     void encode_format(XbusStreamWriter &stream, uint8_t part);
 
     bool update(const xbus::pid_s &pid, const mandala::spec_s &spec, XbusStreamReader &stream);
@@ -49,6 +49,7 @@ public:
 private:
     xbus::telemetry::enc_slots_s _slots;
     uint16_t _slots_cnt{0};
+    uint16_t _slots_upd_cnt{0}; // re-scheduled slots top limit (before bitfields)
 
     void _insert(size_t index, const xbus::telemetry::field_s &field);
 
@@ -65,5 +66,5 @@ private:
     uint8_t _cobs_code;
     uint8_t _cobs_copy;
 
-    void encode_values(XbusStreamWriter &stream, uint8_t seq);
+    void encode_values(XbusStreamWriter &stream, uint32_t seq);
 };

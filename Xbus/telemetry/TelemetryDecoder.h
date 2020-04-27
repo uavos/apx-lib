@@ -70,5 +70,5 @@ protected:
     uint8_t _cobs_code{0};
     uint8_t _cobs_copy{0};
 
-    bool decode_values(XbusStreamReader &stream);
+    bool decode_values(XbusStreamReader &stream, uint8_t seq);
 };

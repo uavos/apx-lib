@@ -19,6 +19,16 @@ size_t unpack_value(const void *src, void *dest, size_t size)
     return sizeof(Tsrc);
 }
 
+template<typename T>
+size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, size_t size, const mandala::real_t &scale)
+{
+    *type = mandala::type_real;
+    if (!unpack_value<T, mandala::real_t>(src, dest, size))
+        return 0;
+    *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) * scale;
+    return sizeof(T);
+}
+
 static float float_from_f16(const uint16_t &v)
 {
     uint16_t hs, he, hm;
@@ -108,17 +118,9 @@ size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e
         *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) * 10.f;
         return sizeof(int8_t);
     case fmt_sbyte_01:
-        *type = mandala::type_real;
-        if (!unpack_value<int8_t, mandala::real_t>(src, dest, size))
-            break;
-        *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) / 10.f;
-        return sizeof(int8_t);
+        return unpack_value<int8_t>(src, dest, type, size, 1.f / 10.f);
     case fmt_sbyte_001:
-        *type = mandala::type_real;
-        if (!unpack_value<int8_t, mandala::real_t>(src, dest, size))
-            break;
-        *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) / 100.f;
-        return sizeof(int8_t);
+        return unpack_value<int8_t>(src, dest, type, size, 1.f / 100.f);
 
     case fmt_byte_10:
         *type = mandala::type_dword;
@@ -128,17 +130,9 @@ size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e
         return sizeof(uint8_t);
 
     case fmt_byte_01:
-        *type = mandala::type_real;
-        if (!unpack_value<uint8_t, mandala::real_t>(src, dest, size))
-            break;
-        *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) / 10.f;
-        return sizeof(uint8_t);
+        return unpack_value<uint8_t>(src, dest, type, size, 1.f / 10.f);
     case fmt_byte_001:
-        *type = mandala::type_real;
-        if (!unpack_value<uint8_t, mandala::real_t>(src, dest, size))
-            break;
-        *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) / 100.f;
-        return sizeof(uint8_t);
+        return unpack_value<uint8_t>(src, dest, type, size, 1.f / 100.f);
 
     case fmt_rad:
         *type = mandala::type_real;
@@ -154,17 +148,9 @@ size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e
         return sizeof(mandala::word_t);
 
     case fmt_byte_u:
-        *type = mandala::type_real;
-        if (!unpack_value<uint8_t, mandala::real_t>(src, dest, size))
-            break;
-        *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) / 255.f;
-        return sizeof(uint8_t);
+        return unpack_value<uint8_t>(src, dest, type, size, 1.f / 255.f);
     case fmt_sbyte_u:
-        *type = mandala::type_real;
-        if (!unpack_value<int8_t, mandala::real_t>(src, dest, size))
-            break;
-        *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) / 127.f;
-        return sizeof(uint8_t);
+        return unpack_value<int8_t>(src, dest, type, size, 1.f / 127.f);
     }
     return 0;
 }

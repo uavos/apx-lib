@@ -17,6 +17,10 @@ bool TelemetryEncoder::add(const field_s &field)
     if (_slots_cnt >= slots_size)
         return false;
 
+    if (field.fmt == fmt_bit)
+        return true;
+    if (field.fmt == fmt_opt)
+        return true;
     // find dups
     for (size_t i = 0; i < _slots_cnt; ++i) {
         auto const &f = _slots.fields[i];
@@ -77,6 +81,13 @@ bool TelemetryEncoder::add(const field_s &field)
     }
 
     _insert(index, field);
+
+    for (_slots_upd_cnt = 0; _slots_upd_cnt < _slots_cnt; ++_slots_upd_cnt) {
+        auto const &f = _slots.fields[index];
+        if (f.fmt == fmt_bit)
+            break;
+    }
+
     return true;
 }
 void TelemetryEncoder::_insert(size_t index, const xbus::telemetry::field_s &field)
@@ -130,7 +141,7 @@ void TelemetryEncoder::_set_data(size_t n, const mandala::spec_s &spec, XbusStre
     flags.upd = true;
 }
 
-bool TelemetryEncoder::encode(XbusStreamWriter &stream, uint8_t seq, uint16_t ts)
+bool TelemetryEncoder::encode(XbusStreamWriter &stream, uint32_t seq, uint16_t ts)
 {
     stream_s hdr;
     hdr.ts = ts;
@@ -208,82 +219,43 @@ uint8_t TelemetryEncoder::_get_feed_fmt()
     }
 }
 
-void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint8_t seq)
+void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint32_t seq)
 {
     uint8_t *code_cnt = stream.ptr();
     stream.write<uint8_t>(0);
 
     size_t pos_data = stream.pos();
     uint8_t *code = stream.ptr();
-    uint8_t code_bit = 0x80;
+    uint8_t code_bit = (1 << 7);
+    uint8_t code_zero = 0;
 
-    uint8_t scheduled_index = seq % (_slots_cnt + 1);
-
-    size_t index = 0;
-    for (; index < _slots_cnt; ++index) {
-        auto const &f = _slots.fields[index];
-        if (f.fmt == fmt_bit)
-            break;
-        //if (f.fmt == fmt_opt)
-        //    break;
-
-        if (code_bit == 0x80) {
-            code = stream.ptr();
-            stream.write<uint8_t>(0);
-            code_bit = 1;
-        } else
-            code_bit <<= 1;
-
-        auto &flags = _slots.flags[index];
-
-        //re-schedule according to index
-        if (index == scheduled_index) {
-            flags.upd = true;
-            _slots.packed[index] = ~_slots.packed[index]; //re-pack
-        }
-
-        if (flags.upd && ((f.pid.seq & seq) == 0)) {
-            flags.upd = false;
-
-            auto &value = _slots.value[index];
-            auto &buf = _slots.packed[index];
-            size_t sz = xbus::telemetry::pack_value(&value, &buf, flags.type, f.fmt);
-            if (sz) {
-                stream.write(&buf, sz);
-                pos_data = stream.pos();
-                (*code) |= code_bit;
-                (*code_cnt)++;
-            }
-        }
-    }
-
-    //append opt nibbles
-    code_bit = 0x80;
     uint8_t *nibble = nullptr;
     uint8_t nibble_n = 0;
+
+    // re-schedule according to index
+    size_t index = seq % _slots_upd_cnt;
+    _slots.flags[index].upd = true;
+    _slots.packed[index] += 0x01010101; //re-pack
+
+    index = 0;
     for (; index < _slots_cnt; ++index) {
         auto const &f = _slots.fields[index];
-        if (f.fmt != fmt_opt)
-            break;
         if (f.fmt == fmt_bit)
             break;
 
-        if (code_bit == 0x80) {
+        //if (f.pid.seq & seq)
+        //    continue;
+
+        if (code_bit == (1 << 7)) {
+            code_zero++;
+            code_bit = 1;
             code = stream.ptr();
             stream.write<uint8_t>(0);
-            code_bit = 1;
             nibble_n = 0;
         } else
             code_bit <<= 1;
 
         auto &flags = _slots.flags[index];
-
-        //re-schedule according to index
-        if (index == scheduled_index) {
-            flags.upd = true;
-            _slots.packed[index]++; //re-pack
-        }
-
         if (flags.upd) {
             flags.upd = false;
 
@@ -291,18 +263,34 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint8_t seq)
             auto &buf = _slots.packed[index];
             size_t sz = xbus::telemetry::pack_value(&value, &buf, flags.type, f.fmt);
             if (sz) {
-                uint8_t v = buf & 0x0F;
-                if (nibble_n == 0) {
-                    nibble_n = 1;
-                    nibble = stream.ptr();
-                    stream.write<uint8_t>(v);
-                    pos_data = stream.pos();
+                if (code_zero >= 2) {
+                    // two or more consequtive zero codes
+                    code = stream.ptr() - (code_zero - 1);
+                    (*code) = index;
+                    stream.reset(stream.pos() - (code_zero - 2));
+                    code_bit = 1 << 7;
+                } else {
+                    (*code) |= code_bit;
+                }
+
+                if (f.fmt == fmt_opt) {
+                    uint8_t v = buf & 0x0F;
+                    if (nibble_n == 0) {
+                        nibble_n = 1;
+                        nibble = stream.ptr();
+                        stream.write<uint8_t>(v);
+                        pos_data = stream.pos();
+                    } else {
+                        nibble_n = 0;
+                        (*nibble) |= v << 4;
+                    }
                 } else {
                     nibble_n = 0;
-                    (*nibble) |= v << 4;
+                    stream.write(&buf, sz);
+                    pos_data = stream.pos();
                 }
-                (*code) |= code_bit;
                 (*code_cnt)++;
+                code_zero = 0;
             }
         }
     }
@@ -310,9 +298,9 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint8_t seq)
     stream.reset(pos_data);
 
     //append all bitfields
-    code_bit = 0x80;
+    code_bit = (1 << 7);
     for (; index < _slots_cnt; ++index) {
-        if (code_bit == 0x80) {
+        if (code_bit == (1 << 7)) {
             code = stream.ptr();
             stream.write<uint8_t>(0);
             code_bit = 1;

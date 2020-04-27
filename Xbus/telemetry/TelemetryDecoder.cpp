@@ -18,7 +18,7 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
     xbus::telemetry::stream_s hdr;
     hdr.read(&stream);
 
-    uint8_t seq = pid.seq; // | static_cast<uint8_t>(hdr.spec.seq << 2);
+    uint8_t seq = pid.seq;
     uint8_t dseq = (seq - _seq) & 3;
     _seq = seq;
     bool seq_ok = dseq == 1;
@@ -52,7 +52,7 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
 
     // fmt looks consistent
     _valid = true;
-    return decode_values(stream);
+    return decode_values(stream, seq);
 }
 
 float TelemetryDecoder::rate()
@@ -151,44 +151,76 @@ void TelemetryDecoder::_set_feed_fmt(uint8_t v)
     _fmt_pos++;
 }
 
-bool TelemetryDecoder::decode_values(XbusStreamReader &stream)
+bool TelemetryDecoder::decode_values(XbusStreamReader &stream, uint8_t seq)
 {
     if (stream.available() == 0)
         return false;
 
     uint8_t cnt = stream.read<uint8_t>();
     uint8_t code = 0;
-    uint8_t code_bit = 0x80;
+    uint8_t code_bit = (1 << 7);
+
+    uint8_t nibble_v = 0;
+    uint8_t nibble_n = 0;
 
     bool upd = false;
     size_t index = 0;
     for (; index < _slots_cnt && stream.available() > 0 && cnt > 0; ++index) {
-        auto const &f = _slots.fields[index];
+        auto *f = &_slots.fields[index];
 
-        //if (f.fmt == fmt_opt)
-        //    break;
-        if (f.fmt == fmt_bit)
+        if (f->fmt == fmt_bit)
             break;
 
-        if (code_bit == 0x80) {
+        //if (f->pid.seq & seq)
+        //    continue;
+
+        if (code_bit == (1 << 7)) {
             code = stream.read<uint8_t>();
             code_bit = 1;
+            nibble_n = 0;
+            if (code == 0) {
+                code = stream.read<uint8_t>();
+                if ((index + 8) > code || code >= _slots_cnt)
+                    break;
+                index = code;
+                code_bit = (1 << 7);
+                code = (1 << 7);
+                f = &_slots.fields[index];
+                if (f->fmt == fmt_bit)
+                    break;
+                //if (f->pid.seq & seq)
+                //    break;
+            }
         } else
             code_bit <<= 1;
 
-        if (stream.available() == 0)
+        if (stream.available() == 0 && nibble_n == 0)
             break;
 
         if (!(code & code_bit))
             continue;
 
         auto &value = _slots.value[index];
-        mandala::type_id_e type;
-        size_t sz = unpack_value(stream.ptr(), &value, &type, f.fmt, stream.available());
-        if (!sz || sz > stream.available())
-            break;
-        stream.reset(stream.pos() + sz);
-
+        mandala::type_id_e type = mandala::type_void;
+        if (nibble_n == 0) {
+            size_t sz = unpack_value(stream.ptr(), &value, &type, f->fmt, stream.available());
+            if (!sz || sz > stream.available())
+                break;
+            stream.reset(stream.pos() + sz);
+        }
+        if (f->fmt == fmt_opt) {
+            if (nibble_n == 0) {
+                nibble_n = 1;
+                nibble_v = value & 0xFF;
+                value &= 0x0F;
+            } else {
+                nibble_n = 0;
+                value = nibble_v >> 4;
+            }
+            type = mandala::type_byte;
+        } else {
+            nibble_n = 0;
+        }
         auto &flags = _slots.flags[index];
         flags.type = type;
         flags.upd = true;
@@ -198,58 +230,6 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream)
         if (cnt == 0)
             break;
     }
-    // read opt nibbles
-    if (index < _slots_cnt && stream.available() > 0 && cnt > 0) {
-        code_bit = 0x80;
-        uint8_t nibble_v = 0;
-        uint8_t nibble_n = 0;
-        for (; index < _slots_cnt; ++index) {
-            auto const &f = _slots.fields[index];
-
-            if (f.fmt != fmt_opt) // error
-                break;
-            if (f.fmt == fmt_bit)
-                break;
-
-            if (code_bit == 0x80) {
-                if (stream.available() == 0)
-                    break;
-                code = stream.read<uint8_t>();
-                code_bit = 1;
-                nibble_n = 0;
-            } else
-                code_bit <<= 1;
-
-            if (!(code & code_bit))
-                continue;
-
-            auto &value = _slots.value[index];
-            if (nibble_n == 0) {
-                nibble_n = 1;
-                mandala::type_id_e type;
-                size_t sz = unpack_value(stream.ptr(), &value, &type, f.fmt, stream.available());
-                if (!sz || sz > stream.available())
-                    break;
-                stream.reset(stream.pos() + sz);
-                nibble_v = value & 0xFF;
-                value &= 0x0F;
-            } else {
-                nibble_n = 0;
-                value = nibble_v >> 4;
-            }
-            auto &flags = _slots.flags[index];
-            flags.type = mandala::type_byte;
-            flags.upd = true;
-            upd = true;
-
-            cnt--;
-            if (cnt == 0)
-                break;
-
-            if (stream.available() == 0 && nibble_n == 0)
-                break;
-        }
-    }
 
     // read appended bitfields
     if (index < _slots_cnt && stream.available() > 0 && cnt == 0) {
@@ -258,13 +238,13 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream)
                 break;
         }
         cnt = _slots_cnt - index;
-        code_bit = 0x80;
+        code_bit = (1 << 7);
         for (; index < _slots_cnt; ++index) {
             auto const &f = _slots.fields[index];
             if (f.fmt != fmt_bit)
                 break;
 
-            if (code_bit == 0x80) {
+            if (code_bit == (1 << 7)) {
                 if (stream.available() == 0)
                     break;
                 code = stream.read<uint8_t>();
@@ -276,13 +256,14 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream)
             cnt--;
 
             auto &value = _slots.value[index];
-            if (value != v) {
-                value = v;
-                auto &flags = _slots.flags[index];
-                flags.type = mandala::type_byte;
-                flags.upd = true;
-                upd = true;
-            }
+            //if (value != v) {
+            // always update
+            value = v;
+            auto &flags = _slots.flags[index];
+            flags.type = mandala::type_byte;
+            flags.upd = true;
+            upd = true;
+            //}
         }
     }
 
