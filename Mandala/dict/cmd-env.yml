@@ -28,15 +28,15 @@
   content:
     - name: data
       title: Telemetry data stream
-      descr: <format_mn><time><packed data...>
+      descr: <time><hash feed><fmt feed><packed data...>
     - name: format
       title: Telemetry data format array
       descr: req <part>, re <part><parts_cnt><format feed block 256 bytes>
-    - name: stream
-      title: Telemetry stream request/select
     - name: request
       title: Specific uid request
       descr: <uid><period_ms>[<format>]
+    - name: stream
+      title: Telemetry stream request/select
 
 - name: mission
   title: Mission data
@@ -71,8 +71,8 @@
 - name: stream
   title: Special streams and wrappers
   content:
-    - name: local
-      title: Local data no uplink
+    - name: gcs
+      title: Local GCS data no uplink
       descr: <local><uid><data>
     - name: payload
       title: Payload data

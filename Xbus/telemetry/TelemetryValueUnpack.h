@@ -31,6 +31,8 @@ size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, size_
 
 static float float_from_f16(const uint16_t &v)
 {
+    if (v == 0)
+        return 0.f;
     uint16_t hs, he, hm;
     uint32_t xp;
     uint32_t xs, xe, xm;

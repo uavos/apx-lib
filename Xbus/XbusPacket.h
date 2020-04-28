@@ -41,11 +41,11 @@ union pid_s {
         : _raw(0)
     {}
 
-    // constructor to make mandala binding uid
-    constexpr explicit pid_s(uint16_t _uid, pri_e _pri)
+    // _seq=2 indicates valid uid (_raw!=0)
+    constexpr explicit pid_s(uint16_t _uid, pri_e _pri, uint8_t _seq = 2)
         : uid(_uid)
         , pri(_pri)
-        , seq(2) // indicates valid uid (_raw!=0)
+        , seq(_seq)
     {}
 
     static constexpr inline uint16_t psize()

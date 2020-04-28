@@ -158,7 +158,7 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream, uint8_t seq)
 
     uint8_t cnt = stream.read<uint8_t>();
     uint8_t code = 0;
-    uint8_t code_bit = (1 << 7);
+    uint8_t code_bit = (1 << 6);
 
     uint8_t nibble_v = 0;
     uint8_t nibble_n = 0;
@@ -171,25 +171,50 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream, uint8_t seq)
         if (f->fmt == fmt_bit)
             break;
 
-        //if (f->pid.seq & seq)
-        //    continue;
+        switch (f->pid.seq) {
+        case seq_always:
+            break;
+        case seq_skip:
+            if (seq & 1)
+                continue;
+            break;
+        case seq_rare:
+            if (seq & 3)
+                continue;
+            break;
+        case seq_scheduled:
+            break;
+        }
 
-        if (code_bit == (1 << 7)) {
+        if (code_bit == (1 << 6)) {
             code = stream.read<uint8_t>();
             code_bit = 1;
             nibble_n = 0;
-            if (code == 0) {
-                code = stream.read<uint8_t>();
-                if ((index + 8) > code || code >= _slots_cnt)
+            if (code & (1 << 7)) {
+                // special code - offset
+                uint8_t offset = code & 0x7F;
+                if (offset < 7)
                     break;
-                index = code;
-                code_bit = (1 << 7);
-                code = (1 << 7);
+                int16_t dindex = offset;
+                while (offset == 0x7F) {
+                    code = 0;
+                    offset = stream.read<uint8_t>();
+                    if (!(offset & (1 << 7)))
+                        break;
+                    offset &= 0x7F;
+                    code = (1 << 7);
+                    dindex += offset;
+                }
+                if (!(code & (1 << 7)))
+                    break;
+                if (dindex < 7)
+                    break;
+                index += dindex;
+                if (index >= _slots_cnt)
+                    break;
                 f = &_slots.fields[index];
-                if (f->fmt == fmt_bit)
-                    break;
-                //if (f->pid.seq & seq)
-                //    break;
+                code_bit = (1 << 6);
+                code = (1 << 6);
             }
         } else
             code_bit <<= 1;

@@ -209,9 +209,13 @@
       title: Wind direction to
       units: deg
 
+    - name: vib
+      title: Common vibration level
+      type: byte
+      units: "%"
     - name: mag
       title: Magnetometer magnitude
-      units: su
+      units: u
 
 - name: ctr
   title: Control parameters

@@ -160,7 +160,7 @@ typedef char string_t[16];
 typedef char text_t[64];
 typedef xbus::pid_raw_t bind_t;
 
-enum type_e {
+enum type_e : uint8_t {
     group = 0,
     command,
     option = 4,
@@ -174,17 +174,21 @@ enum type_e {
 };
 
 // field descriptor packed into dict array
+#pragma pack(1)
 typedef struct
 {
-    type_e type : 4;
-    uint8_t array : 4; // >0 if array
-    uint8_t group;     // group idx
+    type_e type;
+    uint8_t array; // >0 if array
+    uint8_t group; // group idx
 
     // field strings: name, title, units
     // group strings: name, title, descr
     // command strings: name, title
 
 } field_s;
+#pragma pack()
+static_assert(sizeof(field_s) == 3, "size error");
+
 // dict array content:
 // <hash><fields array>
 }; // namespace conf

@@ -38,9 +38,16 @@ enum fmt_e {
     fmt_sbyte_u,   // signed units -1..+1
 };
 
+enum seq_e {
+    seq_always,
+    seq_skip,
+    seq_rare,
+    seq_scheduled
+};
+
 typedef struct
 {
-    xbus::pid_s pid; // seq = pid seq skip mask
+    xbus::pid_s pid; // seq = seq_e skip mode
     fmt_e fmt : 8;
     //uint8_t _rsv : 4;
 } field_s;

@@ -17,10 +17,6 @@ bool TelemetryEncoder::add(const field_s &field)
     if (_slots_cnt >= slots_size)
         return false;
 
-    if (field.fmt == fmt_bit)
-        return true;
-    if (field.fmt == fmt_opt)
-        return true;
     // find dups
     for (size_t i = 0; i < _slots_cnt; ++i) {
         auto const &f = _slots.fields[i];
@@ -117,7 +113,7 @@ bool TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spe
         auto const &f = _slots.fields[i];
         if (f.pid.uid != pid.uid)
             continue;
-        if (f.pid.pri != pid.pri)
+        if (f.pid.pri != pid.pri && f.pid.pri != xbus::pri_dynamic)
             continue;
         _set_data(i, spec, stream);
         return true;
@@ -136,9 +132,12 @@ void TelemetryEncoder::_set_data(size_t n, const mandala::spec_s &spec, XbusStre
         return;
     value = v;
 
+    auto &f = _slots.fields[n];
     auto &flags = _slots.flags[n];
+
     flags.type = spec.type;
-    flags.upd = true;
+    if (f.pid.seq != seq_scheduled)
+        flags.upd = true;
 }
 
 bool TelemetryEncoder::encode(XbusStreamWriter &stream, uint32_t seq, uint16_t ts)
@@ -226,8 +225,9 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint32_t seq)
 
     size_t pos_data = stream.pos();
     uint8_t *code = stream.ptr();
-    uint8_t code_bit = (1 << 7);
+    uint8_t code_bit = (1 << 6);
     uint8_t code_zero = 0;
+    uint8_t code_index = 0;
 
     uint8_t *nibble = nullptr;
     uint8_t nibble_n = 0;
@@ -243,10 +243,24 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint32_t seq)
         if (f.fmt == fmt_bit)
             break;
 
-        //if (f.pid.seq & seq)
-        //    continue;
+        switch (f.pid.seq) {
+        case seq_always:
+            break;
+        case seq_skip:
+            if (seq & 1)
+                continue;
+            break;
+        case seq_rare:
+            if (seq & 3)
+                continue;
+            break;
+        case seq_scheduled:
+            break;
+        }
 
-        if (code_bit == (1 << 7)) {
+        if (code_bit == (1 << 6)) {
+            if (code_zero == 0)
+                code_index = index;
             code_zero++;
             code_bit = 1;
             code = stream.ptr();
@@ -265,10 +279,17 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint32_t seq)
             if (sz) {
                 if (code_zero >= 2) {
                     // two or more consequtive zero codes
-                    code = stream.ptr() - (code_zero - 1);
-                    (*code) = index;
-                    stream.reset(stream.pos() - (code_zero - 2));
-                    code_bit = 1 << 7;
+                    stream.reset(stream.pos() - code_zero);
+                    uint8_t dindex = index - code_index;
+                    uint8_t offset = dindex;
+                    while (dindex > 0 || offset == 0x7F) {
+                        offset = dindex;
+                        if (offset > 0x7F)
+                            offset = 0x7F;
+                        stream.write<uint8_t>(offset | 0x80);
+                        dindex -= offset;
+                    }
+                    code_bit = 1 << 6;
                 } else {
                     (*code) |= code_bit;
                 }
