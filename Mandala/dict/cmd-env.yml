@@ -1,12 +1,3 @@
-- name: dict
-  title: Dictionary Management
-  content:
-    - name: search
-      title: Search for dict source
-    - name: ident
-      title: Dictionary identifier
-      descr: <hash><node_uid>
-
 - name: vehicle
   title: Vehicle addressed data
   content:
@@ -114,18 +105,20 @@
     - name: display
       title: Visualization
 
-- reserved: a
-- reserved: b
-- reserved: c
-- reserved: d
-- reserved: e
+# ensure nmt is the last
+- reserved: 0x09
+- reserved: 0x0A
+- reserved: 0x0B
+- reserved: 0x0C
+- reserved: 0x0D
+- reserved: 0x0E
 
 - name: nmt
   title: Network Management
   content:
     - name: search
       title: Search nodes
-      descr: Broadcast request
+      descr: Broadcast request, re <sn>
 
     - name: ident
       title: Node identification
@@ -151,13 +144,17 @@
       title: Update parameter
       descr: <fid_t><data>
 
+    - name: sh
+      title: Shell command
+      descr: <strings> [<params data>]
+
+    - name: status
+      title: Node quick status
+      descr: <status_s>
+
     - name: debug
       title: Debug data
       descr: <data>
-
-    - name: status
-      title: Node status
-      descr: <type_e> re:<status_s>
 
     - name: usr
       title: Node specific command

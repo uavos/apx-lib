@@ -49,7 +49,7 @@ struct item_t
 
 static constexpr const uint8_t uid_base = 32;
 
-static constexpr const meta_s meta_void = cmd::env::dict::search::meta;
+static constexpr const meta_s meta_void = cmd::env::nmt::search::meta;
 
 typedef enum {
     MBSTREAM(service, "Service packet <node_sn>,<cmd>,<data..>", = 0),

@@ -25,7 +25,7 @@ public:
             _head = node;
             return;
         }
-        for (auto i : *this) {
+        for (auto i = _head; i != nullptr; i = i->getSibling()) {
             if (i->getSibling())
                 continue;
             i->setSibling(node);
@@ -55,7 +55,7 @@ public:
             return true;
         }
 
-        for (auto i : *this) {
+        for (auto i = _head; i != nullptr; i = i->getSibling()) {
             if (i->getSibling() != node)
                 continue;
             i->setSibling(node->getSibling());
