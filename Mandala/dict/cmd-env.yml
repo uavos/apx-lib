@@ -144,13 +144,9 @@
       title: Update parameter
       descr: <fid_t><data>
 
-    - name: sh
-      title: Shell command
-      descr: <strings> [<params data>]
-
-    - name: status
-      title: Node quick status
-      descr: <status_s>
+    - name: mod
+      title: Modules tree
+      descr: <op_e>
 
     - name: debug
       title: Debug data

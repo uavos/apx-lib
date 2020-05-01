@@ -64,9 +64,7 @@ union pid_s {
     constexpr pid_s(const pid_raw_t &v)
         : _raw(v)
     {}
-    constexpr pid_s(const pid_s &v)
-        : _raw(v._raw)
-    {}
+
     constexpr pid_s &operator=(const pid_raw_t &v)
     {
         _raw = v;

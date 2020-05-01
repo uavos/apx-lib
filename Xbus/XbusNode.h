@@ -33,7 +33,7 @@ typedef struct
 
     // strings: name, version, hardware, [files]
 
-    static inline uint16_t psize()
+    static constexpr inline uint16_t psize()
     {
         return sizeof(uint32_t) * 2 + sizeof(hash_t);
     }
@@ -107,7 +107,7 @@ typedef struct
         uint32_t raw;
     } flags;
 
-    static inline uint16_t psize()
+    static constexpr inline uint16_t psize()
     {
         return sizeof(size) + sizeof(time) + sizeof(hash) + sizeof(offset) + sizeof(flags.raw);
     }
@@ -209,16 +209,22 @@ typedef uint16_t timeout_t;
 }; // namespace ack
 
 //---------------------------
+// mod - modules tree
+//---------------------------
+namespace mod {
+
+enum op_e : uint8_t {
+    sh,     // shell command, report to terminal
+    ls,     // re: <strings> tree
+    status, // re: <status_s>
+};
+
+}; // namespace mod
+
+//---------------------------
 // status
 //---------------------------
 namespace status {
-
-enum type_e : uint8_t {
-    stats = 0, // no additional reports, jist <status_s>
-    errors,    // additional text messages
-    mem,       // report memory usage
-    debug,     // report debug raw data
-};
 
 typedef struct
 {
@@ -236,7 +242,7 @@ typedef struct
         uint8_t _rsv[6];
     } cnt;
 
-    static inline uint16_t psize()
+    static constexpr inline uint16_t psize()
     {
         return sizeof(uint8_t) * 4;
     }
