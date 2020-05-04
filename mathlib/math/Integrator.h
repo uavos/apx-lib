@@ -91,3 +91,68 @@ private:
 	 */
     void _reset(uint32_t &integral_dt);
 };
+
+namespace matrix {
+
+};
+
+namespace math {
+
+template<typename>
+struct IntegratorTypeSum
+{};
+
+template<>
+struct IntegratorTypeSum<int16_t>
+{
+    typedef int32_t type;
+};
+
+template<typename T, typename Tsum = typename IntegratorTypeSum<T>::type>
+class Integrator
+{
+public:
+    bool update(const T sample[], uint8_t cnt)
+    {
+        // integrate
+        _samples += cnt;
+
+        // trapezoidal integration (equally spaced, scaled by dt later)
+        cnt--;
+        for (uint8_t i = 0; i < cnt; ++i)
+            _sum += sample[i];
+        _sum += (_last_sample + sample[cnt]) / 2;
+        _last_sample = sample[cnt];
+
+        if (_samples > 0 && (_samples >= _reset_samples)) {
+            return true;
+        }
+        return false;
+    }
+
+    const Tsum &result()
+    {
+        _sum /= _samples;
+        return _sum;
+    }
+
+    void set_reset_samples(uint16_t v)
+    {
+        //reset();
+        _reset_samples = v;
+    }
+
+    void reset()
+    {
+        _samples = 0;
+        _sum = {};
+    }
+
+private:
+    Tsum _sum{};
+    T _last_sample{};
+    uint16_t _samples{0};
+    uint16_t _reset_samples{0};
+};
+
+}; // namespace math

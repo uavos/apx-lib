@@ -190,7 +190,8 @@ public:
         return res;
     }
 
-    Matrix<Type, M, N> operator+(const Matrix<Type, M, N> &other) const
+    template<typename Tin>
+    Matrix<Type, M, N> operator+(const Matrix<Tin, M, N> &other) const
     {
         Matrix<Type, M, N> res;
         const Matrix<Type, M, N> &self = *this;
@@ -233,13 +234,15 @@ public:
         return res;
     }
 
-    void operator+=(const Matrix<Type, M, N> &other)
+    template<typename Tin>
+    void operator+=(const Matrix<Tin, M, N> &other)
     {
         Matrix<Type, M, N> &self = *this;
         self = self + other;
     }
 
-    void operator-=(const Matrix<Type, M, N> &other)
+    template<typename Tin>
+    void operator-=(const Matrix<Tin, M, N> &other)
     {
         Matrix<Type, M, N> &self = *this;
         self = self - other;

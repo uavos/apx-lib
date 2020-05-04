@@ -150,9 +150,9 @@ const T gradual(const T &value, const T &x_low, const T &x_high, const T &y_low,
 template<typename T, typename Tin>
 const T sum(const Tin samples[], size_t len)
 {
-    T sum = 0;
+    T sum{};
     for (size_t n = 0; n < len; n++)
-        sum += samples[n];
+        sum = sum + samples[n];
     return sum;
 }
 
