@@ -57,9 +57,9 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
 
 float TelemetryDecoder::rate()
 {
-    if (_dts > 100 || _dts == 0)
+    if (_dts > 1000 || _dts == 0)
         return 0;
-    return 10.f / _dts;
+    return 100.f / _dts;
 }
 
 void TelemetryDecoder::reset(bool reset_hash)

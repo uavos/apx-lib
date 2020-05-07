@@ -41,7 +41,7 @@ public:
     bool valid() { return _valid; }
     void reset(bool reset_hash = true);
 
-    uint16_t timestamp_dms() { return _ts; }
+    uint32_t timestamp_10ms() { return _ts; }
 
     xbus::telemetry::dec_slots_s &dec_slots() { return _slots; }
     uint16_t slots_cnt() { return _slots_cnt; }
@@ -53,8 +53,8 @@ protected:
     uint16_t _slots_cnt{0};
 
     uint8_t _seq{0};
-    uint16_t _ts{0};
-    uint8_t _dts{0};
+    uint32_t _ts{0};
+    uint32_t _dts{0};
 
     bool _valid{false};
 

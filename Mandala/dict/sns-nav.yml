@@ -49,7 +49,9 @@
       type: byte
       units: u
     - name: vib
-      suffix: vibration metric
+      suffix: vibration
+      type: byte
+      units: "%"
 
 - name: mag
   title: Magnetometer
@@ -73,7 +75,9 @@
       type: byte
       units: u
     - name: vib
-      suffix: vibration metric
+      suffix: vibration
+      type: byte
+      units: "%"
 
 - name: gps
   title: GPS

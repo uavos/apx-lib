@@ -66,13 +66,13 @@ static constexpr const size_t slots_size{220};
 // stream header
 typedef struct
 {
-    uint16_t ts;       // timestamp [100's of ms]
+    uint32_t ts;       // timestamp in 10' of milliseconds
     uint8_t feed_hash; // dataset structure hash_32 (pid.seq = byte no)
     uint8_t feed_fmt;  // dataset format COBS encoded feed
 
     static constexpr inline uint16_t psize()
     {
-        return 4;
+        return 6;
     }
     inline void read(XbusStreamReader *s)
     {

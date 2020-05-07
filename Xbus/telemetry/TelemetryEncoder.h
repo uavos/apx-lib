@@ -38,7 +38,7 @@ public:
 
     bool add(const xbus::telemetry::field_s &field);
 
-    bool encode(XbusStreamWriter &stream, uint32_t seq, uint16_t ts);
+    bool encode(XbusStreamWriter &stream, uint32_t seq, uint32_t ts);
     void encode_format(XbusStreamWriter &stream, uint8_t part);
 
     bool update(const xbus::pid_s &pid, const mandala::spec_s &spec, XbusStreamReader &stream);
