@@ -103,6 +103,11 @@ void TelemetryDecoder::_set_feed_fmt(uint8_t v)
     if (v == 0) {
         // packet delimiter
         do {
+            if (_fmt_pos == 0) {
+                _cobs_code = 0xFF;
+                _cobs_copy = 0;
+                return;
+            }
             if (_cobs_copy)
                 break;
             if (_fmt_pos < (sizeof(field_s) + 1) || ((_fmt_pos - 1) % sizeof(field_s)))

@@ -15,28 +15,26 @@ typedef struct
     uid_t uid;
 
     union {
+        uint32_t _raw;
         struct
         {
-            uint32_t gcs : 1; // set if Ground Control
-        } bits;
-        uint32_t raw;
+            bool gcs : 1; // set if Ground Control
+        };
     } flags;
-
-    // strings: callsign
 
     static inline uint16_t psize()
     {
-        return sizeof(uid_t) + sizeof(flags.raw);
+        return sizeof(uid_t) + sizeof(flags._raw);
     }
     inline void read(XbusStreamReader *s)
     {
         s->read(uid, sizeof(uid));
-        *s >> flags.raw;
+        *s >> flags._raw;
     }
     inline void write(XbusStreamWriter *s) const
     {
         s->write(uid, sizeof(uid));
-        *s << flags.raw;
+        *s << flags._raw;
     }
 } ident_s;
 

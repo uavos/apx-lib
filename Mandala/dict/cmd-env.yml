@@ -1,33 +1,28 @@
 - name: vehicle
-  title: Vehicle addressed data
+  title: Vehicle object data
   content:
     - name: ident
       title: Vehicle Identification
-      descr: <squawk><ident>
+      descr: <squawk>[<ident>]
     - name: xpdr
-      title: Transponder data from vehicle
+      title: Transponder data
       descr: <squawk><xpdr data>
     - name: downlink
-      title: Data packet from vehicle
+      title: Data packet from vehicle to GCS
       descr: <squawk><uid><data...>
     - name: uplink
       title: Data packet from GCS to vehicle
       descr: <squawk><uid><data...> or <empty> for heartbeat
 
 - name: telemetry
-  title: Telemetry packed stream
+  title: Telemetry stream
   content:
     - name: data
-      title: Telemetry data stream
+      title: Telemetry data
       descr: <time><hash feed><fmt feed><packed data...>
     - name: format
-      title: Telemetry data format array
+      title: Telemetry format array
       descr: req <part>, re <part><parts_cnt><format feed block 256 bytes>
-    - name: request
-      title: Specific uid request
-      descr: <uid><period_ms>[<format>]
-    - name: stream
-      title: Telemetry stream request/select
 
 - name: mission
   title: Mission data

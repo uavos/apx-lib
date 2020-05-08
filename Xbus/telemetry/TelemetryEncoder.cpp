@@ -8,8 +8,7 @@ using namespace xbus::telemetry;
 
 TelemetryEncoder::TelemetryEncoder()
 {
-    memset(&_slots, 0, sizeof(_slots));
-    _update_feeds();
+    clear();
 }
 
 bool TelemetryEncoder::add(const field_s &field)
@@ -105,6 +104,12 @@ void TelemetryEncoder::_insert(size_t index, const xbus::telemetry::field_s &fie
 
     _update_feeds();
 }
+void TelemetryEncoder::clear()
+{
+    _slots_cnt = 0;
+    memset(&_slots, 0, sizeof(_slots));
+    _update_feeds();
+}
 
 bool TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spec, XbusStreamReader &stream)
 {
@@ -172,8 +177,12 @@ void TelemetryEncoder::_update_feeds()
     _slots.crc_cobs = crc_cobs;
 
     _fmt_size = size;
-    _fmt_pos = _fmt_size + 1;
     _cobs_code = 0;
+    reset_feeds();
+}
+void TelemetryEncoder::reset_feeds()
+{
+    _fmt_pos = _fmt_size + 1;
 }
 
 uint8_t TelemetryEncoder::_get_feed_fmt()

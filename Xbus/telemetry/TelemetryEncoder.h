@@ -37,6 +37,7 @@ public:
     explicit TelemetryEncoder();
 
     bool add(const xbus::telemetry::field_s &field);
+    void clear();
 
     bool encode(XbusStreamWriter &stream, uint32_t seq, uint32_t ts);
     void encode_format(XbusStreamWriter &stream, uint8_t part);
@@ -45,6 +46,8 @@ public:
 
     xbus::telemetry::enc_slots_s &enc_slots() { return _slots; }
     uint16_t slots_cnt() { return _slots_cnt; }
+
+    void reset_feeds();
 
 private:
     xbus::telemetry::enc_slots_s _slots;
@@ -56,6 +59,7 @@ private:
     xbus::telemetry::hash_s _hash;
 
     void _set_data(size_t n, const mandala::spec_s &spec, XbusStreamReader &stream);
+
     void _update_feeds();
 
     // fmt feed COBS encoder
