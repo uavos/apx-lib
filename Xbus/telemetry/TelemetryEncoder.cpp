@@ -145,10 +145,11 @@ void TelemetryEncoder::_set_data(size_t n, const mandala::spec_s &spec, XbusStre
         flags.upd = true;
 }
 
-bool TelemetryEncoder::encode(XbusStreamWriter &stream, uint32_t seq, uint32_t ts)
+bool TelemetryEncoder::encode(XbusStreamWriter &stream, uint32_t seq, xbus::telemetry::dt_e dt)
 {
     stream_s hdr;
-    hdr.ts = ts;
+    hdr.spec.seq = seq >> 2;
+    hdr.spec.dt = dt;
 
     hdr.feed_hash = _hash.byte[seq & 3];
     hdr.feed_fmt = _get_feed_fmt();

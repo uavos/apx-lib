@@ -18,13 +18,15 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
     xbus::telemetry::stream_s hdr;
     hdr.read(&stream);
 
-    uint8_t seq = pid.seq;
-    uint8_t dseq = (seq - _seq) & 3;
+    uint32_t seq = pid.seq;
+    seq |= hdr.spec.seq << 2;
+
+    uint8_t dseq = (seq - _seq) & 0x7FFFFFFF;
     _seq = seq;
+
     bool seq_ok = dseq == 1;
 
-    _dts = hdr.ts - _ts;
-    _ts = hdr.ts;
+    _dt = hdr.spec.dt;
 
     uint8_t &h = _hash.byte[seq & 3];
     if (h != hdr.feed_hash) {
@@ -53,13 +55,6 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
     // fmt looks consistent
     _valid = true;
     return decode_values(stream, seq);
-}
-
-float TelemetryDecoder::rate()
-{
-    if (_dts > 1000 || _dts == 0)
-        return 0;
-    return 100.f / _dts;
 }
 
 void TelemetryDecoder::reset(bool reset_hash)
@@ -332,8 +327,11 @@ bool TelemetryDecoder::decode_format(uint8_t part, uint8_t parts, XbusStreamRead
             if (pos % sizeof(field_s)) {
                 break;
             }
-            if (check_hash(pos))
+            if (check_hash(pos)) {
+                _fmt_pos = 0;
+                _cobs_code = 0;
                 return true;
+            }
         }
         // mid part
         if (_slots_cnt == 0)

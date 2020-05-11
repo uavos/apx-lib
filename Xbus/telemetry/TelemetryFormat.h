@@ -45,6 +45,39 @@ enum seq_e {
     seq_scheduled
 };
 
+enum dt_e {
+    dt_10ms,  // 100 Hz
+    dt_20ms,  // 50 Hz
+    dt_50ms,  // 20 Hz
+    dt_100ms, // 10 Hz
+    dt_200ms, // 5 Hz
+    dt_1s,    // 1 Hz
+    dt_5s,
+    dt_off,
+};
+static constexpr uint32_t dt_ms(dt_e dt)
+{
+    switch (dt) {
+    case dt_10ms:
+        return 10;
+    case dt_20ms:
+        return 20;
+    case dt_50ms:
+        return 50;
+    case dt_100ms:
+        return 100;
+    case dt_200ms:
+        return 200;
+    case dt_1s:
+        return 1000;
+    case dt_5s:
+        return 5000;
+    case dt_off:
+        return 0;
+    }
+    return 0;
+}
+
 typedef struct
 {
     xbus::pid_s pid; // seq = seq_e skip mode
@@ -66,7 +99,14 @@ static constexpr const size_t slots_size{220};
 // stream header
 typedef struct
 {
-    uint32_t ts;       // timestamp in 10' of milliseconds
+    union {
+        uint32_t _raw;
+        struct
+        {
+            uint32_t seq : 29;
+            dt_e dt : 3;
+        };
+    } spec;
     uint8_t feed_hash; // dataset structure hash_32 (pid.seq = byte no)
     uint8_t feed_fmt;  // dataset format COBS encoded feed
 
@@ -76,13 +116,13 @@ typedef struct
     }
     inline void read(XbusStreamReader *s)
     {
-        *s >> ts;
+        *s >> spec._raw;
         *s >> feed_hash;
         *s >> feed_fmt;
     }
     inline void write(XbusStreamWriter *s) const
     {
-        *s << ts;
+        *s << spec._raw;
         *s << feed_hash;
         *s << feed_fmt;
     }

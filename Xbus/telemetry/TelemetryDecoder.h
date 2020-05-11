@@ -36,25 +36,22 @@ public:
 
     bool decode_format(uint8_t part, uint8_t parts, XbusStreamReader &stream);
 
-    float rate();
-
-    bool valid() { return _valid; }
+    inline bool valid() { return _valid; }
     void reset(bool reset_hash = true);
 
-    uint32_t timestamp_10ms() { return _ts; }
+    inline uint32_t seq() { return _seq; }
+    inline uint32_t dt_ms() { return xbus::telemetry::dt_ms(_dt); }
 
-    xbus::telemetry::dec_slots_s &dec_slots() { return _slots; }
-    uint16_t slots_cnt() { return _slots_cnt; }
-    uint16_t fmt_cnt() { return _fmt_pos; }
-    uint8_t seq() { return _seq; }
+    inline xbus::telemetry::dec_slots_s &dec_slots() { return _slots; }
+    inline uint16_t slots_cnt() { return _slots_cnt; }
+    inline uint16_t fmt_cnt() { return _fmt_pos; }
 
 protected:
     xbus::telemetry::dec_slots_s _slots;
     uint16_t _slots_cnt{0};
 
-    uint8_t _seq{0};
-    uint32_t _ts{0};
-    uint32_t _dts{0};
+    uint32_t _seq{0};
+    xbus::telemetry::dt_e _dt{xbus::telemetry::dt_off};
 
     bool _valid{false};
 
