@@ -15,9 +15,21 @@ public:
 
     {}
 
+    void init(const void *p, size_t size)
+    {
+        _buf = static_cast<const uint8_t *>(p);
+        _size = size;
+        reset();
+    }
+
     inline void discard() { _pos = _size; }
     inline const uint8_t *buffer() const { return _buf; }
     inline const uint8_t *ptr() const { return &(_buf[_pos]); }
+
+    inline void skip(size_t size)
+    {
+        reset(_pos + size);
+    }
 
     template<typename _T>
     void read(_T &data);

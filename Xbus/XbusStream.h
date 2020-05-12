@@ -1,8 +1,9 @@
 #pragma once
 
+#include <do_not_copy.h>
 #include <sys/types.h>
 
-class XbusStream
+class XbusStream : public do_not_copy
 {
 public:
     explicit XbusStream(size_t size)

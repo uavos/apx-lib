@@ -48,7 +48,7 @@ union pid_s {
         , seq(_seq)
     {}
 
-    static constexpr inline uint16_t psize()
+    /*static constexpr inline uint16_t psize()
     {
         return sizeof(pid_raw_t);
     }
@@ -59,7 +59,7 @@ union pid_s {
     inline void write(XbusStreamWriter *s) const
     {
         *s << _raw;
-    }
+    }*/
 
     constexpr pid_s(const pid_raw_t &v)
         : _raw(v)

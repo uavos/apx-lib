@@ -75,7 +75,7 @@ private:
     void push(const uint8_t *data);
     void remove(const extid_s &extid);
     void remove(Tree &t);
-    size_t read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_id);
+    size_t read_packet(Tree &t, void *dest, size_t sz);
 };
 
 } // namespace can

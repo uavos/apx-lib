@@ -240,17 +240,17 @@ size_t Pool::read_packet(void *dest, size_t sz, uint8_t *src_id)
         if (!t.dlc)
             continue;
         // finished msg found in tree t
-        size_t cnt = read_packet(t, dest, sz, src_id);
+        *src_id = t.extid.src;
+        size_t cnt = read_packet(t, dest, sz);
         if (cnt > 0)
             return cnt;
     }
     return 0;
 }
-size_t Pool::read_packet(Tree &t, void *dest, size_t sz, uint8_t *src_id)
+size_t Pool::read_packet(Tree &t, void *dest, size_t sz)
 {
-    *src_id = t.extid.src;
-
     XbusStreamWriter stream(dest, sz);
+
     stream.write<xbus::pid_raw_t>(t.extid.pid);
 
     for (uint8_t next = t.head;;) {

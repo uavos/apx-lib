@@ -4,9 +4,6 @@
     - name: ident
       title: Vehicle Identification
       descr: <squawk>[<ident>]
-    - name: xpdr
-      title: Transponder data
-      descr: <squawk><xpdr data>
     - name: downlink
       title: Data packet from vehicle to GCS
       descr: <squawk><uid><data...>
@@ -23,6 +20,9 @@
     - name: format
       title: Telemetry format array
       descr: req <part>, re <part><parts_cnt><format feed block 256 bytes>
+    - name: xpdr
+      title: Transponder data
+      descr: <xpdr>
 
 - name: mission
   title: Mission data

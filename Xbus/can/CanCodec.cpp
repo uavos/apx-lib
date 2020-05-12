@@ -94,7 +94,7 @@ bool Codec::send_packet(const void *data, size_t size)
     extid.raw = _extid_defaults.raw;
 
     xbus::pid_s pid;
-    pid.read(&stream);
+    stream >> pid._raw;
     extid.pid = pid._raw;
 
     size_t cnt = stream.available();
