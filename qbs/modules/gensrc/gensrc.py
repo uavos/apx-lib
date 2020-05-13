@@ -112,7 +112,7 @@ def sort_modules(list_dicts):
             else:
                 before = init
         else:
-            before = 'app'
+            before = 'late'
 
         if before:
             if before in init_order:
