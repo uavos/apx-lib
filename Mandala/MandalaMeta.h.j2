@@ -27,16 +27,24 @@
 {% set units_id = 'units_none' %}
 {%- endif -%}
 
+{%- if level<(data.uid_bits|length-1) -%}
+{% set group = 1 %}
+{% set uid_val = uid %}
+{% else %}
+{% set group = 0 %}
+{% set uid_val = uid+1 %}
+{%- endif -%}
+
 {{ ind }}{
 {{ ind1 }}.name = "{{ d.name }}",
 {{ ind1 }}.title = "{{ title }}",
 {{ ind1 }}.descr = "{{ d.descr }}",
 {{ ind1 }}.units = "{{ units }}",
 {{ ind1 }}.path = "{{ path|join('.') }}",
-{{ ind1 }}.uid = 0x{{ '%0x' % (uid) }},
+{{ ind1 }}.uid = 0x{{ '%0x' % (uid_val) }},
 {{ ind1 }}.mask = 0x{{ '%0x' % (2**(data.uid_bits|sum)-1-(2**(data.uid_bits[level+1:]|sum)-1)+data.uid_base) }},
 {{ ind1 }}.level = {{ level }},
-{{ ind1 }}.group = {% if level<(data.uid_bits|length-1) %}1{% else %}0{% endif %},
+{{ ind1 }}.group = {{ group }},
 {{ ind1 }}.type_id = type_{% if d.content is defined %}void{% else %}{{ d.type }}{% endif %},
 {{ ind1 }}.units_id = {{ units_id }},
 {{ ind }}},

@@ -41,14 +41,19 @@ union pid_s {
         : _raw(0)
     {}
 
-    // _seq=2 indicates valid uid (_raw!=0)
-    constexpr explicit pid_s(uint16_t _uid, pri_e _pri, uint8_t _seq = 2)
+    constexpr inline pid_raw_t raw()
+    {
+        return _raw;
+    }
+
+    // _seq!=0 indicates valid uid (_raw!=0)
+    constexpr explicit pid_s(uint16_t _uid, pri_e _pri, uint8_t _seq)
         : uid(_uid)
         , pri(_pri)
         , seq(_seq)
     {}
 
-    /*static constexpr inline uint16_t psize()
+    static constexpr inline uint16_t psize()
     {
         return sizeof(pid_raw_t);
     }
@@ -59,7 +64,7 @@ union pid_s {
     inline void write(XbusStreamWriter *s) const
     {
         *s << _raw;
-    }*/
+    }
 
     constexpr pid_s(const pid_raw_t &v)
         : _raw(v)
@@ -70,7 +75,7 @@ union pid_s {
         _raw = v;
         return *this;
     }
-    constexpr bool match(const pid_s &v) const { return uid == v.uid; }
+    inline constexpr bool match(const pid_s &v) const { return uid == v.uid; }
 };
 static_assert(sizeof(pid_s) == sizeof(pid_raw_t), "pid_s size error");
 #pragma pack()

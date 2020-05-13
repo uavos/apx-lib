@@ -226,7 +226,7 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream, uint8_t seq)
             continue;
 
         auto &value = _slots.value[index];
-        mandala::type_id_e type = mandala::type_void;
+        mandala::type_id_e type = mandala::type_real; // dummy
         if (nibble_n == 0) {
             size_t sz = unpack_value(stream.ptr(), &value, &type, f->fmt, stream.available());
             if (!sz || sz > stream.available())

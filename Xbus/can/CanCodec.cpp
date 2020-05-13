@@ -86,16 +86,17 @@ void Codec::sendAddressing()
 
 bool Codec::send_packet(const void *data, size_t size)
 {
-    if (size < sizeof(xbus::pid_s))
+    if (size < xbus::pid_s::psize())
         return true;
+
     XbusStreamReader stream(data, size);
 
     extid_s extid;
     extid.raw = _extid_defaults.raw;
 
     xbus::pid_s pid;
-    stream >> pid._raw;
-    extid.pid = pid._raw;
+    pid.read(&stream);
+    extid.pid = pid.raw();
 
     size_t cnt = stream.available();
 

@@ -28,8 +28,9 @@ enum type_id_e {
 
     // bundle formats
     type_bundle = 10,
-    type_vec2 = type_bundle,
-    type_vec3,
+    type_vec2 = type_bundle, // <x>,<y>
+    type_vec3,               // <x>,<y>,<z>
+    type_ins,                // <dt16_us>,<ins fields>
 };
 
 template<typename T>
