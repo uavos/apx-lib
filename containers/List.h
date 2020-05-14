@@ -2,6 +2,7 @@
 
 #include <cinttypes>
 #include <cstddef>
+#include <do_not_copy.h>
 
 template<class T>
 class ListNode
@@ -15,7 +16,7 @@ protected:
 };
 
 template<class T>
-class List
+class List : private do_not_copy
 {
 public:
     void add(T node)

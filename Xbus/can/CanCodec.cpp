@@ -64,6 +64,9 @@ ErrorType Codec::push_message(const xcan_msg_s &msg)
             break;
         }
 
+        if (!accept_filter(extid))
+            return MsgAccepted;
+
         //process message
         return pool.push(extid, msg.data, msg.dlc);
 
