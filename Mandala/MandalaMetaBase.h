@@ -28,9 +28,8 @@ enum type_id_e {
 
     // bundle formats
     type_bundle = 10,
-    type_vec2 = type_bundle, // <x>,<y>
-    type_vec3,               // <x>,<y>,<z>
-    type_ins,                // <dt16_us>,<ins fields>
+    type_vec2, // <x>,<y>
+    type_vec3, // <x>,<y>,<z>
 };
 
 template<typename T>
@@ -146,28 +145,6 @@ union spec_s {
 static_assert(sizeof(spec_s) == spec_s::psize() && sizeof(spec_s) == sizeof(spec_s::_raw), "spec_s size error");
 #pragma pack()
 
-enum sfmt_id_e {
-    sfmt_void,
-
-    sfmt_bit,
-
-    sfmt_u4, //(uint32)uint
-    sfmt_u2, //(uint16)uint
-    sfmt_u1, //(uint8)uint
-
-    sfmt_f4,      //float32
-    sfmt_f2,      //float16
-    sfmt_f1,      //(uint8)float
-    sfmt_f1_10,   //(uint8)float/10
-    sfmt_f1_01,   //(uint8)float*10
-    sfmt_f1_001,  //(uint8)float*100
-    sfmt_f1_s,    //(int8)float
-    sfmt_f1_s10,  //(int8)float/10
-    sfmt_f1_s01,  //(int8)float*10
-    sfmt_f1_s001, //(int8)float*100
-
-};
-
 struct meta_s
 {
     const char *name;
@@ -182,19 +159,6 @@ struct meta_s
     const bool group : 1;
     const type_id_e type_id : 4;
     const uint8_t units_id;
-};
-
-struct stream_item_s
-{
-    const uid_t uid : sizeof(uid_t) * 8;
-    const sfmt_id_e sfmt : 4;
-};
-
-struct stream_id_s
-{
-    const char *name;
-    const char *title;
-    const stream_item_s *content;
 };
 
 }; // namespace mandala

@@ -13,15 +13,21 @@ typedef uint16_t pid_raw_t;
 constexpr const size_t size_packet_max = 512;
 
 enum pri_e {
-    pri_none = 0,
+    pri_final = 0,
     pri_primary,
     pri_secondary,
     pri_failsafe,
     pri_auxilary,
 
+    // special cases
+
+    // nmt
     pri_response = 6, // response not request
     pri_request = 7,  // request not response
-    pri_dynamic = 7,  // configured priority for pubs
+
+    // redundancy
+    pri_any = 7,    // telemetry value accepts any priority
+    pri_select = 7, // sub selects priority automatically
 };
 
 // Packet identifier [16 bits]

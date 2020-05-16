@@ -118,7 +118,7 @@ bool TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spe
         auto const &f = _slots.fields[i];
         if (f.pid.uid != pid.uid)
             continue;
-        if (f.pid.pri != pid.pri && f.pid.pri != xbus::pri_dynamic)
+        if (f.pid.pri != pid.pri && f.pid.pri != xbus::pri_any)
             continue;
         _set_data(i, spec, stream);
         return true;

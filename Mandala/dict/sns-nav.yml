@@ -2,6 +2,11 @@
   title: Gyro
   units: deg/s
   content:
+    - name: dt
+      suffix: dt
+      type: dword
+      units: us
+
     - name: "x"
       suffix: "X"
     - name: "y"
@@ -31,6 +36,11 @@
   title: Accelerometer
   units: m/s^2
   content:
+    - name: dt
+      suffix: dt
+      type: dword
+      units: us
+
     - name: "x"
       suffix: "X"
     - name: "y"
@@ -82,6 +92,11 @@
 - name: gps
   title: GPS
   content:
+    - name: dt
+      suffix: dt
+      type: dword
+      units: us
+
     - name: lat
       suffix: latitude
       units: deg
@@ -130,11 +145,17 @@
 
     - name: jam
       suffix: jamming level
-      units: u
+      type: byte
+      units: "%"
 
 - name: pt
   title: Dynamic pressure
   content:
+    - name: dt
+      suffix: dt
+      type: dword
+      units: us
+
     - name: airspeed
       title: Airspeed
       units: m/s
@@ -151,6 +172,11 @@
 - name: ps
   title: Static pressure
   content:
+    - name: dt
+      suffix: dt
+      type: dword
+      units: us
+
     - name: altitude
       title: Barometric altitude
       units: m
@@ -214,6 +240,11 @@
   title: Landing Assistance sensors
   descr: Used for approach correction.
   content:
+    - name: dt
+      suffix: dt
+      type: dword
+      units: us
+
     - name: dx
       title: Relative distance X
       units: m
@@ -246,6 +277,11 @@
   title: Platform
   descr: Used for landing to a moving platform with las.
   content:
+    - name: dt
+      suffix: dt
+      type: dword
+      units: us
+
     - name: lat
       suffix: latitude
       units: deg
@@ -280,6 +316,11 @@
   title: Visual navigation
   descr: Used for global position estimation and dead-reckoning.
   content:
+    - name: dt
+      suffix: dt
+      type: dword
+      units: us
+
     - name: vx
       title: Visual velocity X
       units: m/s

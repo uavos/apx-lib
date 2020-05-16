@@ -72,6 +72,8 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
         return fmt_sbyte_u;
     case units_u:
         return fmt_byte_u;
+    case units_us:
+        break;
     case units_V:
         return fmt_f16;
     }
@@ -93,7 +95,7 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
 }
 
 template<class M>
-constexpr ds_field_s ds(fmt_e _fmt = default_fmt(M::meta.type_id, static_cast<units_e>(M::meta.units_id)), seq_e _seq = seq_always, xbus::pri_e _pri = xbus::pri_none)
+constexpr ds_field_s ds(fmt_e _fmt = default_fmt(M::meta.type_id, static_cast<units_e>(M::meta.units_id)), seq_e _seq = seq_always, xbus::pri_e _pri = xbus::pri_final)
 {
     return ds_field_s{xbus::pid_s(M::uid, _pri, _seq), _fmt};
 }
@@ -117,9 +119,9 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::pos::course>(fmt_rad),
     ds<est::nav::pos::speed>(fmt_f16, seq_skip),
 
-    ds<est::nav::rel::ax>(fmt_sbyte),
-    ds<est::nav::rel::ay>(fmt_sbyte),
-    ds<est::nav::rel::az>(fmt_sbyte),
+    ds<est::nav::rel::ax>(fmt_sbyte_01),
+    ds<est::nav::rel::ay>(fmt_sbyte_01),
+    ds<est::nav::rel::az>(fmt_f16),
 
     ds<est::nav::ref::status>(fmt_bit),
     ds<est::nav::ref::lat>(fmt_real, seq_scheduled),
