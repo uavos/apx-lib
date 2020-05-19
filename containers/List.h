@@ -8,19 +8,26 @@ template<class T>
 class ListNode
 {
 public:
-    void setSibling(T sibling) { _list_node_sibling = sibling; }
-    const T getSibling() const { return _list_node_sibling; }
+    inline constexpr void setSibling(T sibling) { _list_node_sibling = sibling; }
+    inline constexpr const T getSibling() const { return _list_node_sibling; }
 
 protected:
     T _list_node_sibling{nullptr};
 };
 
-template<class T>
+struct ListGuard
+{
+};
+
+template<class T, typename GUARD = ListGuard>
 class List : private do_not_copy
 {
 public:
     void add(T node)
     {
+        GUARD guard;
+        (void) guard;
+
         node->setSibling(nullptr);
         if (!_head) {
             _head = node;
@@ -36,6 +43,9 @@ public:
 
     void insert(T node, T after)
     {
+        GUARD guard;
+        (void) guard;
+
         if (!after) {
             node->setSibling(_head);
             _head = node;
@@ -47,12 +57,16 @@ public:
 
     bool remove(T node)
     {
+        GUARD guard;
+        (void) guard;
+
         if (node == nullptr || _head == nullptr) {
             return false;
         }
 
         if (node == _head) {
-            _head = _head->getSibling();
+            _head = node->getSibling();
+            node->setSibling(nullptr);
             return true;
         }
 
@@ -60,8 +74,10 @@ public:
             if (i->getSibling() != node)
                 continue;
             i->setSibling(node->getSibling());
+            node->setSibling(nullptr);
             return true;
         }
+        node->setSibling(nullptr);
         return false;
     }
 
@@ -77,6 +93,9 @@ public:
         T operator*() const { return node; }
         Iterator &operator++()
         {
+            GUARD guard;
+            (void) guard;
+
             if (node) {
                 node = node->getSibling();
             }
@@ -102,6 +121,9 @@ public:
     size_t size() const
     {
         size_t sz = 0;
+
+        GUARD guard;
+        (void) guard;
 
         for (auto node = _head; node != nullptr; node = node->getSibling()) {
             sz++;

@@ -20,10 +20,20 @@
 
 #pragma once
 
+#include <atomic>
 #include <stdbool.h>
 #include <stdint.h>
 
 namespace apx {
+
+template<typename T>
+class atomic_std : public std::atomic<T>
+{
+public:
+    // Ensure that all operations are lock-free, so that 'atomic' can be used from
+    // IRQ handlers. This might not be required everywhere though.
+    static_assert(__atomic_always_lock_free(sizeof(T), 0), "atomic is not lock-free for the given type T");
+};
 
 template<typename T>
 class atomic

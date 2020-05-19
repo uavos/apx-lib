@@ -129,12 +129,9 @@
       suffix: status
       type: option
       units:
+        - unknown
         - ok
-        - disabled
         - busy
-        - warning
-        - spoofing
-        - critical
 
     - name: sv
       suffix: visible satellites
@@ -144,9 +141,14 @@
       type: word
 
     - name: jam
-      suffix: jamming level
-      type: byte
-      units: "%"
+      suffix: jamming status
+      type: option
+      units:
+        - unknown
+        - ok
+        - warning
+        - critical
+        - spoofing
 
 - name: pt
   title: Dynamic pressure
