@@ -52,7 +52,7 @@ protected:
     uint line_cnt;
     char line_buf[256];
     uint16_t packet_sz;
-    uint16_t packet_crc16;
+    uint32_t packet_crc32;
     bool readline(void);
 
     int setNonblocking(int fd);

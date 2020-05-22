@@ -1,5 +1,5 @@
 #include "TelemetryDecoder.h"
-#include <crc/crc.h>
+#include <crc.h>
 
 #include "TelemetryValueUnpack.h"
 
@@ -71,7 +71,7 @@ void TelemetryDecoder::reset(bool reset_hash)
 
 uint32_t TelemetryDecoder::get_hash(size_t sz)
 {
-    return CRC_32_APX(_slots.fields, sz, 0);
+    return CRC32(_slots.fields, sz).result();
 }
 bool TelemetryDecoder::check_hash(size_t sz)
 {

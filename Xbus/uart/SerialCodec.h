@@ -5,8 +5,6 @@
 class SerialCodec
 {
 public:
-    virtual ~SerialCodec() {}
-
     // return size of encoded data in buffer
     virtual size_t size() = 0;
 

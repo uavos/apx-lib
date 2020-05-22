@@ -36,7 +36,7 @@ public:
             : next_slot(0)
             , esrc(0)
         {} //{dmsg("slot create\n");}
-        virtual ~Slot()
+        ~Slot()
         {
             if (esrc)
                 disconnect(esrc);

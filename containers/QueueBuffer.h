@@ -18,10 +18,10 @@ public:
     inline size_t space() const { return _total - _size; }
     inline bool empty() const { return _size == 0; }
 
+    inline void reset() { _head = _tail = _size = 0; }
+
     virtual size_t write(const void *src, size_t sz) = 0;
     virtual size_t read(void *dest, size_t sz) = 0;
-
-    inline void reset() { _head = _tail = _size = 0; }
 
     //packet support
     virtual size_t write_packet(const void *src, size_t sz) = 0;
@@ -75,12 +75,12 @@ protected:
     const size_t _total;
 };
 
-template<size_t _buf_size, typename T = uint8_t>
+template<typename T = uint8_t>
 class QueueBufferT : public QueueBufferBase
 {
 public:
-    explicit QueueBufferT(T *_buf)
-        : QueueBufferBase(_buf_size)
+    explicit QueueBufferT(T *_buf, size_t size)
+        : QueueBufferBase(size)
         , buf(_buf)
     {}
 
@@ -182,11 +182,11 @@ protected:
 };
 
 template<size_t _total, typename T = uint8_t>
-class QueueBuffer : public QueueBufferT<_total, T>
+class QueueBuffer : public QueueBufferT<T>
 {
 public:
     explicit QueueBuffer()
-        : QueueBufferT<_total, T>(m_buf)
+        : QueueBufferT<T>(m_buf, _total)
     {}
 
 private:

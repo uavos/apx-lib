@@ -14,7 +14,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <crc/crc.h>
+#include <crc.h>
 //==============================================================================
 _tcp_client::_tcp_client(const char *name)
     : silent(false)
@@ -113,7 +113,7 @@ bool _tcp_client::write(const uint8_t *buf, uint cnt)
         return tx_fifo.write_packet(buf, cnt);
     }
     uint16_t sz = cnt;
-    uint16_t crc16 = CRC_16_IBM(buf, cnt, 0xFFFF);
+    uint16_t crc16 = CRC32(buf, cnt).result();
     bool bErr = true;
     memcpy(&(tx_packet[0]), &sz, sizeof(sz));
     memcpy(&(tx_packet[sizeof(sz)]), &crc16, sizeof(crc16));
@@ -144,11 +144,11 @@ uint _tcp_client::read(uint8_t *buf, uint sz)
         return 0;
     //printf("rx: %u\n",rcnt);
     if (packet_sz == 0) {
-        if ((size_t) rcnt < (sizeof(packet_sz) + sizeof(packet_crc16)))
+        if ((size_t) rcnt < (sizeof(packet_sz) + sizeof(packet_crc32)))
             return 0;
         ::read(fd, &packet_sz, sizeof(packet_sz));
-        ::read(fd, &packet_crc16, sizeof(packet_crc16));
-        rcnt -= (sizeof(packet_sz) + sizeof(packet_crc16));
+        ::read(fd, &packet_crc32, sizeof(packet_crc32));
+        rcnt -= (sizeof(packet_sz) + sizeof(packet_crc32));
         if (packet_sz > sz)
             packet_sz = sz;
     }
@@ -157,7 +157,8 @@ uint _tcp_client::read(uint8_t *buf, uint sz)
     sz = packet_sz;
     packet_sz = 0;
     int cnt = ::read(fd, buf, sz);
-    if (cnt <= 0 || packet_crc16 != CRC_16_IBM(buf, cnt, 0xffff)) {
+    uint32_t crc32 = CRC32(buf, cnt).result();
+    if (cnt <= 0 || packet_crc32 != crc32) {
         printf("[%s]Error: Reading Packet Failed (%i/%u).\n", name, cnt, sz);
         close();
         return 0;

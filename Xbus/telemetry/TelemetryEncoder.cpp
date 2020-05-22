@@ -2,7 +2,7 @@
 
 #include "TelemetryValuePack.h"
 
-#include <crc/crc.h>
+#include <crc.h>
 
 using namespace xbus::telemetry;
 
@@ -165,7 +165,7 @@ void TelemetryEncoder::_update_feeds()
 {
     const uint16_t size = _slots_cnt * sizeof(*_slots.fields);
 
-    uint32_t vhash = CRC_32_APX(_slots.fields, size, 0);
+    uint32_t vhash = CRC32(_slots.fields, size).result();
     _hash.byte[0] = vhash;
     _hash.byte[1] = vhash >> 8;
     _hash.byte[2] = vhash >> 16;
