@@ -7,20 +7,11 @@
 #pragma once
 
 #include <cinttypes>
-#include <do_not_copy.h>
 #include <sys/types.h>
+#include <visibility.h>
 
-class CRC32 : private do_not_copy
-{
-public:
-    explicit CRC32();
-    explicit CRC32(const void *data, size_t sz);
+namespace apx {
 
-    void reset();
-    uint32_t result() const;
+__EXPORT uint32_t crc32(const void *data, size_t sz);
 
-    void add(const void *data, size_t sz);
-
-private:
-    uint32_t _value;
-};
+}

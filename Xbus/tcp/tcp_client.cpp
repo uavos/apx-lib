@@ -113,7 +113,7 @@ bool _tcp_client::write(const uint8_t *buf, uint cnt)
         return tx_fifo.write_packet(buf, cnt);
     }
     uint16_t sz = cnt;
-    uint16_t crc16 = CRC32(buf, cnt).result();
+    uint16_t crc16 = apx::crc32(buf, cnt);
     bool bErr = true;
     memcpy(&(tx_packet[0]), &sz, sizeof(sz));
     memcpy(&(tx_packet[sizeof(sz)]), &crc16, sizeof(crc16));
@@ -157,7 +157,7 @@ uint _tcp_client::read(uint8_t *buf, uint sz)
     sz = packet_sz;
     packet_sz = 0;
     int cnt = ::read(fd, buf, sz);
-    uint32_t crc32 = CRC32(buf, cnt).result();
+    uint32_t crc32 = apx::crc32(buf, cnt);
     if (cnt <= 0 || packet_crc32 != crc32) {
         printf("[%s]Error: Reading Packet Failed (%i/%u).\n", name, cnt, sz);
         close();

@@ -7,6 +7,7 @@
 #pragma once
 
 #include <cstdint>
+#include <do_not_copy.h>
 
 #include "CanFormat.h"
 #include "xcan_msg.h"
@@ -28,10 +29,9 @@ enum ErrorType {
     ErrorOrphan,
 };
 
-class Pool
+class Pool : private do_not_copy
 {
 public:
-    Pool();
     void init();
 
     ErrorType push(const extid_s &extid, const uint8_t *data, uint8_t dlc);

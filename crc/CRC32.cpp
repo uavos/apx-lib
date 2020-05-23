@@ -8,28 +8,11 @@
 
 #include "crc32_sw.h"
 
-CRC32::CRC32()
+namespace apx {
+
+uint32_t crc32(const void *data, size_t sz)
 {
-    reset();
+    return CRC32_SW(data, sz, 0xFFFFFFFF);
 }
 
-CRC32::CRC32(const void *data, size_t sz)
-{
-    reset();
-    add(data, sz);
-}
-
-void CRC32::reset()
-{
-    _value = 0xFFFFFFFF;
-}
-
-uint32_t CRC32::result() const
-{
-    return _value;
-}
-
-void CRC32::add(const void *data, size_t sz)
-{
-    _value = CRC32_SW(data, sz, _value);
-}
+} // namespace apx

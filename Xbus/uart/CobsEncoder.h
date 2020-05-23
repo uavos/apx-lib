@@ -19,7 +19,7 @@ public:
     //write and encode data to fifo
     size_t encode(const void *src, size_t sz) override
     {
-        if (space() < (sz + 1 + 2)) //estimate
+        if (space() < (sz + (2 + 4 + sizeof(uint16_t)))) //estimate
             return 0;
 
         size_t head_s = head();
@@ -33,24 +33,21 @@ public:
 
             // data
             const T *ptr = static_cast<const T *>(src);
-            size_t cnt = sz + 1;
-            //uint16_t crc16 = CRC32(src, sz).result();
-            uint8_t crc = 0;
+            size_t cnt = sz + 2;
+            uint16_t crc16 = apx::crc32(src, sz);
             while (cnt) {
                 if (code != 0xFF) {
                     T c;
                     switch (cnt) {
                     default:
                         c = *ptr++;
-                        crc ^= c;
                         break;
                     case 1:
-                        //c = crc16 >> 8;
-                        c = crc;
+                        c = crc16 >> 8;
                         break;
-                        //case 2:
-                        //    c = crc16;
-                        //    break;
+                    case 2:
+                        c = crc16;
+                        break;
                     }
                     cnt--;
                     if (c != _esc) {
@@ -107,7 +104,7 @@ private:
     using QueueBuffer<_buf_size, T>::read;
 };
 
-template<size_t _buf_size, typename T = uint8_t, T _esc = 0>
+/*template<size_t _buf_size, typename T = uint8_t, T _esc = 0>
 class CobsEncoder2 : private QueueBuffer<_buf_size, T>, public SerialEncoder
 {
 public:
@@ -222,4 +219,4 @@ private:
     using QueueBuffer<_buf_size, T>::write;
     using QueueBuffer<_buf_size, T>::write_ptr;
     using QueueBuffer<_buf_size, T>::read;
-};
+};*/

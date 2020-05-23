@@ -165,7 +165,7 @@ void TelemetryEncoder::_update_feeds()
 {
     const uint16_t size = _slots_cnt * sizeof(*_slots.fields);
 
-    uint32_t vhash = CRC32(_slots.fields, size).result();
+    uint32_t vhash = apx::crc32(_slots.fields, size);
     _hash.byte[0] = vhash;
     _hash.byte[1] = vhash >> 8;
     _hash.byte[2] = vhash >> 16;

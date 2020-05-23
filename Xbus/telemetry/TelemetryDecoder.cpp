@@ -71,7 +71,7 @@ void TelemetryDecoder::reset(bool reset_hash)
 
 uint32_t TelemetryDecoder::get_hash(size_t sz)
 {
-    return CRC32(_slots.fields, sz).result();
+    return apx::crc32(_slots.fields, sz);
 }
 bool TelemetryDecoder::check_hash(size_t sz)
 {

@@ -7,6 +7,7 @@
 #include "CanCodec.h"
 #include "CanFormat.h"
 
+#include <crc.h>
 #include <cstring>
 
 #define XCAN_CODEC_DEBUG
@@ -14,7 +15,7 @@
 #ifdef XCAN_CODEC_DEBUG
 #include <platform/log.h>
 #define debug(...) apxdebug(__VA_ARGS__)
-#define MODULE_NAME "cc"
+#define MODULE_NAME "xcan"
 #else
 #define debug(...)
 #endif
@@ -41,12 +42,12 @@ size_t Codec::read_packet(void *dest, size_t sz, uint8_t *src_id)
 }
 size_t Codec::check_crc(void *dest, size_t sz)
 {
-    sz -= sizeof(xbus::node::crc_t);
+    sz -= sizeof(uint16_t);
     const uint8_t *p = static_cast<const uint8_t *>(dest) + sz;
-    xbus::node::crc_t crc = p[0] | (p[1] << 8);
-    xbus::node::crc_t v = get_crc(dest, sz);
-    if (v != crc) {
-        debug("crc err: %X (%X) %d", v, crc, sz);
+    uint16_t packet_crc16 = p[0] | (p[1] << 8);
+    uint16_t crc16 = apx::crc32(dest, sz);
+    if (packet_crc16 != crc16) {
+        debug("err:crc: %X (%X) %d", packet_crc16, crc16, sz);
         return 0;
     }
     return sz;
@@ -115,8 +116,8 @@ bool Codec::send_packet(const void *data, size_t size)
     }
 
     //multi-frame
-    xbus::node::crc_t crc = get_crc(data, size);
-    cnt += sizeof(xbus::node::crc_t);
+    uint16_t crc16 = apx::crc32(data, size);
+    cnt += sizeof(uint16_t);
     const uint8_t *src = static_cast<const uint8_t *>(stream.ptr());
     uint8_t frm = frm_start;
     while (cnt > 0) {
@@ -127,7 +128,7 @@ bool Codec::send_packet(const void *data, size_t size)
             frm = (frm == frm_start || frm >= frm_seq_max) ? 0 : (frm + 1);
             if (cnt == 9) {
                 memcpy(txmsg.data, src, 7);
-                txmsg.data[7] = crc;
+                txmsg.data[7] = crc16;
             } else {
                 memcpy(txmsg.data, src, 8);
             }
@@ -137,13 +138,13 @@ bool Codec::send_packet(const void *data, size_t size)
             if (cnt > 2) {
                 size_t sz = cnt - 2;
                 memcpy(txmsg.data, src, sz);
-                txmsg.data[sz] = crc;
-                txmsg.data[sz + 1] = crc >> 8;
+                txmsg.data[sz] = crc16;
+                txmsg.data[sz + 1] = crc16 >> 8;
             } else if (cnt == 2) {
-                txmsg.data[0] = crc;
-                txmsg.data[1] = crc >> 8;
+                txmsg.data[0] = crc16;
+                txmsg.data[1] = crc16 >> 8;
             } else {
-                txmsg.data[0] = crc >> 8;
+                txmsg.data[0] = crc16 >> 8;
             }
         }
         txmsg.id = extid.raw;

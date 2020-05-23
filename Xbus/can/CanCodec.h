@@ -68,8 +68,6 @@ protected:
 
     virtual void lock_push(bool locked) = 0;
 
-    virtual xbus::node::crc_t get_crc(const void *src, size_t sz) const = 0;
-
     virtual bool accept_filter(const extid_s &extid) = 0;
 
 private:

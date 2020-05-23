@@ -1,6 +1,7 @@
 #pragma once
 
 #include <containers/QueueBuffer.h>
+#include <crc.h>
 
 #include "SerialCodec.h"
 
@@ -60,7 +61,17 @@ public:
 
     inline size_t read_decoded(void *dest, size_t sz) override
     {
-        return QueueBuffer<_buf_size, T>::read_packet(dest, sz);
+        sz = QueueBuffer<_buf_size, T>::read_packet(dest, sz);
+        if (sz <= sizeof(uint16_t))
+            return 0;
+        sz -= sizeof(uint16_t);
+        const uint8_t *p = static_cast<const uint8_t *>(dest) + sz;
+        uint16_t packet_crc16 = p[0] | (p[1] << 8);
+        uint16_t crc16 = apx::crc32(dest, sz);
+        if (packet_crc16 != crc16) {
+            return 0;
+        }
+        return sz;
     }
     inline size_t size() override
     {
@@ -78,13 +89,11 @@ private:
 
     T _code{0xFF};
     T _copy{0};
-    T _crc;
 
     inline void restart()
     {
         _code = 0xFF;
         _copy = 0;
-        _crc = 0;
         _rcnt = 0;
     }
     inline void error()
@@ -104,26 +113,20 @@ private:
         }
         if (!write(c))
             return false;
-        _crc ^= c;
         _rcnt++;
         return true;
     }
     inline ErrorType check_packet()
     {
-        if (_rcnt <= 1) { //no data
+        if (_rcnt < sizeof(uint16_t)) { //no data
             error();
             return ErrorSize;
         }
-        T v_crc = pop_one();
-        _crc ^= v_crc;
-        if (_crc != v_crc) {
-            error();
-            return ErrorCRC;
-        }
+
         //frame received...
         size_t h = head();
         pop_head(_head_s);
-        write_word(_rcnt - 1);
+        write_word(_rcnt);
         push_head(h);
         restart();
         return DataAccepted;

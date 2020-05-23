@@ -9,7 +9,6 @@ namespace node {
 
 typedef uint8_t guid_t[12]; //global unique node id
 
-typedef uint16_t crc_t;
 typedef uint32_t hash_t;
 
 //---------------------------

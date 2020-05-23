@@ -14,7 +14,7 @@
 #ifdef XCAN_CODEC_DEBUG
 #include <platform/log.h>
 #define debug(...) apxdebug(__VA_ARGS__)
-#define MODULE_NAME "cc"
+#define MODULE_NAME "xcan"
 #else
 #define debug(...)
 #endif
@@ -23,10 +23,6 @@
 
 using namespace xbus::can;
 
-Pool::Pool()
-{
-    init();
-}
 void Pool::init()
 {
     // clear pool
@@ -174,7 +170,7 @@ ErrorType Pool::push_next(Tree &t, const uint8_t *data)
         next = i.next;
     }
     // stream error
-    //debug("err %X %d", mid, seq_idx);
+    debug("tail %u %X", cnt, t.extid);
     return ErrorSeqIdx;
 }
 void Pool::push(const uint8_t *data)
