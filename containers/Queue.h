@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdlib.h>
+#include <sys/types.h>
 
 template<class T>
 class Queue

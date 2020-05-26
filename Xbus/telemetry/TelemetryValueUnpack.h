@@ -3,7 +3,7 @@
 #include "TelemetryFormat.h"
 #include <Mandala/MandalaMetaBase.h>
 
-#include <cmath>
+#include <math.h>
 
 namespace xbus {
 namespace telemetry {

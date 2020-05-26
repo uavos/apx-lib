@@ -53,7 +53,7 @@ template<typename Tin>
 float cast_value(rtype<float>, const Tin &v)
 {
     float ret = v;
-    return isnan(ret) ? 0 : ret;
+    return std::isnan(ret) ? 0 : ret;
 }
 
 template<typename Tin>
@@ -106,7 +106,7 @@ static uint16_t float_to_f16(const float &v)
     //IEEE 754r
     if (v == 0.f)
         return 0;
-    uint32_t x = isnan(v) ? 0 : *static_cast<const uint32_t *>(static_cast<const void *>(&v));
+    uint32_t x = std::isnan(v) ? 0 : *static_cast<const uint32_t *>(static_cast<const void *>(&v));
     uint32_t xs, xe, xm;
     uint16_t hs, he, hm;
     uint16_t hp; // = static_cast<uint16_t *>(buf);
