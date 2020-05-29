@@ -93,9 +93,9 @@ static constexpr const item_t items[] = {
     MBVECT(est::nav::att::q::meta, q, f2, s10, 1),
     MBVECT(est::nav::att::r::meta, r, f2, s10, 2),
 
-    MBVECT(sns::nav::mag::x::meta, Hx, f2, s001, 0),
-    MBVECT(sns::nav::mag::y::meta, Hy, f2, s001, 1),
-    MBVECT(sns::nav::mag::z::meta, Hz, f2, s001, 2),
+    MBVECT(meta_void, Hx, f2, s001, 0),
+    MBVECT(meta_void, Hy, f2, s001, 1),
+    MBVECT(meta_void, Hz, f2, s001, 2),
 
     MBITEM(est::nav::air::altitude::meta, altitude, f4, f4),
     MBITEM(est::nav::air::airspeed::meta, airspeed, f2, f2),
@@ -272,7 +272,7 @@ static constexpr const item_t items[] = {
 
     MBITEM(sns::nav::gps::sv::meta, gps_SV, u1, u1),
     MBITEM(sns::nav::gps::su::meta, gps_SU, u1, u1),
-    MBITEM(sns::nav::gps::jam::meta, gps_jcw, u1, u1),
+    MBITEM(sns::nav::gps::emi::meta, gps_jcw, u1, u1),
     MBITEM(meta_void, gps_jstate, u1, u1),
 
     MBVECT(est::nav::ref::lat::meta, home_lat, f4, f4, 0),

@@ -108,9 +108,9 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::att::pitch>(fmt_rad2),
     ds<est::nav::att::yaw>(fmt_rad),
 
-    ds<est::nav::att::p>(fmt_sbyte_01), //727 deg/s
-    ds<est::nav::att::q>(fmt_sbyte_01),
-    ds<est::nav::att::r>(fmt_sbyte_01),
+    ds<est::nav::att::p>(fmt_f16), //fmt_sbyte_01), //727 deg/s
+    ds<est::nav::att::q>(fmt_f16), //fmt_sbyte_01),
+    ds<est::nav::att::r>(fmt_f16), //fmt_sbyte_01),
 
     ds<est::nav::pos::lat>(fmt_real),
     ds<est::nav::pos::lon>(fmt_real),
@@ -255,10 +255,15 @@ static constexpr const ds_field_s dataset_default[] = {
     // sns
     ds<sns::nav::gyro::temp>(fmt_sbyte),
 
+    ds<sns::nav::gps::src>(fmt_opt),
     ds<sns::nav::gps::status>(fmt_opt),
+    ds<sns::nav::gps::emi>(fmt_byte_u, seq_rare),
+    ds<sns::nav::gps::hacc>(fmt_byte_01),
+    ds<sns::nav::gps::vacc>(fmt_byte_01),
+    ds<sns::nav::gps::sacc>(fmt_byte_001),
+    ds<sns::nav::gps::pdop>(fmt_byte_01),
     ds<sns::nav::gps::sv>(fmt_byte),
     ds<sns::nav::gps::su>(fmt_byte),
-    ds<sns::nav::gps::jam>(fmt_byte_u, seq_rare),
 
     ds<sns::env::eng::rpm>(fmt_word, seq_rare),
     ds<sns::env::eng::temp>(fmt_byte, seq_rare),
