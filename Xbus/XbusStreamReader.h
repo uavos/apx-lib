@@ -25,6 +25,7 @@ public:
     inline void discard() { _pos = _size; }
     inline const uint8_t *buffer() const { return _buf; }
     inline const uint8_t *ptr() const { return &(_buf[_pos]); }
+    inline const void *ptr_void() const { return &(_buf[_pos]); }
 
     inline void skip(size_t size)
     {

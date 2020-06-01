@@ -36,6 +36,8 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
         return fmt_rad;
     case units_degps:
         return fmt_sbyte_001;
+    case units_degps_sq:
+        return fmt_sbyte_001;
     case units_K:
         return fmt_f16;
     case units_kPa:
@@ -108,9 +110,9 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::att::pitch>(fmt_rad2),
     ds<est::nav::att::yaw>(fmt_rad),
 
-    ds<est::nav::att::p>(fmt_f16), //fmt_sbyte_01), //727 deg/s
-    ds<est::nav::att::q>(fmt_f16), //fmt_sbyte_01),
-    ds<est::nav::att::r>(fmt_f16), //fmt_sbyte_01),
+    ds<est::nav::gyro::x>(fmt_f16), //fmt_sbyte_01), //727 deg/s
+    ds<est::nav::gyro::y>(fmt_f16), //fmt_sbyte_01),
+    ds<est::nav::gyro::z>(fmt_f16), //fmt_sbyte_01),
 
     ds<est::nav::pos::lat>(fmt_real),
     ds<est::nav::pos::lon>(fmt_real),
@@ -118,22 +120,20 @@ static constexpr const ds_field_s dataset_default[] = {
 
     ds<est::nav::pos::course>(fmt_rad),
     ds<est::nav::pos::speed>(fmt_f16, seq_skip),
+    ds<est::nav::pos::agl>(fmt_byte_01),
 
-    ds<est::nav::rel::ax>(fmt_sbyte_01),
-    ds<est::nav::rel::ay>(fmt_sbyte_01),
-    ds<est::nav::rel::az>(fmt_f16),
+    ds<est::nav::lpos::ax>(fmt_sbyte_01),
+    ds<est::nav::lpos::ay>(fmt_sbyte_01),
+    ds<est::nav::lpos::az>(fmt_f16),
 
     ds<est::nav::ref::status>(fmt_bit),
     ds<est::nav::ref::lat>(fmt_real, seq_scheduled),
     ds<est::nav::ref::lon>(fmt_real, seq_scheduled),
     ds<est::nav::ref::hmsl>(fmt_real, seq_scheduled),
 
-    ds<est::nav::agl::status>(fmt_bit),
-    ds<est::nav::agl::altitude>(fmt_byte_01),
-
     ds<est::nav::air::status>(fmt_bit),
     ds<est::nav::air::altitude>(fmt_real),
-    ds<est::nav::air::vspeed>(fmt_f16),
+    ds<est::nav::air::vario>(fmt_f16),
     ds<est::nav::air::airspeed>(fmt_f16),
     ds<est::nav::air::slip>(fmt_sbyte_01),
     ds<est::nav::air::aoa>(fmt_sbyte_01),
@@ -170,6 +170,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::env::status::bat>(fmt_opt),
     ds<est::env::status::pwr>(fmt_opt),
     ds<est::env::status::gps>(fmt_opt),
+    ds<est::env::status::agl>(fmt_opt),
     ds<est::env::status::pt>(fmt_opt),
     ds<est::env::status::ps>(fmt_opt),
     ds<est::env::status::imu>(fmt_opt),

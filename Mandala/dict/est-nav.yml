@@ -11,16 +11,6 @@
       suffix: yaw
       units: deg
 
-    - name: p
-      title: Angular rate X
-      units: deg/s
-    - name: q
-      title: Angular rate Y
-      units: deg/s
-    - name: r
-      title: Angular rate Z
-      units: deg/s
-
     - name: qa
       suffix: quat a
     - name: qb
@@ -43,24 +33,8 @@
       title: Altitude MSL
       units: m
 
-    - name: vn
-      title: Velocity north
-      units: m/s
-    - name: ve
-      title: Velocity east
-      units: m/s
-    - name: vd
-      title: Velocity down
-      units: m/s
-
-    - name: "n"
-      title: Local position north
-      units: m
-    - name: "e"
-      title: Local position east
-      units: m
-    - name: "d"
-      title: Local position down
+    - name: agl
+      title: Altitude above ground
       units: m
 
     - name: course
@@ -71,18 +45,45 @@
       title: Ground speed
       units: m/s
 
-- name: rel
-  title: Relative pos
+    - name: vspeed
+      title: Vertical speed
+      units: m/s
+
+- name: gyro
+  title: Angular rate
   content:
-    - name: dx
-      title: Delta X
-      units: m
-    - name: dy
-      title: Delta Y
-      units: m
-    - name: dz
-      title: Delta Z
-      units: m
+    - name: "x"
+      suffix: "X"
+      units: deg/s
+    - name: "y"
+      suffix: "Y"
+      units: deg/s
+    - name: "z"
+      suffix: "Z"
+      units: deg/s
+
+    - name: "ax"
+      suffix: acceleration X
+      units: deg/s^2
+    - name: "ay"
+      suffix: acceleration Y
+      units: deg/s^2
+    - name: "az"
+      suffix: acceleration Z
+      units: deg/s^2
+
+- name: lpos
+  title: Local position
+  content:
+    - name: "ax"
+      title: Acceleration X
+      units: m/s^2
+    - name: "ay"
+      title: Acceleration X
+      units: m/s^2
+    - name: "az"
+      title: Acceleration X
+      units: m/s^2
 
     - name: vx
       title: Velocity X
@@ -94,15 +95,34 @@
       title: Velocity Z
       units: m/s
 
-    - name: ax
-      title: Acceleration X
-      units: m/s^2
-    - name: ay
-      title: Acceleration Y
-      units: m/s^2
-    - name: az
-      title: Acceleration Z
-      units: m/s^2
+    - name: dx
+      title: Delta X
+      units: m
+    - name: dy
+      title: Delta Y
+      units: m
+    - name: dz
+      title: Delta Z
+      units: m
+
+    # - name: vn
+    #   title: Velocity north
+    #   units: m/s
+    # - name: ve
+    #   title: Velocity east
+    #   units: m/s
+    # - name: vd
+    #   title: Velocity down
+    #   units: m/s
+    # - name: "n"
+    #   title: Local position north
+    #   units: m
+    # - name: "e"
+    #   title: Local position east
+    #   units: m
+    # - name: "d"
+    #   title: Local position down
+    #   units: m
 
 - name: ref
   title: Ref point
@@ -135,19 +155,6 @@
       title: Distance to home
       units: m
 
-- name: agl
-  title: AGL
-  content:
-    - name: status
-      suffix: status
-      type: option
-      units:
-        - "unavailable"
-        - "available"
-    - name: altitude
-      suffix: altitude
-      units: m
-
 - name: air
   title: Aerodynamic
   content:
@@ -162,15 +169,15 @@
       title: Flight altitude
       units: m
 
-    - name: vspeed
-      title: Vertical speed
+    - name: vario
+      title: Variometer
       units: m/s
 
     - name: airspeed
       title: Airspeed
       units: m/s
-    - name: airspeed_d
-      title: Airspeed derivative
+    - name: airacc
+      title: Airspeed acceleration
       units: m/s^2
 
     - name: slip
