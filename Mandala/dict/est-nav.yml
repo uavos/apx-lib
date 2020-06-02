@@ -72,17 +72,30 @@
       suffix: acceleration Z
       units: deg/s^2
 
+- name: acc
+  title: Acceleration
+  content:
+    - name: "x"
+      suffix: "X"
+      units: m/s^2
+    - name: "y"
+      suffix: "Y"
+      units: m/s^2
+    - name: "z"
+      suffix: "Z"
+      units: m/s^2
+
 - name: lpos
   title: Local position
   content:
     - name: "ax"
-      title: Acceleration X
+      title: Linear acceleration X
       units: m/s^2
     - name: "ay"
-      title: Acceleration X
+      title: Linear acceleration Y
       units: m/s^2
     - name: "az"
-      title: Acceleration X
+      title: Linear acceleration Z
       units: m/s^2
 
     - name: vx

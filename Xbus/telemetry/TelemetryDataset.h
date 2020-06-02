@@ -110,9 +110,17 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::att::pitch>(fmt_rad2),
     ds<est::nav::att::yaw>(fmt_rad),
 
-    ds<est::nav::gyro::x>(fmt_f16), //fmt_sbyte_01), //727 deg/s
-    ds<est::nav::gyro::y>(fmt_f16), //fmt_sbyte_01),
-    ds<est::nav::gyro::z>(fmt_f16), //fmt_sbyte_01),
+    ds<est::nav::gyro::x>(fmt_sbyte_01), //727 deg/s
+    ds<est::nav::gyro::y>(fmt_sbyte_01),
+    ds<est::nav::gyro::z>(fmt_sbyte_01),
+
+    ds<est::nav::gyro::ax>(fmt_sbyte_01), //727 deg/s
+    ds<est::nav::gyro::ay>(fmt_sbyte_01),
+    ds<est::nav::gyro::az>(fmt_sbyte_01),
+
+    ds<est::nav::acc::x>(fmt_sbyte_01),
+    ds<est::nav::acc::y>(fmt_sbyte_01),
+    ds<est::nav::acc::z>(fmt_sbyte_01),
 
     ds<est::nav::pos::lat>(fmt_real),
     ds<est::nav::pos::lon>(fmt_real),
@@ -120,6 +128,7 @@ static constexpr const ds_field_s dataset_default[] = {
 
     ds<est::nav::pos::course>(fmt_rad),
     ds<est::nav::pos::speed>(fmt_f16, seq_skip),
+    ds<est::nav::pos::vspeed>(fmt_f16),
     ds<est::nav::pos::agl>(fmt_byte_01),
 
     ds<est::nav::lpos::ax>(fmt_sbyte_01),
@@ -254,7 +263,20 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::rc::ovr>(fmt_bit),
 
     // sns
-    ds<sns::nav::gyro::temp>(fmt_sbyte),
+    ds<sns::nav::gyro::src>(fmt_opt, seq_skip),
+    ds<sns::nav::gyro::temp>(fmt_sbyte, seq_skip),
+    ds<sns::nav::gyro::clip>(fmt_byte, seq_skip),
+    ds<sns::nav::gyro::vib>(fmt_byte, seq_skip),
+    ds<sns::nav::gyro::coning>(fmt_byte_01, seq_skip),
+
+    ds<sns::nav::acc::src>(fmt_opt, seq_skip),
+    ds<sns::nav::acc::temp>(fmt_sbyte, seq_skip),
+    ds<sns::nav::acc::clip>(fmt_byte, seq_skip),
+    ds<sns::nav::acc::vib>(fmt_byte, seq_skip),
+
+    ds<sns::nav::mag::src>(fmt_opt, seq_skip),
+    ds<sns::nav::mag::temp>(fmt_sbyte, seq_skip),
+    ds<sns::nav::mag::vib>(fmt_byte, seq_skip),
 
     ds<sns::nav::gps::src>(fmt_opt),
     ds<sns::nav::gps::status>(fmt_opt),
