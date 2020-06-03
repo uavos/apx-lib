@@ -45,8 +45,8 @@
     - name: altitude
       title: Cmd altitude
       units: m
-    - name: vspeed
-      title: Cmd vspeed
+    - name: vario
+      title: Cmd vario
       units: m/s
 
     - name: slip

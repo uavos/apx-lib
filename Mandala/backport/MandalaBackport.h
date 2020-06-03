@@ -146,7 +146,7 @@ static constexpr const item_t items[] = {
     MBITEM(cmd::nav::aux::rpm::meta, cmd_rpm, u2, u2),
     MBITEM(cmd::nav::air::altitude::meta, cmd_altitude, f2, f2),
     MBITEM(cmd::nav::air::airspeed::meta, cmd_airspeed, f2, f2),
-    MBITEM(cmd::nav::air::vspeed::meta, cmd_vspeed, f2, s01),
+    MBITEM(cmd::nav::air::vario::meta, cmd_vspeed, f2, s01),
     MBITEM(cmd::nav::air::slip::meta, cmd_slip, f2, s1),
 
     MBVECT(est::nav::pos::lat::meta, gps_lat, f4, f4, 0),
