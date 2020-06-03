@@ -245,7 +245,7 @@ static constexpr const ds_field_s dataset_default[] = {
 
     ds<cmd::nav::air::airspeed>(fmt_f16),
     ds<cmd::nav::air::altitude>(fmt_real),
-    ds<cmd::nav::air::vspeed>(fmt_sbyte_01),
+    ds<cmd::nav::air::vario>(fmt_sbyte_01),
     ds<cmd::nav::air::slip>(fmt_sbyte_001),
 
     ds<cmd::nav::aux::rpm>(fmt_word),
