@@ -152,10 +152,10 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::tecs::vse>(fmt_sbyte_01),
     ds<est::nav::tecs::ktas>(fmt_byte_001, seq_rare),
 
-    ds<est::nav::aux::wspd>(fmt_byte_01, seq_rare),
-    ds<est::nav::aux::whdg>(fmt_rad, seq_rare),
-    ds<est::nav::aux::vib>(fmt_byte, seq_skip),
-    ds<est::nav::aux::mag>(fmt_byte_001, seq_skip),
+    ds<est::env::aux::wspd>(fmt_byte_01, seq_rare),
+    ds<est::env::aux::whdg>(fmt_rad, seq_rare),
+    ds<est::env::aux::vib>(fmt_byte, seq_skip),
+    ds<est::env::aux::mag>(fmt_byte_001, seq_skip),
 
     ds<est::nav::ctr::delta>(fmt_f16),
     ds<est::nav::ctr::radius>(fmt_f16),

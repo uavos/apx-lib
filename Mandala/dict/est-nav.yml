@@ -219,24 +219,6 @@
       title: CAS to TAS multiplier
       units: K
 
-- name: aux
-  title: Auxilary parameters
-  content:
-    - name: wspd
-      title: Wind speed
-      units: m/s
-    - name: whdg
-      title: Wind direction to
-      units: deg
-
-    - name: vib
-      title: Common vibration level
-      type: byte
-      units: "%"
-    - name: mag
-      title: Magnetometer magnitude
-      units: u
-
 - name: ctr
   title: Control parameters
   content:
