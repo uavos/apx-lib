@@ -28,15 +28,15 @@ public:
         GUARD guard;
         (void) guard;
 
-        node->setSibling(nullptr);
+        node->ListNode<T>::setSibling(nullptr);
         if (!_head) {
             _head = node;
             return;
         }
-        for (auto i = _head; i != nullptr; i = i->getSibling()) {
-            if (i->getSibling())
+        for (auto i = _head; i != nullptr; i = i->ListNode<T>::getSibling()) {
+            if (i->ListNode<T>::getSibling())
                 continue;
-            i->setSibling(node);
+            i->ListNode<T>::setSibling(node);
             return;
         }
     }
@@ -47,12 +47,12 @@ public:
         (void) guard;
 
         if (!after) {
-            node->setSibling(_head);
+            node->ListNode<T>::setSibling(_head);
             _head = node;
             return;
         }
-        node->setSibling(after->getSibling());
-        after->setSibling(node);
+        node->ListNode<T>::setSibling(after->ListNode<T>::getSibling());
+        after->ListNode<T>::setSibling(node);
     }
 
     bool remove(T node)
@@ -65,19 +65,19 @@ public:
         }
 
         if (node == _head) {
-            _head = node->getSibling();
-            node->setSibling(nullptr);
+            _head = node->ListNode<T>::getSibling();
+            node->ListNode<T>::setSibling(nullptr);
             return true;
         }
 
-        for (auto i = _head; i != nullptr; i = i->getSibling()) {
-            if (i->getSibling() != node)
+        for (auto i = _head; i != nullptr; i = i->ListNode<T>::getSibling()) {
+            if (i->ListNode<T>::getSibling() != node)
                 continue;
-            i->setSibling(node->getSibling());
-            node->setSibling(nullptr);
+            i->ListNode<T>::setSibling(node->ListNode<T>::getSibling());
+            node->ListNode<T>::setSibling(nullptr);
             return true;
         }
-        node->setSibling(nullptr);
+        node->ListNode<T>::setSibling(nullptr);
         return false;
     }
 
@@ -97,7 +97,7 @@ public:
             (void) guard;
 
             if (node) {
-                node = node->getSibling();
+                node = node->ListNode<T>::getSibling();
             }
 
             return *this;
@@ -125,7 +125,7 @@ public:
         GUARD guard;
         (void) guard;
 
-        for (auto node = _head; node != nullptr; node = node->getSibling()) {
+        for (auto node = _head; node != nullptr; node = node->ListNode<T>::getSibling()) {
             sz++;
         }
 

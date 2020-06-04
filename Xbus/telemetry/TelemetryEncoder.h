@@ -42,7 +42,8 @@ public:
     bool encode(XbusStreamWriter &stream, uint32_t seq, xbus::telemetry::dt_e dt);
     void encode_format(XbusStreamWriter &stream, uint8_t part);
 
-    bool update(const xbus::pid_s &pid, const mandala::spec_s &spec, XbusStreamReader &stream);
+    void update(const xbus::pid_s &pid, const mandala::spec_s &spec, XbusStreamReader &stream);
+    void update(const xbus::pid_s &pid, mandala::real_t value);
 
     xbus::telemetry::enc_slots_s &enc_slots() { return _slots; }
     uint16_t slots_cnt() { return _slots_cnt; }
@@ -59,6 +60,7 @@ private:
     xbus::telemetry::hash_s _hash;
 
     void _set_data(size_t n, const mandala::spec_s &spec, XbusStreamReader &stream);
+    void _set_data(size_t n, mandala::real_t value);
 
     void _update_feeds();
 

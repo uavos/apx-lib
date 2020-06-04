@@ -263,24 +263,24 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::rc::ovr>(fmt_bit),
 
     // sns
-    ds<sns::nav::gyro::src>(fmt_opt, seq_skip),
-    ds<sns::nav::gyro::temp>(fmt_sbyte, seq_skip),
+    ds<sns::nav::gyro::src>(fmt_opt, seq_rare),
+    ds<sns::nav::gyro::temp>(fmt_sbyte, seq_rare),
     ds<sns::nav::gyro::clip>(fmt_byte, seq_skip),
     ds<sns::nav::gyro::vib>(fmt_byte, seq_skip),
     ds<sns::nav::gyro::coning>(fmt_byte_01, seq_skip),
 
-    ds<sns::nav::acc::src>(fmt_opt, seq_skip),
-    ds<sns::nav::acc::temp>(fmt_sbyte, seq_skip),
+    ds<sns::nav::acc::src>(fmt_opt, seq_rare),
+    ds<sns::nav::acc::temp>(fmt_sbyte, seq_rare),
     ds<sns::nav::acc::clip>(fmt_byte, seq_skip),
     ds<sns::nav::acc::vib>(fmt_byte, seq_skip),
 
-    ds<sns::nav::mag::src>(fmt_opt, seq_skip),
-    ds<sns::nav::mag::temp>(fmt_sbyte, seq_skip),
+    ds<sns::nav::mag::src>(fmt_opt, seq_rare),
+    ds<sns::nav::mag::temp>(fmt_sbyte, seq_rare),
     ds<sns::nav::mag::vib>(fmt_byte, seq_skip),
 
-    ds<sns::nav::gps::src>(fmt_opt),
-    ds<sns::nav::gps::status>(fmt_opt),
-    ds<sns::nav::gps::emi>(fmt_byte_u, seq_rare),
+    ds<sns::nav::gps::src>(fmt_opt, seq_rare),
+    ds<sns::nav::gps::status>(fmt_opt, seq_rare),
+    ds<sns::nav::gps::emi>(fmt_opt, seq_rare),
     ds<sns::nav::gps::hacc>(fmt_byte_01),
     ds<sns::nav::gps::vacc>(fmt_byte_01),
     ds<sns::nav::gps::sacc>(fmt_byte_001),

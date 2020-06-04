@@ -111,7 +111,7 @@ void TelemetryEncoder::clear()
     _update_feeds();
 }
 
-bool TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spec, XbusStreamReader &stream)
+void TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spec, XbusStreamReader &stream)
 {
     // called by MandalaDataBroker
     for (size_t i = 0; i < _slots_cnt; ++i) {
@@ -121,9 +121,21 @@ bool TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spe
         if (f.pid.pri != pid.pri && f.pid.pri != xbus::pri_any)
             continue;
         _set_data(i, spec, stream);
-        return true;
+        return;
     }
-    return false;
+}
+void TelemetryEncoder::update(const xbus::pid_s &pid, mandala::real_t value)
+{
+    // called by MandalaDataBroker
+    for (size_t i = 0; i < _slots_cnt; ++i) {
+        auto const &f = _slots.fields[i];
+        if (f.pid.uid != pid.uid)
+            continue;
+        if (f.pid.pri != pid.pri && f.pid.pri != xbus::pri_any)
+            continue;
+        _set_data(i, value);
+        return;
+    }
 }
 
 void TelemetryEncoder::_set_data(size_t n, const mandala::spec_s &spec, XbusStreamReader &stream)
@@ -131,16 +143,34 @@ void TelemetryEncoder::_set_data(size_t n, const mandala::spec_s &spec, XbusStre
     mandala::raw_t v = 0;
     stream.read(&v, mandala::type_size(spec.type));
 
-    auto &value = _slots.value[n];
+    auto &prev = _slots.value[n];
 
-    if (value == v)
+    if (prev == v)
         return;
-    value = v;
+    prev = v;
 
     auto &f = _slots.fields[n];
     auto &flags = _slots.flags[n];
 
     flags.type = spec.type;
+    if (f.pid.seq != seq_scheduled)
+        flags.upd = true;
+}
+
+void TelemetryEncoder::_set_data(size_t n, mandala::real_t value)
+{
+    mandala::raw_t v = *static_cast<mandala::raw_t *>(static_cast<void *>(&value));
+
+    auto &prev = _slots.value[n];
+
+    if (prev == v)
+        return;
+    prev = v;
+
+    auto &f = _slots.fields[n];
+    auto &flags = _slots.flags[n];
+
+    flags.type = mandala::type_real;
     if (f.pid.seq != seq_scheduled)
         flags.upd = true;
 }
