@@ -57,9 +57,13 @@
 - name: stream
   title: Special streams and wrappers
   content:
+    - name: calib
+      title: Calibration data
+      descr: <sensor uid><raw sensor data>
+
     - name: gcs
       title: Local GCS data no uplink
-      descr: <local><uid><data>
+      descr: <uid><data>
     - name: payload
       title: Payload data
       descr: <payload><uid><data>

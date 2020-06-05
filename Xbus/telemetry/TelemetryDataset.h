@@ -110,17 +110,17 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::att::pitch>(fmt_rad2),
     ds<est::nav::att::yaw>(fmt_rad),
 
-    ds<est::nav::gyro::x>(fmt_sbyte_01), //727 deg/s
-    ds<est::nav::gyro::y>(fmt_sbyte_01),
-    ds<est::nav::gyro::z>(fmt_sbyte_01),
+    ds<est::nav::gyro::x>(fmt_f16), //fmt_sbyte_01), //727 deg/s
+    ds<est::nav::gyro::y>(fmt_f16), //fmt_sbyte_01),
+    ds<est::nav::gyro::z>(fmt_f16), //fmt_sbyte_01),
 
-    ds<est::nav::gyro::ax>(fmt_sbyte_01), //727 deg/s
-    ds<est::nav::gyro::ay>(fmt_sbyte_01),
-    ds<est::nav::gyro::az>(fmt_sbyte_01),
+    ds<est::nav::gyro::ax>(fmt_f16), //fmt_sbyte_01), //727 deg/s
+    ds<est::nav::gyro::ay>(fmt_f16), //fmt_sbyte_01),
+    ds<est::nav::gyro::az>(fmt_f16), //fmt_sbyte_01),
 
-    ds<est::nav::acc::x>(fmt_sbyte_01),
-    ds<est::nav::acc::y>(fmt_sbyte_01),
-    ds<est::nav::acc::z>(fmt_sbyte_01),
+    ds<est::nav::acc::x>(fmt_f16), //fmt_sbyte_01),
+    ds<est::nav::acc::y>(fmt_f16), //fmt_sbyte_01),
+    ds<est::nav::acc::z>(fmt_f16), //fmt_sbyte_01),
 
     ds<est::nav::pos::lat>(fmt_real),
     ds<est::nav::pos::lon>(fmt_real),
