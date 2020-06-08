@@ -159,10 +159,12 @@ typedef char string_t[16];
 typedef char text_t[64];
 typedef xbus::pid_raw_t bind_t;
 
+static constexpr const uint8_t type_field{4};
+
 enum type_e : uint8_t {
     group = 0,
     command,
-    option = 4,
+    option = type_field,
     real,
     byte,
     word,
@@ -170,6 +172,8 @@ enum type_e : uint8_t {
     bind,
     string,
     text,
+
+    type_max
 };
 
 // field descriptor packed into dict array
@@ -187,6 +191,35 @@ typedef struct
 } field_s;
 #pragma pack()
 static_assert(sizeof(field_s) == 3, "size error");
+
+constexpr const char *type_to_str(type_e t)
+{
+    switch (t) {
+    case group:
+        return "group";
+    case command:
+        return "command";
+    case option:
+        return "option";
+    case real:
+        return "real";
+    case byte:
+        return "byte";
+    case word:
+        return "word";
+    case dword:
+        return "dword";
+    case bind:
+        return "bind";
+    case string:
+        return "string";
+    case text:
+        return "text";
+    case type_max:
+        break;
+    }
+    return "";
+}
 
 // dict array content:
 // <hash><fields array>
