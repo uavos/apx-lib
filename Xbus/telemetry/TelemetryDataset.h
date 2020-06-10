@@ -240,8 +240,8 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::pos::lon>(fmt_real, seq_skip),
     ds<cmd::nav::pos::hmsl>(fmt_real, seq_skip),
     ds<cmd::nav::pos::course>(fmt_rad),
-    ds<cmd::nav::pos::n>(fmt_f16),
-    ds<cmd::nav::pos::e>(fmt_f16),
+    //ds<cmd::nav::pos::n>(fmt_f16),
+    //ds<cmd::nav::pos::e>(fmt_f16),
 
     ds<cmd::nav::air::airspeed>(fmt_f16),
     ds<cmd::nav::air::altitude>(fmt_real),

@@ -5,9 +5,9 @@
 {%- macro constants_expand(d, indent, level, uid) -%}
 {% set ind = ' '*indent*indent_size %}
 {{ ind }}typedef {{ d.type }}_t type_t;
-{{ ind }}static constexpr const meta_s &meta{ mandala::meta[{{ ns.meta_id }}]  };
-{{ ind }}static constexpr const uid_t uid{meta.uid};
-{{ ind }}static constexpr const type_id_e type_id{meta.type_id};
+{{ ind }}static constexpr const meta_s &meta{ mandala::meta[{{ ns.meta_id }}] };
+{{ ind }}static constexpr const uid_t uid{ meta.uid }; //0x{{ '%0x' % uid }}
+{{ ind }}static constexpr const type_id_e type_id{ type_{% if d.content is defined %}void{% else %}{{ d.type }}{% endif %} };
 {%- endmacro -%}
 
 {%- macro mandala_expand(d, indent=0, level=0, uid=0) -%}
@@ -31,9 +31,9 @@
 {{ ind }}};
 {%- endmacro -%}
 
-{%- block content %}
-
+{%- block content -%}
 // generated file
+
 #pragma once
 
 #include <Mandala/MandalaTreeBase.h>
