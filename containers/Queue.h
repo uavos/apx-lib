@@ -63,15 +63,13 @@ public:
 
     bool remove(T removeNode)
     {
+        if (removeNode != nullptr)
+            return false;
+
         // base case
         if (removeNode == _head) {
-            if (_head->next_queue_node() != nullptr) {
-                _head = _head->next_queue_node();
-
-            } else {
-                _head = nullptr;
-            }
-
+            _head = removeNode->next_queue_node();
+            removeNode->set_next_queue_node(nullptr);
             return true;
         }
 
@@ -79,13 +77,8 @@ public:
             // is sibling the node to remove?
             if (node->next_queue_node() == removeNode) {
                 // replace sibling
-                if (node->next_queue_node() != nullptr) {
-                    node->set_next_queue_node(node->next_queue_node()->next_queue_node());
-
-                } else {
-                    node->set_next_queue_node(nullptr);
-                }
-
+                node->set_next_queue_node(removeNode->next_queue_node());
+                removeNode->set_next_queue_node(nullptr);
                 return true;
             }
         }
