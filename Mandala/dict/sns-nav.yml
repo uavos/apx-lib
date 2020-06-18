@@ -138,7 +138,28 @@
       suffix: temperature
       units: C
 
-- name: pt
+- name: baro
+  title: Static pressure
+  content:
+    - name: src
+      suffix: source
+      type: option
+      units:
+        - unknown
+        - local
+        - primary
+        - secondary
+        - failsafe
+        - auxilary
+
+    - name: mbar
+      title: Absolute pressure
+      units: mbar
+    - name: temp
+      title: Barometer temperature
+      units: C
+
+- name: pitot
   title: Dynamic pressure
   content:
     - name: src
@@ -163,33 +184,6 @@
       units: C
     - name: raw
       title: Dynamic pressure
-      units: kPa
-
-- name: ps
-  title: Static pressure
-  content:
-    - name: src
-      suffix: source
-      type: option
-      units:
-        - unknown
-        - local
-        - primary
-        - secondary
-        - failsafe
-        - auxilary
-
-    - name: altitude
-      title: Barometric altitude
-      units: m
-    - name: vspeed
-      title: Barometric altitude derivative
-      units: m/s
-    - name: temp
-      title: Altitude probe temperature
-      units: C
-    - name: raw
-      title: Static pressure
       units: kPa
 
 - name: air

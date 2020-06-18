@@ -45,6 +45,10 @@
       title: Ground speed
       units: m/s
 
+    - name: altitude
+      title: Flight altitude
+      units: m
+
     - name: vspeed
       title: Vertical speed
       units: m/s
@@ -157,19 +161,12 @@
       title: Home altitude MSL
       units: m
 
-    - name: altps
-      title: Baro ground altitude
-      units: m
-
-    - name: hdg
-      title: Heading to home
-      units: deg
-    - name: dist
-      title: Distance to home
+    - name: altitude
+      title: MSL Altitude offset
       units: m
 
 - name: air
-  title: Aerodynamic
+  title: Air data
   content:
     - name: status
       suffix: status
@@ -178,20 +175,13 @@
         - "flying"
         - "landed"
 
-    - name: altitude
-      title: Flight altitude
-      units: m
-
-    - name: vario
-      title: Variometer
-      units: m/s
-
     - name: airspeed
       title: Airspeed
       units: m/s
-    - name: airacc
-      title: Airspeed acceleration
-      units: m/s^2
+
+    - name: rho
+      title: Air density
+      units: kg/m^3
 
     - name: slip
       title: Slip angle

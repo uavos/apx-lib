@@ -97,9 +97,9 @@ static constexpr const item_t items[] = {
     MBVECT(meta_void, Hy, f2, s001, 1),
     MBVECT(meta_void, Hz, f2, s001, 2),
 
-    MBITEM(est::nav::air::altitude::meta, altitude, f4, f4),
+    MBITEM(est::nav::pos::altitude::meta, altitude, f4, f4),
     MBITEM(est::nav::air::airspeed::meta, airspeed, f2, f2),
-    MBITEM(est::nav::air::vario::meta, vspeed, f2, f2),
+    MBITEM(est::nav::pos::vspeed::meta, vspeed, f2, f2),
     MBITEM(est::nav::pos::course::meta, course, f2, f2),
 
     MBITEM(sns::env::eng::rpm::meta, rpm, u2, u2),
@@ -144,9 +144,9 @@ static constexpr const item_t items[] = {
     MBVECT(cmd::nav::pos::e::meta, cmd_east, f2, f2, 1),
     MBITEM(cmd::nav::pos::course::meta, cmd_course, f2, f2),
     MBITEM(cmd::nav::aux::rpm::meta, cmd_rpm, u2, u2),
-    MBITEM(cmd::nav::air::altitude::meta, cmd_altitude, f2, f2),
+    MBITEM(cmd::nav::pos::altitude::meta, cmd_altitude, f2, f2),
     MBITEM(cmd::nav::air::airspeed::meta, cmd_airspeed, f2, f2),
-    MBITEM(cmd::nav::air::vario::meta, cmd_vspeed, f2, s01),
+    MBITEM(cmd::nav::pos::vspeed::meta, cmd_vspeed, f2, s01),
     MBITEM(cmd::nav::air::slip::meta, cmd_slip, f2, s1),
 
     MBVECT(est::nav::pos::lat::meta, gps_lat, f4, f4, 0),
@@ -278,7 +278,7 @@ static constexpr const item_t items[] = {
     MBVECT(est::nav::ref::lat::meta, home_lat, f4, f4, 0),
     MBVECT(est::nav::ref::lon::meta, home_lon, f4, f4, 1),
     MBVECT(est::nav::ref::hmsl::meta, home_hmsl, f4, f4, 2),
-    MBITEM(est::nav::ref::altps::meta, altps_gnd, f4, f4),
+    MBITEM(est::nav::ref::altitude::meta, altps_gnd, f4, f4),
 
     MBITEM(meta_void, errcode, u1, u1),
 
@@ -332,8 +332,8 @@ static constexpr const item_t items[] = {
     MBVECT(meta_void, pos_east, f4, f4, 1),
     MBVECT(meta_void, vel_north, f4, f4, 0),
     MBVECT(meta_void, vel_east, f4, f4, 1),
-    MBITEM(est::nav::ref::hdg::meta, homeHDG, f4, f4),
-    MBITEM(est::nav::ref::dist::meta, dHome, f4, f4),
+    MBITEM(meta_void, homeHDG, f4, f4),
+    MBITEM(meta_void, dHome, f4, f4),
     MBITEM(est::nav::wpt::dist::meta, dWPT, f4, f4),
     MBVECT(est::nav::lpos::vx::meta, Vx, f4, f4, 0),
     MBVECT(est::nav::lpos::vy::meta, Vy, f4, f4, 1),
@@ -347,9 +347,9 @@ static constexpr const item_t items[] = {
     MBITEM(meta_void, dl_period, u2, u2),
     MBITEM(meta_void, dl_timestamp, u4, u4),
 
-    MBITEM(sns::nav::ps::altitude::meta, altps, f4, f4),
-    MBITEM(sns::nav::ps::vspeed::meta, vario, f4, f4),
-    MBITEM(sns::nav::pt::acc::meta, vcas, f4, f4),
+    MBITEM(meta_void, altps, f4, f4),
+    MBITEM(meta_void, vario, f4, f4),
+    MBITEM(meta_void, vcas, f4, f4),
     MBITEM(meta_void, denergy, f4, f4),
 
     MBITEM(cmd::nav::rc::ovr::meta, rc_override, u1, u1),

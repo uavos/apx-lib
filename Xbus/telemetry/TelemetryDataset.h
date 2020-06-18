@@ -40,6 +40,8 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
         return fmt_sbyte_001;
     case units_K:
         return fmt_f16;
+    case units_kgpm_cb:
+        return fmt_f16;
     case units_kPa:
         return fmt_f16;
     case units_l:
@@ -49,6 +51,8 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
     case units_lph:
         return fmt_byte_01;
     case units_m:
+        return fmt_f16;
+    case units_mbar:
         return fmt_f16;
     case units_mps:
         return fmt_f16;
@@ -128,6 +132,7 @@ static constexpr const ds_field_s dataset_default[] = {
 
     ds<est::nav::pos::course>(fmt_rad),
     ds<est::nav::pos::speed>(fmt_f16, seq_skip),
+    ds<est::nav::pos::altitude>(fmt_real),
     ds<est::nav::pos::vspeed>(fmt_f16),
     ds<est::nav::pos::agl>(fmt_byte_01),
 
@@ -139,10 +144,9 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::ref::lat>(fmt_real, seq_scheduled),
     ds<est::nav::ref::lon>(fmt_real, seq_scheduled),
     ds<est::nav::ref::hmsl>(fmt_real, seq_scheduled),
+    ds<est::nav::ref::altitude>(fmt_real, seq_scheduled),
 
     ds<est::nav::air::status>(fmt_bit),
-    ds<est::nav::air::altitude>(fmt_real),
-    ds<est::nav::air::vario>(fmt_f16),
     ds<est::nav::air::airspeed>(fmt_f16),
     ds<est::nav::air::slip>(fmt_sbyte_01),
     ds<est::nav::air::aoa>(fmt_sbyte_01),
@@ -240,12 +244,10 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::pos::lon>(fmt_real, seq_skip),
     ds<cmd::nav::pos::hmsl>(fmt_real, seq_skip),
     ds<cmd::nav::pos::course>(fmt_rad),
-    //ds<cmd::nav::pos::n>(fmt_f16),
-    //ds<cmd::nav::pos::e>(fmt_f16),
 
     ds<cmd::nav::air::airspeed>(fmt_f16),
-    ds<cmd::nav::air::altitude>(fmt_real),
-    ds<cmd::nav::air::vario>(fmt_sbyte_01),
+    ds<cmd::nav::pos::altitude>(fmt_real),
+    ds<cmd::nav::pos::vspeed>(fmt_sbyte_01),
     ds<cmd::nav::air::slip>(fmt_sbyte_001),
 
     ds<cmd::nav::aux::rpm>(fmt_word),
@@ -287,6 +289,9 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<sns::nav::gps::pdop>(fmt_byte_01),
     ds<sns::nav::gps::sv>(fmt_byte),
     ds<sns::nav::gps::su>(fmt_byte),
+
+    ds<sns::nav::baro::src>(fmt_opt, seq_rare),
+    ds<sns::nav::baro::temp>(fmt_sbyte, seq_rare),
 
     ds<sns::env::eng::rpm>(fmt_word, seq_rare),
     ds<sns::env::eng::temp>(fmt_byte, seq_rare),

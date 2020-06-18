@@ -24,29 +24,22 @@
       title: Cmd altitude MSL
       units: m
 
+    - name: altitude
+      title: Cmd altitude
+      units: m
+    - name: vspeed
+      title: Cmd vspeed
+      units: m/s
+
     - name: course
       title: Cmd course
       units: deg
-
-    - name: "n"
-      title: Cmd north
-      units: m
-    - name: "e"
-      title: Cmd east
-      units: m
 
 - name: air
   title: Aerodynamic regulators
   content:
     - name: airspeed
       title: Cmd airspeed
-      units: m/s
-
-    - name: altitude
-      title: Cmd altitude
-      units: m
-    - name: vario
-      title: Cmd vario
       units: m/s
 
     - name: slip

@@ -22,7 +22,7 @@
 {%- endif -%}
 
 {%- if d.units and d.type != 'option' -%}
-{% set units_id = 'units_' + d.units|replace('/','p')|replace('%','percent')|replace('^2','_sq') %}
+{% set units_id = 'units_' + d.units|replace('/','p')|replace('%','percent')|replace('^2','_sq')|replace('^3','_cb') %}
 {% else %}
 {% set units_id = 'units_none' %}
 {%- endif -%}
@@ -85,7 +85,7 @@
 {{ collect_units(i) }}
 {%- endfor -%}
 {%- elif d.units and d.type != 'option' -%}
-{% set all_units.value = all_units.value + [d.units|replace('/','p')|replace('%','percent')|replace('^2','_sq')] -%}
+{% set all_units.value = all_units.value + [d.units|replace('/','p')|replace('%','percent')|replace('^2','_sq')|replace('^3','_cb')] -%}
 {%- endif -%}
 {%- endmacro -%}
 
