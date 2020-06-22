@@ -1,3 +1,50 @@
+- name: ahrs
+  title: AHRS fusion
+  content:
+    - name: status
+      title: AHRS
+      type: option
+      units:
+        - "unknown"
+        - "ok"
+        - "busy"
+        - "warning"
+        - "critical"
+        - "failure"
+
+    - name: imu
+      title: IMU
+      type: option
+      units:
+        - "unknown"
+        - "ok"
+        - "warning"
+        - "critical"
+        - "failure"
+
+    - name: stall
+      title: STALL
+      type: option
+      units:
+        - "unknown"
+        - "ok"
+        - "warning"
+        - "critical"
+
+    - name: inair
+      title: Vehicle
+      type: option
+      units:
+        - "landed"
+        - "airborne"
+
+    - name: wspd
+      title: Wind speed
+      units: m/s
+    - name: whdg
+      title: Wind heading
+      units: deg
+
 - name: att
   title: Attitude
   content:
@@ -122,25 +169,6 @@
       title: Delta Z
       units: m
 
-    # - name: vn
-    #   title: Velocity north
-    #   units: m/s
-    # - name: ve
-    #   title: Velocity east
-    #   units: m/s
-    # - name: vd
-    #   title: Velocity down
-    #   units: m/s
-    # - name: "n"
-    #   title: Local position north
-    #   units: m
-    # - name: "e"
-    #   title: Local position east
-    #   units: m
-    # - name: "d"
-    #   title: Local position down
-    #   units: m
-
 - name: ref
   title: Ref point
   content:
@@ -168,20 +196,9 @@
 - name: air
   title: Air data
   content:
-    - name: status
-      suffix: status
-      type: option
-      units:
-        - "flying"
-        - "landed"
-
     - name: airspeed
       title: Airspeed
       units: m/s
-
-    - name: rho
-      title: Air density
-      units: kg/m^3
 
     - name: slip
       title: Slip angle
@@ -190,24 +207,25 @@
       title: Angle of attack
       units: deg
 
-- name: tecs
-  title: TECS parameters
-  content:
     - name: ld
       title: Glide ratio
       units: L/D
-
-    - name: stab
-      title: Stability
-      units: u
 
     - name: vse
       title: Compensated variometer
       units: m/s
 
+    - name: rho
+      title: Air density
+      units: kg/m^3
+
     - name: ktas
-      title: CAS to TAS multiplier
+      title: IAS to TAS multiplier
       units: K
+
+    - name: stab
+      title: Stability
+      units: u
 
 - name: ctr
   title: Control parameters

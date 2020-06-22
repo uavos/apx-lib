@@ -26,7 +26,6 @@ typedef struct
     mandala::raw_t packed[slots_size]; // packed value
 } enc_slots_s;
 //static_assert(sizeof(enc_slots_s) == 12 * slots_size + 1, "size error");
-#pragma pack()
 
 } // namespace telemetry
 } // namespace xbus
@@ -46,14 +45,15 @@ public:
     void update(const xbus::pid_s &pid, mandala::real_t value);
 
     xbus::telemetry::enc_slots_s &enc_slots() { return _slots; }
-    uint16_t slots_cnt() { return _slots_cnt; }
+    inline uint16_t slots_cnt() const { return _slots_cnt; }
+    inline uint16_t slots_upd_cnt() const { return _slots_upd_cnt; }
 
     void reset_feeds();
 
 private:
     xbus::telemetry::enc_slots_s _slots;
-    uint16_t _slots_cnt{0};
-    uint16_t _slots_upd_cnt{0}; // re-scheduled slots top limit (before bitfields)
+    uint16_t _slots_cnt;
+    uint16_t _slots_upd_cnt; // re-scheduled slots top limit (before bitfields)
 
     void _insert(size_t index, const xbus::telemetry::field_s &field);
 

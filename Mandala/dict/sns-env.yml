@@ -2,6 +2,18 @@
   title: Engine
 
   content:
+    - name: status
+      suffix: status
+      type: option
+      units:
+        - "unknown"
+        - "ready"
+        - "start"
+        - "stop"
+        - "running"
+        - "warning"
+        - "failure"
+
     - name: rpm
       suffix: RPM
       units: rpm
@@ -45,15 +57,32 @@
       title: Turbocharger
       type: option
       units:
-        - unknown
+        - "unknown"
         - "off"
-        - active
-        - warn
-        - caution
+        - "active"
+        - "warning"
+        - "critical"
+        - "failure"
+
+    - name: block
+      title: Disable starter switch
+      type: option
+      units:
+        - "off"
+        - "on"
 
 - name: gbox
   title: Gearbox
   content:
+    - name: status
+      suffix: status
+      type: option
+      units:
+        - "unknown"
+        - "ok"
+        - "warning"
+        - "failure"
+
     - name: rpm
       suffix: RPM
       units: rpm
@@ -63,7 +92,7 @@
       units: C
 
     - name: clutch
-      title: Clutch status
+      title: Clutch
       type: option
       units:
         - "on"
@@ -73,6 +102,15 @@
 - name: prop
   title: Prop
   content:
+    - name: status
+      suffix: status
+      type: option
+      units:
+        - "unknown"
+        - "ok"
+        - "warning"
+        - "failure"
+
     - name: rpm
       suffix: RPM
       units: rpm
@@ -88,6 +126,17 @@
 - name: gen
   title: Generator
   content:
+    - name: status
+      suffix: status
+      type: option
+      units:
+        - "unknown"
+        - "ok"
+        - "idle"
+        - "free"
+        - "warning"
+        - "failure"
+
     - name: rpm
       suffix: RPM
       units: rpm
@@ -100,14 +149,6 @@
     - name: temp
       suffix: temperature
       units: C
-    - name: status
-      suffix: status
-      type: option
-      units:
-        - ok
-        - idle
-        - free
-        - error
 
 - name: fuel
   title: Fuel
@@ -128,6 +169,17 @@
 - name: bat
   title: Battery
   content:
+    - name: status
+      title: BAT
+      type: option
+      units:
+        - "unknown"
+        - "ok"
+        - "charging"
+        - "shutdown"
+        - "warning"
+        - "failure"
+
     - name: voltage
       suffix: voltage
       units: V
@@ -140,14 +192,6 @@
     - name: temp
       suffix: temperature
       units: C
-    - name: status
-      suffix: status
-      type: option
-      units:
-        - ok
-        - discharging
-        - charging
-        - error
 
 - name: pwr
   title: Power
@@ -156,10 +200,11 @@
       suffix: status
       type: option
       units:
-        - ok
-        - failsafe
-        - warning
-        - error
+        - "unknown"
+        - "ok"
+        - "shutdown"
+        - "warning"
+        - "failure"
 
     - name: vsys
       title: System voltage
@@ -186,13 +231,15 @@
   title: Datalink
   content:
     - name: status
-      title: Modem status
+      suffix: status
       type: option
       units:
-        - ok
-        - mute
-        - busy
-        - warning
+        - "unknown"
+        - "ok"
+        - "muted"
+        - "busy"
+        - "warning"
+        - "failure"
 
     - name: rss
       title: Received signal strength
@@ -243,32 +290,25 @@
     - name: fgear
       title: Landing gear force
       units: u
-    - name: ers
+
+- name: ers
+  title: Emergency Rescue System
+  content:
+    - name: status
       title: ERS status
       type: option
       units:
-        - ok
-        - disarmed
-        - busy
-        - error
-
-- name: btn
-  title: Buttons
-  type: option
-  units:
-    - "off"
-    - "on"
-  content:
-    - name: pwron
-      title: System power on
-    - name: shutdown
-      title: System shutdown
-    - name: starter
-      title: Engine starter
-    - name: safe
-      title: Safety switch
-    - name: noers
+        - "unknown"
+        - "ok"
+        - "disarmed"
+        - "busy"
+        - "failure"
+    - name: block
       title: ERS disable switch
+      type: option
+      units:
+        - "off"
+        - "on"
 
 - name: srv
   title: Servo

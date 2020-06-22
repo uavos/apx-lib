@@ -78,7 +78,7 @@ bool TelemetryEncoder::add(const field_s &field)
     _insert(index, field);
 
     for (_slots_upd_cnt = 0; _slots_upd_cnt < _slots_cnt; ++_slots_upd_cnt) {
-        auto const &f = _slots.fields[index];
+        auto const &f = _slots.fields[_slots_upd_cnt];
         if (f.fmt == fmt_bit)
             break;
     }
@@ -106,13 +106,14 @@ void TelemetryEncoder::_insert(size_t index, const xbus::telemetry::field_s &fie
 }
 void TelemetryEncoder::clear()
 {
-    _slots_cnt = 0;
+    _slots_cnt = _slots_upd_cnt = 0;
     memset(&_slots, 0, sizeof(_slots));
     _update_feeds();
 }
 
 void TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spec, XbusStreamReader &stream)
 {
+    return;
     // called by MandalaDataBroker
     for (size_t i = 0; i < _slots_cnt; ++i) {
         auto const &f = _slots.fields[i];
@@ -126,6 +127,7 @@ void TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spe
 }
 void TelemetryEncoder::update(const xbus::pid_s &pid, mandala::real_t value)
 {
+    return;
     // called by MandalaDataBroker
     for (size_t i = 0; i < _slots_cnt; ++i) {
         auto const &f = _slots.fields[i];
@@ -273,7 +275,7 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint32_t seq)
     uint8_t nibble_n = 0;
 
     // re-schedule according to index
-    size_t index = seq % _slots_upd_cnt;
+    size_t index = seq % _slots_upd_cnt % _slots_cnt;
     _slots.flags[index].upd = true;
     _slots.packed[index] += 0x01010101; //re-pack
 

@@ -42,7 +42,7 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
         _fmt_pos = 0;
         _cobs_code = 0;
     }
-    _set_feed_fmt(hdr.feed_fmt);
+    //_set_feed_fmt(hdr.feed_fmt);
 
     _valid = false;
 

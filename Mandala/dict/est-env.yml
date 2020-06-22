@@ -1,6 +1,15 @@
 - name: sys
   title: System
   content:
+    - name: mode
+      suffix: mode
+      type: option
+      units:
+        - "ground"
+        - "check"
+        - "taxi"
+        - "normal"
+
     - name: health
       suffix: health
       type: option
@@ -9,6 +18,7 @@
         - "normal"
         - "warning"
         - "critical"
+
     - name: time
       suffix: time
       type: dword
@@ -29,61 +39,6 @@
     - name: corr
       title: Correlator output
       units: K
-
-- name: status
-  title: Submodules status
-  type: option
-  units:
-    - "unknown"
-    - "ok"
-    - "warning"
-    - "error"
-  content:
-    - name: eng
-      title: Engine
-    - name: gen
-      title: Generator
-    - name: bat
-      title: Battery
-    - name: pwr
-      title: Power
-
-    - name: gps
-      title: GPS
-
-    - name: agl
-      title: AGL
-
-    - name: pt
-      title: Dynamic pressure
-    - name: ps
-      title: Static pressure
-    - name: imu
-      title: IMU
-
-    - name: uplink
-      title: Uplink
-
-    - name: ers
-      title: ERS
-
-- name: aux
-  title: Auxilary parameters
-  content:
-    - name: wspd
-      title: Wind speed
-      units: m/s
-    - name: whdg
-      title: Wind direction to
-      units: deg
-
-    - name: vib
-      title: Common vibration level
-      type: byte
-      units: "%"
-    - name: mag
-      title: Magnetometer magnitude
-      units: u
 
 - name: ats
   title: ATS

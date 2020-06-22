@@ -71,6 +71,15 @@
         - secondary
         - failsafe
         - auxilary
+    - name: status
+      title: Magnetometer
+      type: option
+      units:
+        - "unknown"
+        - "available"
+        - "blocked"
+        - "warning"
+        - "failure"
 
     - name: temp
       suffix: temperature
@@ -80,6 +89,14 @@
       suffix: vibration
       type: byte
       units: "%"
+
+    - name: norm
+      suffix: magnitude
+      units: u
+
+    - name: decl
+      suffix: declination
+      units: deg
 
 - name: gps
   title: GPS
@@ -151,6 +168,15 @@
         - secondary
         - failsafe
         - auxilary
+    - name: status
+      title: Baro
+      type: option
+      units:
+        - "unknown"
+        - "available"
+        - "warning"
+        - "critical"
+        - "failure"
 
     - name: mbar
       title: Absolute pressure
@@ -172,6 +198,15 @@
         - secondary
         - failsafe
         - auxilary
+    - name: status
+      title: Pitot
+      type: option
+      units:
+        - "unknown"
+        - "available"
+        - "warning"
+        - "critical"
+        - "failure"
 
     - name: airspeed
       title: Airspeed
@@ -185,6 +220,35 @@
     - name: raw
       title: Dynamic pressure
       units: kPa
+
+- name: agl
+  title: Altitude above ground sensors
+  units: m
+  content:
+    - name: status
+      title: AGL
+      type: option
+      units:
+        - "unknown"
+        - "available"
+        - "unavailable"
+        - "ready"
+        - "warning"
+        - "failure"
+
+    - name: sonic
+      title: Ultrasonic AGL altitude
+    - name: laser
+      title: Laser AGL altitude
+    - name: radio
+      title: Radio AGL altitude
+    - name: ground
+      title: Ground
+      type: option
+      units:
+        - "unknown"
+        - "landed"
+        - "flying"
 
 - name: air
   title: Aerodynamic sensors
@@ -201,23 +265,6 @@
     - name: buo
       title: Blimp ballonet pressure
       units: kPa
-
-- name: agl
-  title: Altitude above ground sensors
-  units: m
-  content:
-    - name: sonic
-      title: Ultrasonic AGL altitude
-    - name: laser
-      title: Laser AGL altitude
-    - name: radio
-      title: Radio AGL altitude
-    - name: ground
-      title: Ground
-      type: option
-      units:
-        - off
-        - detected
 
 - name: rtk
   title: RTK
@@ -236,10 +283,13 @@
   title: Landing Assistance sensors
   descr: Used for approach correction.
   content:
-    - name: dt
-      suffix: dt
-      type: dword
-      units: us
+    - name: status
+      title: LAS status
+      type: option
+      units:
+        - ok
+        - holdon
+        - cancel
 
     - name: dx
       title: Relative distance X
@@ -261,23 +311,10 @@
       title: Relative velocity Z
       units: m/s
 
-    - name: status
-      title: LAS status
-      type: option
-      units:
-        - ok
-        - holdon
-        - cancel
-
 - name: pfm
   title: Platform
   descr: Used for landing to a moving platform with las.
   content:
-    - name: dt
-      suffix: dt
-      type: dword
-      units: us
-
     - name: lat
       suffix: latitude
       units: deg
@@ -312,11 +349,6 @@
   title: Visual navigation
   descr: Used for global position estimation and dead-reckoning.
   content:
-    - name: dt
-      suffix: dt
-      type: dword
-      units: us
-
     - name: vx
       title: Visual velocity X
       units: m/s
