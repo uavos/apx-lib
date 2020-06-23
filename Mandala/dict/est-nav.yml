@@ -35,9 +35,26 @@
       title: Vehicle
       type: option
       units:
-        - "landed"
+        - "stby"
+        - "ground"
         - "airborne"
 
+    - name: hgt
+      title: Height source
+      type: option
+      units:
+        - "none"
+        - "baro"
+        - "gps"
+        - "agl"
+        - "vision"
+
+    - name: wind
+      title: Wind estimation
+      type: option
+      units:
+        - "unknown"
+        - "available"
     - name: wspd
       title: Wind speed
       units: m/s

@@ -72,7 +72,7 @@
         - failsafe
         - auxilary
     - name: status
-      title: Magnetometer
+      title: MAG
       type: option
       units:
         - "unknown"

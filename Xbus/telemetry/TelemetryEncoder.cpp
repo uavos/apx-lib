@@ -113,7 +113,6 @@ void TelemetryEncoder::clear()
 
 void TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spec, XbusStreamReader &stream)
 {
-    return;
     // called by MandalaDataBroker
     for (size_t i = 0; i < _slots_cnt; ++i) {
         auto const &f = _slots.fields[i];
@@ -127,7 +126,6 @@ void TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spe
 }
 void TelemetryEncoder::update(const xbus::pid_s &pid, mandala::real_t value)
 {
-    return;
     // called by MandalaDataBroker
     for (size_t i = 0; i < _slots_cnt; ++i) {
         auto const &f = _slots.fields[i];

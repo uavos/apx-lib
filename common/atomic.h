@@ -33,6 +33,11 @@ public:
     // Ensure that all operations are lock-free, so that 'atomic' can be used from
     // IRQ handlers. This might not be required everywhere though.
     static_assert(__atomic_always_lock_free(sizeof(T), 0), "atomic is not lock-free for the given type T");
+
+    /*explicit atomic_std(T value)
+    {
+        std::atomic_init(this, value);
+    }*/
 };
 
 template<typename T>

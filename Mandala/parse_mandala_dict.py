@@ -10,6 +10,7 @@ import yaml
 # Parse commandline
 parser = argparse.ArgumentParser(description='Parse Mandala dict YAML files and print JSON')
 parser.add_argument('--dict', required=False, help='path to dict YAML file')
+parser.add_argument('--out', required=False, help='path to output JSON file')
 args = parser.parse_args()
 
 args.dict = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dict/mandala.yml')
@@ -55,9 +56,14 @@ class Mandala(dict):
     def read_config(self, config):
         # print('Reading {}...'.format(config))
         with open(config, 'r') as f:
-            return yaml.load(f.read())
+            return yaml.load(f.read(), Loader=yaml.Loader)
 
 
 mandala = Mandala(root_config=args.dict)
 
-print(simplejson.dumps(mandala))
+if args.out:
+    with open(args.out, 'w') as f:
+        simplejson.dump(mandala, f, sort_keys=True, indent=2)
+        f.write('\n')
+else:
+    print(simplejson.dumps(mandala))

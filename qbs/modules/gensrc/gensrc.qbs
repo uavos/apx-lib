@@ -32,50 +32,71 @@ Module {
         fileTags: ["gensrc.input"]
     }
     Rule {
-        //inputsFromDependencies: ["gensrc.input"]
-        inputs: ["gensrc.input"]
+        //inputsFromDependencies: ["gensrc.data."+product.gensrc.prefix]
+        explicitlyDependsOn:  ["gensrc.data."+product.gensrc.prefix]
+        inputs: ["gensrc.input", "gensrc.data."+product.gensrc.prefix]
+        multiplex: true
         outputFileTags: ["hpp", "cpp", "c", "gensrc.output"]
         outputArtifacts: {
-            var a, list = []
-            var tname = input.completeBaseName
-            var ftype = FileInfo.completeSuffix(tname)
-            a = {}
-            a.fileTags = [ "gensrc.output" ]
-            if(ftype.startsWith("h"))a.fileTags.push("hpp")
-            else a.fileTags.push(ftype)
+            var list = []
 
-            a.filePath = FileInfo.joinPaths(product.buildDirectory, "gensrc", product.gensrc.prefix, tname)
-            //console.info(product.gensrc.prefix)
+            for(var i in inputs["gensrc.input"]){
+                var inp = inputs["gensrc.input"][i]
+                var tname = inp.completeBaseName
+                var ftype = FileInfo.completeSuffix(tname)
+                var a = {}
+                a.fileTags = [ "gensrc.output" ]
+                if(ftype.startsWith("h"))a.fileTags.push("hpp")
+                else a.fileTags.push(ftype)
 
-            list.push(a)
+                a.filePath = FileInfo.joinPaths(product.buildDirectory, "gensrc", product.gensrc.prefix, tname)
+                //console.info(product.gensrc.prefix)
+
+                list.push(a)
+            }
             return list
         }
 
         prepare: {
             var cmd, commands = []
 
-            var args = []
-            args.push(product.gensrc.tool)
-            args.push("--template")
-            args.push(input.filePath)
-            args.push("--dest")
-            args.push(FileInfo.path(output.filePath))
-            args.push("--data")
+            for(var i in inputs["gensrc.input"]){
+                var inp = inputs["gensrc.input"][i]
+                var tname = inp.completeBaseName
+                var out = FileInfo.joinPaths(product.buildDirectory, "gensrc", product.gensrc.prefix, tname)
 
-            var fname = FileInfo.joinPaths(product.buildDirectory, input.fileName+".json")
-            args.push(fname)
-            File.makePath(FileInfo.path(fname))
-            var f = TextFile(fname, TextFile.WriteOnly)
-            f.write(JSON.stringify(product.gensrc.data,0,2))
-            f.close()
+                var args = []
+                args.push(product.gensrc.tool)
+                args.push("--template")
+                args.push(inp.filePath)
+                args.push("--dest")
+                args.push(FileInfo.path(out))
+                args.push("--data")
 
-            cmd = new Command("python", args);
-            cmd.description = "Parsing "+input.fileName
-            cmd.highlight = "codegen"
-            cmd.stdoutFilterFunction=function(s){
-                return ""
+                var tdata = "gensrc.data."+product.gensrc.prefix
+                var fdata = inputs[tdata]
+                var cmd_desc
+                if(fdata){
+                    console.info(tdata+"["+fdata.length+"]: " + fdata[0].filePath)
+                    args.push(fdata[0].filePath)
+                    cmd_desc=fdata[0].fileName
+                }else{
+                    var fname = FileInfo.joinPaths(product.buildDirectory, inp.fileName+".json")
+                    args.push(fname)
+                    File.makePath(FileInfo.path(fname))
+                    var f = TextFile(fname, TextFile.WriteOnly)
+                    f.write(JSON.stringify(product.gensrc.data,0,2))
+                    f.close()
+                }
+
+                cmd = new Command("python", args);
+                cmd.description = "Parsing "+inp.fileName + (cmd_desc?" with "+cmd_desc:"")
+                cmd.highlight = "codegen"
+                cmd.stdoutFilterFunction=function(s){
+                    return ""
+                }
+                commands.push(cmd)
             }
-            commands.push(cmd)
 
             return commands
         }
