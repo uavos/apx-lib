@@ -12,16 +12,6 @@
         - "critical"
         - "failure"
 
-    - name: imu
-      title: IMU
-      type: option
-      units:
-        - "unknown"
-        - "ok"
-        - "warning"
-        - "critical"
-        - "failure"
-
     - name: stall
       title: STALL
       type: option

@@ -13,6 +13,16 @@
         - failsafe
         - auxilary
 
+    - name: status
+      title: IMU
+      type: option
+      units:
+        - "unknown"
+        - "ok"
+        - "warning"
+        - "critical"
+        - "failure"
+
     - name: temp
       suffix: temperature
       units: C
@@ -76,7 +86,8 @@
       type: option
       units:
         - "unknown"
-        - "available"
+        - "3D"
+        - "HDG"
         - "blocked"
         - "warning"
         - "failure"

@@ -154,7 +154,6 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::air::ktas>(fmt_byte_001, seq_rare),
 
     ds<est::nav::ahrs::status>(fmt_opt, seq_rare),
-    ds<est::nav::ahrs::imu>(fmt_opt, seq_rare),
     ds<est::nav::ahrs::stall>(fmt_opt, seq_rare),
     ds<est::nav::ahrs::inair>(fmt_opt, seq_rare),
     ds<est::nav::ahrs::hgt>(fmt_opt, seq_rare),
@@ -256,6 +255,7 @@ static constexpr const ds_field_s dataset_default[] = {
 
     // sns
     ds<sns::nav::gyro::src>(fmt_opt, seq_rare),
+    ds<sns::nav::gyro::status>(fmt_opt, seq_rare),
     ds<sns::nav::gyro::temp>(fmt_sbyte, seq_rare),
     ds<sns::nav::gyro::clip>(fmt_byte, seq_skip),
     ds<sns::nav::gyro::vib>(fmt_byte, seq_skip),
