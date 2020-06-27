@@ -264,8 +264,8 @@ static constexpr const item_t items[] = {
     MBITEM(est::nav::wpt::eta::meta, ETA, u4, u4),
     MBITEM(est::nav::ctr::mtype::meta, mtype, u1, u1),
 
-    MBITEM(est::nav::ahrs::wspd::meta, windSpd, f2, u01),
-    MBITEM(est::nav::ahrs::whdg::meta, windHdg, f2, f2),
+    MBITEM(est::env::wind::speed::meta, windSpd, f2, u01),
+    MBITEM(est::env::wind::heading::meta, windHdg, f2, f2),
     MBITEM(est::nav::air::ktas::meta, cas2tas, f2, u001),
 
     MBITEM(cmd::nav::op::adj::meta, rwAdj, s1, s1),

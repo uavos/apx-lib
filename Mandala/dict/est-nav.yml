@@ -1,60 +1,18 @@
-- name: ahrs
-  title: AHRS fusion
+- name: att
+  title: Attitude
   content:
     - name: status
-      title: AHRS
+      suffix: status
       type: option
       units:
         - "unknown"
         - "ok"
+        - "rest"
         - "busy"
         - "warning"
         - "critical"
         - "failure"
 
-    - name: stall
-      title: STALL
-      type: option
-      units:
-        - "unknown"
-        - "ok"
-        - "warning"
-        - "critical"
-
-    - name: inair
-      title: Vehicle
-      type: option
-      units:
-        - "stby"
-        - "ground"
-        - "airborne"
-
-    - name: hgt
-      title: Height source
-      type: option
-      units:
-        - "none"
-        - "baro"
-        - "gps"
-        - "agl"
-        - "vision"
-
-    - name: wind
-      title: Wind estimation
-      type: option
-      units:
-        - "unknown"
-        - "available"
-    - name: wspd
-      title: Wind speed
-      units: m/s
-    - name: whdg
-      title: Wind heading
-      units: deg
-
-- name: att
-  title: Attitude
-  content:
     - name: roll
       suffix: roll
       units: deg
@@ -65,18 +23,31 @@
       suffix: yaw
       units: deg
 
-    - name: qa
-      suffix: quat a
-    - name: qb
-      suffix: quat b
-    - name: qc
-      suffix: quat c
-    - name: qd
-      suffix: quat d
+    - name: mag
+      title: Magnetometer
+      type: option
+      units:
+        - "unknown"
+        - "3D"
+        - "HDG"
+        - "blocked"
+        - "warning"
+        - "failure"
 
 - name: pos
-  title: Position
+  title: Global Position
   content:
+    - name: status
+      suffix: status
+      type: option
+      units:
+        - "unknown"
+        - "ok"
+        - "busy"
+        - "warning"
+        - "critical"
+        - "failure"
+
     - name: lat
       title: Latitude
       units: deg
@@ -106,6 +77,16 @@
     - name: vspeed
       title: Vertical speed
       units: m/s
+
+    - name: hgt
+      title: Height source
+      type: option
+      units:
+        - "none"
+        - "baro"
+        - "gps"
+        - "agl"
+        - "vision"
 
 - name: gyro
   title: Angular rate
@@ -146,6 +127,17 @@
 - name: lpos
   title: Local position
   content:
+    - name: status
+      suffix: status
+      type: option
+      units:
+        - "unknown"
+        - "ok"
+        - "busy"
+        - "warning"
+        - "critical"
+        - "failure"
+
     - name: "ax"
       title: Linear acceleration X
       units: m/s^2
@@ -233,6 +225,15 @@
     - name: stab
       title: Stability
       units: u
+
+    - name: stall
+      title: STALL
+      type: option
+      units:
+        - "unknown"
+        - "ok"
+        - "warning"
+        - "critical"
 
 - name: ctr
   title: Control parameters

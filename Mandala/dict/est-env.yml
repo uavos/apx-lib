@@ -5,10 +5,12 @@
       suffix: mode
       type: option
       units:
+        - "busy"
         - "ground"
         - "check"
         - "taxi"
-        - "normal"
+        - "ready"
+        - "airborne"
 
     - name: health
       suffix: health
@@ -39,6 +41,23 @@
     - name: corr
       title: Correlator output
       units: K
+
+- name: wind
+  title: Wind estimator
+  content:
+    - name: status
+      title: Wind
+      type: option
+      units:
+        - "unknown"
+        - "available"
+
+    - name: speed
+      title: Wind speed
+      units: m/s
+    - name: heading
+      title: Wind heading
+      units: deg
 
 - name: ats
   title: ATS

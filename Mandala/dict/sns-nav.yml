@@ -13,16 +13,6 @@
         - failsafe
         - auxilary
 
-    - name: status
-      title: IMU
-      type: option
-      units:
-        - "unknown"
-        - "ok"
-        - "warning"
-        - "critical"
-        - "failure"
-
     - name: temp
       suffix: temperature
       units: C
@@ -81,16 +71,6 @@
         - secondary
         - failsafe
         - auxilary
-    - name: status
-      title: MAG
-      type: option
-      units:
-        - "unknown"
-        - "3D"
-        - "HDG"
-        - "blocked"
-        - "warning"
-        - "failure"
 
     - name: temp
       suffix: temperature
@@ -123,11 +103,11 @@
         - failsafe
         - auxilary
 
-    - name: status
-      suffix: fix status
+    - name: fix
+      suffix: fix type
       type: option
       units:
-        - nofix
+        - none
         - 2D
         - 3D
         - DIFF
