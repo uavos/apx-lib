@@ -7,7 +7,6 @@
       units:
         - "unknown"
         - "ok"
-        - "rest"
         - "busy"
         - "warning"
         - "critical"
@@ -33,6 +32,13 @@
         - "blocked"
         - "warning"
         - "failure"
+
+    - name: rest
+      title: At rest
+      type: option
+      units:
+        - "no"
+        - "yes"
 
 - name: pos
   title: Global Position
@@ -78,14 +84,14 @@
       title: Vertical speed
       units: m/s
 
-    - name: hgt
+    - name: hsrc
       title: Height source
       type: option
       units:
         - "none"
         - "baro"
         - "gps"
-        - "agl"
+        - "range"
         - "vision"
 
 - name: gyro

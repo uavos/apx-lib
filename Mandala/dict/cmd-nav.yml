@@ -46,6 +46,27 @@
       title: Cmd slip
       units: deg
 
+- name: ahrs
+  title: AHRS options
+  type: option
+  units:
+    - "no"
+    - "yes"
+  content:
+    - name: inair
+      title: AHRS airdata
+    - name: nogps
+      title: Block GPS
+    - name: nomag
+      title: Block magnetometer
+    - name: hsrc
+      title: Select height source
+      units:
+        - "baro"
+        - "gps"
+        - "range"
+        - "vision"
+
 - name: aux
   title: Auxilary regulators
   content:
@@ -99,16 +120,7 @@
       title: Throttle cut
     - name: throvr
       title: Throttle override
-    - name: ahrs
-      title: AHRS mode
-      units:
-        - gps
-        - inertial
-    - name: nomag
-      title: Block magnetometer
-      units:
-        - "no"
-        - "yes"
+
     - name: hyaw
       title: Hover yaw
       type: option

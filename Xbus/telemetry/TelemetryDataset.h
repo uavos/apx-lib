@@ -108,11 +108,12 @@ static constexpr const ds_field_s dataset_default[] = {
 
     // est
 
-    ds<est::nav::att::status>(fmt_opt, seq_rare),
+    ds<est::nav::att::status>(fmt_opt),
     ds<est::nav::att::roll>(fmt_rad),
     ds<est::nav::att::pitch>(fmt_rad2),
     ds<est::nav::att::yaw>(fmt_rad),
-    ds<est::nav::att::mag>(fmt_opt, seq_rare),
+    ds<est::nav::att::mag>(fmt_opt),
+    ds<est::nav::att::rest>(fmt_bit),
 
     ds<est::nav::gyro::x>(fmt_f16), //fmt_sbyte_01), //727 deg/s
     ds<est::nav::gyro::y>(fmt_f16), //fmt_sbyte_01),
@@ -126,19 +127,19 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::acc::y>(fmt_f16), //fmt_sbyte_01),
     ds<est::nav::acc::z>(fmt_f16), //fmt_sbyte_01),
 
-    ds<est::nav::pos::status>(fmt_opt, seq_rare),
+    ds<est::nav::pos::status>(fmt_opt),
     ds<est::nav::pos::lat>(fmt_real),
     ds<est::nav::pos::lon>(fmt_real),
-    ds<est::nav::pos::hmsl>(fmt_real, seq_rare),
+    ds<est::nav::pos::hmsl>(fmt_real),
 
     ds<est::nav::pos::course>(fmt_rad),
     ds<est::nav::pos::speed>(fmt_f16, seq_skip),
     ds<est::nav::pos::altitude>(fmt_real),
     ds<est::nav::pos::vspeed>(fmt_f16),
     ds<est::nav::pos::agl>(fmt_byte_01),
-    ds<est::nav::pos::hgt>(fmt_opt, seq_rare),
+    ds<est::nav::pos::hsrc>(fmt_opt),
 
-    ds<est::nav::lpos::status>(fmt_opt, seq_rare),
+    ds<est::nav::lpos::status>(fmt_opt),
     ds<est::nav::lpos::ax>(fmt_sbyte_01),
     ds<est::nav::lpos::ay>(fmt_sbyte_01),
     ds<est::nav::lpos::az>(fmt_f16),
@@ -157,7 +158,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::air::stab>(fmt_byte_u),
     ds<est::nav::air::vse>(fmt_sbyte_01),
     ds<est::nav::air::ktas>(fmt_byte_001, seq_rare),
-    ds<est::nav::air::stall>(fmt_opt, seq_rare),
+    ds<est::nav::air::stall>(fmt_opt),
 
     ds<est::env::wind::status>(fmt_bit),
     ds<est::env::wind::speed>(fmt_byte_01, seq_rare),
@@ -175,7 +176,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::wpt::twidx>(fmt_word),
     ds<est::nav::wpt::piidx>(fmt_word),
 
-    ds<est::env::sys::mode>(fmt_opt, seq_rare),
+    ds<est::env::sys::mode>(fmt_opt),
     ds<est::env::sys::health>(fmt_opt),
     ds<est::env::sys::time>(fmt_dword),
     ds<est::env::sys::ttl>(fmt_word),
@@ -241,6 +242,11 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::pos::vspeed>(fmt_sbyte_01),
     ds<cmd::nav::air::slip>(fmt_sbyte_001),
 
+    ds<cmd::nav::ahrs::inair>(fmt_bit),
+    ds<cmd::nav::ahrs::nogps>(fmt_bit),
+    ds<cmd::nav::ahrs::nomag>(fmt_bit),
+    ds<cmd::nav::ahrs::hsrc>(fmt_opt),
+
     ds<cmd::nav::aux::rpm>(fmt_word),
 
     ds<cmd::nav::op::mode>(fmt_byte),
@@ -249,31 +255,29 @@ static constexpr const ds_field_s dataset_default[] = {
 
     ds<cmd::nav::opt::thrcut>(fmt_bit),
     ds<cmd::nav::opt::throvr>(fmt_bit),
-    ds<cmd::nav::opt::ahrs>(fmt_bit),
-    ds<cmd::nav::opt::nomag>(fmt_bit),
     ds<cmd::nav::opt::hyaw>(fmt_bit),
 
     ds<cmd::nav::rc::ovr>(fmt_bit),
 
     // sns
-    ds<sns::nav::gyro::src>(fmt_opt, seq_rare),
+    ds<sns::nav::gyro::src>(fmt_opt),
     ds<sns::nav::gyro::temp>(fmt_sbyte, seq_rare),
     ds<sns::nav::gyro::clip>(fmt_byte, seq_skip),
     ds<sns::nav::gyro::vib>(fmt_byte, seq_skip),
     ds<sns::nav::gyro::coning>(fmt_byte_01, seq_skip),
 
-    ds<sns::nav::acc::src>(fmt_opt, seq_rare),
+    ds<sns::nav::acc::src>(fmt_opt),
     ds<sns::nav::acc::temp>(fmt_sbyte, seq_rare),
     ds<sns::nav::acc::clip>(fmt_byte, seq_skip),
     ds<sns::nav::acc::vib>(fmt_byte, seq_skip),
 
-    ds<sns::nav::mag::src>(fmt_opt, seq_rare),
+    ds<sns::nav::mag::src>(fmt_opt),
     ds<sns::nav::mag::temp>(fmt_sbyte, seq_rare),
     ds<sns::nav::mag::vib>(fmt_byte, seq_skip),
 
-    ds<sns::nav::gps::src>(fmt_opt, seq_rare),
-    ds<sns::nav::gps::fix>(fmt_opt, seq_rare),
-    ds<sns::nav::gps::emi>(fmt_opt, seq_rare),
+    ds<sns::nav::gps::src>(fmt_opt),
+    ds<sns::nav::gps::fix>(fmt_opt),
+    ds<sns::nav::gps::emi>(fmt_opt),
     ds<sns::nav::gps::hacc>(fmt_byte_01),
     ds<sns::nav::gps::vacc>(fmt_byte_01),
     ds<sns::nav::gps::sacc>(fmt_byte_001),
@@ -281,17 +285,17 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<sns::nav::gps::sv>(fmt_byte),
     ds<sns::nav::gps::su>(fmt_byte),
 
-    ds<sns::nav::baro::src>(fmt_opt, seq_rare),
-    ds<sns::nav::baro::status>(fmt_opt, seq_rare),
+    ds<sns::nav::baro::src>(fmt_opt),
+    ds<sns::nav::baro::status>(fmt_opt),
     ds<sns::nav::baro::temp>(fmt_sbyte, seq_rare),
 
-    ds<sns::nav::pitot::src>(fmt_opt, seq_rare),
-    ds<sns::nav::pitot::status>(fmt_opt, seq_rare),
+    ds<sns::nav::pitot::src>(fmt_opt),
+    ds<sns::nav::pitot::status>(fmt_opt),
     ds<sns::nav::pitot::temp>(fmt_sbyte, seq_rare),
 
-    ds<sns::nav::agl::status>(fmt_opt, seq_rare),
+    ds<sns::nav::agl::status>(fmt_opt),
 
-    ds<sns::env::eng::status>(fmt_opt, seq_rare),
+    ds<sns::env::eng::status>(fmt_opt),
     ds<sns::env::eng::rpm>(fmt_word, seq_rare),
     ds<sns::env::eng::temp>(fmt_byte, seq_rare),
     ds<sns::env::eng::ot>(fmt_byte, seq_rare),
@@ -303,18 +307,18 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<sns::env::eng::tc>(fmt_opt),
     ds<sns::env::eng::block>(fmt_bit),
 
-    ds<sns::env::bat::status>(fmt_opt, seq_rare),
-    ds<sns::env::gen::status>(fmt_opt, seq_rare),
+    ds<sns::env::bat::status>(fmt_opt),
+    ds<sns::env::gen::status>(fmt_opt),
 
-    ds<sns::env::pwr::status>(fmt_opt, seq_rare),
+    ds<sns::env::pwr::status>(fmt_opt),
     ds<sns::env::pwr::vsys>(fmt_f16, seq_rare),
     ds<sns::env::pwr::vsrv>(fmt_f16, seq_rare),
     ds<sns::env::pwr::vpld>(fmt_f16, seq_rare),
 
-    ds<sns::env::com::status>(fmt_opt, seq_rare),
+    ds<sns::env::com::status>(fmt_opt),
     ds<sns::env::com::rss>(fmt_byte_u),
 
-    ds<sns::env::ers::status>(fmt_opt, seq_rare),
+    ds<sns::env::ers::status>(fmt_opt),
     ds<sns::env::ers::block>(fmt_bit),
 
     /*

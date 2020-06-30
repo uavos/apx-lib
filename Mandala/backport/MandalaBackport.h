@@ -226,8 +226,8 @@ static constexpr const item_t items[] = {
     MBVECT(cmd::nav::opt::throvr::meta, cmode_throvr, bit, bit, 4),
     MBVECT(est::nav::ctr::hover::meta, cmode_hover, bit, bit, 8),
     MBVECT(cmd::nav::opt::hyaw::meta, cmode_hyaw, bit, bit, 16),
-    MBVECT(cmd::nav::opt::ahrs::meta, cmode_ahrs, bit, bit, 32),
-    MBVECT(cmd::nav::opt::nomag::meta, cmode_nomag, bit, bit, 64),
+    MBVECT(cmd::nav::ahrs::nogps::meta, cmode_ahrs, bit, bit, 32),
+    MBVECT(cmd::nav::ahrs::nomag::meta, cmode_nomag, bit, bit, 64),
 
     MBVECT(ctr::env::pwr::ap::meta, power_ap, bit, bit, 1),
     MBVECT(ctr::env::pwr::servo::meta, power_servo, bit, bit, 2),
