@@ -30,6 +30,25 @@ enum pri_e {
     pri_select = 7, // sub selects priority automatically
 };
 
+constexpr const char *pri_text(uint8_t pri)
+{
+    switch (pri) {
+    default:
+        break;
+    case pri_final:
+        return "local";
+    case pri_primary:
+        return "primary";
+    case pri_secondary:
+        return "secondary";
+    case pri_failsafe:
+        return "failsafe";
+    case pri_auxilary:
+        return "auxilary";
+    }
+    return "";
+}
+
 // Packet identifier [16 bits]
 #pragma pack(1)
 union pid_s {
