@@ -157,7 +157,8 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::air::ld>(fmt_f16, seq_rare),
     ds<est::nav::air::stab>(fmt_byte_u),
     ds<est::nav::air::vse>(fmt_sbyte_01),
-    ds<est::nav::air::ktas>(fmt_byte_001, seq_rare),
+    ds<est::nav::air::keas>(fmt_byte_001, seq_rare),
+    ds<est::nav::air::ktas>(fmt_f16, seq_rare),
     ds<est::nav::air::stall>(fmt_opt),
 
     ds<est::env::wind::status>(fmt_bit),
@@ -260,22 +261,18 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::rc::ovr>(fmt_bit),
 
     // sns
-    ds<sns::nav::gyro::src>(fmt_opt),
     ds<sns::nav::gyro::temp>(fmt_sbyte, seq_rare),
     ds<sns::nav::gyro::clip>(fmt_byte, seq_skip),
     ds<sns::nav::gyro::vib>(fmt_byte, seq_skip),
     ds<sns::nav::gyro::coning>(fmt_byte_01, seq_skip),
 
-    ds<sns::nav::acc::src>(fmt_opt),
     ds<sns::nav::acc::temp>(fmt_sbyte, seq_rare),
     ds<sns::nav::acc::clip>(fmt_byte, seq_skip),
     ds<sns::nav::acc::vib>(fmt_byte, seq_skip),
 
-    ds<sns::nav::mag::src>(fmt_opt),
     ds<sns::nav::mag::temp>(fmt_sbyte, seq_rare),
     ds<sns::nav::mag::vib>(fmt_byte, seq_skip),
 
-    ds<sns::nav::gps::src>(fmt_opt),
     ds<sns::nav::gps::fix>(fmt_opt),
     ds<sns::nav::gps::emi>(fmt_opt),
     ds<sns::nav::gps::hacc>(fmt_byte_01),
@@ -285,11 +282,9 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<sns::nav::gps::sv>(fmt_byte),
     ds<sns::nav::gps::su>(fmt_byte),
 
-    ds<sns::nav::baro::src>(fmt_opt),
     ds<sns::nav::baro::status>(fmt_opt),
     ds<sns::nav::baro::temp>(fmt_sbyte, seq_rare),
 
-    ds<sns::nav::pitot::src>(fmt_opt),
     ds<sns::nav::pitot::status>(fmt_opt),
     ds<sns::nav::pitot::temp>(fmt_sbyte, seq_rare),
 
@@ -424,6 +419,21 @@ static constexpr const ds_field_s dataset_haps[] = {
     ds<est::env::haps::spd2>(fmt_byte_01),
     ds<est::env::haps::ail1>(fmt_sbyte_u),
     ds<est::env::haps::ail2>(fmt_sbyte_u),
+};
+
+static constexpr const ds_field_s dataset_redundancy[] = {
+    ds<sns::nav::gyro::src>(fmt_opt),
+    ds<sns::nav::gyro::cnt>(fmt_opt),
+    ds<sns::nav::acc::src>(fmt_opt),
+    ds<sns::nav::acc::cnt>(fmt_opt),
+    ds<sns::nav::mag::src>(fmt_opt),
+    ds<sns::nav::mag::cnt>(fmt_opt),
+    ds<sns::nav::gps::src>(fmt_opt),
+    ds<sns::nav::gps::cnt>(fmt_opt),
+    ds<sns::nav::baro::src>(fmt_opt),
+    ds<sns::nav::baro::cnt>(fmt_opt),
+    ds<sns::nav::pitot::src>(fmt_opt),
+    ds<sns::nav::pitot::cnt>(fmt_opt),
 };
 
 #pragma pack()

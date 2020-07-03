@@ -225,7 +225,11 @@
       units: kg/m^3
 
     - name: ktas
-      title: IAS to TAS multiplier
+      title: EAS to TAS multiplier
+      units: K
+
+    - name: keas
+      title: IAS to EAS multiplier
       units: K
 
     - name: stab

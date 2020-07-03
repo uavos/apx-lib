@@ -13,6 +13,10 @@
         - failsafe
         - auxilary
 
+    - name: cnt
+      suffix: devices
+      type: byte
+
     - name: temp
       suffix: temperature
       units: C
@@ -44,6 +48,10 @@
         - failsafe
         - auxilary
 
+    - name: cnt
+      suffix: devices
+      type: byte
+
     - name: temp
       suffix: temperature
       units: C
@@ -71,6 +79,10 @@
         - secondary
         - failsafe
         - auxilary
+
+    - name: cnt
+      suffix: devices
+      type: byte
 
     - name: temp
       suffix: temperature
@@ -102,6 +114,10 @@
         - secondary
         - failsafe
         - auxilary
+
+    - name: cnt
+      suffix: devices
+      type: byte
 
     - name: fix
       suffix: fix type
@@ -159,6 +175,11 @@
         - secondary
         - failsafe
         - auxilary
+
+    - name: cnt
+      suffix: devices
+      type: byte
+
     - name: status
       title: Baro
       type: option
@@ -189,6 +210,11 @@
         - secondary
         - failsafe
         - auxilary
+
+    - name: cnt
+      suffix: devices
+      type: byte
+
     - name: status
       title: Pitot
       type: option
