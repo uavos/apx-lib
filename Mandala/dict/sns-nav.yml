@@ -215,6 +215,10 @@
       suffix: devices
       type: byte
 
+    - name: valid
+      suffix: validated devices
+      type: byte
+
     - name: status
       title: Pitot
       type: option

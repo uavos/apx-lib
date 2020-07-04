@@ -434,6 +434,7 @@ static constexpr const ds_field_s dataset_redundancy[] = {
     ds<sns::nav::baro::cnt>(fmt_opt),
     ds<sns::nav::pitot::src>(fmt_opt),
     ds<sns::nav::pitot::cnt>(fmt_opt),
+    ds<sns::nav::pitot::valid>(fmt_opt),
 };
 
 #pragma pack()
