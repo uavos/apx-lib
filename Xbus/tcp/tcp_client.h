@@ -1,27 +1,33 @@
-//=============================================================
-#ifndef tcp_client_H
-#define tcp_client_H
-//=============================================================
-#include <containers/QueueBuffer.h>
+#pragma once
+
 #include <inttypes.h>
 #include <netinet/in.h>
 #include <termios.h>
+
+#include <tcp_ports.h>
+
 #ifndef SOCK_NONBLOCK
 #define SOCK_NONBLOCK O_NONBLOCK
 #endif
-//=============================================================
-class _tcp_client
+
+namespace xbus {
+namespace tcp {
+
+class Client
 {
 public:
-    _tcp_client(const char *name = "tcp");
-    ~_tcp_client();
+    Client(const char *name = "tcp");
+    ~Client();
 
-    bool connect(const char *host, uint port, bool block = false, const char *path = "/datalink");
+    void set_host(const char *host, uint port, const char *path = "/datalink");
+
+    int set_non_blocking();
+
+    bool connect();
     void close();
 
-    bool write(const uint8_t *buf, uint cnt);
-    uint read(uint8_t *buf, uint sz);
-    uint readTO(uint8_t *buf, uint sz, uint timeout_sec);
+    size_t read_packet(void *buf, size_t size);
+    bool write_packet(const void *buf, size_t size);
 
     bool is_connected(void);
 
@@ -30,7 +36,7 @@ public:
 
 protected:
     const char *name;
-    int fd;
+    int fd{-1};
     bool err_mute;
     struct
     {
@@ -40,22 +46,9 @@ protected:
         char server[64];
     } host;
 
-    QueueBuffer<4096> tx_fifo;
-    uint8_t tx_packet[1024];
-
-    virtual bool connect_task();
-    uint init_stage;
-    time_t time_tcp_s;
-    uint bytes_available(uint8_t *buf, uint sz);
-
     //line read
-    uint line_cnt;
-    char line_buf[256];
-    uint16_t packet_sz;
-    uint32_t packet_crc32;
-    bool readline(void);
-
-    int setNonblocking(int fd);
+    bool readline(char *line_buf, size_t max_size);
 };
-//=============================================================
-#endif
+
+} // namespace tcp
+} // namespace xbus

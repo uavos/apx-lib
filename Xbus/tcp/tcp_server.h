@@ -1,18 +1,22 @@
-//=============================================================
-#ifndef tcp_server_H
-#define tcp_server_H
-//=============================================================
+#pragma once
+
 #include "tcp_client.h"
-//=============================================================
-class _tcp_server : public _tcp_client
+
+namespace xbus {
+namespace tcp {
+
+class Server : public Client
 {
 public:
-  _tcp_server(const char *name="server");
-  ~_tcp_server();
+    Server(const char *name = "server");
+    ~Server();
+
 protected:
-  bool connect_task();
+    //bool connect_task();
+
 private:
-  int server_fd;
+    int server_fd;
 };
-//=============================================================
-#endif
+
+} // namespace tcp
+} // namespace xbus

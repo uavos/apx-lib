@@ -156,6 +156,27 @@ public:
         return 0;
     }
 
+    size_t read_packet(const uint8_t **dest, size_t *sz)
+    {
+        if (empty())
+            return 0;
+        do {
+            if (_size < 3)
+                break;
+            uint16_t cnt;
+            if (read(&cnt, 2) != 2)
+                break;
+            if (_size < cnt)
+                break;
+            *dest = read_ptr();
+            *sz = cnt;
+            skip_read(cnt);
+            return cnt;
+        } while (0);
+        reset();
+        return 0;
+    }
+
     // specific types
     bool write(const T &v)
     {
