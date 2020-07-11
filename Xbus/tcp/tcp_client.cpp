@@ -28,8 +28,8 @@ Client::Client(const char *name)
     , name(name)
     , err_mute(false)
 {
-    memset(&host.addr, 0, sizeof(host.addr));
-    host.path = "";
+    memset(&_host.addr, 0, sizeof(_host.addr));
+    _host.path = "";
 }
 Client::~Client()
 {
@@ -38,19 +38,20 @@ Client::~Client()
 
 void Client::set_host(const char *host, uint port, const char *path)
 {
-    this->host.addr.sin_family = AF_INET;
-    this->host.addr.sin_addr.s_addr = host ? inet_addr(host) : INADDR_ANY;
-    this->host.addr.sin_port = htons(port);
-    this->host.path = path;
+    _host.addr.sin_family = AF_INET;
+    _host.addr.sin_addr.s_addr = host ? inet_addr(host) : INADDR_ANY;
+    _host.addr.sin_port = htons(port);
+    _host.path = path;
+    printf("%s:connecting to %s:%u%s\n", name, inet_ntoa(_host.addr.sin_addr), ntohs(_host.addr.sin_port), _host.path);
 }
 
 bool Client::connect()
 {
     const char *err = nullptr;
     do {
-        fd = socket(AF_INET, SOCK_STREAM, 0);
+        _client_fd = socket(AF_INET, SOCK_STREAM, 0);
 
-        if (fd <= 0) {
+        if (_client_fd <= 0) {
             if (!err_mute)
                 printf("%s:error:Open Socket Failed\n", name);
             err = "open";
@@ -60,7 +61,7 @@ bool Client::connect()
         if (tcpdebug)
             printf("%s:connecting...\n", name);
 
-        int status = ::connect(fd, (const sockaddr *) &host.addr, sizeof(host.addr));
+        int status = ::connect(_client_fd, (const sockaddr *) &_host.addr, sizeof(_host.addr));
         if (status == 0) {
             if (tcpdebug)
                 printf("%s:connected\n", name);
@@ -73,63 +74,64 @@ bool Client::connect()
         struct timeval tv;
         tv.tv_sec = 5;
         tv.tv_usec = 0;
-        setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (const char *) &tv, sizeof tv);
+        setsockopt(_client_fd, SOL_SOCKET, SO_RCVTIMEO, (const char *) &tv, sizeof tv);
 
         //set options
         int optval = 1;
-        setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+        setsockopt(_client_fd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
 #ifndef __APPLE__
-        setsockopt(fd, IPPROTO_TCP, TCP_QUICKACK, &optval, sizeof(optval));
+        setsockopt(_fd, IPPROTO_TCP, TCP_QUICKACK, &optval, sizeof(optval));
 #endif
 
         //send request
-        if (host.path[0] == 0) {
+        if (_host.path[0] == 0) {
             if (tcpdebug)
                 printf("%s:direct pipe\n", name);
             return true;
         }
 
         if (tcpdebug)
-            printf("%s:requesting '%s'...\n", name, host.path);
+            printf("%s:requesting '%s'...\n", name, _host.path);
 
         char line_buf[256];
-        sprintf(line_buf, "GET %s HTTP/1.0\r\nFrom: %s\r\n\r\n", host.path, name);
-        if (::send(fd, (const uint8_t *) line_buf, strlen(line_buf), 0) <= 0) {
+        sprintf(line_buf, "GET %s HTTP/1.0\r\nFrom: %s\r\n\r\n", _host.path, name);
+        if (::send(_client_fd, (const uint8_t *) line_buf, strlen(line_buf), 0) <= 0) {
             err = "send";
             break;
         }
         if (tcpdebug)
             printf("%s:request sent\n", name);
 
-        if (!readline(line_buf, sizeof(line_buf)))
+        if (!readline(_client_fd, line_buf, sizeof(line_buf)))
             break;
         if (!strstr(line_buf, "200 OK")) {
             printf("%s:header:%s\n", name, line_buf);
             err = "header";
             break;
         }
-        host.stream = false;
-        host.server[0] = 0;
+        _host.stream = false;
+        _host.server[0] = 0;
 
         //read response header
         for (;;) {
-            if (!readline(line_buf, sizeof(line_buf)))
+            if (!readline(_client_fd, line_buf, sizeof(line_buf)))
                 break;
             if (strstr(line_buf, "application/octet-stream")) {
-                host.stream = true;
+                _host.stream = true;
                 continue;
             }
             if (strstr(line_buf, "Server: ")) {
                 const char *s = strstr(line_buf, "Server: ") + 8;
-                strcpy(host.server, s);
-                if (strchr(host.server, '.'))
-                    strchr(host.server, '.')[0] = 0;
+                strcpy(_host.server, s);
+                if (strchr(_host.server, '.'))
+                    strchr(_host.server, '.')[0] = 0;
                 continue;
             }
             if (strlen(line_buf) == 0) {
-                if (host.stream) {
-                    if (!silent)
-                        printf("%s:Connected (%s)\n", name, host.server);
+                if (_host.stream) {
+                    if (!silent) {
+                        printf("%s:connected %s@%s:%u%s\n", name, _host.server, inet_ntoa(_host.addr.sin_addr), ntohs(_host.addr.sin_port), _host.path);
+                    }
                     return true;
                 }
                 err = "header";
@@ -147,17 +149,17 @@ bool Client::connect()
 
 bool Client::is_connected(void)
 {
-    return fd >= 0;
+    return _client_fd >= 0 && _host.stream;
 }
 
 void Client::close()
 {
-    if (fd >= 0)
-        ::close(fd);
-    fd = -1;
+    if (_client_fd >= 0)
+        ::close(_client_fd);
+    _client_fd = -1;
 }
 
-bool Client::readline(char *line_buf, size_t max_size)
+bool Client::readline(int fd, char *line_buf, size_t max_size)
 {
     char *ptr = line_buf;
     size_t rcnt = max_size - 1;
@@ -181,6 +183,14 @@ bool Client::readline(char *line_buf, size_t max_size)
 
 size_t Client::read_packet(void *buf, size_t size)
 {
+    ssize_t cnt = read_packet(_client_fd, buf, size);
+    if (cnt >= 0)
+        return cnt;
+    close();
+    return 0;
+}
+ssize_t Client::read_packet(int fd, void *buf, size_t size)
+{
     struct pollfd pfd;
     pfd.fd = fd;
     pfd.events = POLLIN | POLLHUP | POLLRDNORM;
@@ -193,7 +203,7 @@ size_t Client::read_packet(void *buf, size_t size)
             if (rv < 0) {
                 rv = errno;
                 if (rv != EAGAIN && rv != EWOULDBLOCK) {
-                    printf("%s:rx: %li\n", name, rv);
+                    printf("tcp:rx: %li\n", rv);
                     break;
                 }
                 return 0; // timeout, no data
@@ -203,30 +213,38 @@ size_t Client::read_packet(void *buf, size_t size)
         uint16_t packet_sz;
         uint32_t packet_crc32;
 
-        if (::recv(fd, &packet_sz, sizeof(packet_sz), MSG_WAITALL) != sizeof(packet_sz))
+        if (::recv(fd, &packet_sz, sizeof(packet_sz), MSG_WAITALL) != sizeof(packet_sz)) {
+            printf("tcp:error: packet_sz (%i)\n", errno);
             break;
-        if (packet_sz == 0 || packet_sz > size)
+        }
+        if (packet_sz == 0 || packet_sz > size) {
+            printf("tcp:error: packet size (%u)\n", packet_sz);
             break;
+        }
 
-        if (::recv(fd, &packet_crc32, sizeof(packet_crc32), MSG_WAITALL) != sizeof(packet_crc32))
+        if (::recv(fd, &packet_crc32, sizeof(packet_crc32), MSG_WAITALL) != sizeof(packet_crc32)) {
+            printf("tcp:error: packet_crc32 (%i)\n", errno);
             break;
+        }
 
-        if (::recv(fd, buf, packet_sz, MSG_WAITALL) != packet_sz)
+        if (::recv(fd, buf, packet_sz, MSG_WAITALL) != packet_sz) {
+            printf("tcp:error: packet (%i)\n", errno);
             break;
+        }
 
         uint32_t crc32 = apx::crc32(buf, packet_sz);
         if (packet_crc32 != crc32) {
-            printf("%s:error: Packet CRC (%u)\n", name, packet_sz);
+            printf("tcp:error: CRC (%u)\n", packet_sz);
             break;
         }
         return packet_sz;
 
     } while (0);
 
-    printf("%s:connection interrupted\n", name);
-    close();
-    return 0;
+    printf("tcp:connection lost\n");
+    return -1;
 }
+
 bool Client::write_packet(const void *buf, size_t size)
 {
     if (!size)
@@ -235,7 +253,13 @@ bool Client::write_packet(const void *buf, size_t size)
     if (!is_connected()) {
         return false;
     }
-
+    if (write_packet(_client_fd, buf, size))
+        return true;
+    close();
+    return false;
+}
+bool Client::write_packet(int fd, const void *buf, size_t size)
+{
     uint16_t packet_sz = size;
     uint32_t packet_crc32 = apx::crc32(buf, size);
 
@@ -251,8 +275,7 @@ bool Client::write_packet(const void *buf, size_t size)
         return true;
     } while (0);
 
-    printf("%s:send interrupted (%d)\n", name, errno);
-    close();
+    printf("tcp:send failed (%d)\n", errno);
     return false;
 }
 
@@ -262,12 +285,12 @@ int Client::set_non_blocking()
     /* If they have O_NONBLOCK, use the Posix way to do it */
 #if defined(O_NONBLOCK)
     /* Fixme: O_NONBLOCK is defined but broken on SunOS 4.1.x and AIX 3.2.5. */
-    if (-1 == (flags = fcntl(fd, F_GETFL, 0)))
+    if (-1 == (flags = fcntl(_client_fd, F_GETFL, 0)))
         flags = 0;
-    return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+    return fcntl(_client_fd, F_SETFL, flags | O_NONBLOCK);
 #else
     /* Otherwise, use the old way of doing it */
     flags = 1;
-    return ioctl(fd, FIOBIO, &flags);
+    return ioctl(_client_fd, FIOBIO, &flags);
 #endif
 }

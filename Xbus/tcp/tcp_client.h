@@ -19,35 +19,43 @@ public:
     Client(const char *name = "tcp");
     ~Client();
 
-    void set_host(const char *host, uint port, const char *path = "/datalink");
+    struct host_s
+    {
+        sockaddr_in addr;
+        const char *path;
+        bool stream;
+        char server[64];
+    };
+
+    void set_host(const char *host, uint port, const char *path);
+    inline const host_s &host() const { return _host; }
 
     int set_non_blocking();
 
-    bool connect();
+    virtual bool connect();
     void close();
 
-    size_t read_packet(void *buf, size_t size);
-    bool write_packet(const void *buf, size_t size);
+    virtual size_t read_packet(void *buf, size_t size);
+    virtual bool write_packet(const void *buf, size_t size);
 
     bool is_connected(void);
 
     bool silent;
     bool tcpdebug;
 
+private:
+    int _client_fd{-1};
+
 protected:
     const char *name;
-    int fd{-1};
     bool err_mute;
-    struct
-    {
-        sockaddr_in addr;
-        const char *path;
-        bool stream;
-        char server[64];
-    } host;
+    host_s _host;
 
     //line read
-    bool readline(char *line_buf, size_t max_size);
+    bool readline(int fd, char *line_buf, size_t max_size);
+
+    static ssize_t read_packet(int fd, void *buf, size_t size);
+    static bool write_packet(int fd, const void *buf, size_t size);
 };
 
 } // namespace tcp

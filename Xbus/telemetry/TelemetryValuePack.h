@@ -24,29 +24,25 @@ struct rtype
 template<typename Tin>
 int8_t cast_value(rtype<int8_t>, const Tin &v)
 {
-    int8_t ret = limit<int32_t>(v, -127, 128);
-    return ret;
+    return (int8_t)(limit<int32_t>((int32_t) v, -127, 128));
 }
 
 template<typename Tin>
 uint8_t cast_value(rtype<uint8_t>, const Tin &v)
 {
-    uint8_t ret = limit<int32_t>(v, 0, 255);
-    return ret;
+    return (uint8_t)(limit<int32_t>((int32_t) v, 0, 255));
 }
 
 template<typename Tin>
 uint16_t cast_value(rtype<uint16_t>, const Tin &v)
 {
-    uint16_t ret = limit<int32_t>(v, 0, 65535);
-    return ret;
+    return (uint16_t)(limit<int32_t>((int32_t) v, 0, 65535));
 }
 
 template<typename Tin>
 uint32_t cast_value(rtype<uint32_t>, const Tin &v)
 {
-    uint32_t ret = v < 0 ? 0 : v;
-    return ret;
+    return (uint32_t)(v < 0 ? 0 : v);
 }
 
 template<typename Tin>
@@ -59,7 +55,7 @@ float cast_value(rtype<float>, const Tin &v)
 template<typename Tin>
 int32_t cast_value(rtype<int32_t>, const Tin &v)
 {
-    return v;
+    return (int32_t) v;
 }
 
 template<typename T, typename Tin>
@@ -157,14 +153,14 @@ static int16_t float_to_rad(const float &v)
     const float span = (float) M_PI;
     const float dspan = span * 2.f;
     const float a = v - std::floor(v / dspan + 0.5f) * dspan;
-    return a * (32768.f / (float) M_PI);
+    return (int16_t)(a * (32768.f / (float) M_PI));
 }
 static int16_t float_to_rad2(const float &v)
 {
     const float span = (float) M_PI / 2.f;
     const float dspan = span * 2.f;
     const float a = v - std::floor(v / dspan + 0.5f) * dspan;
-    return a * (32768.f / (float) M_PI);
+    return (int16_t)(a * (32768.f / (float) M_PI));
 }
 
 // pack method
