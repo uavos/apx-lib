@@ -32,6 +32,8 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
         return fmt_byte_01;
     case units_C:
         return fmt_sbyte;
+    case units_kg:
+        return fmt_f16;
     case units_deg:
         return fmt_rad;
     case units_degps:

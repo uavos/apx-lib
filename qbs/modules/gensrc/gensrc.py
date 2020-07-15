@@ -91,7 +91,32 @@ def expand_templates(list_dicts):
             templates[i['template']] = i['content']
         else:
             out.append(i)
-    return expand_templates_impl(out, templates)
+    out = expand_templates_impl(out, templates)
+    return out
+
+
+def expand_constants_impl(list_dicts, constants):
+    out = list()
+    for d in list_dicts:
+        for i in d:
+            if isinstance(d[i], str) and d[i].startswith('$') and d[i][1:] in constants:
+                d[i] = constants[d[i][1:]]
+        out.append(d)
+        if 'content' in d:
+            d['content'] = expand_constants_impl(d['content'], constants)
+    return out
+
+
+def expand_constants(list_dicts):
+    out = list()
+    constants = dict()
+    for i in list(list_dicts):
+        if 'constants' in i:
+            constants.update(i['constants'])
+        else:
+            out.append(i)
+    out = expand_constants_impl(out, constants)
+    return out
 
 
 def sort_modules(list_dicts):
@@ -150,6 +175,7 @@ def render(template, data):
     env.filters['merge_arrays'] = merge_arrays
     env.filters['merge_dicts'] = merge_dicts
     env.filters['expand_templates'] = expand_templates
+    env.filters['expand_constants'] = expand_constants
     env.filters['sort_modules'] = sort_modules
     template = env.get_template(os.path.basename((template)))
     return template.render(data=data)

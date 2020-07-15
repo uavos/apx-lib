@@ -38,6 +38,10 @@
       title: Energy capacity
       units: u
 
+    - name: weight
+      title: Vehicle weight
+      units: kg
+
     - name: corr
       title: Correlator output
       units: K
