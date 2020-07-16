@@ -38,7 +38,7 @@ public:
     virtual size_t read_packet(void *buf, size_t size);
     virtual bool write_packet(const void *buf, size_t size);
 
-    bool is_connected(void);
+    virtual bool is_connected(void);
 
     bool silent;
     bool tcpdebug;

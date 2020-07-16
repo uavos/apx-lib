@@ -28,11 +28,16 @@ Server::~Server()
     if (_server_fd > 0) {
         ::close(_server_fd);
     }
-    pthread_mutex_lock(&_mutex);
+    /*pthread_mutex_lock(&_mutex);
     for (size_t i = 0; i < _tid_cnt; ++i) {
         pthread_join(_tid[i], NULL);
     }
-    pthread_mutex_unlock(&_mutex);
+    pthread_mutex_unlock(&_mutex);*/
+}
+
+bool Server::is_connected(void)
+{
+    return _server_fd > 0 && _client_cnt > 0;
 }
 
 static void *_thread_trampoline(void *arg)

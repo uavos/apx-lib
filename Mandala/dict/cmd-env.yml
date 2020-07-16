@@ -99,7 +99,11 @@
 - name: sim
   title: Simulator data
   content:
+    - name: sns
+      title: Sensors data
     - name: ctr
+      title: Controls
+    - name: cfg
       title: Controls assignments
     - name: display
       title: Visualization

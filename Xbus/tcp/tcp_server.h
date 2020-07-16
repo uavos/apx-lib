@@ -20,6 +20,8 @@ public:
     size_t read_packet(void *buf, size_t size) override;
     bool write_packet(const void *buf, size_t size) override;
 
+    bool is_connected(void) override;
+
     void run();
     bool create_thread();
 
