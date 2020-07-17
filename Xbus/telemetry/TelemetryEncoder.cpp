@@ -3,6 +3,7 @@
 #include "TelemetryValuePack.h"
 
 #include <crc.h>
+#include <cstdio>
 
 using namespace xbus::telemetry;
 
@@ -124,7 +125,7 @@ void TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spe
         return;
     }
 }
-void TelemetryEncoder::update(const xbus::pid_s &pid, mandala::real_t value)
+void TelemetryEncoder::update(const xbus::pid_s &pid, mandala::raw_t raw, mandala::type_id_e type_id)
 {
     // called by MandalaDataBroker
     for (size_t i = 0; i < _slots_cnt; ++i) {
@@ -133,44 +134,29 @@ void TelemetryEncoder::update(const xbus::pid_s &pid, mandala::real_t value)
             continue;
         if (f.pid.pri != pid.pri && f.pid.pri != xbus::pri_any)
             continue;
-        _set_data(i, value);
+        _set_data(i, raw, type_id);
         return;
     }
 }
 
 void TelemetryEncoder::_set_data(size_t n, const mandala::spec_s &spec, XbusStreamReader &stream)
 {
-    mandala::raw_t v = 0;
-    stream.read(&v, mandala::type_size(spec.type));
-
-    auto &prev = _slots.value[n];
-
-    if (prev == v)
-        return;
-    prev = v;
-
-    auto &f = _slots.fields[n];
-    auto &flags = _slots.flags[n];
-
-    flags.type = spec.type;
-    if (f.pid.seq != seq_scheduled)
-        flags.upd = true;
+    mandala::raw_t raw = 0;
+    stream.read(&raw, mandala::type_size(spec.type));
+    _set_data(n, raw, spec.type);
 }
 
-void TelemetryEncoder::_set_data(size_t n, mandala::real_t value)
+void TelemetryEncoder::_set_data(size_t n, mandala::raw_t raw, mandala::type_id_e type_id)
 {
-    mandala::raw_t v = *static_cast<mandala::raw_t *>(static_cast<void *>(&value));
-
     auto &prev = _slots.value[n];
-
-    if (prev == v)
-        return;
-    prev = v;
-
-    auto &f = _slots.fields[n];
     auto &flags = _slots.flags[n];
 
-    flags.type = mandala::type_real;
+    if (prev == raw && flags.type == type_id)
+        return;
+    prev = raw;
+    flags.type = type_id;
+
+    auto &f = _slots.fields[n];
     if (f.pid.seq != seq_scheduled)
         flags.upd = true;
 }
@@ -315,7 +301,7 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint32_t seq)
 
             auto &value = _slots.value[index];
             auto &buf = _slots.packed[index];
-            size_t sz = xbus::telemetry::pack_value(&value, &buf, flags.type, f.fmt);
+            size_t sz = xbus::telemetry::pack_value(value, flags.type, &buf, f.fmt);
             if (sz) {
                 if (code_zero >= 2) {
                     // two or more consequtive zero codes

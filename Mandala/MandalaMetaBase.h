@@ -70,30 +70,22 @@ void write(const T &v, type_id_e type, XbusStreamWriter &stream)
     }
 }
 
-/*template<type_id_e>
-struct type_id
-{};
-
-template<>
-struct type_id<type_real>
+constexpr type_id_e type_id(const real_t &)
 {
-    typedef real_t type;
-};
-
-template<>
-struct type_id<type_dword>
+    return type_real;
+}
+constexpr type_id_e type_id(const dword_t &)
 {
-    typedef dword_t type;
-};*/
-
-/*template<type_id_e>
-struct rtype
-{};
-
-real_t read(rtype<type_real>, XbusStreamReader &stream)
+    return type_dword;
+}
+constexpr type_id_e type_id(const word_t &)
 {
-    return stream.read<real_t>();
-}*/
+    return type_word;
+}
+constexpr type_id_e type_id(const byte_t &)
+{
+    return type_byte;
+}
 
 constexpr size_t type_size(type_id_e type)
 {
@@ -110,6 +102,44 @@ constexpr size_t type_size(type_id_e type)
         return sizeof(byte_t);
     case type_option:
         return sizeof(option_t);
+    }
+}
+
+template<typename T>
+static constexpr inline raw_t to_raw(const T &v)
+{
+    union {
+        raw_t raw;
+        T v;
+    } u;
+    u.raw = 0;
+    u.v = v;
+    return u.raw;
+}
+template<typename T>
+static constexpr inline T from_raw(raw_t r)
+{
+    union {
+        raw_t raw;
+        T v;
+    } u;
+    u.raw = r;
+    return u.v;
+}
+template<typename T>
+static constexpr inline T from_raw(raw_t r, type_id_e type_id)
+{
+    switch (type_id) {
+    case type_real:
+        return (T) from_raw<real_t>(r);
+    case type_dword:
+        return (T) from_raw<dword_t>(r);
+    case type_word:
+        return (T) from_raw<word_t>(r);
+    case type_byte:
+        return (T) from_raw<byte_t>(r);
+    default:
+        return T();
     }
 }
 
