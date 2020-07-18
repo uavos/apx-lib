@@ -1,6 +1,6 @@
 #pragma once
 
-#include <containers/QueueBuffer.h>
+#include <QueueBuffer.h>
 
 #include "SerialCodec.h"
 

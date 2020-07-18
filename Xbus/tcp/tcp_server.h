@@ -3,8 +3,8 @@
 #include "tcp_client.h"
 
 #include <Xbus/XbusPacket.h>
-#include <containers/QueueBuffer.h>
 #include <pthread.h>
+#include <QueueBuffer.h>
 
 namespace xbus {
 namespace tcp {
