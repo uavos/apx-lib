@@ -71,16 +71,20 @@ def merge_arrays(list_dicts):
 
 def expand_templates_impl(list_dicts, templates):
     out = list()
+    exp = False
     for d in list_dicts:
         if 'template' in d:
             t = d['template']
             if t in templates:
                 out = out + templates[t]
+                exp = True
             continue
         out.append(d)
         if 'content' in d:
             d['content'] = expand_templates_impl(d['content'], templates)
-    return out
+    if not exp:
+        return out
+    return expand_templates_impl(out, templates)
 
 
 def expand_templates(list_dicts):
