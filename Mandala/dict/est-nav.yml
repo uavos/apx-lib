@@ -245,6 +245,22 @@
         - "warning"
         - "critical"
 
+- name: tecs
+  title: TECS data
+  content:
+    - name: pe
+      title: Potential energy
+      units: m^2/s^2
+    - name: dpe
+      title: Potential energy rate
+      units: m^2/s^3
+    - name: ke
+      title: Kinetic energy
+      units: m^2/s^2
+    - name: dke
+      title: Kinetic energy rate
+      units: m^2/s^3
+
 - name: ctr
   title: Control parameters
   content:
