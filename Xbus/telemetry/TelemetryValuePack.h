@@ -24,7 +24,7 @@ struct rtype
 template<typename Tin>
 int8_t cast_value(rtype<int8_t>, const Tin &v)
 {
-    return (int8_t)(limit<int32_t>((int32_t) v, -127, 128));
+    return (int8_t)(limit<int32_t>((int32_t) v, -128, 127));
 }
 
 template<typename Tin>
@@ -160,7 +160,7 @@ static int16_t float_to_rad2(const float &v)
     const float span = (float) M_PI / 2.f;
     const float dspan = span * 2.f;
     const float a = v - std::floor(v / dspan + 0.5f) * dspan;
-    return (int16_t)(a * (32768.f / (float) M_PI));
+    return (int16_t)(a * (32768.f / ((float) M_PI / 2.f)));
 }
 
 // pack method

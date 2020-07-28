@@ -53,8 +53,6 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
     case units_lph:
         return fmt_byte_01;
     case units_m:
-    case units_m_sqps_sq:
-    case units_m_sqps_cb:
         return fmt_f16;
     case units_mbar:
         return fmt_f16;
@@ -160,7 +158,7 @@ static constexpr const ds_field_s dataset_default[] = {
 
     ds<est::nav::air::ld>(fmt_f16, seq_rare),
     ds<est::nav::air::stab>(fmt_byte_u),
-    ds<est::nav::air::vse>(fmt_f16), //sbyte_01),
+    ds<est::nav::air::vse>(fmt_sbyte_01),
     ds<est::nav::air::keas>(fmt_byte_001, seq_rare),
     ds<est::nav::air::ktas>(fmt_f16, seq_rare),
     ds<est::nav::air::stall>(fmt_opt),
