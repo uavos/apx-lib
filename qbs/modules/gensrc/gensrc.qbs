@@ -28,7 +28,7 @@ Module {
     property string tool: FileInfo.joinPaths(path, "gensrc.py")
 
     FileTagger {
-        patterns: ["*.h.j2", "*.cpp.j2", "*.c.j2"]
+        patterns: ["*.h.j2", "*.cpp.j2", "*.c.j2", "*.json.j2"]
         fileTags: ["gensrc.input"]
     }
     Rule {
@@ -36,7 +36,18 @@ Module {
         explicitlyDependsOn:  ["gensrc.data."+product.gensrc.prefix]
         inputs: ["gensrc.input", "gensrc.data."+product.gensrc.prefix]
         multiplex: true
-        outputFileTags: ["hpp", "cpp", "c", "gensrc.output"]
+        outputFileTags: [
+            "hpp",
+            "cpp",
+            "c",
+            "json",
+            "gensrc.output",
+            "gensrc.output.h",
+            "gensrc.output.hpp",
+            "gensrc.output.cpp",
+            "gensrc.output.c",
+            "gensrc.output.json",
+        ]
         outputArtifacts: {
             var list = []
 
@@ -45,7 +56,7 @@ Module {
                 var tname = inp.completeBaseName
                 var ftype = FileInfo.completeSuffix(tname)
                 var a = {}
-                a.fileTags = [ "gensrc.output" ]
+                a.fileTags = [ "gensrc.output", "gensrc.output."+ftype ]
                 if(ftype.startsWith("h"))a.fileTags.push("hpp")
                 else a.fileTags.push(ftype)
 
@@ -89,6 +100,7 @@ Module {
                     f.close()
                 }
 
+                //console.info(args)
                 cmd = new Command("python", args);
                 cmd.description = "Parsing "+inp.fileName + (cmd_desc?" with "+cmd_desc:"")
                 cmd.highlight = "codegen"

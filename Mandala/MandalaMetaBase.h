@@ -108,22 +108,28 @@ constexpr size_t type_size(type_id_e type)
 template<typename T>
 static constexpr inline raw_t to_raw(const T &v)
 {
-    union {
+    union raw_u {
+        raw_u()
+            : raw(0)
+        {}
         raw_t raw;
         T v;
-    } u;
-    u.raw = 0;
+    };
+    raw_u u;
     u.v = v;
     return u.raw;
 }
 template<typename T>
 static constexpr inline T from_raw(raw_t r)
 {
-    union {
+    union raw_u {
+        raw_u(raw_t r)
+            : raw(r)
+        {}
         raw_t raw;
         T v;
-    } u;
-    u.raw = r;
+    };
+    raw_u u(r);
     return u.v;
 }
 template<typename T>

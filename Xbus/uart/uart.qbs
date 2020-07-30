@@ -3,7 +3,6 @@ ApxSharedLibModule {
         name: "apx_libs"
         submodules: [
             "common",
-            "containers", 
         ]
     }
 }
