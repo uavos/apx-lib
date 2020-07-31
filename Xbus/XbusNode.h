@@ -184,8 +184,8 @@ typedef struct
     uint8_t array; // >0 if array
     uint8_t group; // group idx
 
-    // field strings: name, title, units
-    // group strings: name, title, descr
+    // field strings: name, units
+    // group strings: name, title
     // command strings: name, title
 
 } field_s;
