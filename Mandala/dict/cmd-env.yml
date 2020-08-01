@@ -6,10 +6,10 @@
       descr: <squawk>[<ident>]
     - name: downlink
       title: Data packet from vehicle to GCS
-      descr: <squawk><uid><data...>
+      descr: <squawk><pid><data...>
     - name: uplink
       title: Data packet from GCS to vehicle
-      descr: <squawk><uid><data...> or <empty> for heartbeat
+      descr: <squawk>[<pid><data...>] or empty for heartbeat
 
 - name: telemetry
   title: Telemetry stream
@@ -127,10 +127,6 @@
       title: Node identification
       descr: <ident_s><strings:name+version+hardware><filenames>
 
-    - name: ack
-      title: Acknowledge request
-      descr: <pid_s><result_e>[<timeout_t>]
-
     - name: file
       title: File operations
       descr: <name><fop_e> [<data>]
@@ -151,10 +147,10 @@
       title: Modules tree
       descr: <op_e>
 
-    - name: debug
-      title: Debug data
-      descr: <data>
-
     - name: usr
       title: Node specific command
       descr: <cmd_s> [<data>]
+
+    - name: debug
+      title: Debug data
+      descr: <data>

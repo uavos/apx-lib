@@ -31,6 +31,18 @@ public:
     {
         reset(_pos + size);
     }
+    inline void trim(size_t pos, size_t size)
+    {
+        init(_buf + pos, size);
+    }
+    inline void trim(size_t pos)
+    {
+        trim(pos, _size - pos);
+    }
+    inline void trim()
+    {
+        trim(_pos);
+    }
 
     template<typename _T>
     void read(_T &data);

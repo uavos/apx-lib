@@ -71,13 +71,14 @@ namespace file {
 
 enum op_e : uint8_t {
     idle,
-    info,  // re: <info_s>
-    ropen, // re: <info_s>
-    wopen, // re: <info_s>
-    close, // re: <info_s>
-    read,  // q: <offset> re: <offset><data>
-    write, // q: <offset><data> re: <offset><size><hash>
-    abort, // re: <info_s>
+    info,   // re: <info_s>
+    ropen,  // re: <info_s>
+    wopen,  // re: <info_s>
+    close,  // re: <info_s>
+    read,   // q: <offset> re: <offset><data>
+    write,  // q: <offset><data> re: <offset><size><hash>
+    abort,  // re: <info_s>
+    extend, // re: <offset><timeout>
 };
 // all op requests prepended with <name> string
 
@@ -87,6 +88,7 @@ typedef uint8_t fd_t;
 typedef uint32_t offset_t;
 typedef uint32_t size_t;
 typedef uint32_t time_t;
+typedef uint16_t timeout_t;
 
 typedef struct
 {
@@ -224,21 +226,6 @@ constexpr const char *type_to_str(type_e t)
 // dict array content:
 // <hash><fields array>
 }; // namespace conf
-
-//---------------------------
-// ack
-//---------------------------
-namespace ack {
-
-enum ack_e : uint8_t {
-    ack_ok = 0,
-    ack_fail,
-    ack_extend,
-};
-
-typedef uint16_t timeout_t;
-
-}; // namespace ack
 
 //---------------------------
 // mod - modules tree
