@@ -132,6 +132,12 @@ struct sim_s
     float air_temp;
 };
 
+struct cmd_pos_s
+{
+    float lat;
+    float lon;
+};
+
 #pragma pack()
 
 } // namespace bundle
