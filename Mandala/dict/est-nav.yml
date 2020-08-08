@@ -252,34 +252,13 @@
       title: General delta
       units: m
 
+    - name: xtrack
+      title: Crosstrack error
+      units: m
+
     - name: thdg
       title: Tangent heading
       units: deg
-
-    - name: tdist
-      title: Tangent alignment
-      units: m
-    - name: tvel
-      title: Tangent alignment velocity
-      units: m/s
-
-    - name: radius
-      title: Turn radius
-      units: m
-
-    - name: mtype
-      title: Mission maneuver type
-      type: option
-      units:
-        - hdg
-        - line
-
-    - name: hover
-      title: Stabilization mode
-      type: option
-      units:
-        - "normal"
-        - "hover"
 
     - name: loops
       title: Remaining loops

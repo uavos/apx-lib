@@ -168,10 +168,9 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::env::wind::heading>(fmt_rad, seq_rare),
 
     ds<est::nav::ctr::delta>(fmt_f16),
-    ds<est::nav::ctr::radius>(fmt_f16),
+    ds<est::nav::ctr::xtrack>(fmt_f16),
+    ds<est::nav::ctr::thdg>(fmt_rad),
     ds<est::nav::ctr::loops>(fmt_byte),
-    ds<est::nav::ctr::mtype>(fmt_bit),
-    ds<est::nav::ctr::hover>(fmt_bit),
 
     ds<est::nav::wpt::eta>(fmt_word),
     ds<est::nav::wpt::wpidx>(fmt_word),
@@ -255,6 +254,8 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::op::mode>(fmt_byte),
     ds<cmd::nav::op::stage>(fmt_byte),
     ds<cmd::nav::op::adj>(fmt_sbyte),
+    ds<cmd::nav::op::radius>(fmt_f16),
+    ds<cmd::nav::op::man>(fmt_opt),
 
     ds<cmd::nav::opt::thrcut>(fmt_bit),
     ds<cmd::nav::opt::throvr>(fmt_bit),

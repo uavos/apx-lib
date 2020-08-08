@@ -105,6 +105,20 @@
         - inc
         - dec
 
+    - name: man
+      title: Maneuver type
+      type: option
+      units:
+        - hdg
+        - direct
+        - track
+        - loiter
+        - hover
+
+    - name: radius
+      title: Loiter radius
+      units: m
+
     - name: adj
       title: Maneuver adjust
       units: m
