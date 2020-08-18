@@ -10,9 +10,9 @@
 
 namespace apx {
 
-uint32_t crc32(const void *data, size_t sz)
+uint32_t crc32(const void *data, size_t sz, uint32_t crc)
 {
-    return CRC32_SW(data, sz, 0xFFFFFFFF);
+    return CRC32_SW(data, sz, crc);
 }
 
 } // namespace apx

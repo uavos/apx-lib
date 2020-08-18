@@ -1,16 +1,30 @@
 #pragma once
+#include "XbusNode.h"
 #include "XbusStreamReader.h"
 #include "XbusStreamWriter.h"
 
 namespace xbus {
 namespace mission {
 
+#pragma pack(1)
+struct file_hdr_s
+{
+    uint32_t size;
+    xbus::node::hash_t hash;
+
+    uint16_t wp;
+    uint16_t rw;
+    uint16_t tw;
+    uint16_t pi;
+};
+#pragma pack()
+
 struct Header
 {
     uint8_t type;   //wp,rw,scr, ..
     uint8_t option; //left,right,line,hdg, ..
 
-    typedef enum { //4bits
+    enum itemtypes_e { //4bits
         mi_stop = 0,
         mi_wp,
         mi_rw,
@@ -19,7 +33,7 @@ struct Header
         mi_action,
         mi_restricted,
         mi_emergency
-    } itemtypes_t;
+    };
 
     static inline uint16_t psize()
     {
@@ -45,10 +59,10 @@ struct Waypoint
     float lon;
     int16_t alt;
 
-    typedef enum {
-        mo_hdg,
-        mo_line,
-    } options_t;
+    enum options_e {
+        Direct,
+        Path,
+    };
 
     static inline uint16_t psize()
     {
@@ -78,10 +92,10 @@ struct Runway
     int16_t dE;
     uint16_t approach;
 
-    typedef enum {
-        mo_left,
-        mo_right,
-    } options_t;
+    enum options_e {
+        Left,
+        Right,
+    };
 
     static inline uint16_t psize()
     {
@@ -212,13 +226,13 @@ struct Area
 
 struct Action
 {
-    typedef enum {
+    enum options_e {
         mo_speed,
         mo_poi,
         mo_scr,
         mo_loiter,
         mo_shot,
-    } options_t;
+    };
 };
 
 struct ActionSpeed
