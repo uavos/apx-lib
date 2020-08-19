@@ -6,18 +6,45 @@
 namespace xbus {
 namespace mission {
 
-#pragma pack(1)
+typedef char title_t[16];
+
 struct file_hdr_s
 {
     uint32_t size;
     xbus::node::hash_t hash;
 
+    title_t title;
+
     uint16_t wp;
     uint16_t rw;
     uint16_t tw;
     uint16_t pi;
+
+    static inline uint16_t psize()
+    {
+        return sizeof(uint32_t) + sizeof(xbus::node::hash_t) + sizeof(title_t) + sizeof(uint16_t) * 4;
+    }
+    inline void read(XbusStreamReader *s)
+    {
+        *s >> size;
+        *s >> hash;
+        s->read(title, sizeof(title));
+        *s >> wp;
+        *s >> rw;
+        *s >> tw;
+        *s >> pi;
+    }
+    inline void write(XbusStreamWriter *s) const
+    {
+        *s << size;
+        *s << hash;
+        s->write(title, sizeof(title));
+        *s << wp;
+        *s << rw;
+        *s << tw;
+        *s << pi;
+    }
 };
-#pragma pack()
 
 struct Header
 {
