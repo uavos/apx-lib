@@ -364,5 +364,22 @@ struct ActionShot
     }
 };
 
+static inline constexpr uint16_t action_psize(uint8_t option)
+{
+    switch (option) {
+    case Action::mo_speed:
+        return ActionSpeed::psize();
+    case Action::mo_poi:
+        return ActionPoi::psize();
+    case Action::mo_scr:
+        return ActionScr::psize();
+    case Action::mo_loiter:
+        return ActionLoiter::psize();
+    case Action::mo_shot:
+        return ActionShot::psize();
+    }
+    return 0;
+}
+
 } // namespace mission
 } // namespace xbus
