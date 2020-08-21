@@ -95,15 +95,15 @@
       title: Procedure stage
       type: byte
 
-    - name: action
-      title: Procedure action
-      type: option
-      units:
-        - idle
-        - next
-        - cancel
-        - inc
-        - dec
+    - name: wp
+      title: Selected waypoint
+      type: word
+    - name: rw
+      title: Selected runway
+      type: word
+    - name: pi
+      title: Selected point of interest
+      type: word
 
     - name: man
       title: Maneuver type
@@ -114,6 +114,16 @@
         - track
         - loiter
         - hover
+
+    - name: action
+      title: Procedure action
+      type: option
+      units:
+        - idle
+        - next
+        - cancel
+        - inc
+        - dec
 
     - name: radius
       title: Loiter radius

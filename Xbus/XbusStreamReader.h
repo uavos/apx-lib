@@ -20,6 +20,10 @@ public:
         _buf = static_cast<const uint8_t *>(p);
         resize(size);
     }
+    void init(const void *p)
+    {
+        _buf = static_cast<const uint8_t *>(p);
+    }
     void resize(size_t size, size_t offset = 0)
     {
         _size = size;

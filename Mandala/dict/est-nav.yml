@@ -278,16 +278,3 @@
       title: Estimated time of arrival
       units: s
       type: word
-
-    - name: wpidx
-      title: Selected waypoint
-      type: word
-    - name: rwidx
-      title: Selected runway
-      type: word
-    - name: twidx
-      title: Selected taxiway
-      type: word
-    - name: piidx
-      title: Selected point of interest
-      type: word

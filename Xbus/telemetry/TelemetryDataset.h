@@ -173,10 +173,6 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::ctr::loops>(fmt_byte),
 
     ds<est::nav::wpt::eta>(fmt_word),
-    ds<est::nav::wpt::wpidx>(fmt_word),
-    ds<est::nav::wpt::rwidx>(fmt_word),
-    ds<est::nav::wpt::twidx>(fmt_word),
-    ds<est::nav::wpt::piidx>(fmt_word),
 
     ds<est::env::sys::mode>(fmt_opt),
     ds<est::env::sys::health>(fmt_opt),
@@ -256,6 +252,10 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::op::adj>(fmt_sbyte),
     ds<cmd::nav::op::radius>(fmt_f16),
     ds<cmd::nav::op::man>(fmt_opt),
+
+    ds<cmd::nav::op::wp>(fmt_word),
+    ds<cmd::nav::op::rw>(fmt_word),
+    ds<cmd::nav::op::pi>(fmt_word),
 
     ds<cmd::nav::opt::thrcut>(fmt_bit),
     ds<cmd::nav::opt::throvr>(fmt_bit),
