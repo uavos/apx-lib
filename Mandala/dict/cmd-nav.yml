@@ -74,7 +74,7 @@
       title: Cmd RPM
       units: rpm
 
-- name: op
+- name: proc
   title: Procedures
   content:
     - name: mode

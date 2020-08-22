@@ -132,6 +132,19 @@ public:
         return sz;
     }
 
+    int indexOf(T node)
+    {
+        GUARD guard;
+        (void) guard;
+
+        int index = 0;
+        for (auto i = _head; i != nullptr; i = i->ListNode<T>::getSibling()) {
+            if (i == node)
+                return index;
+        }
+        return -1;
+    }
+
 protected:
     T _head{nullptr};
 };

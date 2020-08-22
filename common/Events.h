@@ -15,17 +15,31 @@ public:
             i->event(arg);
         }
     }
+    static inline size_t size() { return _list.size(); }
 
 protected:
     explicit Event()
     {
-        _list.add(this);
+        connect();
     }
     ~Event()
     {
-        _list.remove(this);
+        disconnect();
     }
     virtual void event(Event<T> *) = 0;
+
+    int indexOf(Event<T> *e)
+    {
+        return _list.indexOf(e);
+    }
+    inline void connect()
+    {
+        _list.add(this);
+    }
+    inline void disconnect()
+    {
+        _list.remove(this);
+    }
 
 private:
     static List<Event<T> *> _list;
@@ -37,6 +51,6 @@ List<Event<T> *> Event<T>::_list;
 } // namespace apx
 
 #define DefineEvent(name) \
-    struct evt_##name \
+    struct name##_s \
     {}; \
-    using name = apx::Event<evt_##name>
+    using name = apx::Event<name##_s>

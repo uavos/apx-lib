@@ -247,15 +247,15 @@ static constexpr const ds_field_s dataset_default[] = {
 
     ds<cmd::nav::aux::rpm>(fmt_word),
 
-    ds<cmd::nav::op::mode>(fmt_byte),
-    ds<cmd::nav::op::stage>(fmt_byte),
-    ds<cmd::nav::op::adj>(fmt_sbyte),
-    ds<cmd::nav::op::radius>(fmt_f16),
-    ds<cmd::nav::op::man>(fmt_opt),
+    ds<cmd::nav::proc::mode>(fmt_byte),
+    ds<cmd::nav::proc::stage>(fmt_byte),
+    ds<cmd::nav::proc::adj>(fmt_sbyte),
+    ds<cmd::nav::proc::radius>(fmt_f16),
+    ds<cmd::nav::proc::man>(fmt_opt),
 
-    ds<cmd::nav::op::wp>(fmt_word),
-    ds<cmd::nav::op::rw>(fmt_word),
-    ds<cmd::nav::op::pi>(fmt_word),
+    ds<cmd::nav::proc::wp>(fmt_word),
+    ds<cmd::nav::proc::rw>(fmt_word),
+    ds<cmd::nav::proc::pi>(fmt_word),
 
     ds<cmd::nav::opt::thrcut>(fmt_bit),
     ds<cmd::nav::opt::throvr>(fmt_bit),
