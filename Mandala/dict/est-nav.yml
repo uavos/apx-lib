@@ -248,12 +248,12 @@
 - name: ctr
   title: Control parameters
   content:
-    - name: delta
-      title: General delta
-      units: m
-
     - name: xtrack
       title: Crosstrack error
+      units: m
+
+    - name: delta
+      title: Touchdown error
       units: m
 
     - name: thdg
@@ -267,14 +267,13 @@
 - name: wpt
   title: Mission navigation
   content:
+    - name: eta
+      title: Estimated time of arrival
+      units: s
+      type: word
     - name: dist
       title: Distance to waypoint
       units: m
     - name: hdg
       title: Waypoint heading
       units: deg
-
-    - name: eta
-      title: Estimated time of arrival
-      units: s
-      type: word
