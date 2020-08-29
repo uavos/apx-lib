@@ -1,84 +1,8 @@
-- name: att
-  title: Attitide regulators
-  content:
-    - name: roll
-      title: Cmd roll
-      units: deg
-    - name: pitch
-      title: Cmd pitch
-      units: deg
-    - name: yaw
-      title: Cmd yaw
-      units: deg
-
-- name: pos
-  title: Position regulators
-  content:
-    - name: lat
-      title: Cmd latitude
-      units: deg
-    - name: lon
-      title: Cmd latitude
-      units: deg
-    - name: hmsl
-      title: Cmd altitude MSL
-      units: m
-
-    - name: altitude
-      title: Cmd altitude
-      units: m
-    - name: vspeed
-      title: Cmd vspeed
-      units: m/s
-
-    - name: course
-      title: Cmd course
-      units: deg
-
-- name: air
-  title: Aerodynamic regulators
-  content:
-    - name: airspeed
-      title: Cmd airspeed
-      units: m/s
-
-    - name: slip
-      title: Cmd slip
-      units: deg
-
-- name: ahrs
-  title: AHRS options
-  type: option
-  units:
-    - "no"
-    - "yes"
-  content:
-    - name: inair
-      title: AHRS airdata
-    - name: nogps
-      title: Block GPS
-    - name: nomag
-      title: Block magnetometer
-    - name: hsrc
-      title: Select height source
-      units:
-        - "baro"
-        - "gps"
-        - "range"
-        - "vision"
-
-- name: aux
-  title: Auxilary regulators
-  content:
-    - name: rpm
-      title: Cmd RPM
-      units: rpm
-
 - name: proc
   title: Procedures
   content:
     - name: mode
-      title: Flight mode
+      title: Procedure
       type: option
       units:
         - EMG
@@ -89,16 +13,6 @@
         - TAXI
         - TAKEOFF
         - LANDING
-
-    - name: man
-      title: Maneuver type
-      type: option
-      units:
-        - hdg
-        - direct
-        - track
-        - loiter
-        - hover
 
     - name: stage
       title: Procedure stage
@@ -132,24 +46,127 @@
       title: Maneuver adjust
       units: m
 
-- name: opt
-  title: Options
+- name: ahrs
+  title: AHRS options
   type: option
   units:
-    - "off"
-    - "on"
+    - "no"
+    - "yes"
   content:
-    - name: thrcut
-      title: Throttle cut
-    - name: throvr
-      title: Throttle override
+    - name: inair
+      title: AHRS airdata
+    - name: nogps
+      title: Block GPS
+    - name: nomag
+      title: Block magnetometer
+    - name: hsrc
+      title: Select height source
+      units:
+        - "baro"
+        - "gps"
+        - "range"
+        - "vision"
 
-    - name: hyaw
-      title: Hover yaw
+- name: att
+  title: Attitide regulators
+  content:
+    - name: ctr
+      title: Attitude control
       type: option
       units:
-        - "compensated"
-        - "fixed"
+        - "off"
+        - "on"
+
+    - name: roll
+      title: Cmd roll
+      units: deg
+    - name: pitch
+      title: Cmd pitch
+      units: deg
+
+- name: hdg
+  title: Yaw regulators
+  content:
+    - name: ctr
+      title: Yaw control
+      type: option
+      units:
+        - "off"
+        - "yaw"
+        - "slip"
+        - "track"
+
+    - name: yaw
+      title: Cmd yaw
+      units: deg
+    - name: slip
+      title: Cmd slip
+      units: deg
+
+- name: pos
+  title: Position regulators
+  content:
+    - name: ctr
+      title: Position control
+      type: option
+      units:
+        - "off"
+        - hdg
+        - direct
+        - track
+        - loiter
+        - hover
+
+    - name: lat
+      title: Cmd latitude
+      units: deg
+    - name: lon
+      title: Cmd latitude
+      units: deg
+    - name: hmsl
+      title: Cmd altitude MSL
+      units: m
+
+    - name: altitude
+      title: Cmd altitude
+      units: m
+    - name: vspeed
+      title: Cmd vspeed
+      units: m/s
+
+    - name: course
+      title: Cmd course
+      units: deg
+
+    - name: airspeed
+      title: Cmd airspeed
+      units: m/s
+
+- name: eng
+  title: Engine regulators
+  content:
+    - name: ctr
+      title: Throttle control
+      type: option
+      units:
+        - "off"
+        - "on"
+    - name: cut
+      title: Throttle cut
+      type: option
+      units:
+        - "off"
+        - "on"
+    - name: ovr
+      title: Throttle override
+      type: option
+      units:
+        - "off"
+        - "on"
+
+    - name: rpm
+      title: Cmd RPM
+      units: rpm
 
 - name: rc
   title: RC

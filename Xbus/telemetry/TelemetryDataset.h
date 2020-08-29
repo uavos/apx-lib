@@ -226,40 +226,40 @@ static constexpr const ds_field_s dataset_default[] = {
 
     // cmd
 
-    ds<cmd::nav::att::roll>(fmt_rad),
-    ds<cmd::nav::att::pitch>(fmt_rad2),
-    ds<cmd::nav::att::yaw>(fmt_rad),
-
-    ds<cmd::nav::pos::lat>(fmt_real, seq_skip),
-    ds<cmd::nav::pos::lon>(fmt_real, seq_skip),
-    ds<cmd::nav::pos::hmsl>(fmt_real, seq_skip),
-    ds<cmd::nav::pos::course>(fmt_rad),
-
-    ds<cmd::nav::air::airspeed>(fmt_f16),
-    ds<cmd::nav::pos::altitude>(fmt_real),
-    ds<cmd::nav::pos::vspeed>(fmt_sbyte_01),
-    ds<cmd::nav::air::slip>(fmt_sbyte_001),
+    ds<cmd::nav::proc::mode>(fmt_byte),
+    ds<cmd::nav::proc::stage>(fmt_byte),
+    ds<cmd::nav::proc::adj>(fmt_sbyte),
+    ds<cmd::nav::proc::radius>(fmt_f16),
+    ds<cmd::nav::proc::wp>(fmt_word),
+    ds<cmd::nav::proc::rw>(fmt_word),
+    ds<cmd::nav::proc::pi>(fmt_word),
 
     ds<cmd::nav::ahrs::inair>(fmt_bit),
     ds<cmd::nav::ahrs::nogps>(fmt_bit),
     ds<cmd::nav::ahrs::nomag>(fmt_bit),
     ds<cmd::nav::ahrs::hsrc>(fmt_opt),
 
-    ds<cmd::nav::aux::rpm>(fmt_word),
+    ds<cmd::nav::att::ctr>(fmt_bit),
+    ds<cmd::nav::att::roll>(fmt_rad),
+    ds<cmd::nav::att::pitch>(fmt_rad2),
 
-    ds<cmd::nav::proc::mode>(fmt_byte),
-    ds<cmd::nav::proc::stage>(fmt_byte),
-    ds<cmd::nav::proc::adj>(fmt_sbyte),
-    ds<cmd::nav::proc::radius>(fmt_f16),
-    ds<cmd::nav::proc::man>(fmt_opt),
+    ds<cmd::nav::hdg::ctr>(fmt_opt),
+    ds<cmd::nav::hdg::yaw>(fmt_rad),
+    ds<cmd::nav::hdg::slip>(fmt_sbyte_001),
 
-    ds<cmd::nav::proc::wp>(fmt_word),
-    ds<cmd::nav::proc::rw>(fmt_word),
-    ds<cmd::nav::proc::pi>(fmt_word),
+    ds<cmd::nav::pos::ctr>(fmt_opt),
+    ds<cmd::nav::pos::lat>(fmt_real, seq_skip),
+    ds<cmd::nav::pos::lon>(fmt_real, seq_skip),
+    ds<cmd::nav::pos::hmsl>(fmt_real, seq_skip),
+    ds<cmd::nav::pos::course>(fmt_rad),
+    ds<cmd::nav::pos::altitude>(fmt_real),
+    ds<cmd::nav::pos::vspeed>(fmt_sbyte_01),
+    ds<cmd::nav::pos::airspeed>(fmt_f16),
 
-    ds<cmd::nav::opt::thrcut>(fmt_bit),
-    ds<cmd::nav::opt::throvr>(fmt_bit),
-    ds<cmd::nav::opt::hyaw>(fmt_bit),
+    ds<cmd::nav::eng::ctr>(fmt_bit),
+    ds<cmd::nav::eng::cut>(fmt_bit),
+    ds<cmd::nav::eng::ovr>(fmt_bit),
+    ds<cmd::nav::eng::rpm>(fmt_word),
 
     ds<cmd::nav::rc::ovr>(fmt_bit),
 

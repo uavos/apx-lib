@@ -139,15 +139,15 @@ static constexpr const item_t items[] = {
 
     MBVECT(cmd::nav::att::roll::meta, cmd_roll, f2, f2, 0),
     MBVECT(cmd::nav::att::pitch::meta, cmd_pitch, f2, f2, 1),
-    MBVECT(cmd::nav::att::yaw::meta, cmd_yaw, f2, f2, 2),
+    MBVECT(cmd::nav::hdg::yaw::meta, cmd_yaw, f2, f2, 2),
     MBVECT(meta_void, cmd_north, f2, f2, 0),
     MBVECT(meta_void, cmd_east, f2, f2, 1),
     MBITEM(cmd::nav::pos::course::meta, cmd_course, f2, f2),
-    MBITEM(cmd::nav::aux::rpm::meta, cmd_rpm, u2, u2),
+    MBITEM(cmd::nav::eng::rpm::meta, cmd_rpm, u2, u2),
     MBITEM(cmd::nav::pos::altitude::meta, cmd_altitude, f2, f2),
-    MBITEM(cmd::nav::air::airspeed::meta, cmd_airspeed, f2, f2),
+    MBITEM(cmd::nav::pos::airspeed::meta, cmd_airspeed, f2, f2),
     MBITEM(cmd::nav::pos::vspeed::meta, cmd_vspeed, f2, s01),
-    MBITEM(cmd::nav::air::slip::meta, cmd_slip, f2, s1),
+    MBITEM(cmd::nav::hdg::slip::meta, cmd_slip, f2, s1),
 
     MBVECT(est::nav::pos::lat::meta, gps_lat, f4, f4, 0),
     MBVECT(est::nav::pos::lon::meta, gps_lon, f4, f4, 1),
@@ -222,10 +222,10 @@ static constexpr const item_t items[] = {
     MBVECT(meta_void, error_rpm, berr, berr, 16),
 
     MBVECT(meta_void, cmode_dlhd, bit, bit, 1),
-    MBVECT(cmd::nav::opt::thrcut::meta, cmode_thrcut, bit, bit, 2),
-    MBVECT(cmd::nav::opt::throvr::meta, cmode_throvr, bit, bit, 4),
+    MBVECT(cmd::nav::eng::cut::meta, cmode_thrcut, bit, bit, 2),
+    MBVECT(cmd::nav::eng::ovr::meta, cmode_throvr, bit, bit, 4),
     MBVECT(meta_void, cmode_hover, bit, bit, 8),
-    MBVECT(cmd::nav::opt::hyaw::meta, cmode_hyaw, bit, bit, 16),
+    MBVECT(meta_void, cmode_hyaw, bit, bit, 16),
     MBVECT(cmd::nav::ahrs::nogps::meta, cmode_ahrs, bit, bit, 32),
     MBVECT(cmd::nav::ahrs::nomag::meta, cmode_nomag, bit, bit, 64),
 
@@ -262,7 +262,7 @@ static constexpr const item_t items[] = {
     MBITEM(est::nav::ctr::delta::meta, delta, f2, f2),
     MBITEM(est::nav::ctr::loops::meta, loops, u1, u1),
     MBITEM(est::nav::wpt::eta::meta, ETA, u4, u4),
-    MBITEM(cmd::nav::proc::man::meta, man, u1, u1),
+    MBITEM(meta_void, man, u1, u1),
 
     MBITEM(est::env::wind::speed::meta, windSpd, f2, u01),
     MBITEM(est::env::wind::heading::meta, windHdg, f2, f2),
