@@ -245,9 +245,20 @@
         - "warning"
         - "critical"
 
-- name: ctr
-  title: Control parameters
+- name: wpt
+  title: Mission navigation
   content:
+    - name: eta
+      title: Estimated time of arrival
+      units: s
+      type: word
+    - name: dist
+      title: Distance to waypoint
+      units: m
+    - name: hdg
+      title: Waypoint heading
+      units: deg
+
     - name: xtrack
       title: Crosstrack error
       units: m
@@ -263,17 +274,3 @@
     - name: loops
       title: Remaining loops
       type: word
-
-- name: wpt
-  title: Mission navigation
-  content:
-    - name: eta
-      title: Estimated time of arrival
-      units: s
-      type: word
-    - name: dist
-      title: Distance to waypoint
-      units: m
-    - name: hdg
-      title: Waypoint heading
-      units: deg

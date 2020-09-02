@@ -165,9 +165,6 @@
     - name: ub7
       title: User byte 7
       type: byte
-    - name: ub8
-      title: User byte 8
-      type: byte
 
 - name: haps
   title: HAPS

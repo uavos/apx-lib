@@ -167,12 +167,11 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::env::wind::speed>(fmt_byte_01, seq_rare),
     ds<est::env::wind::heading>(fmt_rad, seq_rare),
 
-    ds<est::nav::ctr::delta>(fmt_f16),
-    ds<est::nav::ctr::xtrack>(fmt_f16),
-    ds<est::nav::ctr::thdg>(fmt_rad),
-    ds<est::nav::ctr::loops>(fmt_byte),
-
     ds<est::nav::wpt::eta>(fmt_word),
+    ds<est::nav::wpt::delta>(fmt_f16),
+    ds<est::nav::wpt::xtrack>(fmt_f16),
+    ds<est::nav::wpt::thdg>(fmt_rad),
+    ds<est::nav::wpt::loops>(fmt_byte),
 
     ds<est::env::sys::mode>(fmt_opt),
     ds<est::env::sys::health>(fmt_opt),
@@ -239,24 +238,26 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::ahrs::nomag>(fmt_bit),
     ds<cmd::nav::ahrs::hsrc>(fmt_opt),
 
-    ds<cmd::nav::att::ctr>(fmt_bit),
+    ds<cmd::nav::reg::att>(fmt_bit),
+    ds<cmd::nav::reg::yaw>(fmt_opt),
+    ds<cmd::nav::reg::pos>(fmt_opt),
+    ds<cmd::nav::reg::air>(fmt_bit),
+    ds<cmd::nav::reg::eng>(fmt_bit),
+
     ds<cmd::nav::att::roll>(fmt_rad),
     ds<cmd::nav::att::pitch>(fmt_rad2),
+    ds<cmd::nav::att::yaw>(fmt_rad),
+    ds<cmd::nav::att::slip>(fmt_sbyte_001),
 
-    ds<cmd::nav::hdg::ctr>(fmt_opt),
-    ds<cmd::nav::hdg::yaw>(fmt_rad),
-    ds<cmd::nav::hdg::slip>(fmt_sbyte_001),
-
-    ds<cmd::nav::pos::ctr>(fmt_opt),
     ds<cmd::nav::pos::lat>(fmt_real, seq_skip),
     ds<cmd::nav::pos::lon>(fmt_real, seq_skip),
     ds<cmd::nav::pos::hmsl>(fmt_real, seq_skip),
     ds<cmd::nav::pos::course>(fmt_rad),
+
     ds<cmd::nav::pos::altitude>(fmt_real),
     ds<cmd::nav::pos::vspeed>(fmt_sbyte_01),
     ds<cmd::nav::pos::airspeed>(fmt_f16),
 
-    ds<cmd::nav::eng::ctr>(fmt_bit),
     ds<cmd::nav::eng::cut>(fmt_bit),
     ds<cmd::nav::eng::ovr>(fmt_bit),
     ds<cmd::nav::eng::rpm>(fmt_word),
@@ -405,7 +406,6 @@ static constexpr const ds_field_s dataset_usr[] = {
     ds<est::env::usr::ub5>(fmt_byte),
     ds<est::env::usr::ub6>(fmt_byte),
     ds<est::env::usr::ub7>(fmt_byte),
-    ds<est::env::usr::ub8>(fmt_byte),
 };
 
 static constexpr const ds_field_s dataset_haps[] = {

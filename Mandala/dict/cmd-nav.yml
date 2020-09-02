@@ -46,6 +46,36 @@
       title: Maneuver adjust
       units: m
 
+- name: reg
+  title: Regulators configuration
+  type: option
+  units:
+    - "off"
+    - "on"
+  content:
+    - name: att
+      title: Attitude control
+    - name: pos
+      title: Position control
+      units:
+        - "off"
+        - hdg
+        - direct
+        - track
+        - loiter
+        - hover
+    - name: air
+      title: TECS
+    - name: eng
+      title: Engine control
+    - name: yaw
+      title: Yaw control
+      units:
+        - "off"
+        - "hdg"
+        - "slip"
+        - "track"
+
 - name: ahrs
   title: AHRS options
   type: option
@@ -70,32 +100,12 @@
 - name: att
   title: Attitide regulators
   content:
-    - name: ctr
-      title: Attitude control
-      type: option
-      units:
-        - "off"
-        - "on"
-
     - name: roll
       title: Cmd roll
       units: deg
     - name: pitch
       title: Cmd pitch
       units: deg
-
-- name: hdg
-  title: Yaw regulators
-  content:
-    - name: ctr
-      title: Yaw control
-      type: option
-      units:
-        - "off"
-        - "yaw"
-        - "slip"
-        - "track"
-
     - name: yaw
       title: Cmd yaw
       units: deg
@@ -106,17 +116,6 @@
 - name: pos
   title: Position regulators
   content:
-    - name: ctr
-      title: Position control
-      type: option
-      units:
-        - "off"
-        - hdg
-        - direct
-        - track
-        - loiter
-        - hover
-
     - name: lat
       title: Cmd latitude
       units: deg
@@ -127,6 +126,13 @@
       title: Cmd altitude MSL
       units: m
 
+    - name: course
+      title: Cmd course
+      units: deg
+    - name: airspeed
+      title: Cmd airspeed
+      units: m/s
+
     - name: altitude
       title: Cmd altitude
       units: m
@@ -134,23 +140,13 @@
       title: Cmd vspeed
       units: m/s
 
-    - name: course
-      title: Cmd course
-      units: deg
-
-    - name: airspeed
-      title: Cmd airspeed
-      units: m/s
-
 - name: eng
   title: Engine regulators
   content:
-    - name: ctr
-      title: Throttle control
-      type: option
-      units:
-        - "off"
-        - "on"
+    - name: rpm
+      title: Cmd RPM
+      units: rpm
+
     - name: cut
       title: Throttle cut
       type: option
@@ -163,10 +159,6 @@
       units:
         - "off"
         - "on"
-
-    - name: rpm
-      title: Cmd RPM
-      units: rpm
 
 - name: rc
   title: RC

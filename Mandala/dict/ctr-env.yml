@@ -210,6 +210,3 @@
     - name: ub7
       type: byte
       title: User ctr byte 7
-    - name: ub8
-      type: byte
-      title: User ctr byte 8
