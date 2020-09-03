@@ -239,10 +239,11 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::ahrs::hsrc>(fmt_opt),
 
     ds<cmd::nav::reg::att>(fmt_bit),
-    ds<cmd::nav::reg::yaw>(fmt_opt),
     ds<cmd::nav::reg::pos>(fmt_opt),
     ds<cmd::nav::reg::air>(fmt_bit),
     ds<cmd::nav::reg::eng>(fmt_bit),
+    ds<cmd::nav::reg::yaw>(fmt_opt),
+    ds<cmd::nav::reg::str>(fmt_bit),
 
     ds<cmd::nav::att::roll>(fmt_rad),
     ds<cmd::nav::att::pitch>(fmt_rad2),

@@ -75,6 +75,8 @@
         - "hdg"
         - "slip"
         - "track"
+    - name: str
+      title: Steering control
 
 - name: ahrs
   title: AHRS options
