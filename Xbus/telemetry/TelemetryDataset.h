@@ -228,7 +228,6 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::proc::mode>(fmt_byte),
     ds<cmd::nav::proc::stage>(fmt_byte),
     ds<cmd::nav::proc::adj>(fmt_sbyte),
-    ds<cmd::nav::proc::radius>(fmt_f16),
     ds<cmd::nav::proc::wp>(fmt_word),
     ds<cmd::nav::proc::rw>(fmt_word),
     ds<cmd::nav::proc::pi>(fmt_word),
@@ -244,6 +243,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::reg::eng>(fmt_bit),
     ds<cmd::nav::reg::yaw>(fmt_opt),
     ds<cmd::nav::reg::str>(fmt_bit),
+    ds<cmd::nav::reg::brk>(fmt_bit),
 
     ds<cmd::nav::att::roll>(fmt_rad),
     ds<cmd::nav::att::pitch>(fmt_rad2),
@@ -254,6 +254,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::pos::lon>(fmt_real, seq_skip),
     ds<cmd::nav::pos::hmsl>(fmt_real, seq_skip),
     ds<cmd::nav::pos::course>(fmt_rad),
+    ds<cmd::nav::pos::radius>(fmt_f16),
 
     ds<cmd::nav::pos::altitude>(fmt_real),
     ds<cmd::nav::pos::vspeed>(fmt_sbyte_01),

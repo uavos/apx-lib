@@ -258,7 +258,7 @@ static constexpr const item_t items[] = {
     MBITEM(cmd::nav::proc::pi::meta, piidx, u1, u1),
     MBITEM(meta_void, midx, u1, u1),
     MBITEM(est::nav::wpt::thdg::meta, tgHDG, f2, f2),
-    MBITEM(cmd::nav::proc::radius::meta, turnR, f2, f2),
+    MBITEM(cmd::nav::pos::radius::meta, turnR, f2, f2),
     MBITEM(est::nav::wpt::delta::meta, delta, f2, f2),
     MBITEM(est::nav::wpt::loops::meta, loops, u1, u1),
     MBITEM(est::nav::wpt::eta::meta, ETA, u4, u4),
