@@ -17,6 +17,8 @@ public:
     }
     static inline size_t size() { return _list.size(); }
 
+    typedef T type_t;
+
 protected:
     explicit Event()
     {
@@ -50,7 +52,6 @@ List<Event<T> *> Event<T>::_list;
 
 } // namespace apx
 
-#define DefineEvent(name) \
-    struct name##_s \
-    {}; \
-    using name = apx::Event<name##_s>
+#define DefineEvent(aname) \
+    struct _##aname##_s; \
+    using aname = apx::Event<_##aname##_s>
