@@ -60,8 +60,10 @@
         - track
         - loiter
         - hover
-    - name: air
-      title: TECS
+    - name: spd
+      title: Airspeed control
+    - name: alt
+      title: Altitude control
     - name: eng
       title: Engine control
     - name: yaw
