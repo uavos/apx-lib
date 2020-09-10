@@ -8,67 +8,6 @@ namespace mission {
 
 typedef char title_t[16];
 
-struct file_hdr_s
-{
-    uint32_t size;
-    xbus::node::hash_t hash;
-
-    title_t title;
-
-    struct stats_s
-    {
-        uint16_t wp;
-        uint16_t rw;
-        uint16_t tw;
-        uint16_t pi;
-        uint16_t avoid;
-        uint16_t emg;
-    };
-    stats_s cnt;
-    stats_s offset;
-
-    static inline uint16_t psize()
-    {
-        return sizeof(uint32_t) + sizeof(xbus::node::hash_t) + sizeof(title_t) + sizeof(uint16_t) * 6 * 2;
-    }
-    inline void read(XbusStreamReader *s)
-    {
-        *s >> size;
-        *s >> hash;
-        s->read(title, sizeof(title));
-        *s >> cnt.wp;
-        *s >> cnt.rw;
-        *s >> cnt.tw;
-        *s >> cnt.pi;
-        *s >> cnt.avoid;
-        *s >> cnt.emg;
-        *s >> offset.wp;
-        *s >> offset.rw;
-        *s >> offset.tw;
-        *s >> offset.pi;
-        *s >> offset.avoid;
-        *s >> offset.emg;
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        *s << size;
-        *s << hash;
-        s->write(title, sizeof(title));
-        *s << cnt.wp;
-        *s << cnt.rw;
-        *s << cnt.tw;
-        *s << cnt.pi;
-        *s << cnt.avoid;
-        *s << cnt.emg;
-        *s << offset.wp;
-        *s << offset.rw;
-        *s << offset.tw;
-        *s << offset.pi;
-        *s << offset.avoid;
-        *s << offset.emg;
-    }
-};
-
 struct Header
 {
     uint8_t type;   //wp,rw,scr, ..
@@ -100,6 +39,106 @@ struct Header
     {
         uint8_t v = (type & 0x0F) | ((option << 4) & 0xF0);
         *s << v;
+    }
+};
+
+struct file_hdr_s
+{
+    uint32_t size;
+    xbus::node::hash_t hash;
+
+    title_t title;
+
+    struct stats_s
+    {
+        uint16_t wp;
+        uint16_t rw;
+        uint16_t tw;
+        uint16_t pi;
+        uint16_t avoid;
+        uint16_t emg;
+    };
+    stats_s cnt;
+    stats_s off;
+
+    static inline uint16_t psize()
+    {
+        return sizeof(uint32_t) + sizeof(xbus::node::hash_t) + sizeof(title_t) + sizeof(uint16_t) * 6 * 2;
+    }
+    inline void read(XbusStreamReader *s)
+    {
+        *s >> size;
+        *s >> hash;
+        s->read(title, sizeof(title));
+        *s >> cnt.wp;
+        *s >> cnt.rw;
+        *s >> cnt.tw;
+        *s >> cnt.pi;
+        *s >> cnt.avoid;
+        *s >> cnt.emg;
+        *s >> off.wp;
+        *s >> off.rw;
+        *s >> off.tw;
+        *s >> off.pi;
+        *s >> off.avoid;
+        *s >> off.emg;
+    }
+    inline void write(XbusStreamWriter *s) const
+    {
+        *s << size;
+        *s << hash;
+        s->write(title, sizeof(title));
+        *s << cnt.wp;
+        *s << cnt.rw;
+        *s << cnt.tw;
+        *s << cnt.pi;
+        *s << cnt.avoid;
+        *s << cnt.emg;
+        *s << off.wp;
+        *s << off.rw;
+        *s << off.tw;
+        *s << off.pi;
+        *s << off.avoid;
+        *s << off.emg;
+    }
+
+    inline constexpr uint16_t count(Header::itemtypes_e type) const
+    {
+        switch (type) {
+        default:
+            return 0;
+        case Header::mi_wp:
+            return cnt.wp;
+        case xbus::mission::Header::mi_rw:
+            return cnt.rw;
+        case xbus::mission::Header::mi_tw:
+            return cnt.tw;
+        case xbus::mission::Header::mi_pi:
+            return cnt.pi;
+        case xbus::mission::Header::mi_avoid:
+            return cnt.avoid;
+        case xbus::mission::Header::mi_emg:
+            return cnt.emg;
+        }
+    }
+    inline constexpr uint16_t offset(Header::itemtypes_e type) const
+    {
+        switch (type) {
+        default:
+            return 0;
+        case Header::mi_wp:
+            return off.wp;
+        case xbus::mission::Header::mi_rw:
+            return off.rw;
+        case xbus::mission::Header::mi_tw:
+            return off.tw;
+        case xbus::mission::Header::mi_pi:
+            return off.pi;
+        case xbus::mission::Header::mi_avoid:
+            return off.avoid;
+        case xbus::mission::Header::mi_emg:
+            return off.emg;
+        }
     }
 };
 
