@@ -109,15 +109,15 @@ struct file_hdr_s
             return 0;
         case Header::mi_wp:
             return cnt.wp;
-        case xbus::mission::Header::mi_rw:
+        case Header::mi_rw:
             return cnt.rw;
-        case xbus::mission::Header::mi_tw:
+        case Header::mi_tw:
             return cnt.tw;
-        case xbus::mission::Header::mi_pi:
+        case Header::mi_pi:
             return cnt.pi;
-        case xbus::mission::Header::mi_avoid:
+        case Header::mi_avoid:
             return cnt.avoid;
-        case xbus::mission::Header::mi_emg:
+        case Header::mi_emg:
             return cnt.emg;
         }
     }
@@ -128,15 +128,15 @@ struct file_hdr_s
             return 0;
         case Header::mi_wp:
             return off.wp;
-        case xbus::mission::Header::mi_rw:
+        case Header::mi_rw:
             return off.rw;
-        case xbus::mission::Header::mi_tw:
+        case Header::mi_tw:
             return off.tw;
-        case xbus::mission::Header::mi_pi:
+        case Header::mi_pi:
             return off.pi;
-        case xbus::mission::Header::mi_avoid:
+        case Header::mi_avoid:
             return off.avoid;
-        case xbus::mission::Header::mi_emg:
+        case Header::mi_emg:
             return off.emg;
         }
     }
