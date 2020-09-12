@@ -2,7 +2,7 @@
 
 #include "macro_expand.h"
 
-#define _ENUM_STRINGIFY(X) #X
+#define _ENUM_STRINGIFY(X) #X,
 #define _ENUM_STRINGS(...) FOREACH(_ENUM_STRINGIFY, (__VA_ARGS__))
 
 #define ENUM_MACRO(name, ...) \
