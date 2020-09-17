@@ -141,6 +141,9 @@
     - name: vspeed
       title: Cmd vspeed
       units: m/s
+    - name: tecs
+      title: TECS weighting factor
+      units: u
 
     - name: radius
       title: Loiter radius
