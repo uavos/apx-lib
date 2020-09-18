@@ -77,6 +77,10 @@
       title: Steering control
     - name: brk
       title: Brakes control
+    - name: flaps
+      title: Flaps control
+    - name: airbrk
+      title: Airbrakes control
 
 - name: ahrs
   title: AHRS options
