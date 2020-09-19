@@ -153,7 +153,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::ref::altitude>(fmt_real, seq_scheduled),
 
     ds<est::nav::air::airspeed>(fmt_f16),
-    ds<est::nav::air::slip>(fmt_sbyte_01),
+    ds<est::nav::air::slip>(fmt_f16),
     ds<est::nav::air::aoa>(fmt_sbyte_01),
 
     ds<est::nav::air::ld>(fmt_f16, seq_rare),
