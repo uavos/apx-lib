@@ -244,6 +244,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::reg::eng>(fmt_bit),
     ds<cmd::nav::reg::yaw>(fmt_opt),
     ds<cmd::nav::reg::str>(fmt_bit),
+    ds<cmd::nav::reg::taxi>(fmt_bit),
     ds<cmd::nav::reg::brk>(fmt_bit),
     ds<cmd::nav::reg::flaps>(fmt_bit),
 

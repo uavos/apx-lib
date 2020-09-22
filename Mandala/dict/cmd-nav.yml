@@ -72,9 +72,12 @@
         - "off"
         - "hdg"
         - "slip"
+        - "taxi"
         - "track"
     - name: str
       title: Steering control
+    - name: taxi
+      title: Taxi track control
     - name: brk
       title: Brakes control
     - name: flaps
