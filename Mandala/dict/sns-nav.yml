@@ -162,6 +162,10 @@
       suffix: temperature
       units: C
 
+    - name: hmsl
+      suffix: altitude
+      units: m
+
 - name: baro
   title: Static pressure
   content:
