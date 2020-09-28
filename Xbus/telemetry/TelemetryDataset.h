@@ -298,6 +298,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<sns::nav::pitot::status>(fmt_opt),
     ds<sns::nav::pitot::temp>(fmt_sbyte, seq_rare),
 
+    ds<sns::nav::agl::src>(fmt_opt),
     ds<sns::nav::agl::status>(fmt_opt),
 
     ds<sns::env::eng::status>(fmt_opt),

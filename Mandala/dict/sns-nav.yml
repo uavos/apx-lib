@@ -250,6 +250,14 @@
   title: Altitude above ground sensors
   units: m
   content:
+    - name: src
+      title: AGL source
+      type: option
+      units:
+        - unknown
+        - laser
+        - radio
+        - sonic
     - name: status
       title: AGL
       type: option
