@@ -259,7 +259,7 @@
         - radio
         - sonic
     - name: status
-      title: AGL
+      title: AGL sensor
       type: option
       units:
         - "unknown"

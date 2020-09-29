@@ -138,7 +138,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::pos::speed>(fmt_f16, seq_skip),
     ds<est::nav::pos::altitude>(fmt_real),
     ds<est::nav::pos::vspeed>(fmt_f16),
-    ds<est::nav::pos::agl>(fmt_byte_01),
+    ds<est::nav::pos::agl>(fmt_f16),
     ds<est::nav::pos::hsrc>(fmt_opt),
 
     ds<est::nav::lpos::status>(fmt_opt),
@@ -236,6 +236,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::ahrs::nogps>(fmt_bit),
     ds<cmd::nav::ahrs::nomag>(fmt_bit),
     ds<cmd::nav::ahrs::hsrc>(fmt_opt),
+    ds<cmd::nav::ahrs::hagl>(fmt_bit),
 
     ds<cmd::nav::reg::att>(fmt_bit),
     ds<cmd::nav::reg::pos>(fmt_opt),

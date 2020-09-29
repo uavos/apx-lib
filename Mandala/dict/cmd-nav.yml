@@ -105,6 +105,8 @@
         - "gps"
         - "range"
         - "vision"
+    - name: hagl
+      title: AGL correction
 
 - name: att
   title: Attitide regulators
