@@ -106,7 +106,7 @@
         - "range"
         - "vision"
     - name: hagl
-      title: AGL correction
+      title: AGL altitude
 
 - name: att
   title: Attitide regulators

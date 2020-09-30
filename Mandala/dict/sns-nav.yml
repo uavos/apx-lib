@@ -254,20 +254,16 @@
       title: AGL source
       type: option
       units:
-        - unknown
+        - none
         - laser
         - radio
         - sonic
     - name: status
-      title: AGL sensor
+      title: AGL
       type: option
       units:
-        - "unknown"
-        - "available"
-        - "unavailable"
-        - "ready"
-        - "warning"
-        - "failure"
+        - "off"
+        - "valid"
 
     - name: sonic
       title: Ultrasonic AGL altitude

@@ -185,16 +185,12 @@
         - "initialized"
 
     - name: lat
-      title: Home latitude
+      title: Reference latitude
       units: deg
     - name: lon
-      title: Home latitude
+      title: Reference latitude
       units: deg
     - name: hmsl
-      title: Home altitude MSL
-      units: m
-
-    - name: altitude
       title: MSL Altitude offset
       units: m
 

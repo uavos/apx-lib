@@ -149,8 +149,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::ref::status>(fmt_bit),
     ds<est::nav::ref::lat>(fmt_real, seq_scheduled),
     ds<est::nav::ref::lon>(fmt_real, seq_scheduled),
-    ds<est::nav::ref::hmsl>(fmt_real, seq_scheduled),
-    ds<est::nav::ref::altitude>(fmt_real, seq_scheduled),
+    ds<est::nav::ref::hmsl>(fmt_real, seq_rare),
 
     ds<est::nav::air::airspeed>(fmt_f16),
     ds<est::nav::air::slip>(fmt_f16),
@@ -300,7 +299,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<sns::nav::pitot::temp>(fmt_sbyte, seq_rare),
 
     ds<sns::nav::agl::src>(fmt_opt),
-    ds<sns::nav::agl::status>(fmt_opt),
+    ds<sns::nav::agl::status>(fmt_bit),
 
     ds<sns::env::eng::status>(fmt_opt),
     ds<sns::env::eng::rpm>(fmt_word, seq_rare),

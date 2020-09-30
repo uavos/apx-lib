@@ -278,7 +278,7 @@ static constexpr const item_t items[] = {
     MBVECT(est::nav::ref::lat::meta, home_lat, f4, f4, 0),
     MBVECT(est::nav::ref::lon::meta, home_lon, f4, f4, 1),
     MBVECT(est::nav::ref::hmsl::meta, home_hmsl, f4, f4, 2),
-    MBITEM(est::nav::ref::altitude::meta, altps_gnd, f4, f4),
+    MBITEM(meta_void, altps_gnd, f4, f4),
 
     MBITEM(meta_void, errcode, u1, u1),
 
