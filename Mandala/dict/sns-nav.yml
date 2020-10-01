@@ -265,12 +265,12 @@
         - "off"
         - "valid"
 
-    - name: sonic
-      title: Ultrasonic AGL altitude
     - name: laser
       title: Laser AGL altitude
     - name: radio
       title: Radio AGL altitude
+    - name: sonic
+      title: Ultrasonic AGL altitude
     - name: ground
       title: Ground
       type: option
