@@ -42,6 +42,14 @@
       title: Maneuver adjust
       units: m
 
+    - name: loops
+      title: Remaining loops
+      type: word
+    - name: timeout
+      title: Procedure timeout
+      type: word
+      units: s
+
 - name: reg
   title: Regulators configuration
   type: option

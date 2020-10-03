@@ -266,7 +266,3 @@
     - name: thdg
       title: Tangent heading
       units: deg
-
-    - name: loops
-      title: Remaining loops
-      type: word

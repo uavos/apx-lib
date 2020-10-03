@@ -170,7 +170,6 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::wpt::delta>(fmt_f16),
     ds<est::nav::wpt::xtrack>(fmt_f16),
     ds<est::nav::wpt::thdg>(fmt_rad),
-    ds<est::nav::wpt::loops>(fmt_byte),
 
     ds<est::env::sys::mode>(fmt_opt),
     ds<est::env::sys::health>(fmt_opt),
@@ -230,6 +229,8 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<cmd::nav::proc::wp>(fmt_word),
     ds<cmd::nav::proc::rw>(fmt_word),
     ds<cmd::nav::proc::pi>(fmt_word),
+
+    ds<cmd::nav::proc::loops>(fmt_byte),
 
     ds<cmd::nav::ahrs::inair>(fmt_bit),
     ds<cmd::nav::ahrs::nogps>(fmt_bit),
