@@ -323,7 +323,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<sns::env::pwr::vpld>(fmt_f16, seq_rare),
 
     ds<sns::env::com::status>(fmt_opt),
-    ds<sns::env::com::rss>(fmt_byte_u),
+    ds<sns::env::com::rss>(fmt_byte),
 
     ds<sns::env::ers::status>(fmt_opt),
     ds<sns::env::ers::block>(fmt_bit),

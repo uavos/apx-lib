@@ -243,7 +243,8 @@
 
     - name: rss
       title: Received signal strength
-      units: u
+      units: "%"
+      type: byte
     - name: snr
       title: Signal to noise ratio
       units: u
