@@ -160,6 +160,7 @@ typedef uint32_t dword_t;
 typedef char string_t[16];
 typedef char text_t[64];
 typedef xbus::pid_raw_t bind_t;
+typedef xbus::node::hash_t script_t;
 
 static constexpr const uint8_t type_field{4};
 
@@ -174,6 +175,7 @@ enum type_e : uint8_t {
     bind,
     string,
     text,
+    script,
 
     type_max
 };
@@ -217,9 +219,13 @@ constexpr const char *type_to_str(type_e t)
         return "string";
     case text:
         return "text";
+    case script:
+        return "script";
+
     case type_max:
         break;
     }
+
     return "";
 }
 
