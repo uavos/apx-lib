@@ -19,7 +19,7 @@ struct file_hdr_s
 
     static inline uint16_t psize()
     {
-        return sizeof(uint32_t) + sizeof(xbus::node::hash_t) + sizeof(title_t) + sizeof(uint32_t);
+        return sizeof(uint32_t) * 2 + sizeof(title_t);
     }
     inline void read(XbusStreamReader *s)
     {
