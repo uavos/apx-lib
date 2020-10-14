@@ -6,7 +6,7 @@
 namespace xbus {
 namespace script {
 
-typedef char title_t[16];
+typedef char title_t[64];
 
 static constexpr const size_t max_file_size{65535};
 
