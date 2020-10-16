@@ -9,7 +9,7 @@ Module {
         id: _probe
 
         //input
-        property string git_top: FileInfo.cleanPath(FileInfo.joinPaths(project.sourceDirectory, "../"))
+        property string git_top: FileInfo.cleanPath(project.sourceDirectory)
         property var mod: File.lastModified(git_top + "/.git/logs/HEAD")
         property string projectName: FileInfo.baseName(project.sourceDirectory)
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "TelemetryFormat.h"
-#include <Mandala/MandalaMetaBase.h>
+#include <mandala/MandalaMetaBase.h>
 
 namespace xbus {
 namespace telemetry {
@@ -25,7 +25,7 @@ typedef struct
     mandala::raw_t value[slots_size];  // raw value
     mandala::raw_t packed[slots_size]; // packed value
 } enc_slots_s;
-//static_assert(sizeof(enc_slots_s) == 12 * slots_size + 1, "size error");
+// static_assert(sizeof(enc_slots_s) == 12 * slots_size + 1, "size error");
 
 } // namespace telemetry
 } // namespace xbus

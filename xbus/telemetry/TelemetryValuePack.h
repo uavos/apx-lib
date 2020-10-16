@@ -1,8 +1,8 @@
 #pragma once
 
 #include "TelemetryFormat.h"
-#include <Mandala/MandalaMetaBase.h>
-#include <Xbus/XbusStreamWriter.h>
+#include <mandala/MandalaMetaBase.h>
+#include <xbus/XbusStreamWriter.h>
 
 #include <cmath>
 

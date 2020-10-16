@@ -3,7 +3,7 @@
 #include <cinttypes>
 #include <sys/types.h>
 
-#include <Xbus/XbusPacket.h>
+#include <xbus/XbusPacket.h>
 
 namespace mandala {
 

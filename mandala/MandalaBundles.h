@@ -114,13 +114,15 @@ struct pitot_s
 
 struct sim_s
 {
-    float att[3];
+    float att_deg[3];  // degrees
+    float gyro_deg[3]; // deg/s
+    float acc_ned[3];  // NED
 
-    float acc[3];
-    float gyro[3];
+    double lat_deg;
+    double lon_deg;
+    float hmsl;
 
-    float llh[3];
-    float vel[3];
+    float vel_ned[3];
 
     float agl;
     float rpm;

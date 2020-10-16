@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Mandala/MandalaMetaBase.h>
-#include <Mandala/MandalaMetaTree.h>
+#include <mandala/MandalaMetaBase.h>
+#include <mandala/MandalaMetaTree.h>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"

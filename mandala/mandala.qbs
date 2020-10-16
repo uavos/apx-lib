@@ -9,7 +9,7 @@ ApxSharedLibModule {
         name: "gensrc"
     }
     //gensrc.data: _probe.data
-    gensrc.prefix: "Mandala"
+    gensrc.prefix: "mandala"
 
     files: base
     .concat([
@@ -26,16 +26,16 @@ ApxSharedLibModule {
         multiplex: true
         Artifact {
             filePath: FileInfo.joinPaths(product.buildDirectory, "gensrc", product.gensrc.prefix, "mandala.json")
-            fileTags: ["gensrc.data.Mandala"]
+            fileTags: ["gensrc.data.mandala"]
         }
 
         prepare: {
             var cmd, commands = []
 
             var args = []
-            args.push(FileInfo.joinPaths(product.apx_libs.Mandala.libPath, "parse_mandala_dict.py"))
+            args.push(FileInfo.joinPaths(product.apx_libs.mandala.libPath, "parse_mandala_dict.py"))
             args.push("--dict")
-            args.push(FileInfo.joinPaths(product.apx_libs.Mandala.libPath, "dict", "mandala.yml"))
+            args.push(FileInfo.joinPaths(product.apx_libs.mandala.libPath, "dict", "mandala.yml"))
             args.push("--out")
             args.push(output.filePath)
 

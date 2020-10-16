@@ -3,10 +3,10 @@ import qbs.FileInfo
 import qbs.Process
 
 ApxSharedLibModule {
-    Depends { 
+    Depends {
         name: "apx_libs"
         submodules: [
-            "Mandala",
+            "mandala",
         ]
     }
 }

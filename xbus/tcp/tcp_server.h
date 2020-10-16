@@ -2,7 +2,7 @@
 
 #include "tcp_client.h"
 
-#include <Xbus/XbusPacket.h>
+#include <xbus/XbusPacket.h>
 #include <pthread.h>
 #include <QueueBuffer.h>
 

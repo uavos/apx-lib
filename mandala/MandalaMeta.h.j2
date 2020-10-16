@@ -95,7 +95,7 @@
 
 #pragma once
 
-#include <Mandala/MandalaMetaBase.h>
+#include <mandala/MandalaMetaBase.h>
 
 namespace mandala {
 {% set ind = ' '*indent_size %}
@@ -119,7 +119,7 @@ static constexpr const uint8_t uid_shift[] = {
 
 // valid UID range is [uid_base...uid_max]
 static constexpr const mandala::uid_t uid_base = 0x{{ '%0x' % data.uid_base }};
-static constexpr const mandala::uid_t uid_max = 0x{{ '%0x' % (data.uid_base+(2**(data.uid_bits|sum)-1)) }}; 
+static constexpr const mandala::uid_t uid_max = 0x{{ '%0x' % (data.uid_base+(2**(data.uid_bits|sum)-1)) }};
 
 {% for i in data.content %}
 {{ collect_units(i) }}

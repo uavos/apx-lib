@@ -2,7 +2,7 @@
 
 #include "TelemetryFormat.h"
 
-#include <Mandala/MandalaMetaTree.h>
+#include <mandala/MandalaMetaTree.h>
 #include <constexpr_util.h>
 
 namespace xbus {

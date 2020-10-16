@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Xbus/XbusPacket.h>
-#include <Xbus/XbusStreamReader.h>
-#include <Xbus/XbusStreamWriter.h>
+#include <xbus/XbusPacket.h>
+#include <xbus/XbusStreamReader.h>
+#include <xbus/XbusStreamWriter.h>
 
 namespace xbus {
 namespace telemetry {
@@ -13,17 +13,17 @@ namespace telemetry {
 enum fmt_e {
     fmt_none,
 
-    //raw
+    // raw
     fmt_real,
     fmt_dword,
     fmt_word,
     fmt_byte,
 
-    //packed bitfields
+    // packed bitfields
     fmt_bit, // one bit
     fmt_opt, // 4 bits
 
-    //packed real numbers
+    // packed real numbers
     fmt_f16,       // float16
     fmt_sbyte,     // signed byte
     fmt_sbyte_10,  // signed/10
@@ -82,7 +82,7 @@ typedef struct
 {
     xbus::pid_s pid; // seq = seq_e skip mode
     fmt_e fmt : 8;
-    //uint8_t _rsv : 4;
+    // uint8_t _rsv : 4;
 } field_s;
 static_assert(sizeof(field_s) == 3, "size error");
 
@@ -110,10 +110,7 @@ typedef struct
     uint8_t feed_hash; // dataset structure hash_32 (pid.seq = byte no)
     uint8_t feed_fmt;  // dataset format COBS encoded feed
 
-    static constexpr inline uint16_t psize()
-    {
-        return 6;
-    }
+    static constexpr inline uint16_t psize() { return 6; }
     inline void read(XbusStreamReader *s)
     {
         *s >> spec._raw;
