@@ -23,9 +23,13 @@ Module {
         property string year
 
         configure: {
-            version = "0.0.0"
+            version = "1.1.1"
             branch = ""
             year = ""
+
+            if(File.exists(FileInfo.joinPaths(git_top, "..", ".git")))
+                git_top = FileInfo.joinPaths(git_top, "..")
+
             if(File.exists(git_top+"/.git")){
                 var p = new Process();
                 p.throwOnError=true
@@ -34,7 +38,9 @@ Module {
                     identity = p.readStdOut().trim();
                 }
                 if(p.exec("git", ["describe", "--always", "--tags", "--match", "v*.*"])===0){
-                    version = p.readStdOut().trim().replace("v","").replace(/-/g,".").split(".",3).join(".");
+                    var s = p.readStdOut().trim()
+                    if(s.startsWith("v") && s.contains("."))
+                        version = s.replace("v","").replace(/-/g,".").split(".",3).join(".");
                 }
                 if(p.exec("git", ["rev-parse", "--abbrev-ref", "HEAD"])===0){
                     branch = p.readStdOut().trim();
@@ -52,7 +58,7 @@ Module {
                         break
                     }
                 }
-                if(branch=="") branch = "master";
+                if(branch=="") branch = "main";
 
                 if(p.exec("git", ["rev-parse", "--short", "HEAD"])===0){
                     hash = p.readStdOut().trim();
@@ -62,6 +68,7 @@ Module {
                     year=time.split("-")[0]
                 }
             }
+
             console.info("Project: ["+projectName+"]\tv"+version+" ("+[branch,hash,time,year].join(', ')+")")
             /*console.info("Version: "+version)
             console.info("Branch: "+branch)

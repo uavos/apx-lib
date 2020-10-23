@@ -43,18 +43,10 @@ ModuleProvider {
                     File.makePath(FileInfo.path(outputFilePath))
                     File.copy(inputFilePath, outputFilePath)
                 }
-
-//                var inputFilePath = FileInfo.joinPaths(p, libFolder+".qbs")
-//                if(!File.exists(inputFilePath))
-//                    continue
-
-//                outputFilePath = FileInfo.joinPaths(outputBaseDir, "modules", name, libModuleName, libFolder+".qbs")
-//                File.makePath(FileInfo.path(outputFilePath))
-//                File.copy(inputFilePath, outputFilePath)
             }
         }
 
-        scanDirRecursively(sourceDirectory)
+        scanDirRecursively(sourceDirectory, "")
         return [ "" ]
     }
 }

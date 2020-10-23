@@ -53,3 +53,5 @@ site
 build-*
 
 .history
+
+bazel-*
