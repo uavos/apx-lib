@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <Xbus/XbusPacket.h>
+#include <xbus/XbusPacket.h>
 #include <common/visibility.h>
 #include <sys/types.h>
 

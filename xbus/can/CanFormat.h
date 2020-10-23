@@ -9,7 +9,7 @@
 #include <common/visibility.h>
 #include <sys/types.h>
 
-#include <Xbus/XbusPacket.h>
+#include <xbus/XbusPacket.h>
 
 namespace xbus {
 namespace can {

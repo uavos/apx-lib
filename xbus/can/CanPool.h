@@ -12,7 +12,7 @@
 #include "CanFormat.h"
 #include "xcan_msg.h"
 
-#include <Xbus/XbusPacket.h>
+#include <xbus/XbusPacket.h>
 
 namespace xbus {
 namespace can {

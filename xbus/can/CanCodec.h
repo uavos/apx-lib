@@ -10,8 +10,8 @@
 
 #include "CanPool.h"
 
-#include <Xbus/XbusNode.h>
-#include <Xbus/XbusPacket.h>
+#include <xbus/XbusNode.h>
+#include <xbus/XbusPacket.h>
 #include <common/do_not_copy.h>
 
 namespace xbus {

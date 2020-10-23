@@ -9,7 +9,7 @@
 #include <cstdint>
 
 #include "xcan_msg.h"
-#include <Xbus/XbusPacket.h>
+#include <xbus/XbusPacket.h>
 #include <common/do_not_copy.h>
 
 namespace xbus {
