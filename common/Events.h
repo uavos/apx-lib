@@ -6,10 +6,10 @@
 namespace apx {
 
 template<typename T>
-class Event : public ListNode<Event<T> *>, private do_not_copy
+class Event : public ListNode<apx::Event<T> *>, private do_not_copy
 {
 public:
-    static void signal(Event<T> *arg = nullptr)
+    static void signal(apx::Event<T> *arg = nullptr)
     {
         for (auto i : _list) {
             i->event(arg);
@@ -28,9 +28,9 @@ protected:
     {
         disconnect();
     }
-    virtual void event(Event<T> *) = 0;
+    virtual void event(apx::Event<T> *) = 0;
 
-    int indexOf(Event<T> *e)
+    int indexOf(apx::Event<T> *e)
     {
         return _list.indexOf(e);
     }
@@ -44,14 +44,14 @@ protected:
     }
 
 private:
-    static List<Event<T> *> _list;
+    static List<apx::Event<T> *> _list;
 };
 
 template<typename T>
-List<Event<T> *> Event<T>::_list;
+List<apx::Event<T> *> apx::Event<T>::_list;
 
 } // namespace apx
 
 #define DefineEvent(aname) \
-    struct _##aname##_s; \
-    using aname = apx::Event<_##aname##_s>
+    struct _##aname##_t; \
+    using aname = apx::Event<_##aname##_t>
