@@ -9,7 +9,13 @@ Module {
         id: _probe
 
         //input
-        property string git_top: FileInfo.cleanPath(project.sourceDirectory)
+        property string git_top: {
+            var p=FileInfo.cleanPath(project.sourceDirectory)
+            if(File.exists(FileInfo.joinPaths(p, "..", ".git")))
+                p = FileInfo.joinPaths(p, "..")
+            return p
+        }
+
         property var mod: File.lastModified(git_top + "/.git/logs/HEAD")
         property string projectName: FileInfo.baseName(project.sourceDirectory)
 
@@ -26,9 +32,6 @@ Module {
             version = "1.1.1"
             branch = ""
             year = ""
-
-            if(File.exists(FileInfo.joinPaths(git_top, "..", ".git")))
-                git_top = FileInfo.joinPaths(git_top, "..")
 
             if(File.exists(git_top+"/.git")){
                 var p = new Process();

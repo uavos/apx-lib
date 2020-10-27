@@ -1,2 +1,3 @@
 # apx-lib
-APX libraries shared with GCS and Firmware.
+
+APX libraries shared between GCS and Firmware.
