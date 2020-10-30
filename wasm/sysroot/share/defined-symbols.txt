@@ -1,0 +1,10 @@
+log
+memcmp
+memcpy
+memset
+strchr
+strcmp
+strcpy
+strlen
+strncmp
+strncpy
