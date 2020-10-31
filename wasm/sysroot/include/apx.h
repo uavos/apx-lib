@@ -21,6 +21,7 @@
  */
 #pragma once
 
-#include "apx/visibility.h"
-#include "apx/types.h"
+#include "apx/log.h"
 #include "apx/native.h"
+#include "apx/types.h"
+#include "apx/visibility.h"

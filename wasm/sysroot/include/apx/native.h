@@ -25,8 +25,6 @@
 
 __BEGIN_DECLS
 
-void log(const char *format, ...);
-
 void *memcpy(void *dest, const void *src, size_t n);
 
 __END_DECLS

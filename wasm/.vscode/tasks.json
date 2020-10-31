@@ -19,15 +19,16 @@
 				"-Wl,--no-entry",
 				"-Wl,--strip-all",
 				"-Wl,--allow-undefined-file=${config:wasm.sysroot}/share/defined-symbols.txt",
- 				"-o",
+				"-o",
 				"${fileDirname}/${fileBasenameNoExtension}.wasm",
-				"${file}",
+				"${file}"
 			],
 			"options": {
 				"cwd": "${fileDirname}"
 			},
 			"problemMatcher": [
-				"$gcc","$msCompile"
+				"$gcc",
+				"$msCompile"
 			],
 			"group": {
 				"kind": "build",
@@ -36,7 +37,7 @@
 			"presentation": {
 				"panel": "shared",
 				"clear": true,
-				"reveal": "never"
+				"reveal": "silent"
 			}
 		}
 	]

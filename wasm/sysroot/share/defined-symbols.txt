@@ -1,4 +1,8 @@
 log
+log_s
+log_f
+log_i
+log_u
 memcmp
 memcpy
 memset
