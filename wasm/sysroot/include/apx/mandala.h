@@ -21,10 +21,23 @@
  */
 #pragma once
 
+#include "types.h"
 #include "visibility.h"
+
+#include "MandalaUid.hpp"
 
 __BEGIN_DECLS
 
-void *memcpy(void *dest, const void *src, size_t n);
+void mset_f(uint32_t uid, float v);
 
 __END_DECLS
+
+#ifdef __cplusplus
+
+using namespace mandala;
+
+void mset(uint32_t uid, float v)
+{
+    mset_f(uid, v);
+}
+#endif

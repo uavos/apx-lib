@@ -19,22 +19,45 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 #pragma once
+
+#include "types.h"
+#include "visibility.h"
+
+__BEGIN_DECLS
+
+int puts(const char *v);
+void printf_s(const char *fmt, const char *v);
+void printf_f(const char *fmt, float v);
+void printf_i(const char *fmt, int32_t v);
+
+__END_DECLS
 
 #ifdef __cplusplus
 
-class do_not_copy
+void print(const char *v)
 {
-public:
-    do_not_copy() {}
-
-private:
-    // Disallow copy construction and move assignment
-    do_not_copy(const do_not_copy &) = delete;
-    do_not_copy &operator=(const do_not_copy &) = delete;
-    do_not_copy(do_not_copy &&) = delete;
-    do_not_copy &operator=(do_not_copy &&) = delete;
-};
+    puts(v);
+}
+void printf(const char *v)
+{
+    print(v);
+}
+void printf(const char *fmt, const char *v)
+{
+    printf_s(fmt, v);
+}
+void printf(const char *fmt, float v)
+{
+    printf_f(fmt, v);
+}
+void printf(const char *fmt, int32_t v)
+{
+    printf_i(fmt, v);
+}
+void printf(const char *fmt, uint32_t v)
+{
+    printf_i(fmt, v);
+}
 
 #endif

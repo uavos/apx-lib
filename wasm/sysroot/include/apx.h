@@ -21,7 +21,10 @@
  */
 #pragma once
 
-#include "apx/log.h"
-#include "apx/native.h"
-#include "apx/types.h"
 #include "apx/visibility.h"
+#include "apx/types.h"
+
+#include "apx/console.h"
+#include "apx/libc.h"
+#include "apx/sys.h"
+#include "apx/mandala.h"

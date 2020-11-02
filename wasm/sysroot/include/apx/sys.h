@@ -26,31 +26,8 @@
 
 __BEGIN_DECLS
 
-void log(const char *v);
-void log_s(const char *fmt, const char *v);
-void log_f(const char *fmt, float v);
-void log_i(const char *fmt, int32_t v);
-void log_u(const char *fmt, uint32_t v);
+void sleep(uint32_t ms);
+
+uint32_t time_ms();
 
 __END_DECLS
-
-#ifdef __cplusplus
-
-void log(const char *fmt, const char *v)
-{
-    log_s(fmt, v);
-}
-void log(const char *fmt, float v)
-{
-    log_f(fmt, v);
-}
-void log(const char *fmt, int32_t v)
-{
-    log_i(fmt, v);
-}
-void log(const char *fmt, uint32_t v)
-{
-    log_u(fmt, v);
-}
-
-#endif

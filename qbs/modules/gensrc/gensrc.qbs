@@ -28,7 +28,7 @@ Module {
     property string tool: FileInfo.joinPaths(path, "gensrc.py")
 
     FileTagger {
-        patterns: ["*.h.j2", "*.cpp.j2", "*.c.j2", "*.json.j2"]
+        patterns: ["*.h.j2", "*.cpp.j2", "*.c.j2", "*.json.j2", "*.hpp.j2"]
         fileTags: ["gensrc.input"]
     }
     Rule {

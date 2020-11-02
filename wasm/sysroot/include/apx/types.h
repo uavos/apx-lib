@@ -21,7 +21,7 @@
  */
 #pragma once
 
-#define NULL ((void *) 0)
+#define NULL ((void *)0)
 
 #define CHAR_BIT 8
 #define SCHAR_MIN -128
@@ -51,18 +51,19 @@
 typedef char int8_t;
 typedef short int int16_t;
 typedef int int32_t;
-typedef long int int64_t;
+typedef long long int int64_t;
 
 /* Unsigned.  */
 typedef unsigned char uint8_t;
 typedef unsigned short int uint16_t;
 typedef unsigned int uint32_t;
-typedef unsigned long int uint64_t;
+typedef unsigned long long int uint64_t;
 
 typedef __INTPTR_TYPE__ intptr_t;
 typedef __UINTPTR_TYPE__ uintptr_t;
 
 typedef uint32_t size_t;
+typedef uint32_t uint;
 
 /* Minimum of signed integral types.  */
 #define INT8_MIN (-128)
