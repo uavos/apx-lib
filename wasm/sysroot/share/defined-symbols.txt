@@ -40,6 +40,13 @@ snprintf_i
 
 sleep
 time_ms
+task
+exit
 
 mset_f
+mset_i
+mbind
+mget
+mnotify
+
 

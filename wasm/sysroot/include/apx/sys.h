@@ -30,4 +30,8 @@ void sleep(uint32_t ms);
 
 uint32_t time_ms();
 
+void task(const char *callback, uint32_t period_ms = 0);
+
+void exit(const char *exception = 0);
+
 __END_DECLS
