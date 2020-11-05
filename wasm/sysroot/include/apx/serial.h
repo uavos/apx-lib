@@ -21,11 +21,17 @@
  */
 #pragma once
 
-#include "apx/visibility.h"
-#include "apx/types.h"
+#include "types.h"
+#include "visibility.h"
 
-#include "apx/console.h"
-#include "apx/libc.h"
-#include "apx/sys.h"
-#include "apx/mandala.h"
-#include "apx/serial.h"
+__BEGIN_DECLS
+
+typedef uint8_t port_id_t;
+
+// register receive callback for Virtual Comm Port
+void receive(port_id_t port_id, const char *rx_callback);
+
+// send data to Virtual Comm Port
+void send(port_id_t port_id, const void *data, size_t size, bool online = false);
+
+__END_DECLS

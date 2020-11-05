@@ -158,5 +158,7 @@ struct cmd_pos_s
 
 #pragma pack()
 
+typedef uint8_t vcp_id_t;
+
 } // namespace bundle
 } // namespace mandala

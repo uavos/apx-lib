@@ -45,77 +45,19 @@
       title: Transponder data
       descr: <xpdr>
 
-- name: mission
-  title: Mission data
-  content:
-    - name: data
-      title: Mission data
-    - name: info
-      title: Mission information
-
-- name: vcp
-  title: Virtual comm port data
-  content:
-    - name: rx
-      title: Received VCP serial data
-      descr: <port_id><data...>
-    - name: tx
-      title: Transmit VCP serial data
-      descr: <port_id><data...>
-    # - name: can_rx
-    #   title: Received AUX CAN message
-    #   descr: <port_id><ID32 b31=IDE><data...>
-    # - name: can_tx
-    #   title: Transmit AUX CAN message
-    #   descr: <port_id><ID32 b31=IDE><data...>
-
-- name: redundancy
-  title: Redundancy management
-  content:
-    - name: alive
-      title: Autopilot alive flag
-
 - name: stream
-  title: Special streams and wrappers
+  title: Data streams
   content:
+    - name: vcp
+      title: Virtual Comm Port channel data
+      descr: <vcp_id><raw data>
+
     - name: calib
       title: Calibration data
       descr: <sensor uid><raw sensor data>
 
-    - name: gcs
-      title: Local GCS data no uplink
-      descr: <uid><data>
-    - name: payload
+    - name: pld
       title: Payload data
-      descr: <payload><uid><data>
-
-    - name: hid
-      title: Human interface
-      descr: <hid><uid><data>
-    - name: video
-      title: Video data
-
-- name: script
-  title: Scripting commands
-  content:
-    - name: vmexec
-      title: Execute VM script onboard
-      descr: <@function>
-    - name: jsexec
-      title: Execute JS script on GCS
-      descr: <script text>
-
-- name: formation
-  title: Formation data
-  content:
-    - name: haps
-      title: HAPS shared data
-    - name: left
-      title: Left wing data
-    - name: right
-      title: Right wing data
-    - name: center
-      title: Center wing data
 
 - name: sim
   title: Simulator data
@@ -129,7 +71,51 @@
     - name: display
       title: Visualization
 
+- name: script
+  title: Scripting commands
+  content:
+    - name: vmexec
+      title: Execute VM script onboard
+      descr: <function name>
+    - name: jsexec
+      title: Execute JS script on GCS
+      descr: <script text>
+
+- name: aux
+  title: Auxilary data
+  content:
+    - name: gcs
+      title: GCS data
+      descr: <gcs><uid><data>
+
+    - name: pld
+      title: Payload data
+      descr: <pld><uid><data>
+
+    - name: hid
+      title: Human interface
+      descr: <hid><uid><data>
+
+- name: redundancy
+  title: Redundancy data
+  content:
+    - name: alive
+      title: Autopilot alive notify
+
+- name: formation
+  title: Formation data
+  content:
+    - name: haps
+      title: HAPS shared data
+    - name: left
+      title: Left wing data
+    - name: right
+      title: Right wing data
+    - name: center
+      title: Center wing data
+
 # ensure nmt is the last
+- reserved: 0x08
 - reserved: 0x09
 - reserved: 0x0A
 - reserved: 0x0B

@@ -219,6 +219,11 @@ public:
         return buf[_head];
     }
 
+    const T &first()
+    {
+        return buf[_tail];
+    }
+
 protected:
     T *buf;
 };
