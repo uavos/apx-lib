@@ -30,6 +30,9 @@
 #ifdef XCAN_CODEC_DEBUG
 #include <platform/log.h>
 #define debug(...) apxdebug(__VA_ARGS__)
+#ifdef MODULE_NAME
+#undef MODULE_NAME
+#endif
 #define MODULE_NAME "xcan"
 #else
 #define debug(...)
