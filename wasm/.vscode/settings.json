@@ -1,7 +1,8 @@
 {
     "wasm": {
         "cc": "${env:HOME}/Documents/UAVOS/Scripts/compiler/wasi-sdk-11.0/bin/clang",
-        "sysroot": "${workspaceFolder}/sysroot"
+        "sysroot": "${workspaceFolder}/sysroot",
+        "flags": "-I${workspaceFolder}/include"
     },
     "files.exclude": {
         "**/.DS_Store": true,
