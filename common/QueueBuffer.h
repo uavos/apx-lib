@@ -100,28 +100,29 @@ template<typename T = uint8_t>
 class QueueBufferT : public QueueBufferBase
 {
 public:
-    explicit QueueBufferT(T *_buf, size_t size)
+    explicit QueueBufferT(T *buf, size_t size)
         : QueueBufferBase(size)
-        , buf(_buf)
+        , _buf(buf)
     {}
 
-    inline const T *read_ptr() const { return buf + _tail; }
-    inline T *write_ptr() const { return buf + _head; }
+    inline const T *read_ptr() const { return _buf + _tail; }
+    inline T *write_ptr() const { return _buf + _head; }
+    inline T *buf_ptr() const { return _buf; }
 
     size_t write(const void *src, size_t sz) override
     {
         if (space() < sz)
             return 0;
         if (sz == 1) {
-            buf[_head] = *static_cast<const T *>(src);
+            _buf[_head] = *static_cast<const T *>(src);
         } else {
             size_t cnt1 = _total - _head;
             if (cnt1 > sz)
                 cnt1 = sz;
-            memcpy(buf + _head, static_cast<const T *>(src), cnt1 * sizeof(T));
+            memcpy(_buf + _head, static_cast<const T *>(src), cnt1 * sizeof(T));
             size_t cnt2 = sz - cnt1;
             if (cnt2 > 0)
-                memcpy(buf, static_cast<const T *>(src) + cnt1, cnt2 * sizeof(T));
+                memcpy(_buf, static_cast<const T *>(src) + cnt1, cnt2 * sizeof(T));
         }
         advance(&_head, sz);
         _size += sz;
@@ -135,7 +136,7 @@ public:
         if (sz > _size)
             sz = _size;
         if (sz == 1) {
-            *static_cast<T *>(dest) = buf[_tail];
+            *static_cast<T *>(dest) = _buf[_tail];
         } else {
             size_t cnt1 = _total - _tail;
             if (cnt1 > sz)
@@ -143,7 +144,7 @@ public:
             memcpy(static_cast<T *>(dest), read_ptr(), cnt1 * sizeof(T));
             size_t cnt2 = sz - cnt1;
             if (cnt2 > 0)
-                memcpy(static_cast<T *>(dest) + cnt1, buf, cnt2 * sizeof(T));
+                memcpy(static_cast<T *>(dest) + cnt1, _buf, cnt2 * sizeof(T));
         }
         skip_read(sz);
         return sz;
@@ -208,7 +209,7 @@ public:
     {
         size_t i = _tail;
         skip_read(1);
-        return buf[i];
+        return _buf[i];
     }
 
     // LIFO
@@ -216,16 +217,16 @@ public:
     {
         _head = _head > 0 ? _head - 1 : _total - 1;
         _size--;
-        return buf[_head];
+        return _buf[_head];
     }
 
     const T &first()
     {
-        return buf[_tail];
+        return _buf[_tail];
     }
 
 protected:
-    T *buf;
+    T *_buf;
 };
 
 template<size_t _total, typename T = uint8_t>

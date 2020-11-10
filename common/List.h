@@ -49,17 +49,21 @@ public:
         GUARD guard;
         (void) guard;
 
-        node->ListNode<T>::setSibling(nullptr);
         if (!_head) {
             _head = node;
+            node->ListNode<T>::setSibling(nullptr);
             return;
         }
-        for (auto i = _head; i != nullptr; i = i->ListNode<T>::getSibling()) {
+        for (auto i = _head;; i = i->ListNode<T>::getSibling()) {
+            if (i == node)
+                return;
             if (i->ListNode<T>::getSibling())
                 continue;
             i->ListNode<T>::setSibling(node);
+            node->ListNode<T>::setSibling(nullptr);
             return;
         }
+        node->ListNode<T>::setSibling(nullptr);
     }
 
     void insert(T node, T after)

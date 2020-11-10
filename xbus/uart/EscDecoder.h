@@ -24,7 +24,7 @@
 #include <QueueBuffer.h>
 
 #include "SerialCodec.h"
-
+/*
 template<size_t _buf_size, typename T = uint8_t>
 class EscDecoder : private QueueBuffer<_buf_size, T>, public SerialDecoder
 {
@@ -171,3 +171,4 @@ private:
     using QueueBuffer<_buf_size, T>::write_word;
     using QueueBuffer<_buf_size, T>::pop_one;
 };
+*/

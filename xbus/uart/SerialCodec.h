@@ -22,20 +22,22 @@
 #pragma once
 
 #include <sys/types.h>
+#include <QueueBuffer.h>
 
-class SerialCodec
+class SerialCodec : public QueueBufferT<uint8_t>
 {
 public:
-    // return size of encoded data in buffer
-    virtual size_t size() = 0;
-
-    // reset internal state
-    virtual void reset() = 0;
+    explicit SerialCodec(uint8_t *buf, size_t size)
+        : QueueBufferT<uint8_t>(buf, size)
+    {}
 };
 
 class SerialEncoder : public SerialCodec
 {
 public:
+    explicit SerialEncoder(uint8_t *buf, size_t size)
+        : SerialCodec(buf, size)
+    {}
     // write and encode data to buffer
     virtual size_t encode(const void *src, size_t sz) = 0;
 
@@ -46,6 +48,10 @@ public:
 class SerialDecoder : public SerialCodec
 {
 public:
+    explicit SerialDecoder(uint8_t *buf, size_t size)
+        : SerialCodec(buf, size)
+    {}
+
     enum ErrorType {
         DataAccepted,
         DataDropped,

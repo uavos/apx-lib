@@ -27,10 +27,14 @@
 #include "SerialCodec.h"
 
 template<size_t _buf_size, typename T = uint8_t, T _esc = 0>
-class CobsDecoder : private QueueBuffer<_buf_size, T>, public SerialDecoder
+class CobsDecoder : public SerialDecoder
 {
 public:
-    using QueueBuffer<_buf_size, T>::head;
+    explicit CobsDecoder()
+        : SerialDecoder(_buf, _buf_size)
+    {}
+
+    //    using QueueBuffer<_buf_size, T>::head;
 
     //write and encode data to fifo
     ErrorType decode(const void *src, size_t sz) override
@@ -82,7 +86,7 @@ public:
 
     inline size_t read_decoded(void *dest, size_t sz) override
     {
-        sz = QueueBuffer<_buf_size, T>::read_packet(dest, sz);
+        sz = SerialCodec::read_packet(dest, sz);
         if (sz <= sizeof(uint16_t))
             return 0;
         sz -= sizeof(uint16_t);
@@ -94,16 +98,18 @@ public:
         }
         return sz;
     }
-    inline size_t size() override
-    {
-        return QueueBuffer<_buf_size, T>::size();
-    }
-    inline void reset() override
-    {
-        QueueBuffer<_buf_size, T>::reset();
-    }
+    //    inline size_t size() override
+    //    {
+    //        return QueueBuffer<_buf_size, T>::size();
+    //    }
+    //    inline void reset() override
+    //    {
+    //        QueueBuffer<_buf_size, T>::reset();
+    //    }
 
 private:
+    uint8_t _buf[_buf_size];
+
     size_t _head_pending_s;
     size_t _head_s;
     size_t _rcnt{0};
@@ -153,10 +159,10 @@ private:
         return DataAccepted;
     }
 
-    using QueueBuffer<_buf_size, T>::space;
-    using QueueBuffer<_buf_size, T>::push_head;
-    using QueueBuffer<_buf_size, T>::pop_head;
-    using QueueBuffer<_buf_size, T>::pop_one;
-    using QueueBuffer<_buf_size, T>::write;
-    using QueueBuffer<_buf_size, T>::write_word;
+    //    using QueueBuffer<_buf_size, T>::space;
+    //    using QueueBuffer<_buf_size, T>::push_head;
+    //    using QueueBuffer<_buf_size, T>::pop_head;
+    //    using QueueBuffer<_buf_size, T>::pop_one;
+    //    using QueueBuffer<_buf_size, T>::write;
+    //    using QueueBuffer<_buf_size, T>::write_word;
 };
