@@ -171,7 +171,7 @@ enum type_e : uint8_t {
 //---------------------------
 namespace conf {
 
-typedef uint16_t fid_t;
+typedef uint32_t fid_t; // [idx:24][array idx:8]
 
 typedef uint8_t option_t;
 typedef float real_t;
