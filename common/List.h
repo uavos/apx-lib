@@ -55,7 +55,7 @@ public:
             return;
         }
         for (auto i = _head;; i = i->ListNode<T>::getSibling()) {
-            if (i == node)
+            if (i == node) // already added
                 return;
             if (i->ListNode<T>::getSibling())
                 continue;
@@ -70,6 +70,11 @@ public:
     {
         GUARD guard;
         (void) guard;
+
+        for (auto i = _head; i; i = i->ListNode<T>::getSibling()) {
+            if (i == node) // already added
+                return;
+        }
 
         if (!after) {
             node->ListNode<T>::setSibling(_head);
