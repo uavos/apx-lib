@@ -60,8 +60,7 @@ public:
             if (i->ListNode<T>::getSibling())
                 continue;
             i->ListNode<T>::setSibling(node);
-            node->ListNode<T>::setSibling(nullptr);
-            return;
+            break;
         }
         node->ListNode<T>::setSibling(nullptr);
     }

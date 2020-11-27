@@ -133,19 +133,6 @@ void TelemetryEncoder::clear()
     _update_feeds();
 }
 
-void TelemetryEncoder::update(const xbus::pid_s &pid, const mandala::spec_s &spec, XbusStreamReader &stream)
-{
-    // called by MandalaDataBroker
-    for (size_t i = 0; i < _slots_cnt; ++i) {
-        auto const &f = _slots.fields[i];
-        if (f.pid.uid != pid.uid)
-            continue;
-        if (f.pid.pri != pid.pri && f.pid.pri != xbus::pri_any)
-            continue;
-        _set_data(i, spec, stream);
-        return;
-    }
-}
 void TelemetryEncoder::update(const xbus::pid_s &pid, mandala::raw_t raw, mandala::type_id_e type_id)
 {
     // called by MandalaDataBroker
@@ -158,13 +145,6 @@ void TelemetryEncoder::update(const xbus::pid_s &pid, mandala::raw_t raw, mandal
         _set_data(i, raw, type_id);
         return;
     }
-}
-
-void TelemetryEncoder::_set_data(size_t n, const mandala::spec_s &spec, XbusStreamReader &stream)
-{
-    mandala::raw_t raw = 0;
-    stream.read(&raw, mandala::type_size(spec.type));
-    _set_data(n, raw, spec.type);
 }
 
 void TelemetryEncoder::_set_data(size_t n, mandala::raw_t raw, mandala::type_id_e type_id)
