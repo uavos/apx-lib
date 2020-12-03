@@ -37,32 +37,17 @@ public:
         }
     }
     static inline size_t size() { return _list.size(); }
+    static inline int indexOf(apx::Event<T> *e) { return _list.indexOf(e); }
 
     typedef T type_t;
 
 protected:
-    explicit Event()
-    {
-        connect();
-    }
-    ~Event()
-    {
-        disconnect();
-    }
-    virtual void event(apx::Event<T> *) = 0;
+    explicit Event() { connect(); }
+    ~Event() { disconnect(); }
+    inline void connect() { _list.add(this); }
+    inline void disconnect() { _list.remove(this); }
 
-    int indexOf(apx::Event<T> *e)
-    {
-        return _list.indexOf(e);
-    }
-    inline void connect()
-    {
-        _list.add(this);
-    }
-    inline void disconnect()
-    {
-        _list.remove(this);
-    }
+    virtual void event(apx::Event<T> *) = 0;
 
 private:
     static List<apx::Event<T> *> _list;
@@ -73,6 +58,6 @@ List<apx::Event<T> *> apx::Event<T>::_list;
 
 } // namespace apx
 
-#define DefineEvent(aname) \
+#define EVENT(aname) \
     struct _##aname##_t; \
     using aname = apx::Event<_##aname##_t>
