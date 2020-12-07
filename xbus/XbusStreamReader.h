@@ -21,7 +21,9 @@
  */
 #pragma once
 
+#include <cinttypes>
 #include <cstring>
+#include <sys/types.h>
 #include <type_traits>
 
 #include "XbusStream.h"

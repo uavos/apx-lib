@@ -39,7 +39,7 @@ ApxSharedLibModule {
             args.push("--out")
             args.push(output.filePath)
 
-            cmd = new Command("python", args);
+            cmd = new Command("python3", args);
             cmd.description = "Parsing Mandala Dictionary source YML files..."
             cmd.highlight = "codegen"
             //cmd.stdoutFilterFunction=function(s){ return "" }

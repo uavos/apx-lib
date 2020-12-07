@@ -124,7 +124,7 @@ def expand_constants_impl(list_dicts, constants):
     out = list()
     for d in list_dicts:
         for i in d:
-            if isinstance(d[i], str) and d[i].startswith('$') and d[i][1:] in constants:
+            if str(d[i]) == d[i] and d[i].startswith('$') and d[i][1:] in constants:
                 d[i] = constants[d[i][1:]]
         out.append(d)
         if 'content' in d:

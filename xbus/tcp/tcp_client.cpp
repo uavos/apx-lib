@@ -101,7 +101,7 @@ bool Client::connect()
         int optval = 1;
         setsockopt(_client_fd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
 #ifndef __APPLE__
-        setsockopt(_fd, IPPROTO_TCP, TCP_QUICKACK, &optval, sizeof(optval));
+        setsockopt(_client_fd, IPPROTO_TCP, TCP_QUICKACK, &optval, sizeof(optval));
 #endif
 
         //send request

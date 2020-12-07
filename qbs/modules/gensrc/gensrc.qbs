@@ -101,7 +101,7 @@ Module {
                 }
 
                 //console.info(args)
-                cmd = new Command("python", args);
+                cmd = new Command("python3", args);
                 cmd.description = "Parsing "+inp.fileName + (cmd_desc?" with "+cmd_desc:"")
                 cmd.highlight = "codegen"
                 cmd.stdoutFilterFunction=function(s){
