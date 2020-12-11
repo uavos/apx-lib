@@ -26,7 +26,7 @@
 #include <crc.h>
 #include <cstring>
 
-#define XCAN_CODEC_DEBUG
+//#define XCAN_CODEC_DEBUG
 
 #ifdef XCAN_CODEC_DEBUG
 #include <platform/log.h>

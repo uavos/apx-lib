@@ -21,9 +21,9 @@
  */
 #pragma once
 
-#include <common/visibility.h>
 #include <stdint.h>
 #include <sys/types.h>
+#include <visibility.h>
 
 __BEGIN_DECLS
 

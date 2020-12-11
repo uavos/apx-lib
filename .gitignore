@@ -50,7 +50,7 @@ site
 *.pyc
 .tags*
 
-build-*
+build*
 
 .history
 

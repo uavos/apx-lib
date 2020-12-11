@@ -150,28 +150,6 @@ typedef enum {
 {% endfor %}
 } constants_t;
 
-{#
-
-// Default streams
-{% for s in data.streams %}
-// stream: {{ s.name }}: {{ s.title }}
-static constexpr const mandala::stream_item_t stream_{{ s.name }}[] = {
-{% for i in s.content %}
-{% set path = i.keys()[0] %}
-{% set fmt = i.values()[0] %}
-{% set uid = ns.path_uid[path] %}
-{ .uid = 0x{{ '%0x' % uid }}, .sfmt = sfmt_{{ fmt }} },  // {{ path }}
-{% endfor %}
-{ .uid = 0, .sfmt = sfmt_void }
-};
-{% endfor %}
-
-static constexpr const mandala::stream_id_t streams[] = {
-{% for s in data.streams %}
-{ .name = "{{ s.name }}", .title = "{{ s.title }}", .content = stream_{{ s.name }} },
-{% endfor %}
-};
-#}
 }; // namespace mandala
 
 {% endblock %}

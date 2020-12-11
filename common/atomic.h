@@ -19,25 +19,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-/**
- * @file atomic.h
- *
- * Provides atomic integers and counters. Each method is executed atomically and thus
- * can be used to prevent data races and add memory synchronization between threads.
- *
- * In addition to the atomicity, each method serves as a memory barrier (sequential
- * consistent ordering). This means all operations that happen before and could
- * potentially have visible side-effects in other threads will happen before
- * the method is executed.
- *
- * The implementation uses the built-in methods from GCC (supported by Clang as well).
- * @see https://gcc.gnu.org/onlinedocs/gcc/_005f_005fatomic-Builtins.html.
- *
- * @note: on ARM, the instructions LDREX and STREX might be emitted. To ensure correct
- * behavior, the exclusive monitor needs to be cleared on a task switch (via CLREX).
- * This happens automatically e.g. on ARMv7-M as part of an exception entry or exit
- * sequence.
- */
 
 #pragma once
 
