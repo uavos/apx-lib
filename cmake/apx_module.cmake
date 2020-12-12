@@ -36,6 +36,7 @@ function(apx_module)
     endif()
     string(REPLACE "." ";" MODULE_NAME ${MODULE})
     list(GET MODULE_NAME -1 MODULE_NAME)
+    string(TOLOWER ${MODULE_NAME} MODULE_NAME_LC)
 
     # first include dependencies (other modules)
     if(DEPENDS)
@@ -97,6 +98,11 @@ function(apx_module)
         else()
             target_include_directories(${MODULE} PUBLIC ${INCLUDES})
         endif()
+    endif()
+
+    # defines
+    if(NOT INTERFACE)
+        target_compile_definitions(${MODULE} PRIVATE "MODULE_NAME=\"${MODULE_NAME_LC}\"")
     endif()
 
     # compile flags
