@@ -16,7 +16,7 @@ set(CMAKE_VERBOSE_MAKEFILE
 
 define_property(
     GLOBAL
-    PROPERTY APX_MODULEs
+    PROPERTY APX_MODULES
     BRIEF_DOCS "APX modules"
     FULL_DOCS "List of all used APX modules"
 )

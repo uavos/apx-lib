@@ -43,9 +43,27 @@ endif()
 # endif()
 
 execute_process(
-    COMMAND ${GIT_EXECUTABLE} describe --always --tags --match "v*.*"
-    OUTPUT_VARIABLE APX_GIT_TAG
+    COMMAND ${GIT_EXECUTABLE} describe --always --tags
+    OUTPUT_VARIABLE APX_GIT_IDENTITY
     OUTPUT_STRIP_TRAILING_WHITESPACE
     WORKING_DIRECTORY ${APX_GIT_ROOT}
 )
-message(STATUS "APX version: ${APX_GIT_TAG}")
+
+execute_process(
+    COMMAND ${GIT_EXECUTABLE} describe --always --tags --match "v*.*"
+    OUTPUT_VARIABLE APX_GIT_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    WORKING_DIRECTORY ${APX_GIT_ROOT}
+)
+string(REPLACE "v" "" APX_GIT_VERSION ${APX_GIT_VERSION})
+string(REPLACE "-" "." APX_GIT_VERSION ${APX_GIT_VERSION})
+string(REGEX MATCH "^([0-9]*\.[0-9]*\.[0-9]*)" APX_GIT_VERSION ${APX_GIT_VERSION})
+
+execute_process(
+    COMMAND ${GIT_EXECUTABLE} branch --show-current
+    OUTPUT_VARIABLE APX_GIT_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    WORKING_DIRECTORY ${APX_GIT_ROOT}
+)
+
+message(STATUS "APX version: ${APX_GIT_VERSION} (${APX_GIT_BRANCH})")

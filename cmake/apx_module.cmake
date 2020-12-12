@@ -3,6 +3,8 @@ function(apx_module)
 
     apx_parse_function_args(
         NAME apx_module
+        ONE_VALUE
+            MODULE
         MULTI_VALUE
             SRCS
             INCLUDES
@@ -12,28 +14,35 @@ function(apx_module)
             GENSRC
         OPTIONS
             INTERFACE
+            INIT
         ARGN ${ARGN}
     )
 # cmake-format: on
 
-    # guess module name
-    set(path ${CMAKE_CURRENT_SOURCE_DIR})
-    if(${path} MATCHES "^${APX_SHARED_DIR}")
-        file(RELATIVE_PATH path ${APX_SHARED_DIR} ${path})
-        set(path "shared.${path}")
-        get_filename_component(GROUP_DIR ${APX_SHARED_DIR} ABSOLUTE)
-    elseif(${path} MATCHES "^${APX_MODULES_DIR}")
-        file(RELATIVE_PATH path ${APX_MODULES_DIR} ${path})
-        get_filename_component(GROUP_DIR ${APX_SHARED_DIR} ABSOLUTE)
-    else()
-        message(FATAL_ERROR "Can't guess module name: ${CMAKE_CURRENT_SOURCE_DIR}")
+    if(NOT MODULE)
+        # guess module name
+        set(path ${CMAKE_CURRENT_SOURCE_DIR})
+        if(${path} MATCHES "^${APX_SHARED_DIR}")
+            file(RELATIVE_PATH path ${APX_SHARED_DIR} ${path})
+            set(path "shared.${path}")
+            get_filename_component(GROUP_DIR ${APX_SHARED_DIR} ABSOLUTE)
+        elseif(${path} MATCHES "^${APX_MODULES_DIR}")
+            file(RELATIVE_PATH path ${APX_MODULES_DIR} ${path})
+            get_filename_component(GROUP_DIR ${APX_SHARED_DIR} ABSOLUTE)
+        else()
+            message(FATAL_ERROR "Can't guess module name: ${CMAKE_CURRENT_SOURCE_DIR}")
+        endif()
+        string(REPLACE "/" "." MODULE ${path})
     endif()
-    string(REPLACE "/" "." MODULE ${path})
 
-    set(MODULE
-        ${MODULE}
-        PARENT_SCOPE
-    )
+    # first include dependencies (other modules)
+    if(DEPENDS)
+        foreach(dep ${DEPENDS})
+            apx_use_module(${dep})
+        endforeach()
+    endif()
+
+    # add this module to the list *after* all dependencies for natural sorting
     set_property(GLOBAL APPEND PROPERTY APX_MODULES ${module})
 
     # glob SRCS when needed
@@ -56,7 +65,9 @@ function(apx_module)
                 set(src ${src_exp})
             endif()
         endif()
-        list(APPEND srcs ${src})
+        if(NOT src MATCHES "[\*]")
+            list(APPEND srcs ${src})
+        endif()
     endforeach()
 
     # add library
@@ -67,7 +78,7 @@ function(apx_module)
     endif()
 
     # includes
-    if(NOT INCLUDES)
+    if(NOT INCLUDES AND GROUP_DIR)
         set(INCLUDES "${GROUP_DIR}")
     endif()
 
@@ -88,36 +99,42 @@ function(apx_module)
     # generated sources
     if(GENSRC)
         foreach(gensrc ${GENSRC})
+            add_dependencies(${MODULE} ${gensrc})
+            get_target_property(gensrc_targets ${gensrc} INTERFACE_SOURCES)
+            get_target_property(gensrc_dir ${gensrc} INCLUDE_DIRECTORIES)
             if(INTERFACE)
-                add_dependencies(${MODULE} ${gensrc})
+                target_include_directories(${MODULE} INTERFACE ${gensrc_dir})
             else()
-                get_target_property(gensrc_targets ${gensrc} INTERFACE_SOURCES)
-                get_target_property(gensrc_dir ${gensrc} INCLUDE_DIRECTORIES)
-
-                add_dependencies(${MODULE} ${gensrc})
                 target_include_directories(${MODULE} PUBLIC ${gensrc_dir})
                 target_sources(${MODULE} PRIVATE ${gensrc_targets})
             endif()
         endforeach()
     endif()
 
-    # dependencies (other modules)
+    # dependencies linking
     if(DEPENDS)
         foreach(dep ${DEPENDS})
-
-            apx_use_module(${dep})
-
             get_target_property(dep_type ${dep} TYPE)
             if(${dep_type} STREQUAL "STATIC_LIBRARY" OR ${dep_type} STREQUAL "INTERFACE_LIBRARY")
                 if(INTERFACE)
                     target_link_libraries(${MODULE} INTERFACE ${dep})
                 else()
-                    target_link_libraries(${MODULE} PRIVATE ${dep})
+                    target_link_libraries(${MODULE} PUBLIC ${dep})
                 endif()
             else()
                 add_dependencies(${MODULE} ${dep})
             endif()
         endforeach()
     endif()
+
+    if(INIT)
+        set_property(GLOBAL APPEND PROPERTY APX_MODULES_INIT ${module})
+    endif()
+
+    # make module name available in parent scope
+    set(MODULE
+        ${MODULE}
+        PARENT_SCOPE
+    )
 
 endfunction()

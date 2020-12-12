@@ -21,9 +21,9 @@
  */
 #pragma once
 
-#include <common/do_not_copy.h>
 #include <cstdint>
 #include <cstring>
+#include <do_not_copy.h>
 
 class QueueBufferBase : public do_not_copy
 {
