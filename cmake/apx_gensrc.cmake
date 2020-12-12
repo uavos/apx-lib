@@ -49,14 +49,15 @@ function(apx_gensrc TARGET)
     set(deps ${DATA})
     if(DATA MATCHES "^\#.*")
         set(deps)
-        set(DATA "'${DATA}'")
+        set(DATA "${DATA}")
     endif()
 
     # parse templates command
     add_custom_command(
         OUTPUT ${targets}
-        COMMAND ${PYTHON_EXECUTABLE} ${script} --data ${DATA} --template ${srcs} --dest ${dest}
+        COMMAND ${PYTHON_EXECUTABLE} ${script} --data "${DATA}" --template ${srcs} --dest ${dest}
         DEPENDS ${script} ${srcs} ${deps}
+        VERBATIM
     )
 
     # output

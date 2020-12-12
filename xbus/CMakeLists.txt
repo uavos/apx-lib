@@ -1,1 +1,1 @@
-apx_module(INTERFACE DEPENDS shared.common)
+apx_module(INTERFACE DEPENDS shared.common INCLUDES ..)

@@ -28,11 +28,13 @@ import networkx as nx
 import simplejson
 from jinja2 import Environment, FileSystemLoader
 
+import yaml
+
 # import matplotlib.pyplot as plt
 
 # Parse commandline
 parser = argparse.ArgumentParser(description='Generate source files for APX system.')
-parser.add_argument('--data', action='store', required=True, help='JSON data file name or raw JSON or cmake format')
+parser.add_argument('--data', action='store', required=True, help='JSON/YAML data file name[s] or raw JSON or cmake format')
 parser.add_argument('--template', action='store', nargs='*', required=True, help='Template file to use')
 parser.add_argument('--dest', action='store', required=True, help='Destination directory')
 args = parser.parse_args()
@@ -205,24 +207,52 @@ def render(template, data):
     return template.render(data=data)
 
 
+def load_data(data):
+    ext = os.path.splitext(data)[1][1:].lower()
+    with open(data, 'r') as f:
+        if ext == 'yml' or ext == 'yaml':
+            return yaml.load(f.read(), Loader=yaml.Loader)
+        elif ext == 'json':
+            return simplejson.loads(str(f.read()))
+    return {}
+
+
 def parse_cmake_data(data):
-    values = data.split(' ')
-    values.pop(0)
-    data = dict()
-    for i in values:
-        name, value = i.split(':')
+    out = dict()
+    index = data.index(';')+1
+    while index < len(data):
+        next_index = data.index(';', index)
+        if next_index > data.index('[', index):
+            next_index = data.index(']', index)+1
+
+        if next_index <= 0:
+            next_index = len(data)
+
+        token = data[index:next_index]
+        index = next_index+1
+
+        name, value = token.split(':')
         if value.startswith('['):
             value = value[1:-1].split(';')
-        data[name] = value
-    return data
+            if os.path.exists(value[0]):
+                value_exp = []
+                for v in value:
+                    value_exp.append(load_data(v))
+                value = value_exp
+        out[name] = value
+        # print("{}: {}".format(name, value))
+    return out
 
 
 # main
-if args.data.startswith('# '):
+if args.data.startswith('#'):
     data = parse_cmake_data(args.data)
+elif ';' in args.data:
+    data = []
+    for i in args.data.split(';'):
+        data.append(load_data(i))
 elif os.path.exists(args.data):
-    with open(args.data, 'r') as f:
-        data = simplejson.loads(str(f.read()))
+    data = load_data(args.data)
 else:
     data = simplejson.loads(str(args.data))
 

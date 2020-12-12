@@ -34,6 +34,8 @@ function(apx_module)
         endif()
         string(REPLACE "/" "." MODULE ${path})
     endif()
+    string(REPLACE "." ";" MODULE_NAME ${MODULE})
+    list(GET MODULE_NAME -1 MODULE_NAME)
 
     # first include dependencies (other modules)
     if(DEPENDS)
@@ -42,8 +44,19 @@ function(apx_module)
         endforeach()
     endif()
 
+    # collect global modules list properties
     # add this module to the list *after* all dependencies for natural sorting
     set_property(GLOBAL APPEND PROPERTY APX_MODULES ${module})
+
+    if(INIT)
+        set_property(GLOBAL APPEND PROPERTY APX_MODULES_INIT ${module})
+    endif()
+
+    set(meta "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_NAME}.yml")
+    if(EXISTS ${meta})
+        set_property(GLOBAL APPEND PROPERTY APX_MODULES_META ${meta})
+        # message(STATUS "META: ${meta}")
+    endif()
 
     # glob SRCS when needed
     set(srcs)
@@ -78,14 +91,12 @@ function(apx_module)
     endif()
 
     # includes
-    if(NOT INCLUDES AND GROUP_DIR)
-        set(INCLUDES "${GROUP_DIR}")
-    endif()
-
-    if(INTERFACE)
-        target_include_directories(${MODULE} INTERFACE ${INCLUDES})
-    else()
-        target_include_directories(${MODULE} PUBLIC ${INCLUDES})
+    if(INCLUDES)
+        if(INTERFACE)
+            target_include_directories(${MODULE} INTERFACE ${INCLUDES})
+        else()
+            target_include_directories(${MODULE} PUBLIC ${INCLUDES})
+        endif()
     endif()
 
     # compile flags
@@ -125,10 +136,6 @@ function(apx_module)
                 add_dependencies(${MODULE} ${dep})
             endif()
         endforeach()
-    endif()
-
-    if(INIT)
-        set_property(GLOBAL APPEND PROPERTY APX_MODULES_INIT ${module})
     endif()
 
     # make module name available in parent scope
