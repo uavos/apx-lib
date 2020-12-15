@@ -5,6 +5,7 @@ function(apx_module)
         NAME apx_module
         ONE_VALUE
             MODULE
+            PREFIX
         MULTI_VALUE
             SRCS
             INCLUDES
@@ -60,7 +61,6 @@ function(apx_module)
     endif()
 
     # glob SRCS when needed
-    set(srcs)
     if(NOT SRCS)
         if(INTERFACE)
             set(SRCS "*.h*")
@@ -68,21 +68,7 @@ function(apx_module)
             set(SRCS "*.[ch]*")
         endif()
     endif()
-    foreach(src ${SRCS})
-        if(NOT EXISTS ${src})
-            file(
-                GLOB src_exp
-                RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-                ${src}
-            )
-            if(src_exp)
-                set(src ${src_exp})
-            endif()
-        endif()
-        if(NOT src MATCHES "[\*]")
-            list(APPEND srcs ${src})
-        endif()
-    endforeach()
+    include(srcs)
 
     # add library
     if(INTERFACE)
@@ -93,11 +79,22 @@ function(apx_module)
 
     # includes
     if(INCLUDES)
-        if(INTERFACE)
-            target_include_directories(${MODULE} INTERFACE ${INCLUDES})
-        else()
-            target_include_directories(${MODULE} PUBLIC ${INCLUDES})
-        endif()
+        foreach(inc ${INCLUDES})
+            file(REAL_PATH ${inc} inc)
+            if(PREFIX)
+                file(RELATIVE_PATH inc_rel ${CMAKE_CURRENT_SOURCE_DIR} ${inc})
+                get_filename_component(inc_link ${CMAKE_CURRENT_BINARY_DIR}/${PREFIX}/${inc_rel} ABSOLUTE)
+                get_filename_component(link_dir ${inc_link} DIRECTORY)
+                file(MAKE_DIRECTORY ${link_dir})
+                file(CREATE_LINK ${inc} ${inc_link} SYMBOLIC)
+                set(inc ${CMAKE_CURRENT_BINARY_DIR})
+            endif()
+            if(INTERFACE)
+                target_include_directories(${MODULE} INTERFACE ${inc})
+            else()
+                target_include_directories(${MODULE} PUBLIC ${inc})
+            endif()
+        endforeach()
     endif()
 
     # defines

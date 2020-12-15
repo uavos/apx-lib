@@ -30,13 +30,19 @@ from jinja2 import Environment, FileSystemLoader
 
 import yaml
 
+import copy
+
 # import matplotlib.pyplot as plt
 
 # Parse commandline
-parser = argparse.ArgumentParser(description='Generate source files for APX system.')
-parser.add_argument('--data', action='store', required=True, help='JSON/YAML data file name[s] or raw JSON or cmake format')
-parser.add_argument('--template', action='store', nargs='*', required=True, help='Template file to use')
-parser.add_argument('--dest', action='store', required=True, help='Destination directory')
+parser = argparse.ArgumentParser(
+    description='Generate source files for APX system.')
+parser.add_argument('--data', action='store', required=True,
+                    help='JSON/YAML data file name[s] or raw JSON or cmake format')
+parser.add_argument('--template', action='store', nargs='*',
+                    required=True, help='Template file to use')
+parser.add_argument('--dest', action='store', required=True,
+                    help='Destination directory')
 args = parser.parse_args()
 #########################
 
@@ -44,7 +50,7 @@ args = parser.parse_args()
 # filters
 
 def merge_dicts_impl(out, d):
-    if not isinstance(d, dict):
+    if type(d) is not dict:
         print("Error dict object: ", d)
         return
     for i in out:
@@ -53,7 +59,7 @@ def merge_dicts_impl(out, d):
         for key, value in d.items():
             if key not in i:
                 i[key] = value
-            elif isinstance(value, list):
+            elif type(value) is list:
                 i.update({key: i[key] + value})
             else:
                 i.update({key: value})
@@ -64,38 +70,50 @@ def merge_dicts_impl(out, d):
 def merge_dicts(list_dicts):
     out = list()
     dout = dict()
+    # print("MERGE DICTS: {}".format(list_dicts))
     for d in list(list_dicts):
-        assert isinstance(d, dict), "Error dict object"
-        if d['name'] in dout:
-            base = dout[d['name']]
+        assert type(d) is dict, "Error dict object ({})".format(d)
+        name = d['name']
+        if name in dout:
+            base = dout[name]
+            # print("UPD<{}: {} {}".format(name, dout, base))
+            # print("UPD>{}: {} {}".format(name, dout, d))
             for key, value in d.items():
+                if not value:
+                    continue
                 if key not in base:
-                    base[key] = value
-                elif isinstance(value, list):
-                    base.update({key: merge_dicts(base[key] + value)})
+                    base.update({key: value})
+                elif type(value) is list:
+                    if base[key]:
+                        base.update({key: merge_dicts(base[key] + value)})
+                    else:
+                        base.update({key: merge_dicts(value)})
                 else:
                     base.update({key: value})
         else:
-            base = d
+            base = copy.deepcopy(d)
             out.append(base)
-        dout[base['name']] = base
+        dout[name] = base
     return out
 
 
 def merge_arrays(list_dicts):
     out = list()
     for i in list(list_dicts):
-        if isinstance(i, list):
+        if type(i) is list:
             out = out + i
         else:
             out = out + [i]
+    # print("MERGE ARRAYS: {}".format(out))
     return out
 
 
 def expand_templates_impl(list_dicts, templates):
+    if not list_dicts:
+        return None
     out = list()
     exp = False
-    for d in list_dicts:
+    for d in list(list_dicts):
         if 'template' in d:
             t = d['template']
             if t in templates:
@@ -119,10 +137,13 @@ def expand_templates(list_dicts):
         else:
             out.append(i)
     out = expand_templates_impl(out, templates)
+    # print("EXP TEMPLATES: {}".format(out))
     return out
 
 
 def expand_constants_impl(list_dicts, constants):
+    if not list_dicts:
+        return None
     out = list()
     for d in list_dicts:
         for i in d:
@@ -143,6 +164,7 @@ def expand_constants(list_dicts):
         else:
             out.append(i)
     out = expand_constants_impl(out, constants)
+    # print("EXP CONSTANTS: {}".format(out))
     return out
 
 
@@ -262,6 +284,9 @@ os.makedirs(args.dest, exist_ok=True)
 
 for template in args.template:
     dest = os.path.splitext(os.path.basename(template))[0]
+    if not '.' in dest:
+        continue
+
     print("Generating {}...".format(dest))
 
     with open(os.path.join(args.dest, dest), 'w') as f:

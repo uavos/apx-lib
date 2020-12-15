@@ -1,1 +1,9 @@
-apx_module(INTERFACE DEPENDS shared.common INCLUDES ..)
+apx_module(
+    INTERFACE
+    DEPENDS
+    shared.common
+    INCLUDES
+    .
+    PREFIX
+    xbus
+)

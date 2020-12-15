@@ -8,4 +8,14 @@ add_custom_command(
 
 apx_gensrc(mandala_headers DATA mandala.json PREFIX mandala)
 
-apx_module(INTERFACE DEPENDS shared.common GENSRC mandala_headers)
+apx_module(
+    INTERFACE
+    DEPENDS
+    shared.common
+    GENSRC
+    mandala_headers
+    INCLUDES
+    .
+    PREFIX
+    mandala
+)
