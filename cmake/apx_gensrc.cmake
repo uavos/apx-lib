@@ -7,6 +7,7 @@ function(apx_gensrc TARGET)
             SRCS
             DATA
             PREFIX
+            DEPENDS
         REQUIRED
             DATA
         ARGN ${ARGN}
@@ -59,7 +60,7 @@ function(apx_gensrc TARGET)
     add_custom_command(
         OUTPUT ${targets}
         COMMAND ${PYTHON_EXECUTABLE} ${script} --data "${DATA}" --template ${srcs} --dest ${dest}
-        DEPENDS ${script} ${srcs} ${deps}
+        DEPENDS ${script} ${srcs} ${deps} ${DEPENDS}
         VERBATIM
     )
 
