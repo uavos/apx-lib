@@ -141,6 +141,13 @@ function(apx_module)
         endforeach()
     endif()
 
+    # report
+    set(report ${MODULE})
+    if(INIT)
+        set(report "${report} INIT")
+    endif()
+    message(STATUS "MODULE: ${report}")
+
     # make module name available in parent scope
     set(MODULE
         ${MODULE}

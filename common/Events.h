@@ -58,6 +58,6 @@ List<apx::Event<T> *> apx::Event<T>::_list;
 
 } // namespace apx
 
-#define EVENT(aname) \
-    struct _##aname##_t; \
-    using aname = apx::Event<_##aname##_t>
+#define EVENT(_name) \
+    struct _##_name##_t; \
+    using _name = apx::Event<_##_name##_t>
