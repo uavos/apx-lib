@@ -1,1 +1,1 @@
-apx_module(INTERFACE INCLUDES .)
+apx_module(INCLUDES .)
