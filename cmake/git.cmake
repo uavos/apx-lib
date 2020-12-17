@@ -66,4 +66,9 @@ execute_process(
     WORKING_DIRECTORY ${APX_GIT_ROOT}
 )
 
+string(REPLACE "." ";" version_list ${APX_GIT_VERSION})
+list(GET version_list 0 APX_GIT_VERSION_MAJOR)
+list(GET version_list 1 APX_GIT_VERSION_MINOR)
+list(GET version_list 2 APX_GIT_VERSION_BUILD)
+
 message(STATUS "APX version: ${APX_GIT_VERSION} (${APX_GIT_BRANCH})")
