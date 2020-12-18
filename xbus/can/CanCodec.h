@@ -26,7 +26,7 @@
 
 #include "CanPool.h"
 
-#include <common/do_not_copy.h>
+#include <do_not_copy.h>
 #include <xbus/XbusNode.h>
 #include <xbus/XbusPacket.h>
 

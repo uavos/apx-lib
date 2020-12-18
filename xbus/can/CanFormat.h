@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <common/visibility.h>
 #include <sys/types.h>
+#include <visibility.h>
 
 #include <xbus/XbusPacket.h>
 
