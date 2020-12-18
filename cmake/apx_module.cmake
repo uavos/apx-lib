@@ -1,30 +1,3 @@
-macro(module_srcs)
-    if(NOT SRCS)
-        if(INTERFACE)
-            set(SRCS "*.h*")
-        else()
-            set(SRCS "*.[ch]*")
-        endif()
-    endif()
-    set(srcs)
-    foreach(src ${SRCS})
-        if(NOT EXISTS ${src})
-            file(
-                GLOB src_exp
-                RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-                ${src}
-            )
-            if(src_exp)
-                set(src ${src_exp})
-            endif()
-        endif()
-        if(NOT src MATCHES "[\*]")
-            list(APPEND srcs ${src})
-        endif()
-    endforeach()
-    set(SRCS ${srcs})
-endmacro()
-
 # cmake-format: off
 function(apx_module)
 
@@ -46,7 +19,7 @@ function(apx_module)
 
     # guess module name
 
-    set(path ${CMAKE_CURRENT_SOURCE_DIR})
+    set(path ${CMAKE_CURRENT_LIST_DIR})
     if(${path} MATCHES "^${APX_SHARED_DIR}")
         file(RELATIVE_PATH path ${APX_SHARED_DIR} ${path})
         set(path "shared.${path}")
@@ -64,7 +37,9 @@ function(apx_module)
     # first include dependencies (other modules)
     if(DEPENDS)
         foreach(dep ${DEPENDS})
-            apx_use_module(${dep})
+            if(NOT TARGET ${dep})
+                apx_use_module(${dep})
+            endif()
         endforeach()
     endif()
 
