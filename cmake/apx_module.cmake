@@ -65,7 +65,8 @@ function(apx_module)
     endif()
     set(srcs)
     foreach(src ${SRCS})
-        if(NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/${src})
+        # if(NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/${src})
+        if(src MATCHES "[\*]")
             file(
                 GLOB src_exp
                 RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -80,7 +81,7 @@ function(apx_module)
         endif()
     endforeach()
     set(SRCS ${srcs})
-    message(STATUS "SRC: ${MODULE}: ${SRCS}")
+    # message(STATUS "SRC: ${MODULE}: ${SRCS}")
 
     # check if src contains headers only - i.e. interface
     if(GENSRC)
