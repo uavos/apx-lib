@@ -20,6 +20,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #pragma once
+#include "XbusPacket.h"
+
 #include "XbusStreamReader.h"
 #include "XbusStreamWriter.h"
 
@@ -31,7 +33,7 @@ typedef uint16_t squawk_t;
 // Vehicle IDENT
 typedef uint8_t uid_t[12]; //global unique vehicle id
 
-typedef struct
+struct ident_s
 {
     uid_t uid;
 
@@ -57,7 +59,7 @@ typedef struct
         s->write(uid, sizeof(uid));
         *s << flags._raw;
     }
-} ident_s;
+};
 
 // Vehicle transponder data
 typedef float lat_t;
@@ -67,7 +69,7 @@ typedef uint16_t speed_t;
 typedef int16_t course_t;
 typedef uint8_t mode_t;
 
-typedef struct
+struct xpdr_s
 {
     lat_t lat;
     lon_t lon;
@@ -104,7 +106,7 @@ typedef struct
         s->write<course_t, float>(course * (32768.0f / 180.0f));
         *s << mode;
     }
-} xpdr_s;
+};
 
 } // namespace vehicle
 } // namespace xbus

@@ -37,7 +37,7 @@ typedef uint32_t hash_t;
 //---------------------------
 namespace ident {
 
-typedef struct
+struct ident_s
 {
     uint32_t format; // protocol format
     hash_t hash;     // structure hash
@@ -69,7 +69,7 @@ typedef struct
         *s << hash;
         *s << flags.raw;
     }
-} ident_s;
+};
 
 }; // namespace ident
 
@@ -111,7 +111,7 @@ typedef uint32_t size_t;
 typedef uint32_t time_t;
 typedef uint16_t timeout_t;
 
-typedef struct
+struct info_s
 {
     size_t size;     // file size
     time_t time;     // modified time
@@ -149,7 +149,7 @@ typedef struct
         *s << offset;
         *s << flags.raw;
     }
-} info_s;
+};
 
 }; // namespace file
 
@@ -203,7 +203,7 @@ enum type_e : uint8_t {
 
 // field descriptor packed into dict array
 #pragma pack(1)
-typedef struct
+struct field_s
 {
     type_e type;
     uint8_t array; // >0 if array
@@ -212,8 +212,7 @@ typedef struct
     // field strings: name, units
     // group strings: name, title
     // command strings: name, title
-
-} field_s;
+};
 #pragma pack()
 static_assert(sizeof(field_s) == 3, "size error");
 
@@ -272,7 +271,7 @@ enum op_e : uint8_t {
 //---------------------------
 namespace status {
 
-typedef struct
+struct status_s
 {
     struct
     {
@@ -312,8 +311,7 @@ typedef struct
         *s << cnt.tx;
         s->write(cnt._rsv, sizeof(cnt._rsv));
     }
-
-} status_s;
+};
 
 }; // namespace status
 

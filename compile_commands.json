@@ -1,0 +1,27 @@
+[
+{
+  "directory": "/Volumes/Projects/Autopilot/apx/lib/build",
+  "command": "/usr/bin/clang++ -DMODULE_NAME=\\\"telemetry\\\" -Imodules/shared/xbus/telemetry -Imodules/shared/xbus/telemetry/modules/shared/xbus -I../common -Imodules/shared/xbus/telemetry/modules/shared/mandala -Imodules/shared/xbus/telemetry/modules/shared/mandala/gensrc -I../crc/include -g -flto=thin -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=gnu++14 -o modules/shared/xbus/telemetry/CMakeFiles/shared.xbus.telemetry.dir/TelemetryDecoder.cpp.o -c /Volumes/Projects/Autopilot/apx/lib/xbus/telemetry/TelemetryDecoder.cpp",
+  "file": "/Volumes/Projects/Autopilot/apx/lib/xbus/telemetry/TelemetryDecoder.cpp"
+},
+{
+  "directory": "/Volumes/Projects/Autopilot/apx/lib/build",
+  "command": "/usr/bin/clang++ -DMODULE_NAME=\\\"telemetry\\\" -Imodules/shared/xbus/telemetry -Imodules/shared/xbus/telemetry/modules/shared/xbus -I../common -Imodules/shared/xbus/telemetry/modules/shared/mandala -Imodules/shared/xbus/telemetry/modules/shared/mandala/gensrc -I../crc/include -g -flto=thin -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=gnu++14 -o modules/shared/xbus/telemetry/CMakeFiles/shared.xbus.telemetry.dir/TelemetryEncoder.cpp.o -c /Volumes/Projects/Autopilot/apx/lib/xbus/telemetry/TelemetryEncoder.cpp",
+  "file": "/Volumes/Projects/Autopilot/apx/lib/xbus/telemetry/TelemetryEncoder.cpp"
+},
+{
+  "directory": "/Volumes/Projects/Autopilot/apx/lib/build",
+  "command": "/usr/bin/clang -DMODULE_NAME=\\\"common\\\" -I../common -g -flto=thin -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=gnu11 -o modules/shared/xbus/telemetry/modules/shared/xbus/modules/shared/common/CMakeFiles/shared.common.dir/empty.c.o -c /Volumes/Projects/Autopilot/apx/lib/common/empty.c",
+  "file": "/Volumes/Projects/Autopilot/apx/lib/common/empty.c"
+},
+{
+  "directory": "/Volumes/Projects/Autopilot/apx/lib/build",
+  "command": "/usr/bin/clang++ -DMODULE_NAME=\\\"crc\\\" -I../crc/include -I../common -g -flto=thin -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=gnu++14 -o modules/shared/xbus/telemetry/modules/shared/crc/CMakeFiles/shared.crc.dir/CRC32.cpp.o -c /Volumes/Projects/Autopilot/apx/lib/crc/CRC32.cpp",
+  "file": "/Volumes/Projects/Autopilot/apx/lib/crc/CRC32.cpp"
+},
+{
+  "directory": "/Volumes/Projects/Autopilot/apx/lib/build",
+  "command": "/usr/bin/clang -DMODULE_NAME=\\\"crc\\\" -I../crc/include -I../common -g -flto=thin -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk -std=gnu11 -o modules/shared/xbus/telemetry/modules/shared/crc/CMakeFiles/shared.crc.dir/crc32_sw.c.o -c /Volumes/Projects/Autopilot/apx/lib/crc/crc32_sw.c",
+  "file": "/Volumes/Projects/Autopilot/apx/lib/crc/crc32_sw.c"
+}
+]

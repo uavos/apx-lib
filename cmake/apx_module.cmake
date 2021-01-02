@@ -6,6 +6,7 @@ function(apx_module)
         ONE_VALUE
             MODULE_NAME
             PREFIX
+            BEFORE
         MULTI_VALUE
             INCLUDES
             SRCS
@@ -48,10 +49,20 @@ function(apx_module)
     set_property(GLOBAL APPEND PROPERTY APX_MODULES ${MODULE})
 
     if(INIT)
-        set_property(GLOBAL APPEND PROPERTY APX_MODULES_INIT ${MODULE})
+        if(BEFORE)
+            get_property(all_modules GLOBAL PROPERTY APX_MODULES_INIT)
+            list(FIND all_modules ${BEFORE} before_index)
+            if(before_index LESS 0)
+                message(FATAL_ERROR "Cant insert module ${MODULE} before ${BEFORE}")
+            endif()
+            list(INSERT all_modules ${before_index} ${MODULE})
+            set_property(GLOBAL PROPERTY APX_MODULES_INIT ${all_modules})
+        else()
+            set_property(GLOBAL APPEND PROPERTY APX_MODULES_INIT ${MODULE})
+        endif()
     endif()
 
-    set(meta "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_NAME}.yml")
+    set(meta "${CMAKE_CURRENT_LIST_DIR}/${MODULE_NAME}.yml")
     if(EXISTS ${meta})
         set_property(GLOBAL APPEND PROPERTY APX_MODULES_META ${meta})
         # message(STATUS "META: ${meta}")

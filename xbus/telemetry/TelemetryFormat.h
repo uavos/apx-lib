@@ -99,18 +99,18 @@ static constexpr uint32_t dt_ms(dt_e dt)
     return 0;
 }
 
-typedef struct
+struct field_s
 {
     xbus::pid_s pid; // seq = seq_e skip mode
     fmt_e fmt : 8;
     // uint8_t _rsv : 4;
-} field_s;
+};
 static_assert(sizeof(field_s) == 3, "size error");
 
-typedef union {
+union hash_s {
     uint32_t hash;
     uint8_t byte[4];
-} hash_s;
+};
 static_assert(sizeof(hash_s) == 4, "size error");
 
 static constexpr const size_t fmt_block_size = 64;
@@ -118,7 +118,7 @@ static constexpr const size_t fmt_block_size = 64;
 static constexpr const size_t slots_size{240};
 
 // stream header
-typedef struct
+struct stream_s
 {
     union {
         uint32_t _raw;
@@ -144,7 +144,7 @@ typedef struct
         *s << feed_hash;
         *s << feed_fmt;
     }
-} stream_s;
+};
 static_assert(sizeof(stream_s) == stream_s::psize(), "size error");
 
 #pragma pack()

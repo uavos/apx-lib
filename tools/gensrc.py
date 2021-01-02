@@ -40,9 +40,9 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--data', action='store', required=True,
                     help='JSON/YAML data file name[s] or raw JSON or cmake format')
 parser.add_argument('--template', action='store', nargs='*',
-                    required=True, help='Template file to use')
+                    required=False, help='Template file[s] to use')
 parser.add_argument('--dest', action='store', required=True,
-                    help='Destination directory')
+                    help='Destination directory or file name')
 args = parser.parse_args()
 #########################
 
@@ -236,6 +236,8 @@ def load_data(data):
             return yaml.load(f.read(), Loader=yaml.Loader)
         elif ext == 'json':
             return simplejson.loads(str(f.read()))
+        else:
+            return str(f.read()).strip()
     return {}
 
 
@@ -243,8 +245,8 @@ def parse_cmake_data(data):
     out = dict()
     index = data.index(';')+1
     while index < len(data):
-        next_index = data.index(';', index)
-        if next_index > data.index('[', index):
+        next_index = data.find(';', index)
+        if '[' in data and next_index > data.find('[', index):
             next_index = data.index(']', index)+1
 
         if next_index <= 0:
@@ -261,12 +263,18 @@ def parse_cmake_data(data):
                 for v in value:
                     value_exp.append(load_data(v))
                 value = value_exp
+        elif os.path.exists(value):
+            value = load_data(value)
         out[name] = value
         # print("{}: {}".format(name, value))
     return out
 
-
+##################################################################
 # main
+##################################################################
+
+
+# parse and load all data
 if args.data.startswith('#'):
     data = parse_cmake_data(args.data)
 elif ';' in args.data:
@@ -277,18 +285,34 @@ elif os.path.exists(args.data):
     data = load_data(args.data)
 else:
     data = simplejson.loads(str(args.data))
-
-os.makedirs(args.dest, exist_ok=True)
-
 # print("GENSRC_DATA: {}".format(data))
 
-for template in args.template:
-    dest = os.path.splitext(os.path.basename(template))[0]
-    if not '.' in dest:
-        continue
+# process data
 
-    print("Generating {}...".format(dest))
+if args.template:
+    # render templates mode
+    os.makedirs(args.dest, exist_ok=True)
 
-    with open(os.path.join(args.dest, dest), 'w') as f:
-        f.write(render(template, data))
+    for template in args.template:
+        dest = os.path.splitext(os.path.basename(template))[0]
+        if not '.' in dest:
+            continue
+
+        # print("Generating {}...".format(dest))
+
+        with open(os.path.join(args.dest, dest), 'w') as f:
+            f.write(render(template, data))
+            f.close()
+    exit()
+
+
+if os.path.splitext(args.dest)[1][1:].lower() == 'json':
+    # output JSON mode
+    # print("Generating {}...".format(args.dest))
+    outdir = os.path.dirname(args.dest)
+    if outdir:
+        os.makedirs(outdir, exist_ok=True)
+    with open(args.dest, 'w') as f:
+        simplejson.dump(data, f, indent=4)
         f.close()
+    exit()

@@ -51,6 +51,7 @@ site
 .tags*
 
 build*
+cquery*
 
 .history
 
