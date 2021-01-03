@@ -24,3 +24,8 @@ macro(get_all_targets_recursive targets dir)
     )
     list(APPEND ${targets} ${current_targets})
 endmacro()
+
+function(print_all_targets)
+    get_all_targets(all_targets)
+    message(STATUS "TARGETS: ${all_targets}")
+endfunction()
