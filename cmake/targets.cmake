@@ -1,12 +1,3 @@
-function(get_all_targets var)
-    set(targets)
-    get_all_targets_recursive(targets ${CMAKE_CURRENT_SOURCE_DIR})
-    set(${var}
-        ${targets}
-        PARENT_SCOPE
-    )
-endfunction()
-
 macro(get_all_targets_recursive targets dir)
     get_property(
         subdirectories
@@ -24,6 +15,15 @@ macro(get_all_targets_recursive targets dir)
     )
     list(APPEND ${targets} ${current_targets})
 endmacro()
+
+function(get_all_targets var)
+    set(targets)
+    get_all_targets_recursive(targets ${CMAKE_CURRENT_SOURCE_DIR})
+    set(${var}
+        ${targets}
+        PARENT_SCOPE
+    )
+endfunction()
 
 function(print_all_targets)
     get_all_targets(all_targets)
