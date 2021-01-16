@@ -1,4 +1,13 @@
+# cmake-format: off
 function(apx_use_module module)
+
+    apx_parse_function_args(
+        NAME apx_use_module
+        ONE_VALUE
+            DEST
+        ARGN ${ARGN}
+    )
+# cmake-format: on
 
     get_property(modules GLOBAL PROPERTY APX_MODULES)
     if(${module} IN_LIST modules)
@@ -9,7 +18,11 @@ function(apx_use_module module)
     string(REPLACE "." "/" module_path ${module})
     list(GET module_path_list 0 type)
 
-    set(dest_path ${APX_BINARY_DIR}/modules/${module_path})
+    if(DEST)
+        set(dest_path ${DEST})
+    else()
+        set(dest_path ${APX_BINARY_DIR}/modules/${module})
+    endif()
 
     if(type STREQUAL "shared")
         list(POP_FRONT module_path_list)
