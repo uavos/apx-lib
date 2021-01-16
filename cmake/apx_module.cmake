@@ -62,13 +62,15 @@ function(apx_module)
         endif()
     endif()
 
-    set(meta "${CMAKE_CURRENT_LIST_DIR}/${MODULE_NAME}.yml")
-    if(EXISTS ${meta})
+    # meta data
+    set(meta)
+    file(GLOB meta_list ${CMAKE_CURRENT_LIST_DIR}/${MODULE_NAME}.yml ${CMAKE_CURRENT_LIST_DIR}/${MODULE_NAME}-*.yml ${CMAKE_CURRENT_LIST_DIR}/*.yml)
+    foreach(meta_f ${meta_list})
+        set(meta ${meta_f})
         set_property(GLOBAL APPEND PROPERTY APX_MODULES_META ${meta})
         # message(STATUS "META: ${meta}")
-    else()
-        set(meta)
-    endif()
+        break()
+    endforeach()
 
     # glob SRCS when needed
     if(NOT SRCS)
