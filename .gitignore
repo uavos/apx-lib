@@ -56,3 +56,5 @@ cquery*
 .history
 
 bazel-*
+
+compile_commands.json
