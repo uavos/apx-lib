@@ -37,6 +37,7 @@ find_package(PythonInterp 3 REQUIRED)
 
 include(apx_parse_function_args)
 
+include(apx_srcs)
 include(apx_module)
 include(apx_use_module)
 include(apx_gensrc)

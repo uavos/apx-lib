@@ -21,7 +21,7 @@ function(apx_use_module module)
     if(DEST)
         set(dest_path ${DEST})
     else()
-        set(dest_path ${APX_BINARY_DIR}/modules/${module})
+        set(dest_path ${PROJECT_BINARY_DIR}/modules/${module})
     endif()
 
     if(type STREQUAL "shared")

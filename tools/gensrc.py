@@ -255,7 +255,7 @@ def parse_cmake_data(data):
         token = data[index:next_index]
         index = next_index+1
 
-        name, value = token.split(':')
+        name, value = token.split(':', 1)
         if value.startswith('['):
             value = value[1:-1].split(';')
             if os.path.exists(value[0]):
