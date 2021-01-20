@@ -1,17 +1,22 @@
-macro(apx_srcs var)
+function(apx_glob_srcs)
 
-    if(NOT ${var})
-        set(${var} "*.[chsS]*")
+    if(ARGN)
+        set(SRCS "${ARGN}")
+    else()
+        set(SRCS "*.[chsS]*")
     endif()
 
-    # message(STATUS "SRC_LOOKUP: ${${var}}")
+    # message(STATUS "SRC_GLOB: ${SRCS}")
 
     set(srcs)
-    foreach(src ${${var}})
-        if(EXISTS "${src}/")
+    foreach(src ${SRCS})
+        # message(STATUS "NEXT: ${src} ${CMAKE_CURRENT_SOURCE_DIR}")
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${src}/" OR EXISTS "${src}/")
+            # message(STATUS "DIR: ${src}")
             file(
                 GLOB_RECURSE src_exp
                 RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+                LIST_DIRECTORIES FALSE
                 ${src}/*
             )
             if(src_exp)
@@ -21,6 +26,7 @@ macro(apx_srcs var)
             file(
                 GLOB src_exp
                 RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+                LIST_DIRECTORIES FALSE
                 ${src}
             )
             if(src_exp)
@@ -40,8 +46,24 @@ macro(apx_srcs var)
         endforeach()
     endforeach()
 
-    set(${var} ${srcs})
+    foreach(src ${srcs})
+        if(src MATCHES "^/")
+            file(RELATIVE_PATH src ${CMAKE_CURRENT_SOURCE_DIR} ${src})
+        endif()
+        if(NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${src})
+            message(FATAL_ERROR "Not found: ${src}")
+        endif()
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${src}/")
+            message(FATAL_ERROR "SRC is a directory: ${src}")
+        endif()
+    endforeach()
 
-    # message(STATUS "SRC: ${srcs}")
+    # return value
+    set(SRCS
+        ${srcs}
+        PARENT_SCOPE
+    )
 
-endmacro()
+    message(STATUS "SRC_GLOB_OUT: ${srcs}")
+
+endfunction()

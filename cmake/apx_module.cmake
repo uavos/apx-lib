@@ -74,7 +74,7 @@ function(apx_module)
     endforeach()
 
     # glob SRCS when needed
-    apx_srcs(SRCS)
+    apx_glob_srcs(${SRCS})
     # message(STATUS "SRC: ${SRCS}")
 
     # check if src contains headers only - i.e. interface
