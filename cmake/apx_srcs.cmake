@@ -11,30 +11,33 @@ function(apx_glob_srcs)
     set(srcs)
     foreach(src ${SRCS})
         # message(STATUS "NEXT: ${src} ${CMAKE_CURRENT_SOURCE_DIR}")
+        set(glob GLOB)
         if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${src}/" OR EXISTS "${src}/")
-            # message(STATUS "DIR: ${src}")
-            file(
-                GLOB_RECURSE src_exp
-                RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-                LIST_DIRECTORIES FALSE
-                ${src}/*
-            )
-            if(src_exp)
-                set(src ${src_exp})
-            endif()
-        elseif(src MATCHES "[\\*]")
-            file(
-                GLOB src_exp
-                RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-                LIST_DIRECTORIES FALSE
-                ${src}
-            )
-            if(src_exp)
-                set(src ${src_exp})
-            endif()
+            set(src "${src}/**")
         endif()
+        if(src MATCHES "\\*\\*")
+            set(glob GLOB_RECURSE)
+        endif()
+
+        # message(STATUS "DIR: ${src}")
+        file(
+            ${glob}
+            src_exp
+            RELATIVE
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            LIST_DIRECTORIES
+            FALSE
+            ${src}
+        )
+        if(src_exp)
+            set(src ${src_exp})
+        else()
+            message(WARNING "SRCS glob missing: ${src}")
+        endif()
+
         foreach(fsrc ${src})
-            if(fsrc MATCHES "[\\*]+")
+            if(fsrc MATCHES "[\\*\\?]+")
+                message(WARNING "SRCS glob not expanded: ${fsrc}")
                 continue()
             endif()
             get_filename_component(fname ${fsrc} NAME)
@@ -54,7 +57,7 @@ function(apx_glob_srcs)
             message(FATAL_ERROR "Not found: ${src}")
         endif()
         if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${src}/")
-            message(FATAL_ERROR "SRC is a directory: ${src}")
+            message(FATAL_ERROR "SRCS glob expanded to directory: ${src}")
         endif()
     endforeach()
 
@@ -64,6 +67,6 @@ function(apx_glob_srcs)
         PARENT_SCOPE
     )
 
-    message(STATUS "SRC_GLOB_OUT: ${srcs}")
+    # message(STATUS "SRC_GLOB_OUT: ${srcs}")
 
 endfunction()
