@@ -230,14 +230,19 @@ def render(template, data):
 
 
 def load_data(data):
+    if not type(data) is str or not os.path.exists(data) or os.path.isdir(data):
+        return data
+
     ext = os.path.splitext(data)[1][1:].lower()
     with open(data, 'r') as f:
         if ext == 'yml' or ext == 'yaml':
             return yaml.load(f.read(), Loader=yaml.Loader)
         elif ext == 'json':
             return simplejson.loads(str(f.read()))
-        else:
+        elif ext == 'txt':
             return str(f.read()).strip()
+        else:
+            return data
     return {}
 
 
@@ -263,9 +268,22 @@ def parse_cmake_data(data):
                 for v in value:
                     value_exp.append(load_data(v))
                 value = value_exp
-        elif os.path.exists(value):
-            value = load_data(value)
-        out[name] = value
+
+        value = load_data(value)
+
+        if '.' in name:
+            names = name.split('.')
+            name = names[0]
+            if not name in out:
+                out[name] = dict()
+            vdict = out[name]
+            for n in names[1:-1]:
+                if not n in vdict:
+                    vdict[n] = dict()
+                vdict = vdict[n]
+            vdict[names[-1]] = value
+        else:
+            out[name] = value
         # print("{}: {}".format(name, value))
     return out
 
