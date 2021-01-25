@@ -41,3 +41,5 @@ include(apx_srcs)
 include(apx_module)
 include(apx_use_module)
 include(apx_gensrc)
+
+include(apx_targets)

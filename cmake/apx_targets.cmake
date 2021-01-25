@@ -1,11 +1,11 @@
-macro(get_all_targets_recursive targets dir)
+macro(apx_get_all_targets_recursive targets dir)
     get_property(
         subdirectories
         DIRECTORY ${dir}
         PROPERTY SUBDIRECTORIES
     )
     foreach(subdir ${subdirectories})
-        get_all_targets_recursive(${targets} ${subdir})
+        apx_get_all_targets_recursive(${targets} ${subdir})
     endforeach()
 
     get_property(
@@ -16,16 +16,16 @@ macro(get_all_targets_recursive targets dir)
     list(APPEND ${targets} ${current_targets})
 endmacro()
 
-function(get_all_targets var)
+function(apx_get_all_targets var)
     set(targets)
-    get_all_targets_recursive(targets ${CMAKE_CURRENT_SOURCE_DIR})
+    apx_get_all_targets_recursive(targets ${CMAKE_CURRENT_SOURCE_DIR})
     set(${var}
         ${targets}
         PARENT_SCOPE
     )
 endfunction()
 
-function(print_all_targets)
-    get_all_targets(all_targets)
+function(apx_print_all_targets)
+    apx_get_all_targets(all_targets)
     message(STATUS "TARGETS: ${all_targets}")
 endfunction()
