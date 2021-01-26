@@ -33,7 +33,12 @@ define_property(
     FULL_DOCS "List of YAML files with metadata of all used APX modules"
 )
 
-find_package(PythonInterp 3 REQUIRED)
+find_package(
+    Python3
+    COMPONENTS Interpreter
+    REQUIRED
+)
+set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
 
 include(apx_parse_function_args)
 
