@@ -55,9 +55,15 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
     WORKING_DIRECTORY ${APX_GIT_ROOT}
 )
-string(REPLACE "v" "" APX_GIT_VERSION ${APX_GIT_VERSION})
-string(REPLACE "-" "." APX_GIT_VERSION ${APX_GIT_VERSION})
-string(REGEX MATCH "^([0-9]*\.[0-9]*\.[0-9]*)" APX_GIT_VERSION ${APX_GIT_VERSION})
+
+if(APX_GIT_VERSION MATCHES "^v([0-9]*\.[0-9]*)")
+    string(REPLACE "v" "" APX_GIT_VERSION ${APX_GIT_VERSION})
+    string(REPLACE "-" "." APX_GIT_VERSION ${APX_GIT_VERSION})
+    string(REGEX MATCH "^([0-9]*\.[0-9]*\.[0-9]*)" APX_GIT_VERSION ${APX_GIT_VERSION})
+else()
+    set(APX_GIT_VERSION "1.1.1")
+    message(STATUS "** OUT OF TREE BUILD **")
+endif()
 
 execute_process(
     COMMAND ${GIT_EXECUTABLE} branch --show-current
