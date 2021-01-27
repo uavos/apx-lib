@@ -5,7 +5,7 @@ include(apx)
 project(apx-shared LANGUAGES CXX C ASM)
 
 set(APX_SHARED_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(APX_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../fw/src)
+set(APX_MODULES_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 # apx_use_module(shared.mandala)
 # apx_use_module(shared.xbus.can)
