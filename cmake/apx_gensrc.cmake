@@ -67,18 +67,11 @@ function(apx_gensrc TARGET)
         DEPENDS ${script} ${srcs} ${deps} ${DEPENDS}
         VERBATIM
     )
+    set_source_files_properties(${targets} PROPERTIES GENERATED TRUE)
     add_custom_target(${TARGET} DEPENDS ${targets})
-    # set_source_files_properties(${targets} PROPERTIES GENERATED TRUE)
 
     # output
-    add_library(${TARGET}_lib INTERFACE)
-    add_dependencies(${TARGET}_lib ${TARGET})
-    target_sources(${TARGET}_lib INTERFACE ${targets})
-    target_include_directories(${TARGET}_lib INTERFACE ${dest_dir})
-
-    # add_custom_target(${TARGET} DEPENDS ${targets})
-
-    # set_property(TARGET ${TARGET} PROPERTY INTERFACE_SOURCES ${targets})
-    # set_property(TARGET ${TARGET} PROPERTY INCLUDE_DIRECTORIES ${dest_dir})
+    set_property(TARGET ${TARGET} PROPERTY INTERFACE_SOURCES ${targets})
+    set_property(TARGET ${TARGET} PROPERTY INCLUDE_DIRECTORIES ${dest_dir})
 
 endfunction()
