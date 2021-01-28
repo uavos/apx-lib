@@ -14,7 +14,7 @@ function(apx_gensrc TARGET)
     )
 # cmake-format: on
 
-    set(script ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../tools/gensrc.py)
+    set(script ${APX_SHARED_TOOLS_DIR}/gensrc.py)
     if(NOT EXISTS ${script})
         message(FATAL_ERROR "Script not found: ${script}")
     endif()
@@ -67,12 +67,18 @@ function(apx_gensrc TARGET)
         DEPENDS ${script} ${srcs} ${deps} ${DEPENDS}
         VERBATIM
     )
+    add_custom_target(${TARGET} DEPENDS ${targets})
+    # set_source_files_properties(${targets} PROPERTIES GENERATED TRUE)
 
     # output
-    set_source_files_properties(${targets} PROPERTIES GENERATED TRUE)
-    add_custom_target(${TARGET} DEPENDS ${targets})
+    add_library(${TARGET}_lib INTERFACE)
+    add_dependencies(${TARGET}_lib ${TARGET})
+    target_sources(${TARGET}_lib INTERFACE ${targets})
+    target_include_directories(${TARGET}_lib INTERFACE ${dest_dir})
 
-    set_property(TARGET ${TARGET} PROPERTY INTERFACE_SOURCES ${targets})
-    set_property(TARGET ${TARGET} PROPERTY INCLUDE_DIRECTORIES ${dest_dir})
+    # add_custom_target(${TARGET} DEPENDS ${targets})
+
+    # set_property(TARGET ${TARGET} PROPERTY INTERFACE_SOURCES ${targets})
+    # set_property(TARGET ${TARGET} PROPERTY INCLUDE_DIRECTORIES ${dest_dir})
 
 endfunction()
