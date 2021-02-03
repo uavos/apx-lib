@@ -42,27 +42,48 @@ endif()
 #     endif()
 # endif()
 
+# check if we are on specific release
 execute_process(
-    COMMAND ${GIT_EXECUTABLE} describe --always --tags
-    OUTPUT_VARIABLE APX_GIT_IDENTITY
+    COMMAND ${GIT_EXECUTABLE} tag --points-at HEAD
+    OUTPUT_VARIABLE APX_GIT_TAGS
     OUTPUT_STRIP_TRAILING_WHITESPACE
     WORKING_DIRECTORY ${APX_GIT_ROOT}
 )
+string(REPLACE "\n" ";" APX_GIT_TAGS ${APX_GIT_TAGS})
+foreach(tag ${APX_GIT_TAGS})
+    if(tag MATCHES "^release-")
+        string(REGEX MATCH "^release-([0-9]*\.[0-9]*\.[0-9]*)" APX_GIT_VERSION ${tag})
+        set(APX_GIT_VERSION ${CMAKE_MATCH_1})
+        if(APX_GIT_VERSION)
+            message(STATUS "** RELEASE VERSION BUILD ${APX_GIT_VERSION}**")
+            break()
+        endif()
+    endif()
+endforeach()
 
-execute_process(
-    COMMAND ${GIT_EXECUTABLE} describe --always --tags --match "v*.*"
-    OUTPUT_VARIABLE APX_GIT_VERSION
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    WORKING_DIRECTORY ${APX_GIT_ROOT}
-)
+if(NOT APX_GIT_VERSION)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --always --tags
+        OUTPUT_VARIABLE APX_GIT_IDENTITY
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        WORKING_DIRECTORY ${APX_GIT_ROOT}
+    )
 
-if(APX_GIT_VERSION MATCHES "^v([0-9]*\.[0-9]*)")
-    string(REPLACE "v" "" APX_GIT_VERSION ${APX_GIT_VERSION})
-    string(REPLACE "-" "." APX_GIT_VERSION ${APX_GIT_VERSION})
-    string(REGEX MATCH "^([0-9]*\.[0-9]*\.[0-9]*)" APX_GIT_VERSION ${APX_GIT_VERSION})
-else()
-    set(APX_GIT_VERSION "1.1.1")
-    message(STATUS "** OUT OF TREE BUILD **")
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --always --tags --match "v*.*"
+        OUTPUT_VARIABLE APX_GIT_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        WORKING_DIRECTORY ${APX_GIT_ROOT}
+    )
+
+    if(APX_GIT_VERSION MATCHES "^v([0-9]*\.[0-9]*)")
+        string(REPLACE "v" "" APX_GIT_VERSION ${APX_GIT_VERSION})
+        string(REPLACE "-" "." APX_GIT_VERSION ${APX_GIT_VERSION})
+        string(REGEX MATCH "^([0-9]*\.[0-9]*\.[0-9]*)" APX_GIT_VERSION ${APX_GIT_VERSION})
+    else()
+        set(APX_GIT_VERSION "1.1.1")
+        message(STATUS "** OUT OF TREE BUILD **")
+    endif()
 endif()
 
 execute_process(
