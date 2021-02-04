@@ -78,14 +78,21 @@ if(NOT APX_GIT_VERSION)
         WORKING_DIRECTORY ${APX_GIT_ROOT}
     )
 
-    if(APX_GIT_VERSION MATCHES "^v([0-9]*\.[0-9]*)")
+    if(APX_GIT_VERSION MATCHES "^v([0-9]+\.[0-9]+)")
         string(REPLACE "v" "" APX_GIT_VERSION ${APX_GIT_VERSION})
         string(REPLACE "-" "." APX_GIT_VERSION ${APX_GIT_VERSION})
-        string(REGEX MATCH "^([0-9]*\.[0-9]*\.[0-9]*)" APX_GIT_VERSION ${APX_GIT_VERSION})
-    else()
-        set(APX_GIT_VERSION "1.1.1")
-        message(STATUS "** OUT OF TREE BUILD **")
+        string(REPLACE "." ";" version_list ${APX_GIT_VERSION})
+        list(LENGTH version_list version_size)
+        if(version_size LESS "3")
+            string(APPEND APX_GIT_VERSION ".0")
+        endif()
+        string(REGEX MATCH "^([0-9]+\.[0-9]+\.[0-9]+)" APX_GIT_VERSION ${APX_GIT_VERSION})
     endif()
+endif()
+
+if(NOT APX_GIT_VERSION)
+    set(APX_GIT_VERSION "1.1.1")
+    message(STATUS "** OUT OF TREE BUILD **")
 endif()
 
 execute_process(
