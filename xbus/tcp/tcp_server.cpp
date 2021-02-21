@@ -68,6 +68,8 @@ static void *_thread_trampoline(void *arg)
 }
 bool Server::create_thread()
 {
+    printf("%s:create thread %lu\n", name, _tid_cnt);
+    fflush(stdout);
     pthread_mutex_lock(&_mutex);
     bool rv = pthread_create(&_tid[_tid_cnt], NULL, _thread_trampoline, this) == 0;
     if (rv)
@@ -127,6 +129,7 @@ bool Server::connect()
             break;
         }
         printf("%s:listening on port %u\n", name, ntohs(_host.addr.sin_port));
+        fflush(stdout);
 
         return true;
 
@@ -143,7 +146,10 @@ void Server::run()
 {
     struct sockaddr_storage serverStorage;
     socklen_t addr_size = sizeof serverStorage;
-    int fd = accept(_server_fd, (struct sockaddr *) &serverStorage, &addr_size);
+    int fd = -1;
+    do {
+        fd = accept(_server_fd, (struct sockaddr *) &serverStorage, &addr_size);
+    } while (fd <= 0);
     create_thread();
 
     // read timeout
