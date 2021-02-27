@@ -45,10 +45,7 @@ struct hdr_s
     uint8_t type;   //wp,rw,scr, ..
     uint8_t option; //left,right,line,hdg, ..
 
-    static inline uint16_t psize()
-    {
-        return sizeof(uint8_t);
-    }
+    static inline uint16_t psize() { return sizeof(uint8_t); }
     inline void read(XbusStreamReader *s)
     {
         uint8_t v;
@@ -66,7 +63,6 @@ struct hdr_s
 struct file_hdr_s
 {
     uint32_t size;
-    xbus::node::hash_t hash;
 
     title_t title;
 
@@ -84,12 +80,12 @@ struct file_hdr_s
 
     static inline uint16_t psize()
     {
-        return sizeof(uint32_t) + sizeof(xbus::node::hash_t) + sizeof(title_t) + sizeof(uint16_t) * 6 * 2;
+        return sizeof(uint32_t) + sizeof(title_t)
+               + sizeof(uint16_t) * 6 * 2;
     }
     inline void read(XbusStreamReader *s)
     {
         *s >> size;
-        *s >> hash;
         s->read(title, sizeof(title));
         *s >> cnt.wp;
         *s >> cnt.rw;
@@ -107,7 +103,6 @@ struct file_hdr_s
     inline void write(XbusStreamWriter *s) const
     {
         *s << size;
-        *s << hash;
         s->write(title, sizeof(title));
         *s << cnt.wp;
         *s << cnt.rw;
@@ -174,11 +169,7 @@ struct wp_s
         TRACK,
     };
 
-    static inline uint16_t psize()
-    {
-        return sizeof(float) * 2
-               + sizeof(int16_t);
-    }
+    static inline uint16_t psize() { return sizeof(float) * 2 + sizeof(int16_t); }
     inline void read(XbusStreamReader *s)
     {
         *s >> lat;
@@ -209,10 +200,7 @@ struct rw_s
 
     static inline uint16_t psize()
     {
-        return sizeof(float) * 2
-               + sizeof(int16_t)
-               + sizeof(int16_t)
-               + sizeof(int16_t)
+        return sizeof(float) * 2 + sizeof(int16_t) + sizeof(int16_t) + sizeof(int16_t)
                + sizeof(uint16_t);
     }
     inline void read(XbusStreamReader *s)
@@ -240,10 +228,7 @@ struct tw_s
     float lat;
     float lon;
 
-    static inline uint16_t psize()
-    {
-        return sizeof(float) * 2;
-    }
+    static inline uint16_t psize() { return sizeof(float) * 2; }
     inline void read(XbusStreamReader *s)
     {
         *s >> lat;
@@ -267,10 +252,7 @@ struct pi_s
 
     static inline uint16_t psize()
     {
-        return sizeof(float) * 2
-               + sizeof(int16_t)
-               + sizeof(int16_t)
-               + sizeof(uint8_t)
+        return sizeof(float) * 2 + sizeof(int16_t) + sizeof(int16_t) + sizeof(uint8_t)
                + sizeof(uint16_t);
     }
     inline void read(XbusStreamReader *s)
@@ -298,10 +280,7 @@ struct area_s
     float lat;
     float lon;
 
-    static inline uint16_t psize(uint8_t pointsCnt)
-    {
-        return sizeof(float) * 2 * pointsCnt;
-    }
+    static inline uint16_t psize(uint8_t pointsCnt) { return sizeof(float) * 2 * pointsCnt; }
     inline void read(XbusStreamReader *s)
     {
         *s >> lat;
@@ -328,36 +307,18 @@ struct act_speed_s
 {
     uint8_t speed; //0=cruise
 
-    static inline uint16_t psize()
-    {
-        return sizeof(uint8_t);
-    }
-    inline void read(XbusStreamReader *s)
-    {
-        *s >> speed;
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        *s << speed;
-    }
+    static inline uint16_t psize() { return sizeof(uint8_t); }
+    inline void read(XbusStreamReader *s) { *s >> speed; }
+    inline void write(XbusStreamWriter *s) const { *s << speed; }
 };
 
 struct act_pi_s
 {
     uint8_t index; //linked POI [0...n]
 
-    static inline uint16_t psize()
-    {
-        return sizeof(uint8_t);
-    }
-    inline void read(XbusStreamReader *s)
-    {
-        *s >> index;
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        *s << index;
-    }
+    static inline uint16_t psize() { return sizeof(uint8_t); }
+    inline void read(XbusStreamReader *s) { *s >> index; }
+    inline void write(XbusStreamWriter *s) const { *s << index; }
 };
 
 struct act_scr_s
@@ -365,18 +326,9 @@ struct act_scr_s
     typedef char scr_t[16]; //public func @name
     scr_t scr;
 
-    static inline uint16_t psize()
-    {
-        return sizeof(scr_t);
-    }
-    inline void read(XbusStreamReader *s)
-    {
-        s->read(scr, sizeof(scr));
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        s->write(scr, sizeof(scr));
-    }
+    static inline uint16_t psize() { return sizeof(scr_t); }
+    inline void read(XbusStreamReader *s) { s->read(scr, sizeof(scr)); }
+    inline void write(XbusStreamWriter *s) const { s->write(scr, sizeof(scr)); }
 };
 
 struct act_loiter_s
@@ -385,10 +337,7 @@ struct act_loiter_s
     uint8_t loops;    //loops to loiter
     uint16_t timeout; //time to loiter [s]
 
-    static inline uint16_t psize()
-    {
-        return sizeof(int16_t) + sizeof(uint8_t) + sizeof(uint16_t);
-    }
+    static inline uint16_t psize() { return sizeof(int16_t) + sizeof(uint8_t) + sizeof(uint16_t); }
     inline void read(XbusStreamReader *s)
     {
         *s >> radius;
@@ -408,10 +357,7 @@ struct act_shot_s
     uint16_t dist; //distance for series
     uint8_t opt;   //0=single,1=start,2=stop
 
-    static inline uint16_t psize()
-    {
-        return sizeof(uint16_t);
-    }
+    static inline uint16_t psize() { return sizeof(uint16_t); }
     inline void read(XbusStreamReader *s)
     {
         uint16_t v;
