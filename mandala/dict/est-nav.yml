@@ -129,13 +129,13 @@
       units: deg/s
 
     - name: "ax"
-      suffix: acceleration X
+      title: Angular acceleration X
       units: deg/s^2
     - name: "ay"
-      suffix: acceleration Y
+      title: Angular acceleration Y
       units: deg/s^2
     - name: "az"
-      suffix: acceleration Z
+      title: Angular acceleration Z
       units: deg/s^2
 
 - name: acc
