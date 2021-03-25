@@ -31,7 +31,7 @@ TelemetryDecoder::TelemetryDecoder()
     memset(&_slots, 0, sizeof(_slots));
 }
 
-bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
+bool TelemetryDecoder::decode(uint8_t pseq, XbusStreamReader &stream)
 {
     if (stream.available() < xbus::telemetry::stream_s::psize())
         return false;
@@ -39,7 +39,7 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
     xbus::telemetry::stream_s hdr;
     hdr.read(&stream);
 
-    uint32_t seq = pid.seq;
+    uint32_t seq = pseq;
     seq |= hdr.spec.seq << 2;
 
     uint8_t dseq = (seq - _seq) & 0x7FFFFFFF;

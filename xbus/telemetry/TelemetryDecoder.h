@@ -53,7 +53,7 @@ class TelemetryDecoder
 public:
     explicit TelemetryDecoder();
 
-    bool decode(const xbus::pid_s &pid, XbusStreamReader &stream);
+    bool decode(uint8_t pseq, XbusStreamReader &stream);
 
     bool decode_format(uint8_t part, uint8_t parts, XbusStreamReader &stream);
 
