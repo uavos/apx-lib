@@ -121,6 +121,8 @@ static constexpr const uint8_t uid_shift[] = {
 static constexpr const mandala::uid_t uid_base = 0x{{ '%0x' % data.uid_base }};
 static constexpr const mandala::uid_t uid_max = 0x{{ '%0x' % (data.uid_base+(2**(data.uid_bits|sum)-1)) }};
 
+static constexpr bool is_bundle(mandala::uid_t uid) { return (uid & ((1 << uid_bits[uid_levels - 1]) - 1)) == 0; }
+
 {% for i in data.content %}
 {{ collect_units(i) }}
 {% endfor %}
