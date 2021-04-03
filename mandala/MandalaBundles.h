@@ -152,8 +152,8 @@ struct sim_s
 
 struct cmd_pos_s
 {
-    float lat;
-    float lon;
+    double lat;
+    double lon;
 };
 
 #pragma pack()
