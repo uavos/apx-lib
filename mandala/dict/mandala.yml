@@ -32,7 +32,7 @@ descr: Vehicle core data manager and data structure.
 # type:   data type
 # suffix: make title from parent.title+suffix
 
-# Tree UID contains 4 levels of IDs (11 bits):
+# UID contains 4 levels of IDs (11 bits):
 #
 #   4  classes      2 bits  [sns, ctr, est, cmd]
 #   2  types        1 bit   [nav, env]

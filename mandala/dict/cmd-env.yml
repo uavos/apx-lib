@@ -128,7 +128,7 @@
   content:
     - name: search
       title: Search nodes
-      descr: Broadcast request, re <sn>
+      descr: Broadcast request, re <uid>
 
     - name: ident
       title: Node identification
@@ -158,6 +158,12 @@
       title: Node specific command
       descr: <cmd_s> [<data>]
 
+    - name: tree
+      title: Trace packet route
+      descr: <uid1>[<uid2>..<uidN>]
+
+    # debug
+    # should always be the least imprtant to keep uid
     - name: debug
       title: Debug data
       descr: <data>
