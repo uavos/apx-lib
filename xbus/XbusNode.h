@@ -53,10 +53,7 @@ struct ident_s
 
     // strings: name, version, hardware, [files]
 
-    static constexpr inline uint16_t psize()
-    {
-        return sizeof(uint32_t) * 2 + sizeof(hash_t);
-    }
+    static constexpr inline uint16_t psize() { return sizeof(uint32_t) * 2 + sizeof(hash_t); }
     inline void read(XbusStreamReader *s)
     {
         *s >> format;
@@ -260,8 +257,8 @@ namespace mod {
 
 enum op_e : uint8_t {
     sh,     // shell command, report to terminal
-    ls,     // re: <strings> tree
-    status, // re: <status_s>
+    ls,     // req: <strings> of module path, re: <strings> of child modules
+    status, // req: <strings> of module path, re: <strings> of module status
 };
 
 }; // namespace mod
@@ -287,10 +284,7 @@ struct status_s
         uint8_t _rsv[6];
     } cnt;
 
-    static constexpr inline uint16_t psize()
-    {
-        return sizeof(uint8_t) * 4;
-    }
+    static constexpr inline uint16_t psize() { return sizeof(uint8_t) * 4; }
     inline void read(XbusStreamReader *s)
     {
         *s >> err.can;
