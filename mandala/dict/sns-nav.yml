@@ -56,7 +56,6 @@
 
 - name: acc
   title: Accelerometer
-  units: m/s^2
   content:
     - name: src
       suffix: source
@@ -88,7 +87,6 @@
 
 - name: mag
   title: Magnetometer
-  units: su
   content:
     - name: src
       suffix: source
@@ -269,7 +267,6 @@
 
 - name: agl
   title: Altitude above ground sensors
-  units: m
   content:
     - name: src
       title: AGL source
@@ -288,10 +285,13 @@
 
     - name: laser
       title: Laser AGL altitude
+      units: m
     - name: radio
       title: Radio AGL altitude
+      units: m
     - name: sonic
       title: Ultrasonic AGL altitude
+      units: m
     - name: ground
       title: Ground
       type: option
