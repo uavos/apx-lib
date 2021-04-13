@@ -282,20 +282,20 @@
 
     - name: hdg
       title: Radio heading
-      units: deg
+      units: rad
     - name: dme
       title: Radio distance
       units: m
 
     - name: roll
       title: Antenna roll
-      units: deg
+      units: rad
     - name: pitch
       title: Antenna pitch
-      units: deg
+      units: rad
     - name: yaw
       title: Antenna yaw
-      units: deg
+      units: rad
 
 - name: aux
   title: Auxilary sensors
@@ -350,27 +350,27 @@
   content:
     - name: roll
       title: Cam roll
-      units: deg
+      units: rad
     - name: pitch
       title: Cam pitch
-      units: deg
+      units: rad
     - name: yaw
       title: Cam yaw
-      units: deg
+      units: rad
 
     - name: droll
       title: Delta roll
-      units: deg
+      units: rad
     - name: dpitch
       title: Delta pitch
-      units: deg
+      units: rad
     - name: dyaw
       title: Delta yaw
-      units: deg
+      units: rad
 
     - name: fov
       title: Cam field of view
-      units: deg
+      units: rad
 
     - name: range
       title: Payload range
@@ -381,13 +381,13 @@
   content:
     - name: roll
       title: Turret roll
-      units: deg
+      units: rad
     - name: pitch
       title: Turret pitch
-      units: deg
+      units: rad
     - name: yaw
       title: Turret yaw
-      units: deg
+      units: rad
 
     - name: status
       title: Turret status

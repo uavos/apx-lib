@@ -142,16 +142,16 @@
   content:
     - name: roll
       title: Cmd roll
-      units: deg
+      units: rad
     - name: pitch
       title: Cmd pitch
-      units: deg
+      units: rad
     - name: yaw
       title: Cmd yaw
-      units: deg
+      units: rad
     - name: slip
       title: Cmd slip
-      units: deg
+      units: rad
 
 - name: pos
   title: Position regulators
@@ -168,7 +168,7 @@
 
     - name: course
       title: Cmd course
-      units: deg
+      units: rad
     - name: airspeed
       title: Cmd airspeed
       units: m/s
@@ -309,23 +309,23 @@
 
     - name: roll
       suffix: roll
-      units: deg
+      units: rad
     - name: pitch
       suffix: pitch
-      units: deg
+      units: rad
     - name: yaw
       suffix: yaw
-      units: deg
+      units: rad
 
     - name: broll
       suffix: bias roll
-      units: deg/s
+      units: rad/s
     - name: bpitch
       suffix: bias pitch
-      units: deg/s
+      units: rad/s
     - name: byaw
       suffix: bias yaw
-      units: deg/s
+      units: rad/s
 
     - name: lat
       suffix: latitude
@@ -351,23 +351,23 @@
 
     - name: roll
       suffix: roll
-      units: deg
+      units: rad
     - name: pitch
       suffix: pitch
-      units: deg
+      units: rad
     - name: yaw
       suffix: yaw
-      units: deg
+      units: rad
 
     - name: p
       suffix: roll rate
-      units: deg/s
+      units: rad/s
     - name: q
       suffix: pitch rate
-      units: deg/s
+      units: rad/s
     - name: r
       suffix: yaw rate
-      units: deg/s
+      units: rad/s
 
 - name: turret
   title: Turret cmd
@@ -384,30 +384,30 @@
 
     - name: roll
       suffix: roll
-      units: deg
+      units: rad
     - name: pitch
       suffix: pitch
-      units: deg
+      units: rad
     - name: yaw
       suffix: yaw
-      units: deg
+      units: rad
 
     - name: p
       suffix: roll rate
-      units: deg/s
+      units: rad/s
     - name: q
       suffix: pitch rate
-      units: deg/s
+      units: rad/s
     - name: r
       suffix: yaw rate
-      units: deg/s
+      units: rad/s
 
     - name: broll
       suffix: bias roll
-      units: deg/s
+      units: rad/s
     - name: bipitch
       suffix: bias pitch
-      units: deg/s
+      units: rad/s
     - name: byaw
       suffix: bias yaw
-      units: deg/s
+      units: rad/s

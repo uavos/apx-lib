@@ -118,7 +118,7 @@
 
     - name: decl
       suffix: declination
-      units: deg
+      units: rad
 
 - name: gps
   title: GPS
@@ -305,10 +305,10 @@
   content:
     - name: slip
       title: Slip
-      units: deg
+      units: rad
     - name: aoa
       title: Angle of attack
-      units: deg
+      units: rad
     - name: temp
       title: Ambient air temperature
       units: C
@@ -321,13 +321,13 @@
   content:
     - name: roll
       suffix: Roll
-      units: deg
+      units: rad
     - name: pitch
       suffix: Pitch
-      units: deg
+      units: rad
     - name: yaw
       suffix: Yaw
-      units: deg
+      units: rad
 
 - name: las
   title: Landing Assistance sensors
@@ -387,13 +387,13 @@
 
     - name: roll
       suffix: roll
-      units: deg
+      units: rad
     - name: pitch
       suffix: pitch
-      units: deg
+      units: rad
     - name: yaw
       suffix: yaw
-      units: deg
+      units: rad
 
 - name: vps
   title: Visual navigation
@@ -421,13 +421,13 @@
 
     - name: roll
       title: Visual roll
-      units: deg
+      units: rad
     - name: pitch
       title: Visual pitch
-      units: deg
+      units: rad
     - name: yaw
       title: Visual yaw
-      units: deg
+      units: rad
 
     - name: lat
       title: Visual latitude
@@ -452,10 +452,10 @@
       units: m
     - name: hdg
       title: Heading to target
-      units: deg
+      units: rad
     - name: elv
       title: Elevation to target
-      units: deg
+      units: rad
     - name: vel
       title: Velocity of target
       units: m/s

@@ -35,13 +35,13 @@
 
     - name: roll
       suffix: roll
-      units: deg
+      units: rad
     - name: pitch
       suffix: pitch
-      units: deg
+      units: rad
     - name: yaw
       suffix: yaw
-      units: deg
+      units: rad
 
     - name: mag
       title: Magnetometer
@@ -91,7 +91,7 @@
 
     - name: course
       title: Moving direction
-      units: deg
+      units: rad
 
     - name: speed
       title: Ground speed
@@ -120,23 +120,23 @@
   content:
     - name: "x"
       suffix: "X"
-      units: deg/s
+      units: rad/s
     - name: "y"
       suffix: "Y"
-      units: deg/s
+      units: rad/s
     - name: "z"
       suffix: "Z"
-      units: deg/s
+      units: rad/s
 
     - name: "ax"
       title: Angular acceleration X
-      units: deg/s^2
+      units: rad/s^2
     - name: "ay"
       title: Angular acceleration Y
-      units: deg/s^2
+      units: rad/s^2
     - name: "az"
       title: Angular acceleration Z
-      units: deg/s^2
+      units: rad/s^2
 
 - name: acc
   title: Acceleration
@@ -224,10 +224,10 @@
 
     - name: slip
       title: Slip angle
-      units: deg
+      units: rad
     - name: aoa
       title: Angle of attack
-      units: deg
+      units: rad
 
     - name: ld
       title: Glide ratio
@@ -274,7 +274,7 @@
       units: m
     - name: hdg
       title: Waypoint heading
-      units: deg
+      units: rad
 
     - name: xtrack
       title: Crosstrack error
@@ -286,4 +286,4 @@
 
     - name: thdg
       title: Tangent heading
-      units: deg
+      units: rad

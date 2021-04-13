@@ -169,19 +169,19 @@ static uint16_t float_to_f16(const float &v)
     }
     return hp;
 }
-static int16_t float_to_rad(const float &v)
+static int16_t float_to_angle(const float &v, float span)
 {
-    const float span = (float) M_PI;
     const float dspan = span * 2.f;
     const float a = v - std::floor(v / dspan + 0.5f) * dspan;
     return (int16_t)(a * (32768.f / (float) M_PI));
 }
-static int16_t float_to_rad2(const float &v)
+static inline int16_t float_to_rad(const float &v)
 {
-    const float span = (float) M_PI / 2.f;
-    const float dspan = span * 2.f;
-    const float a = v - std::floor(v / dspan + 0.5f) * dspan;
-    return (int16_t)(a * (32768.f / ((float) M_PI / 2.f)));
+    return float_to_angle(v, M_PI);
+}
+static inline int16_t float_to_rad2(const float &v)
+{
+    return float_to_angle(v, M_PI / 2.f);
 }
 
 // pack method

@@ -82,20 +82,20 @@
       units: m/s
     - name: heading
       title: Wind heading
-      units: deg
+      units: rad
 
 - name: ats
   title: ATS
   content:
     - name: roll
       suffix: roll
-      units: deg
+      units: rad
     - name: pitch
       suffix: pitch
-      units: deg
+      units: rad
     - name: yaw
       suffix: yaw
-      units: deg
+      units: rad
 
 - name: cam
   title: Cam
@@ -103,13 +103,13 @@
   content:
     - name: roll
       suffix: roll
-      units: deg
+      units: rad
     - name: pitch
       suffix: pitch
-      units: deg
+      units: rad
     - name: yaw
       suffix: yaw
-      units: deg
+      units: rad
 
     - name: lat
       suffix: latitude
@@ -127,13 +127,13 @@
   content:
     - name: roll
       suffix: roll
-      units: deg
+      units: rad
     - name: pitch
       suffix: pitch
-      units: deg
+      units: rad
     - name: yaw
       suffix: yaw
-      units: deg
+      units: rad
 
     - name: lat
       suffix: latitude
@@ -192,35 +192,35 @@
   content:
     - name: shape
       suffix: dihedral angle
-      units: deg
+      units: rad
     - name: cshape
       suffix: cmd dihedral angle
-      units: deg
+      units: rad
 
     - name: roll
       suffix: central roll
-      units: deg
+      units: rad
 
     - name: roll1
       suffix: roll1
-      units: deg
+      units: rad
     - name: roll2
       suffix: roll2
-      units: deg
+      units: rad
 
     - name: pitch1
       suffix: pitch1
-      units: deg
+      units: rad
     - name: pitch2
       suffix: pitch2
-      units: deg
+      units: rad
 
     - name: cpitch1
       suffix: cmd pitch1
-      units: deg
+      units: rad
     - name: cpitch2
       suffix: cmd pitch2
-      units: deg
+      units: rad
 
     - name: spd1
       suffix: airspeed1
