@@ -29,4 +29,4 @@
 #define ENUM_MACRO(name, ...) \
     enum name { __VA_ARGS__ }; \
     static constexpr const char *name##_strings[] = {_ENUM_STRINGS(__VA_ARGS__)}; \
-    static inline constexpr const char *name##_string(name value) { return name##_strings[value]; }
+    static inline constexpr const char *name##_string(int value) { return name##_strings[value]; }
