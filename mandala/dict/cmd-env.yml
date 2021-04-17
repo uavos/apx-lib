@@ -24,10 +24,10 @@
   content:
     - name: ident
       title: Vehicle Identification
-      descr: <squawk>[<ident>]
+      descr: <squawk><uid>[<ident>]
     - name: downlink
       title: Data packet from vehicle to GCS
-      descr: <squawk><pid><data...>
+      descr: <squawk><uid_seq><pid><data...>
     - name: uplink
       title: Data packet from GCS to vehicle
       descr: <squawk>[<pid><data...>] or empty for heartbeat

@@ -35,8 +35,6 @@ typedef uint8_t uid_t[12]; //global unique vehicle id
 
 struct ident_s
 {
-    uid_t uid;
-
     union {
         uint32_t _raw;
         struct
@@ -47,18 +45,18 @@ struct ident_s
 
     static inline uint16_t psize()
     {
-        return sizeof(uid_t) + sizeof(flags._raw);
+        return sizeof(flags._raw);
     }
     inline void read(XbusStreamReader *s)
     {
-        s->read(uid, sizeof(uid));
         *s >> flags._raw;
     }
     inline void write(XbusStreamWriter *s) const
     {
-        s->write(uid, sizeof(uid));
         *s << flags._raw;
     }
+
+    // strings: callsign
 };
 
 // Vehicle transponder data
