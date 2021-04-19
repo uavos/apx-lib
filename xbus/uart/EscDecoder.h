@@ -24,14 +24,14 @@
 #include <QueueBuffer.h>
 
 #include "SerialCodec.h"
-/*
+
 template<size_t _buf_size, typename T = uint8_t>
-class EscDecoder : private QueueBuffer<_buf_size, T>, public SerialDecoder
+class EscDecoder : public SerialDecoder
 {
 public:
-    using QueueBuffer<_buf_size, T>::size;
-    using QueueBuffer<_buf_size, T>::empty;
-    using QueueBuffer<_buf_size, T>::read_packet;
+    explicit EscDecoder()
+        : SerialDecoder(_buf, _buf_size)
+    {}
 
     //decode ESC encoded data and write packet to fifo
     ErrorType decode(const void *src, size_t sz) override
@@ -132,16 +132,10 @@ public:
     {
         return QueueBuffer<_buf_size, T>::read_packet(dest, sz);
     }
-    inline size_t size() override
-    {
-        return QueueBuffer<_buf_size, T>::size();
-    }
-    inline void reset() override
-    {
-        QueueBuffer<_buf_size, T>::reset();
-    }
 
 private:
+    uint8_t _buf[_buf_size];
+
     uint8_t _state{0};
     size_t _rcnt{0};
     T _crc;
@@ -162,13 +156,4 @@ private:
             pop_head(_head_s);
         }
     }
-
-    using QueueBuffer<_buf_size, T>::space;
-    using QueueBuffer<_buf_size, T>::head;
-    using QueueBuffer<_buf_size, T>::write;
-    using QueueBuffer<_buf_size, T>::pop_head;
-    using QueueBuffer<_buf_size, T>::push_head;
-    using QueueBuffer<_buf_size, T>::write_word;
-    using QueueBuffer<_buf_size, T>::pop_one;
 };
-*/

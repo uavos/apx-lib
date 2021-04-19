@@ -24,20 +24,14 @@
 #include <QueueBuffer.h>
 
 #include "SerialCodec.h"
-/*
+
 template<size_t _buf_size, typename T = uint8_t>
-class EscEncoder : private QueueBuffer<_buf_size, T>, public SerialEncoder
+class EscEncoder : public SerialEncoder
 {
 public:
-    using QueueBuffer<_buf_size, T>::reset;
-    using QueueBuffer<_buf_size, T>::read;
-    using QueueBuffer<_buf_size, T>::size;
-    using QueueBuffer<_buf_size, T>::empty;
-    using QueueBuffer<_buf_size, T>::total;
-    using QueueBuffer<_buf_size, T>::tail;
-    using QueueBuffer<_buf_size, T>::head;
-    using QueueBuffer<_buf_size, T>::read_ptr;
-    using QueueBuffer<_buf_size, T>::skip_read;
+    explicit EscEncoder()
+        : SerialEncoder(_buf, _buf_size)
+    {}
 
     //write and encode data to fifo
     size_t encode(const void *src, size_t sz) override
@@ -84,18 +78,7 @@ public:
     {
         return QueueBuffer<_buf_size, T>::read(dest, sz);
     }
-    inline size_t size() override
-    {
-        return QueueBuffer<_buf_size, T>::size();
-    }
-    inline void reset() override
-    {
-        QueueBuffer<_buf_size, T>::reset();
-    }
 
 private:
-    using QueueBuffer<_buf_size, T>::space;
-    using QueueBuffer<_buf_size, T>::pop_head;
-    using QueueBuffer<_buf_size, T>::write;
+    uint8_t _buf[_buf_size];
 };
-*/
