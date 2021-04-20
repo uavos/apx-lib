@@ -130,6 +130,13 @@
 - name: gyro
   title: Angular rate
   content:
+    - name: valid
+      suffix: validity
+      type: option
+      units:
+        - "no"
+        - "yes"
+
     - name: "x"
       suffix: "X"
       units: rad/s
@@ -153,6 +160,13 @@
 - name: acc
   title: Acceleration
   content:
+    - name: valid
+      suffix: validity
+      type: option
+      units:
+        - "no"
+        - "yes"
+
     - name: "x"
       suffix: "X"
       units: m/s^2

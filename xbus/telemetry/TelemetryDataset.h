@@ -132,9 +132,12 @@ constexpr ds_field_s ds(fmt_e _fmt = default_fmt(M::meta.type_id, static_cast<un
 static constexpr const ds_field_s dataset_default[] = {
 
     // est
+    ds<est::nav::att::valid>(fmt_bit),
+    ds<est::nav::pos::valid>(fmt_bit),
+    ds<est::nav::gyro::valid>(fmt_bit),
+    ds<est::nav::acc::valid>(fmt_bit),
 
     ds<est::nav::att::status>(fmt_opt),
-    ds<est::nav::att::valid>(fmt_bit),
     ds<est::nav::att::roll>(fmt_rad),
     ds<est::nav::att::pitch>(fmt_rad2),
     ds<est::nav::att::yaw>(fmt_rad),
@@ -154,7 +157,6 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::acc::z>(fmt_f16), //fmt_sbyte_01),
 
     ds<est::nav::pos::status>(fmt_opt),
-    ds<est::nav::pos::valid>(fmt_bit),
     ds<est::nav::pos::lat>(fmt_real),
     ds<est::nav::pos::lon>(fmt_real),
     ds<est::nav::pos::hmsl>(fmt_real),
