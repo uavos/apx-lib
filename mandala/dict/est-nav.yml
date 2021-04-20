@@ -32,6 +32,12 @@
         - "warning"
         - "critical"
         - "failure"
+    - name: valid
+      suffix: validity
+      type: option
+      units:
+        - "no"
+        - "yes"
 
     - name: roll
       suffix: roll
@@ -74,6 +80,12 @@
         - "warning"
         - "critical"
         - "failure"
+    - name: valid
+      suffix: validity
+      type: option
+      units:
+        - "no"
+        - "yes"
 
     - name: lat
       title: Latitude
