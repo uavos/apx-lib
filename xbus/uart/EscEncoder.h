@@ -76,7 +76,7 @@ public:
 
     inline size_t read_encoded(void *dest, size_t sz) override
     {
-        return QueueBuffer<_buf_size, T>::read(dest, sz);
+        return SerialEncoder::read(dest, sz);
     }
 
 private:
