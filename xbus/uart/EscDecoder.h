@@ -130,7 +130,7 @@ public:
 
     inline size_t read_decoded(void *dest, size_t sz) override
     {
-        return QueueBuffer<_buf_size, T>::read_packet(dest, sz);
+        return SerialDecoder::read_packet(dest, sz);
     }
 
 private:
