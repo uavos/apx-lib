@@ -22,6 +22,7 @@
 - name: sys
   title: System
   content:
+    # TODO review est.sys mandala vars
     - name: mode
       suffix: mode
       type: option
