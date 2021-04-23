@@ -74,6 +74,10 @@ function(apx_module)
         break()
     endforeach()
 
+    # docs
+    file(GLOB docs ${CMAKE_CURRENT_SOURCE_DIR}/*.md)
+    set_property(GLOBAL APPEND PROPERTY APX_MODULES_DOCS ${docs})
+
     # glob SRCS when needed
     apx_glob_srcs(${SRCS})
     # message(STATUS "SRC: ${SRCS}")
