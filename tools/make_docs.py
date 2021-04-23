@@ -13,13 +13,13 @@ FM_BOUNDARY = re.compile(r'^-{3,}$', re.MULTILINE)
 def parse_frontmatter(content):
     content = content.strip()
     if not content.startswith('---\n'):
-        return dict(), content
+        return None, content
     # Parse text with frontmatter, extract metadata and content.
     try:
         _, fm, text = FM_BOUNDARY.split(content, 2)
     except ValueError:
-        print('YAML error:', content.splitlines()[0])
-        return dict(), content
+        print('Front matter error:', content.splitlines()[0])
+        return None, content
     fm = yaml.load(fm, Loader=yaml.SafeLoader)
     if not fm:
         fm = dict()
@@ -46,6 +46,10 @@ def main():
 
         fm, text = parse_frontmatter(content)
 
+        # skip files with no front matter
+        if fm == None:
+            continue
+
         if 'label' in fm:
             label = fm['label']
         else:
@@ -54,10 +58,11 @@ def main():
         if label == 'readme':
             label = os.path.basename(os.path.dirname(fname)).lower()
 
-        assets = os.path.join(os.path.dirname(fname), 'img')
-        if os.path.exists(assets):
-            copy_tree(assets, os.path.join(
-                args.dest, os.path.basename(assets)))
+        for asset in ['img', 'assets']:
+            asset = os.path.join(os.path.dirname(fname), asset)
+            if os.path.exists(asset):
+                copy_tree(asset, os.path.join(
+                    args.dest, os.path.basename(asset)))
 
         if 'page' in fm and len(text) > 0:
             # append text to another page
@@ -80,7 +85,13 @@ def main():
     if len(pages) > 0 and args.data:
         with open(args.data, "r") as f:
             yml = yaml.load(f, Loader=yaml.SafeLoader)
-        yml['pages'] = list(yml['pages'])+pages
+        if not yml:
+            yml = dict()
+        if type(yml['pages']) is list:
+            yml['pages'] = yml['pages']+pages
+        else:
+            yml['pages'] = pages
+
         with open(args.data, "w") as f:
             yaml.safe_dump(yml, f, default_flow_style=False,
                            encoding='utf-8', allow_unicode=False)
