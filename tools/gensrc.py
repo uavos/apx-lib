@@ -30,21 +30,10 @@ import simplejson
 from jinja2 import Environment, FileSystemLoader
 
 import yaml
+import sys
 
 import copy
 
-# import matplotlib.pyplot as plt
-
-# Parse commandline
-parser = argparse.ArgumentParser(
-    description='Generate source files for APX system.')
-parser.add_argument('--data', action='store', required=True,
-                    help='JSON/YAML data file name[s] or raw JSON or cmake format')
-parser.add_argument('--template', action='store', nargs='*',
-                    required=False, help='Template file[s] to use')
-parser.add_argument('--dest', action='store', required=True,
-                    help='Destination directory or file name')
-args = parser.parse_args()
 #########################
 
 
@@ -118,28 +107,37 @@ def expand_templates_impl(list_dicts, templates):
         if 'template' in d:
             t = d['template']
             if t in templates:
-                out = out + templates[t]
+                # out = out + templates[t]
+                out.extend(templates[t])
                 exp = True
             continue
-        out.append(d)
         if 'content' in d:
-            d['content'] = expand_templates_impl(d['content'], templates)
+            content = expand_templates_impl(d['content'], templates)
+            d['content'] = content
+            # print(content)
+        out.append(d)
     if not exp:
         return out
+    # nested templates
     return expand_templates_impl(out, templates)
 
 
-def expand_templates(list_dicts):
+def extract_templates(list_dicts):
     out = list()
     templates = dict()
     for i in list(list_dicts):
         if 'template' in i and 'content' in i:
-            templates[i['template']] = i['content']
+            name = i['template']
+            content = i['content']
+            templates[name] = content
         else:
             out.append(i)
-    out = expand_templates_impl(out, templates)
-    # print("EXP TEMPLATES: {}".format(out))
-    return out
+    return out, templates
+
+
+def expand_templates(list_dicts):
+    out, templates = extract_templates(list_dicts)
+    return expand_templates_impl(out, templates)
 
 
 def expand_constants_impl(list_dicts, constants):
@@ -194,7 +192,7 @@ def sort_modules(list_dicts):
                 g.add_edge(xn, before)
                 i = init_order.index(before)
                 if i > 0:
-                    g.add_edge(init_order[i-1], xn)
+                    g.add_edge(init_order[i - 1], xn)
             else:
                 g.add_edge(xn, before)
 
@@ -249,17 +247,17 @@ def load_data(data):
 
 def parse_cmake_data(data):
     out = dict()
-    index = data.index(';')+1
+    index = data.index(';') + 1
     while index < len(data):
         next_index = data.find(';', index)
         if '[' in data and next_index > data.find('[', index):
-            next_index = data.index(']', index)+1
+            next_index = data.index(']', index) + 1
 
         if next_index <= 0:
             next_index = len(data)
 
         token = data[index:next_index]
-        index = next_index+1
+        index = next_index + 1
 
         name, value = token.split(':', 1)
         if value.startswith('['):
@@ -293,45 +291,59 @@ def parse_cmake_data(data):
 ##################################################################
 
 
-# parse and load all data
-if args.data.startswith('#'):
-    data = parse_cmake_data(args.data)
-elif ';' in args.data:
-    data = []
-    for i in args.data.split(';'):
-        data.append(load_data(i))
-elif os.path.exists(args.data):
-    data = load_data(args.data)
-else:
-    data = simplejson.loads(str(args.data))
-# print("GENSRC_DATA: {}".format(data))
+def main():
+    parser = argparse.ArgumentParser(
+        description='Generate source files for APX system.')
+    parser.add_argument('--data', action='store', required=True,
+                        help='JSON/YAML data file name[s] or raw JSON or cmake format')
+    parser.add_argument('--template', action='store', nargs='*',
+                        required=False, help='Template file[s] to use')
+    parser.add_argument('--dest', action='store', required=True,
+                        help='Destination directory or file name')
+    args = parser.parse_args()
 
-# process data
+    # parse and load all data
+    if args.data.startswith('#'):
+        data = parse_cmake_data(args.data)
+    elif ';' in args.data:
+        data = []
+        for i in args.data.split(';'):
+            data.append(load_data(i))
+    elif os.path.exists(args.data):
+        data = load_data(args.data)
+    else:
+        data = simplejson.loads(str(args.data))
+    # print("GENSRC_DATA: {}".format(data))
 
-if args.template:
-    # render templates mode
-    os.makedirs(args.dest, exist_ok=True)
+    # process data
 
-    for template in args.template:
-        dest = os.path.splitext(os.path.basename(template))[0]
-        if not '.' in dest:
-            continue
+    if args.template:
+        # render templates mode
+        os.makedirs(args.dest, exist_ok=True)
 
-        # print("Generating {}...".format(dest))
+        for template in args.template:
+            dest = os.path.splitext(os.path.basename(template))[0]
+            if not '.' in dest:
+                continue
 
-        with open(os.path.join(args.dest, dest), 'w') as f:
-            f.write(render(template, data))
+            # print("Generating {}...".format(dest))
+
+            with open(os.path.join(args.dest, dest), 'w') as f:
+                f.write(render(template, data))
+                f.close()
+        exit()
+
+    if os.path.splitext(args.dest)[1][1:].lower() == 'json':
+        # output JSON mode
+        # print("Generating {}...".format(args.dest))
+        outdir = os.path.dirname(args.dest)
+        if outdir:
+            os.makedirs(outdir, exist_ok=True)
+        with open(args.dest, 'w') as f:
+            simplejson.dump(data, f, indent=4)
             f.close()
-    exit()
+        exit()
 
 
-if os.path.splitext(args.dest)[1][1:].lower() == 'json':
-    # output JSON mode
-    # print("Generating {}...".format(args.dest))
-    outdir = os.path.dirname(args.dest)
-    if outdir:
-        os.makedirs(outdir, exist_ok=True)
-    with open(args.dest, 'w') as f:
-        simplejson.dump(data, f, indent=4)
-        f.close()
-    exit()
+if __name__ == "__main__":
+    sys.exit(main())

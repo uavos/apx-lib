@@ -26,19 +26,35 @@ def parse_frontmatter(content):
     return fm, text.strip()
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description='Documentation maker for the APX system.')
-    parser.add_argument('--dest', action='store', required=True,
-                        help='destination directory')
-    parser.add_argument('--data', action='store', required=False,
-                        help='update YAML data file')
-    parser.add_argument('--srcs', nargs='+', required=True,
-                        help='Markdown files to copy')
-    args = parser.parse_args()
+def update_pages_data(path, pages):
+    if len(pages) > 0 and path:
+        with open(path, "r") as f:
+            yml = yaml.load(f, Loader=yaml.SafeLoader)
+        if not yml:
+            yml = dict()
+        if type(yml['pages']) is list:
+            yml['pages'] = yml['pages'] + pages
+        else:
+            yml['pages'] = pages
 
+        with open(path, "w") as f:
+            yaml.safe_dump(yml, f, default_flow_style=False,
+                           encoding='utf-8', allow_unicode=False)
+
+
+def copy_assets(src, dest):
+    assets = list()
+    for asset in ['img', 'assets']:
+        path = os.path.join(src, asset)
+        if os.path.exists(path):
+            copy_tree(path, os.path.join(dest, asset))
+            assets.extend([os.path.join(asset, i) for i in os.listdir(path)])
+    return assets
+
+
+def make_docs(dest, data, headers, srcs):
     pages = list()
-    for fname in args.srcs:
+    for fname in srcs:
         with open(fname, 'r') as f:
             content = f.read().strip()
         if len(content) <= 0:
@@ -58,18 +74,17 @@ def main():
         if label == 'readme':
             label = os.path.basename(os.path.dirname(fname)).lower()
 
-        for asset in ['img', 'assets']:
-            asset = os.path.join(os.path.dirname(fname), asset)
-            if os.path.exists(asset):
-                copy_tree(asset, os.path.join(
-                    args.dest, os.path.basename(asset)))
+        copy_assets(os.path.dirname(fname), dest)
 
         if 'page' in fm and len(text) > 0:
             # append text to another page
             page = fm['page']
-            page_fname = os.path.join(args.dest, page+'.md')
+            page_fname = os.path.join(dest, page + '.md')
             if os.path.exists(page_fname):
-                text = re.sub(r"^(#+)", r"\1#", text)
+                h = headers
+                while h > 0:
+                    text = re.sub(r"^(#+)", r"\1#", text)
+                    h = h - 1
                 with open(page_fname, 'r') as f:
                     content = f.read().strip()
                 content += '\n\n'
@@ -79,22 +94,25 @@ def main():
                     f.write(content)
                 continue
 
-        shutil.copy2(fname, os.path.join(args.dest, label+'.md'))
+        shutil.copy2(fname, os.path.join(dest, label + '.md'))
         pages.append(label)
 
-    if len(pages) > 0 and args.data:
-        with open(args.data, "r") as f:
-            yml = yaml.load(f, Loader=yaml.SafeLoader)
-        if not yml:
-            yml = dict()
-        if type(yml['pages']) is list:
-            yml['pages'] = yml['pages']+pages
-        else:
-            yml['pages'] = pages
+    update_pages_data(data, pages)
 
-        with open(args.data, "w") as f:
-            yaml.safe_dump(yml, f, default_flow_style=False,
-                           encoding='utf-8', allow_unicode=False)
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Documentation maker for the APX system')
+    parser.add_argument('--dest', action='store', required=True,
+                        help='destination directory')
+    parser.add_argument('--data', action='store', required=False,
+                        help='update YAML data file')
+    parser.add_argument('--headers', action='store', required=False, default=1,
+                        help='Markdown headers level increment for nested pages')
+    parser.add_argument('--srcs', nargs='+', required=True,
+                        help='Markdown files to copy')
+    args = parser.parse_args()
+    make_docs(args.dest, args.data, args.headers, args.srcs)
 
 
 if __name__ == "__main__":
