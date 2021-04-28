@@ -38,7 +38,7 @@
 {{ ind }}{
 {{ ind1 }}.name = "{{ d.name }}",
 {{ ind1 }}.title = "{{ title }}",
-{{ ind1 }}.descr = "{{ d.descr }}",
+{{ ind1 }}.descr = "{{ d.descr | trim | replace('`','') }}",
 {{ ind1 }}.units = "{{ units }}",
 {{ ind1 }}.path = "{{ path|join('.') }}",
 {{ ind1 }}.uid = 0x{{ '%0x' % (uid_val) }},
