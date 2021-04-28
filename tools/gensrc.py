@@ -62,7 +62,12 @@ def merge_dicts(list_dicts):
     dout = dict()
     # print("MERGE DICTS: {}".format(list_dicts))
     for d in list(list_dicts):
-        assert type(d) is dict, "Error dict object ({})".format(d)
+        if type(d) is not dict:
+            print('Error dict object ({})'.format(d))
+            continue
+        if 'content' in d and not d['content']:
+            print('Empty dict object ({})'.format(d))
+            continue
         name = d['name']
         if name in dout:
             base = dout[name]
@@ -74,10 +79,13 @@ def merge_dicts(list_dicts):
                 if key not in base:
                     base.update({key: value})
                 elif type(value) is list:
-                    if base[key]:
-                        base.update({key: merge_dicts(base[key] + value)})
+                    if key == 'content':
+                        if base[key]:
+                            base.update({key: merge_dicts(base[key] + value)})
+                        else:
+                            base.update({key: merge_dicts(value)})
                     else:
-                        base.update({key: merge_dicts(value)})
+                        base.update({key: value})
                 else:
                     base.update({key: value})
         else:
@@ -85,6 +93,23 @@ def merge_dicts(list_dicts):
             out.append(base)
         dout[name] = base
     return out
+
+
+def merge_defaults(list_dicts):
+    for d in list(list_dicts):
+        if not 'content' in d:
+            continue
+        content = d['content']
+        if not content:
+            continue
+        if 'default' in d:
+            values = d['default']
+            del d['default']
+            for c in content:
+                if c['name'] in values:
+                    c['default'] = values[c['name']]
+        merge_defaults(content)
+    return list_dicts
 
 
 def merge_arrays(list_dicts):
@@ -224,6 +249,7 @@ def render(template, data):
     env.filters['expand_templates'] = expand_templates
     env.filters['expand_constants'] = expand_constants
     env.filters['sort_modules'] = sort_modules
+    env.filters['merge_defaults'] = merge_defaults
     template = env.get_template(os.path.basename((template)))
     return template.render(data=data)
 
