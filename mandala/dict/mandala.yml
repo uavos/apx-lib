@@ -21,7 +21,7 @@
 ##
 name: mandala
 title: Mandala
-descr: Vehicle core data manager and data structure.
+descr: Vehicle state data structure.
 
 # Parameters:
 #

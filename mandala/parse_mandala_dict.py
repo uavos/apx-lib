@@ -22,19 +22,11 @@
 #
 
 import argparse
-import glob
+import sys
 import os
 
 import simplejson
 import yaml
-
-# Parse commandline
-parser = argparse.ArgumentParser(description='Parse Mandala dict YAML files and print JSON')
-parser.add_argument('--dict', required=False, help='path to dict YAML file')
-parser.add_argument('--out', required=False, help='path to output JSON file')
-args = parser.parse_args()
-
-args.dict = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dict/mandala.yml')
 
 
 # construct dict based on file [config] or data
@@ -58,21 +50,25 @@ class Mandala(dict):
             for key in parent:
                 if key in Mandala.inheritance:
                     self[key] = parent[key]
+            if not 'title' in data and 'suffix' in data:
+                data['title'] = (parent['title'] + ' ' +
+                                 data['suffix']).strip()
 
         for key in data:
             if key != 'content':
                 self[key] = data[key]
 
-        for key in data:
-            if key != 'content':
-                continue
-            obj = data[key]
-            self[key] = list()
-            if not isinstance(obj, list):
-                conf = os.path.join(os.path.dirname(Mandala.config), obj+Mandala.configExt)
-                obj = self.read_config(conf)
-            for i in list(obj):
-                self[key].append(Mandala(data=i, parent=self))
+        if 'content' in data:
+            content = data['content']
+            self['content'] = list()
+            if type(content) is not list:
+                conf = os.path.join(os.path.dirname(
+                    Mandala.config), content + Mandala.configExt)
+                content = self.read_config(conf)
+            for i in list(content):
+                if not 'name' in i:
+                    continue
+                self['content'].append(Mandala(data=i, parent=self).copy())
 
     def read_config(self, config):
         # print('Reading {}...'.format(config))
@@ -80,11 +76,27 @@ class Mandala(dict):
             return yaml.load(f.read(), Loader=yaml.Loader)
 
 
-mandala = Mandala(root_config=args.dict)
+def main():
+    parser = argparse.ArgumentParser(
+        description='Parse Mandala dict YAML files and print JSON')
+    parser.add_argument('--dict', required=False,
+                        help='path to dict YAML file')
+    parser.add_argument('--out', required=False,
+                        help='path to output JSON file')
+    args = parser.parse_args()
 
-if args.out:
-    with open(args.out, 'w') as f:
-        simplejson.dump(mandala, f, sort_keys=True, indent=2)
-        f.write('\n')
-else:
-    print(simplejson.dumps(mandala))
+    args.dict = os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), 'dict/mandala.yml')
+
+    mandala = Mandala(root_config=args.dict)
+
+    if args.out:
+        with open(args.out, 'w') as f:
+            simplejson.dump(mandala, f, sort_keys=True, indent=2)
+            f.write('\n')
+    else:
+        print(simplejson.dumps(mandala))
+
+
+if __name__ == "__main__":
+    sys.exit(main())
