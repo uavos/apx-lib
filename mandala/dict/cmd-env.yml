@@ -92,7 +92,7 @@
         `script text`
 
 - name: aux
-  title: Auxilary data
+  title: Auxillary data
   content:
     - name: gcs
       title: GCS data
@@ -184,7 +184,7 @@
         `uid1` [`uid2`..`uidN`]
 
     # debug
-    # should always be the least imprtant to keep uid
+    # should always be the least important to keep uid
     - name: debug
       title: Debug data
       descr: |

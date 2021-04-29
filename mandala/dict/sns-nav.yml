@@ -32,7 +32,7 @@
         - primary
         - secondary
         - failsafe
-        - auxilary
+        - auxillary
 
     - name: cnt
       suffix: devices
@@ -66,7 +66,7 @@
         - primary
         - secondary
         - failsafe
-        - auxilary
+        - auxillary
 
     - name: cnt
       suffix: devices
@@ -97,7 +97,7 @@
         - primary
         - secondary
         - failsafe
-        - auxilary
+        - auxillary
 
     - name: cnt
       suffix: devices
@@ -132,7 +132,7 @@
         - primary
         - secondary
         - failsafe
-        - auxilary
+        - auxillary
 
     - name: cnt
       suffix: devices
@@ -197,7 +197,7 @@
         - primary
         - secondary
         - failsafe
-        - auxilary
+        - auxillary
 
     - name: cnt
       suffix: devices
@@ -232,7 +232,7 @@
         - primary
         - secondary
         - failsafe
-        - auxilary
+        - auxillary
 
     - name: cnt
       suffix: devices

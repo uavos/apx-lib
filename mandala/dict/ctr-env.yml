@@ -48,7 +48,7 @@
       suffix: Landing Assistance
 
 - name: aux
-  title: Auxilary
+  title: Auxillary
   type: option
   units:
     - "off"
@@ -151,7 +151,7 @@
         - "off"
         - "on"
     - name: aux
-      suffix: auxilary control
+      suffix: auxillary control
       type: byte
 
 - name: ats

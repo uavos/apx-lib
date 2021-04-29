@@ -68,7 +68,7 @@
       title: Oil pressure
       units: bar
     - name: map
-      title: Mainfold air pressure
+      title: Manifold Absolute Pressure
       units: Pa
     - name: iap
       title: Intake air box pressure
@@ -298,7 +298,7 @@
       units: rad
 
 - name: aux
-  title: Auxilary sensors
+  title: Auxillary sensors
   content:
     - name: rt
       title: Room temperature
