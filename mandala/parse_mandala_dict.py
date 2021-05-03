@@ -66,8 +66,8 @@ class Mandala(dict):
                     Mandala.config), content + Mandala.configExt)
                 content = self.read_config(conf)
             for i in list(content):
-                if not 'name' in i:
-                    continue
+                # if not 'name' in i:
+                #     continue
                 self['content'].append(Mandala(data=i, parent=self).copy())
 
     def read_config(self, config):
