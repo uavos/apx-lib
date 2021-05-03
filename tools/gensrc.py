@@ -65,9 +65,9 @@ def merge_dicts(list_dicts):
         if type(d) is not dict:
             print('Error dict object ({})'.format(d))
             continue
-        if 'content' in d and not d['content']:
-            print('Empty dict object ({})'.format(d))
-            continue
+        # if 'content' in d and not d['content']:
+        #     print('Empty dict object ({})'.format(d))
+        #     continue
         name = d['name']
         if name in dout:
             base = dout[name]
