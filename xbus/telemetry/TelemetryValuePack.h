@@ -45,25 +45,25 @@ struct rtype
 template<typename Tin>
 int8_t cast_value(rtype<int8_t>, const Tin &v)
 {
-    return (int8_t)(limit<int32_t>((int32_t) v, -128, 127));
+    return (int8_t) (limit<int32_t>((int32_t) v, -128, 127));
 }
 
 template<typename Tin>
 uint8_t cast_value(rtype<uint8_t>, const Tin &v)
 {
-    return (uint8_t)(limit<int32_t>((int32_t) v, 0, 255));
+    return (uint8_t) (limit<int32_t>((int32_t) v, 0, 255));
 }
 
 template<typename Tin>
 uint16_t cast_value(rtype<uint16_t>, const Tin &v)
 {
-    return (uint16_t)(limit<int32_t>((int32_t) v, 0, 65535));
+    return (uint16_t) (limit<int32_t>((int32_t) v, 0, 65535));
 }
 
 template<typename Tin>
 uint32_t cast_value(rtype<uint32_t>, const Tin &v)
 {
-    return (uint32_t)(v < 0 ? 0 : v);
+    return (uint32_t) (v < 0 ? 0 : v);
 }
 
 template<typename Tin>
@@ -173,7 +173,7 @@ static int16_t float_to_angle(const float &v, float span)
 {
     const float dspan = span * 2.f;
     const float a = v - std::floor(v / dspan + 0.5f) * dspan;
-    return (int16_t)(a * (32768.f / (float) M_PI));
+    return (int16_t) (a * (32768.f / span));
 }
 static inline int16_t float_to_rad(const float &v)
 {
