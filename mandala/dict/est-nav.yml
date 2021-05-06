@@ -101,7 +101,7 @@
       title: Altitude above ground
       units: m
 
-    - name: course
+    - name: bearing
       title: Moving direction
       units: rad
 

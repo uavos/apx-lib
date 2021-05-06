@@ -166,8 +166,8 @@
       title: Cmd altitude MSL
       units: m
 
-    - name: course
-      title: Cmd course
+    - name: bearing
+      title: Cmd bearing
       units: rad
     - name: airspeed
       title: Cmd airspeed
