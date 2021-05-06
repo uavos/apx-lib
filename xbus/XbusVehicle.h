@@ -43,18 +43,9 @@ struct ident_s
         };
     } flags;
 
-    static inline uint16_t psize()
-    {
-        return sizeof(flags._raw);
-    }
-    inline void read(XbusStreamReader *s)
-    {
-        *s >> flags._raw;
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        *s << flags._raw;
-    }
+    static inline uint16_t psize() { return sizeof(flags._raw); }
+    inline void read(XbusStreamReader *s) { *s >> flags._raw; }
+    inline void write(XbusStreamWriter *s) const { *s << flags._raw; }
 
     // strings: callsign
 };
@@ -73,16 +64,12 @@ struct xpdr_s
     lon_t lon;
     float alt;
     float speed;
-    float course;
+    float bearing;
     mode_t mode;
 
     static inline uint16_t psize()
     {
-        return sizeof(lat_t)
-               + sizeof(lon_t)
-               + sizeof(alt_t)
-               + sizeof(speed_t)
-               + sizeof(course_t)
+        return sizeof(lat_t) + sizeof(lon_t) + sizeof(alt_t) + sizeof(speed_t) + sizeof(course_t)
                + sizeof(mode_t);
     }
 
@@ -92,7 +79,7 @@ struct xpdr_s
         *s >> lon;
         alt = s->read<alt_t, float>();
         speed = s->read<speed_t, float>() / 100.0f;
-        course = s->read<course_t, float>() / (32768.0f / 180.0f);
+        bearing = s->read<course_t, float>() / (32768.0f / 180.0f);
         *s >> mode;
     }
     inline void write(XbusStreamWriter *s) const
@@ -101,7 +88,7 @@ struct xpdr_s
         *s << lon;
         s->write<alt_t, float>(alt);
         s->write<speed_t, float>(speed * 100.0f);
-        s->write<course_t, float>(course * (32768.0f / 180.0f));
+        s->write<course_t, float>(bearing * (32768.0f / 180.0f));
         *s << mode;
     }
 };
