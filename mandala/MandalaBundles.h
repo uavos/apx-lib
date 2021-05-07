@@ -148,6 +148,8 @@ struct sim_s
 
     float room_temp;
     float air_temp;
+
+    float slip; //degrees
 };
 
 struct cmd_pos_s
