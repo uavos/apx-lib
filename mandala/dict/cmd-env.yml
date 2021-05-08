@@ -24,15 +24,15 @@
   content:
     - name: ident
       title: Vehicle Identification
-      descr: |
+      descr: >
         `squawk` `uid` [`ident`]
     - name: downlink
       title: Data packet from vehicle to GCS
-      descr: |
+      descr: >
         `squawk` `uid_seq` `pid` `data...`
     - name: uplink
       title: Data packet from GCS to vehicle
-      descr: |
+      descr: >
         `squawk` [`pid` `data...`] or empty for heartbeat
 
 - name: telemetry
@@ -40,15 +40,15 @@
   content:
     - name: data
       title: Telemetry data
-      descr: |
+      descr: >
         `time` `hash feed` `fmt feed` `packed data...`
     - name: format
       title: Telemetry format array
-      descr: |
+      descr: >
         req `part`, re `part` `parts_cnt` `format feed block 256 bytes`
     - name: xpdr
       title: Transponder data
-      descr: |
+      descr: >
         `xpdr`
 
 - name: stream
@@ -56,12 +56,12 @@
   content:
     - name: vcp
       title: Virtual Comm Port channel data
-      descr: |
+      descr: >
         `vcp_id` `raw data`
 
     - name: calib
       title: Calibration data
-      descr: |
+      descr: >
         `sensor uid` `raw sensor data`
 
     - name: pld
@@ -84,11 +84,11 @@
   content:
     - name: vmexec
       title: Execute VM script onboard
-      descr: |
+      descr: >
         `function name`
     - name: jsexec
       title: Execute JS script on GCS
-      descr: |
+      descr: >
         `script text`
 
 - name: aux
@@ -96,17 +96,17 @@
   content:
     - name: gcs
       title: GCS data
-      descr: |
+      descr: >
         `uid` `data`
 
     - name: pld
       title: Payload data
-      descr: |
+      descr: >
         `uid` `data`
 
     - name: hid
       title: Human interface
-      descr: |
+      descr: >
         `uid` `data`
 
 - name: redundancy
@@ -145,47 +145,47 @@
 
     - name: ident
       title: Node identification
-      descr: |
+      descr: >
         `ident_s` `strings:name+version+hardware` `filenames`
 
     - name: file
       title: File operations
-      descr: |
+      descr: >
         `name` `fop_e` [`data`]
 
     - name: reboot
       title: System reboot
-      descr: |
+      descr: >
         `type_e`
 
     - name: msg
       title: Text message
-      descr: |
+      descr: >
         `type_e` `string`
 
     - name: upd
       title: Update parameter
-      descr: |
+      descr: >
         `fid_t` `data`
 
     - name: mod
       title: Modules tree
-      descr: |
+      descr: >
         `op_e`
 
     - name: usr
       title: Node specific command
-      descr: |
+      descr: >
         `cmd_s` [`data`]
 
     - name: tree
       title: Trace packet route
-      descr: |
+      descr: >
         `uid1` [`uid2`..`uidN`]
 
     # debug
     # should always be the least important to keep uid
     - name: debug
       title: Debug data
-      descr: |
+      descr: >
         `data`
