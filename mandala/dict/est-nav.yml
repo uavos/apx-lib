@@ -157,6 +157,10 @@
       title: Angular acceleration Z
       units: rad/s^2
 
+    - name: turn
+      title: Turn rate
+      units: rad/s
+
 - name: acc
   title: Acceleration
   content:
