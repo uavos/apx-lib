@@ -47,17 +47,22 @@
       suffix: time
       type: dword
       units: s
+      descr: |
+        GPS time or when not available - system CPU time.
     - name: uptime
       title: Uptime
       type: dword
       units: ms
+      descr: |
+        Number of milliseconds passed since system powered on.
 
     - name: ttl
       title: Time to live
       type: dword
       units: s
-    - name: energy
-      title: Energy capacity
+
+    - name: fuel
+      title: Fuel capacity
       units: u
 
     - name: weight

@@ -202,7 +202,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::env::sys::health>(fmt_opt),
     ds<est::env::sys::time>(fmt_dword),
     ds<est::env::sys::ttl>(fmt_word),
-    ds<est::env::sys::energy>(fmt_byte_u),
+    ds<est::env::sys::fuel>(fmt_byte_u),
 
     // ctr
     ds<ctr::nav::att::ail>(fmt_sbyte_u),
