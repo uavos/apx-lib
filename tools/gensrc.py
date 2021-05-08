@@ -59,39 +59,40 @@ def merge_dicts_impl(out, d):
 
 def merge_dicts(list_dicts):
     out = list()
-    dout = dict()
+    names = dict()
     # print("MERGE DICTS: {}".format(list_dicts))
+
     for d in list(list_dicts):
-        if type(d) is not dict:
+        if type(d) is not dict or not 'name' in d:
             print('Error dict object ({})'.format(d))
             continue
-        # if 'content' in d and not d['content']:
-        #     print('Empty dict object ({})'.format(d))
-        #     continue
         name = d['name']
-        if name in dout:
-            base = dout[name]
-            # print("UPD<{}: {} {}".format(name, dout, base))
-            # print("UPD>{}: {} {}".format(name, dout, d))
-            for key, value in d.items():
-                if not value:
-                    continue
-                if key not in base:
-                    base.update({key: value})
-                elif type(value) is list:
-                    if key == 'content':
-                        if base[key]:
-                            base.update({key: merge_dicts(base[key] + value)})
-                        else:
-                            base.update({key: merge_dicts(value)})
-                    else:
-                        base.update({key: value})
+
+        item = dict()
+        if name in names:
+            item = names[name]
+
+        # print("UPD<{}: {} {}".format(name, dout, base))
+        # print("UPD>{}: {} {}".format(name, dout, d))
+        for key, value in d.items():
+            if not value:
+                continue
+
+            if key == 'content':
+                if key in item and item[key]:
+                    item.update({key: merge_dicts(item[key] + value)})
                 else:
-                    base.update({key: value})
-        else:
-            base = copy.deepcopy(d)
-            out.append(base)
-        dout[name] = base
+                    item.update({key: merge_dicts(value)})
+                continue
+
+            if key not in item or not item[key]:
+                item.update({key: value})
+                continue
+
+        if item and not name in names:
+            names[name] = item
+            out.append(item)
+
     return out
 
 
