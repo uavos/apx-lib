@@ -152,7 +152,7 @@ struct sim_s
     float slip; //degrees
 };
 
-struct cmd_pos_s
+struct pos_ll_s
 {
     double lat;
     double lon;
