@@ -215,14 +215,14 @@
       title: Velocity Z
       units: m/s
 
-    - name: dx
-      title: Delta X
+    - name: "n"
+      title: North
       units: m
-    - name: dy
-      title: Delta Y
+    - name: "e"
+      title: East
       units: m
-    - name: dz
-      title: Delta Z
+    - name: "d"
+      title: Down
       units: m
 
 - name: ref
