@@ -57,11 +57,6 @@
         Number of milliseconds passed since system powered on. Value updated by `telemetry` module.
         Used for telemetry purposes only.
 
-    - name: ttl
-      title: Time to live
-      type: dword
-      units: s
-
     - name: fuel
       title: Fuel capacity
       units: u
@@ -69,6 +64,16 @@
     - name: weight
       title: Vehicle weight
       units: kg
+
+    - name: ttl
+      title: Time to live
+      type: dword
+      units: s
+
+    - name: range
+      title: Maximum range
+      type: dword
+      units: m
 
     - name: corr
       title: Correlator output

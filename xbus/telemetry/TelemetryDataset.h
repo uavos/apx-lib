@@ -69,11 +69,9 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
         return fmt_f16;
     case units_kPa:
         return fmt_f16;
-    case units_l:
-        return fmt_byte;
     case units_LpD:
         return fmt_f16;
-    case units_lph:
+    case units_uph:
         return fmt_byte_01;
     case units_m:
         return fmt_f16;

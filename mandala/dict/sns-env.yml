@@ -174,12 +174,12 @@
 - name: fuel
   title: Fuel
   content:
-    - name: capacity
-      suffix: capacity
-      units: l
+    - name: level
+      suffix: level
+      units: u
     - name: rate
       suffix: flow rate
-      units: l/h
+      units: u/h
     - name: temp
       suffix: temperature
       units: C
