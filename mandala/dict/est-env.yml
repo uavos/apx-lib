@@ -59,7 +59,8 @@
 
     - name: fuel
       title: Fuel capacity
-      units: u
+      type: byte
+      units: "%"
 
     - name: weight
       title: Vehicle weight
@@ -67,13 +68,13 @@
 
     - name: ttl
       title: Time to live
-      type: dword
-      units: s
+      type: word
+      units: min
 
     - name: range
       title: Maximum range
-      type: dword
-      units: m
+      type: word
+      units: km
 
     - name: corr
       title: Correlator output

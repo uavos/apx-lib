@@ -75,6 +75,8 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
         return fmt_byte_01;
     case units_m:
         return fmt_f16;
+    case units_km:
+        break;
     case units_mbar:
         return fmt_f16;
     case units_mps:
@@ -96,6 +98,8 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
     case units_rpm:
         break;
     case units_s:
+        break;
+    case units_min:
         break;
     case units_su:
         return fmt_sbyte_u;
@@ -200,7 +204,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::env::sys::health>(fmt_opt),
     ds<est::env::sys::time>(fmt_dword),
     ds<est::env::sys::ttl>(fmt_word),
-    ds<est::env::sys::fuel>(fmt_byte_u),
+    ds<est::env::sys::fuel>(fmt_byte),
 
     // ctr
     ds<ctr::nav::att::ail>(fmt_sbyte_u),
