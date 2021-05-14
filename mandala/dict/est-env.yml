@@ -64,6 +64,7 @@
 
     - name: weight
       title: Vehicle weight
+      type: word
       units: kg
 
     - name: ttl
