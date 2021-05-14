@@ -248,7 +248,7 @@ struct pi_s
     int16_t hmsl;
     int16_t radius;
     uint8_t loops;
-    uint16_t timeout;
+    uint16_t timeout; // TODO change to minutes
 
     static inline uint16_t psize()
     {
@@ -331,7 +331,7 @@ struct act_scr_s
     inline void write(XbusStreamWriter *s) const { s->write(scr, sizeof(scr)); }
 };
 
-struct act_loiter_s
+struct act_loiter_s // TODO deprecated action
 {
     int16_t radius;
     uint8_t loops;    //loops to loiter
