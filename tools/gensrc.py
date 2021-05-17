@@ -75,7 +75,7 @@ def merge_dicts(list_dicts):
         # print("UPD<{}: {} {}".format(name, dout, base))
         # print("UPD>{}: {} {}".format(name, dout, d))
         for key, value in d.items():
-            if not value:
+            if value is None:
                 continue
 
             if key == 'content':
