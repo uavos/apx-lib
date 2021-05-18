@@ -248,7 +248,7 @@ struct pi_s
     int16_t hmsl;
     int16_t radius;
     uint8_t loops;
-    uint16_t timeout; // TODO change to minutes
+    uint16_t timeout;
 
     static inline uint16_t psize()
     {
@@ -299,7 +299,6 @@ enum act_e {
     ACT_SPEED,
     ACT_PI,
     ACT_SCR,
-    ACT_LOITER,
     ACT_SHOT,
 };
 
@@ -331,27 +330,6 @@ struct act_scr_s
     inline void write(XbusStreamWriter *s) const { s->write(scr, sizeof(scr)); }
 };
 
-struct act_loiter_s // TODO deprecated action
-{
-    int16_t radius;
-    uint8_t loops;    //loops to loiter
-    uint16_t timeout; //time to loiter [s]
-
-    static inline uint16_t psize() { return sizeof(int16_t) + sizeof(uint8_t) + sizeof(uint16_t); }
-    inline void read(XbusStreamReader *s)
-    {
-        *s >> radius;
-        *s >> loops;
-        *s >> timeout;
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        *s << radius;
-        *s << loops;
-        *s << timeout;
-    }
-};
-
 struct act_shot_s
 {
     uint16_t dist; //distance for series
@@ -381,8 +359,6 @@ inline constexpr uint16_t action_psize(uint8_t option)
         return act_pi_s::psize();
     case ACT_SCR:
         return act_scr_s::psize();
-    case ACT_LOITER:
-        return act_loiter_s::psize();
     case ACT_SHOT:
         return act_shot_s::psize();
     }
