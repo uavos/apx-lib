@@ -101,6 +101,15 @@ public:
             return nullptr;
         //check ASCII
         const uint8_t *c = reinterpret_cast<const uint8_t *>(s);
+        if (len == max_size && max_size == available()) {
+            // string is NOT null-terminated
+            // not the best way of doing the fix though
+            size_t p = _pos + len;
+            if (p <= _size)
+                const_cast<uint8_t *>(_buf)[p] = 0;
+            else
+                return nullptr;
+        }
         while (*c) {
             const uint8_t &v = *c++;
             if (v == '\n')
