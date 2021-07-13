@@ -210,9 +210,9 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<ctr::nav::att::ail>(fmt_sbyte_u),
     ds<ctr::nav::att::elv>(fmt_sbyte_u),
     ds<ctr::nav::att::rud>(fmt_sbyte_u),
-    ds<ctr::nav::att::col>(fmt_sbyte_u),
 
     ds<ctr::nav::eng::thr>(fmt_byte_u),
+    ds<ctr::nav::eng::prop>(fmt_sbyte_u),
     ds<ctr::nav::eng::starter>(fmt_bit),
     ds<ctr::nav::eng::ign1>(fmt_bit),
     ds<ctr::nav::eng::ign2>(fmt_bit),

@@ -29,8 +29,6 @@
       title: Elevator
     - name: rud
       title: Rudder
-    - name: col
-      title: Collective
 
 - name: eng
   title: Engine controls
