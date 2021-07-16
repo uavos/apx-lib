@@ -174,6 +174,13 @@ size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e
         return unpack_value<uint8_t>(src, dest, type, size, 1.f / 255.f);
     case fmt_sbyte_u:
         return unpack_value<int8_t>(src, dest, type, size, 1.f / 127.f);
+
+    case fmt_word_10:
+        *type = mandala::type_dword;
+        if (!unpack_value<uint16_t, mandala::dword_t>(src, dest, size))
+            break;
+        *static_cast<mandala::dword_t *>(dest) = *static_cast<mandala::dword_t *>(dest) * 10;
+        return sizeof(uint16_t);
     }
     return 0;
 }

@@ -98,6 +98,26 @@
       title: Wind heading
       units: rad
 
+- name: eng
+  title: Engine
+  descr: Engine estimated and filtered values
+  content:
+    - name: status
+      suffix: status
+      type: option
+      units:
+        - "idle"
+        - "ok"
+        - "warning"
+        - "failure"
+
+    - name: rpm
+      suffix: RPM
+      units: rpm
+    - name: drpm
+      suffix: RPM rate
+      units: rpm/s
+
 - name: ats
   title: ATS
   content:

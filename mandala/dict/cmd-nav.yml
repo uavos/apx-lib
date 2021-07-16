@@ -190,6 +190,15 @@
 - name: eng
   title: Engine regulators
   content:
+    - name: mode
+      title: Engine mode
+      type: option
+      units:
+        - "auto"
+        - "governor"
+        - "start"
+        - "spin"
+
     - name: rpm
       title: Cmd RPM
       units: rpm

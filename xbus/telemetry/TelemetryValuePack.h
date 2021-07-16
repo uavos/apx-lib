@@ -260,6 +260,10 @@ size_t pack_value(const mandala::raw_t &raw, mandala::type_id_e type, void *dest
         const int8_t v = cast_value<int8_t>(raw_value<float>(&raw, type) * 127.f);
         return pack_value(v, dest);
     }
+    case fmt_word_10: {
+        const uint16_t v = cast_value<uint16_t>(raw_value<uint32_t>(&raw, type) / 10);
+        return pack_value(v, dest);
+    }
     }
 }
 

@@ -23,18 +23,6 @@
   title: Engine
 
   content:
-    - name: status
-      suffix: status
-      type: option
-      units:
-        - "unknown"
-        - "ready"
-        - "start"
-        - "stop"
-        - "running"
-        - "warning"
-        - "failure"
-
     - name: rpm
       suffix: RPM
       units: rpm
@@ -47,16 +35,10 @@
       suffix: temperature
       units: C
 
-    - name: voltage
-      suffix: ECU voltage
-      units: V
-    - name: current
-      suffix: ECU current
-      units: A
-
     - name: ot
       title: Oil temperature
       units: C
+
     - name: egt
       title: Exhaust temperature
       units: C
@@ -74,6 +56,23 @@
       title: Intake air box pressure
       units: kPa
 
+    - name: voltage
+      suffix: ECU voltage
+      units: V
+    - name: current
+      suffix: ECU current
+      units: A
+
+    - name: health
+      suffix: health status
+      type: option
+      units:
+        - "unknown"
+        - "idle"
+        - "running"
+        - "warning"
+        - "failure"
+
     - name: tc
       title: Turbocharger
       type: option
@@ -84,13 +83,6 @@
         - "warning"
         - "critical"
         - "failure"
-
-    - name: block
-      title: Disable starter switch
-      type: option
-      units:
-        - "off"
-        - "on"
 
 - name: gbox
   title: Gearbox
@@ -300,6 +292,13 @@
 - name: aux
   title: Auxillary sensors
   content:
+    - name: srv
+      title: Maintenance service switch
+      type: option
+      units:
+        - "off"
+        - "on"
+
     - name: rt
       title: Room temperature
       units: C

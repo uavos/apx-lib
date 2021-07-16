@@ -57,6 +57,7 @@ enum fmt_e {
     fmt_rad2,      // radians -PI/2..+PI/2
     fmt_byte_u,    // units 0..1
     fmt_sbyte_u,   // signed units -1..+1
+    fmt_word_10,   // unsigned/10
 };
 
 enum seq_e {
