@@ -195,7 +195,6 @@
       type: option
       units:
         - "auto"
-        - "governor"
         - "start"
         - "spin"
 
