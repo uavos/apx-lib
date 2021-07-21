@@ -295,9 +295,12 @@
 - name: wpt
   title: Mission navigation
   content:
-    - name: lock
-      title: Navigation locked
+    - name: status
+      title: Maneuver status
       type: option
+      units:
+        - "ongoing"
+        - "ok"
 
     - name: eta
       title: Estimated time of arrival

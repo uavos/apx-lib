@@ -199,6 +199,7 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::env::wind::speed>(fmt_byte_01, seq_rare),
     ds<est::env::wind::heading>(fmt_rad, seq_rare),
 
+    ds<est::nav::wpt::status>(fmt_bit),
     ds<est::nav::wpt::eta>(fmt_word),
     ds<est::nav::wpt::delta>(fmt_f16),
     ds<est::nav::wpt::xtrack>(fmt_f16),
