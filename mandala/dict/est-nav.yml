@@ -295,10 +295,15 @@
 - name: wpt
   title: Mission navigation
   content:
+    - name: lock
+      title: Navigation locked
+      type: option
+
     - name: eta
       title: Estimated time of arrival
       units: s
       type: word
+
     - name: dist
       title: Distance to waypoint
       units: m

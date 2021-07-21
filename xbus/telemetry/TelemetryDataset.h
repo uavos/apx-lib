@@ -202,7 +202,6 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::wpt::eta>(fmt_word),
     ds<est::nav::wpt::delta>(fmt_f16),
     ds<est::nav::wpt::xtrack>(fmt_f16),
-    ds<est::nav::wpt::thdg>(fmt_rad),
 
     ds<est::env::sys::mode>(fmt_opt),
     ds<est::env::sys::health>(fmt_opt),
