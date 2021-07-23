@@ -89,10 +89,16 @@
         - track
         - loiter
         - hover
+
     - name: spd
       title: Airspeed control
     - name: alt
       title: Altitude control
+      units:
+        - "off"
+        - "on"
+        - "rate"
+
     - name: eng
       title: Engine control
     - name: yaw
