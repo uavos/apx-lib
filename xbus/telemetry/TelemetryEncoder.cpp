@@ -40,12 +40,16 @@ bool TelemetryEncoder::add(const field_s &field)
 
     // find dups
     for (size_t i = 0; i < _slots_cnt; ++i) {
-        auto const &f = _slots.fields[i];
+        auto &f = _slots.fields[i];
         if (f.pid.uid != field.pid.uid)
             continue;
         if (f.pid.pri != field.pid.pri)
             continue;
-        return false;
+        // found duplicate
+        // update record configuration
+        f = field;
+        _update_feeds();
+        return true;
     }
 
     // find sorted index

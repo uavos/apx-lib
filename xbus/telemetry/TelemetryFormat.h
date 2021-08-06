@@ -61,10 +61,10 @@ enum fmt_e {
 };
 
 enum seq_e {
-    seq_always,
-    seq_skip,
-    seq_rare,
-    seq_scheduled
+    seq_always,   // transmit every frame on change
+    seq_skip,     // transmit every second frame
+    seq_rare,     // transmit every fourth frame
+    seq_scheduled // transmit in scheduled slots (rare)
 };
 
 enum dt_e {
