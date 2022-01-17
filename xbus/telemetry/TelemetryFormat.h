@@ -28,8 +28,6 @@
 namespace xbus {
 namespace telemetry {
 
-#pragma pack(1)
-
 // data element format descriptor
 enum fmt_e {
     fmt_none,
@@ -67,44 +65,12 @@ enum seq_e {
     seq_scheduled // transmit in scheduled slots (rare)
 };
 
-enum dt_e {
-    dt_10ms,  // 100 Hz
-    dt_20ms,  // 50 Hz
-    dt_50ms,  // 20 Hz
-    dt_100ms, // 10 Hz
-    dt_200ms, // 5 Hz
-    dt_1s,    // 1 Hz
-    dt_5s,
-    dt_off,
-};
-static constexpr uint32_t dt_ms(dt_e dt)
-{
-    switch (dt) {
-    case dt_10ms:
-        return 10;
-    case dt_20ms:
-        return 20;
-    case dt_50ms:
-        return 50;
-    case dt_100ms:
-        return 100;
-    case dt_200ms:
-        return 200;
-    case dt_1s:
-        return 1000;
-    case dt_5s:
-        return 5000;
-    case dt_off:
-        return 0;
-    }
-    return 0;
-}
-
+// telemetry field descriptor
+#pragma pack(1)
 struct field_s
 {
     xbus::pid_s pid; // seq = seq_e skip mode
     fmt_e fmt : 8;
-    // uint8_t _rsv : 4;
 };
 static_assert(sizeof(field_s) == 3, "size error");
 
@@ -113,42 +79,79 @@ union hash_s {
     uint8_t byte[4];
 };
 static_assert(sizeof(hash_s) == 4, "size error");
+#pragma pack()
 
-static constexpr const size_t fmt_block_size = 64;
-
-static constexpr const size_t slots_size{240};
+// constants
+static constexpr const uint8_t fmt_version = 1;    // increase this number for GCS to be incompatible with AP
+static constexpr const size_t fmt_block_size = 64; // encoder will reply blocks (size bytes) of the fields array with this default
+static constexpr const size_t slots_size{240};     // max number of fields in the stream
 
 // stream header
-struct stream_s
+struct hdr_s
 {
-    union {
-        uint32_t _raw;
-        struct
-        {
-            uint32_t seq : 29;
-            dt_e dt : 3;
-        };
-    } spec;
-    uint8_t feed_hash; // dataset structure hash_32 (pid.seq = byte no)
-    uint8_t feed_fmt;  // dataset format COBS encoded feed
+    uint16_t ts;       // [ms*20] 20 mins ovf
+    uint8_t feed_hash; // dataset structure hash_32 (pid.seq = byte no) stream
 
-    static constexpr inline uint16_t psize() { return 6; }
+    static constexpr const uint32_t ts2ms{20};
+
+    static constexpr inline uint16_t psize() { return 3; }
     inline void read(XbusStreamReader *s)
     {
-        *s >> spec._raw;
+        *s >> ts;
         *s >> feed_hash;
-        *s >> feed_fmt;
     }
     inline void write(XbusStreamWriter *s) const
     {
-        *s << spec._raw;
+        *s << ts;
         *s << feed_hash;
-        *s << feed_fmt;
     }
 };
-static_assert(sizeof(stream_s) == stream_s::psize(), "size error");
 
-#pragma pack()
+// format requests
+struct format_req_s
+{
+    uint8_t version; // must match fmt_version constant
+    uint8_t part;    // part requested
+
+    static constexpr inline uint16_t psize() { return 2; }
+    inline void read(XbusStreamReader *s)
+    {
+        *s >> version;
+        *s >> part;
+    }
+    inline void write(XbusStreamWriter *s) const
+    {
+        *s << version;
+        *s << part;
+    }
+};
+
+struct format_resp_hdr_s
+{
+    uint8_t version; // current format version
+    uint8_t part;    // current part number [0..n]
+    uint8_t pcnt;    // number of parts total
+    uint8_t psz;     // part size [bytes]
+    uint32_t hash;   // format data hash
+
+    static constexpr inline uint16_t psize() { return 8; }
+    inline void read(XbusStreamReader *s)
+    {
+        *s >> version;
+        *s >> part;
+        *s >> pcnt;
+        *s >> psz;
+        *s >> hash;
+    }
+    inline void write(XbusStreamWriter *s) const
+    {
+        *s << version;
+        *s << part;
+        *s << pcnt;
+        *s << psz;
+        *s << hash;
+    }
+};
 
 } // namespace telemetry
 } // namespace xbus

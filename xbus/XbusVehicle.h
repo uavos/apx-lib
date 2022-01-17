@@ -51,15 +51,15 @@ struct ident_s
 };
 
 // Vehicle transponder data
-typedef float lat_t;
-typedef float lon_t;
-typedef int16_t alt_t;
-typedef uint16_t speed_t;
-typedef int16_t bearing_t;
-typedef uint8_t mode_t;
-
 struct xpdr_s
 {
+    typedef float lat_t;
+    typedef float lon_t;
+    typedef int16_t alt_t;
+    typedef uint16_t speed_t;
+    typedef int16_t bearing_t;
+    typedef uint8_t mode_t;
+
     lat_t lat;
     lon_t lon;
     float alt;

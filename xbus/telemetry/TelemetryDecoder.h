@@ -55,38 +55,37 @@ public:
 
     bool decode(uint8_t pseq, XbusStreamReader &stream);
 
-    bool decode_format(uint8_t part, uint8_t parts, XbusStreamReader &stream);
+    bool decode_format(XbusStreamReader &stream, xbus::telemetry::format_resp_hdr_s *hdr);
 
     inline bool valid() { return _valid; }
     void reset(bool reset_hash = true);
 
-    inline uint32_t seq() { return _seq; }
-    inline uint32_t dt_ms() { return xbus::telemetry::dt_ms(_dt); }
+    // decoded stream current parameters
+    inline auto timestamp_ms() const { return _timestamp_ms; }
+    inline auto dt_ms() const { return _dt_ms; }
+    inline void reset_timestamp(uint64_t v = 0) { _timestamp_ms = v; }
 
+    // stream format
     inline xbus::telemetry::dec_slots_s &dec_slots() { return _slots; }
     inline uint16_t slots_cnt() { return _slots_cnt; }
-    inline uint16_t fmt_cnt() { return _fmt_pos; }
 
 protected:
     xbus::telemetry::dec_slots_s _slots;
-    uint16_t _slots_cnt{0};
+    uint16_t _slots_cnt{};
 
-    uint32_t _seq{0};
-    xbus::telemetry::dt_e _dt{xbus::telemetry::dt_off};
+    uint64_t _timestamp_ms{};
+    uint32_t _dt_ms{};
 
-    bool _valid{false};
+    uint16_t _ts{};
+
+    bool _valid{};
 
     xbus::telemetry::hash_s _hash;
-    uint8_t _hash_valid{0};
-    inline bool _is_hash_valid() { return _hash_valid == 4; }
+    uint8_t _hash_valid{};
+
+    inline bool _is_hash_valid() const { return _hash_valid == 4; }
     uint32_t get_hash(size_t sz);
     bool check_hash(size_t sz);
 
-    // fmt feed decoder
-    void _set_feed_fmt(uint8_t v);
-    uint16_t _fmt_pos{0};
-    uint8_t _cobs_code{0};
-    uint8_t _cobs_copy{0};
-
-    bool decode_values(XbusStreamReader &stream, uint8_t seq);
+    bool decode_values(XbusStreamReader &stream, uint8_t pseq);
 };

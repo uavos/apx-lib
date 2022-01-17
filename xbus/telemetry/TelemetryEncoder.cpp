@@ -166,18 +166,16 @@ void TelemetryEncoder::_set_data(size_t n, mandala::raw_t raw, mandala::type_id_
         flags.upd = true;
 }
 
-bool TelemetryEncoder::encode(XbusStreamWriter &stream, uint32_t seq, xbus::telemetry::dt_e dt)
+bool TelemetryEncoder::encode(XbusStreamWriter &stream, uint8_t pseq, uint64_t timestamp_ms)
 {
-    stream_s hdr;
-    hdr.spec.seq = seq >> 2;
-    hdr.spec.dt = dt;
+    hdr_s hdr;
+    hdr.ts = timestamp_ms / hdr.ts2ms;
 
-    hdr.feed_hash = _hash.byte[seq & 3];
-    hdr.feed_fmt = _get_feed_fmt();
+    hdr.feed_hash = _hash.byte[pseq & 3];
 
     hdr.write(&stream);
 
-    encode_values(stream, seq);
+    encode_values(stream, pseq);
 
     return true;
 }
@@ -186,70 +184,14 @@ void TelemetryEncoder::_update_feeds()
 {
     const uint16_t size = _slots_cnt * sizeof(*_slots.fields);
 
-    uint32_t vhash = apx::crc32(_slots.fields, size);
+    uint32_t vhash = apx::crc32(_slots.fields, size, xbus::telemetry::fmt_version);
     _hash.byte[0] = vhash;
     _hash.byte[1] = vhash >> 8;
     _hash.byte[2] = vhash >> 16;
     _hash.byte[3] = vhash >> 24;
-
-    //fields fmt feed
-    uint8_t crc_cobs = 0;
-    for (size_t i = 0; i < size; ++i)
-        crc_cobs ^= reinterpret_cast<const uint8_t *>(_slots.fields)[i];
-    _slots.crc_cobs = crc_cobs;
-
-    _fmt_size = size;
-    _cobs_code = 0;
-    reset_feeds();
-}
-void TelemetryEncoder::reset_feeds()
-{
-    _fmt_pos = _fmt_size + 1;
 }
 
-uint8_t TelemetryEncoder::_get_feed_fmt()
-{
-    if (_fmt_size == 0)
-        return 0;
-    if (_fmt_pos > _fmt_size) {
-        _fmt_pos = 0;
-        _cobs_code = 0;
-        return 0;
-    }
-
-    const uint8_t *buf = reinterpret_cast<const uint8_t *>(_slots.fields);
-
-    for (;;) {
-        // push v to COBS stream
-        if (_cobs_code == 0) {
-            //find and return code, relpos of zero
-            _cobs_code = 1;
-            for (uint16_t i = _fmt_pos; i <= _fmt_size; ++i) {
-                uint8_t v = i < _fmt_size ? buf[i] : _slots.crc_cobs;
-                if (v == 0)
-                    break;
-                _cobs_code++;
-                if (_cobs_code == 0xFF)
-                    break;
-            }
-            _cobs_copy = _cobs_code;
-            return _cobs_code;
-        }
-        uint8_t v = (_fmt_pos >= _fmt_size) ? _slots.crc_cobs : buf[_fmt_pos];
-
-        _cobs_code--;
-        if (_cobs_code == 0) {
-            if (_cobs_copy != 0xFF)
-                _fmt_pos++;
-            continue;
-        }
-
-        _fmt_pos++;
-        return v;
-    }
-}
-
-void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint32_t seq)
+void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint8_t pseq)
 {
     uint8_t *code_cnt = stream.ptr();
     stream.write<uint8_t>(0);
@@ -263,12 +205,17 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint32_t seq)
     uint8_t *nibble = nullptr;
     uint8_t nibble_n = 0;
 
-    // re-schedule according to index
-    size_t index = seq % _slots_upd_cnt % _slots_cnt;
-    _slots.flags[index].upd = true;
-    _slots.packed[index] += 0x01010101; //re-pack
+    // continuously enforce slots update
+    _slots.flags[_enforced_upd].upd = true;
+    _slots.packed[_enforced_upd] += 0x01010101; //re-pack
+    _enforced_upd++;
+    if (_enforced_upd >= _slots_cnt)
+        _enforced_upd = 0;
+    else if (_enforced_upd >= _slots_upd_cnt)
+        _enforced_upd = 0;
 
-    index = 0;
+    // pack updated slots values
+    size_t index = 0;
     for (; index < _slots_cnt; ++index) {
         auto const &f = _slots.fields[index];
         if (f.fmt == fmt_bit)
@@ -278,11 +225,11 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint32_t seq)
         case seq_always:
             break;
         case seq_skip:
-            if (seq & 1)
+            if (pseq & 1)
                 continue;
             break;
         case seq_rare:
-            if (seq & 3)
+            if (pseq & 3)
                 continue;
             break;
         case seq_scheduled:
@@ -365,27 +312,30 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint32_t seq)
     }
 }
 
-void TelemetryEncoder::encode_format(XbusStreamWriter &stream, uint8_t part)
+void TelemetryEncoder::encode_format(XbusStreamWriter &stream, uint8_t part, const uint8_t size)
 {
-    size_t size = _slots_cnt * sizeof(*_slots.fields);
+    xbus::telemetry::format_resp_hdr_s h;
 
-    uint8_t parts = size / fmt_block_size;
-    if (size % fmt_block_size)
-        parts++;
+    h.version = xbus::telemetry::fmt_version;
+    h.hash = _hash.hash;
+
+    h.psz = size;
+
+    size_t cnt = _slots_cnt * sizeof(*_slots.fields);
+
+    h.pcnt = cnt / size;
+    if (cnt % size)
+        h.pcnt++;
 
     const uint8_t *ptr = reinterpret_cast<const uint8_t *>(_slots.fields);
-    size_t sz = part < parts ? size - (part * fmt_block_size) : 0;
-    if (sz > fmt_block_size)
-        sz = fmt_block_size;
+    size_t sz = part < h.pcnt ? cnt - (part * size) : 0;
+    if (sz > size)
+        sz = size;
 
-    stream << part;
-    stream << parts;
+    h.part = part;
 
-    if (part == 0) {
-        //prepend hash on first part
-        stream << _hash.hash;
-    }
+    h.write(&stream);
 
     if (sz > 0)
-        stream.write(ptr + part * fmt_block_size, sz);
+        stream.write(ptr + part * size, sz);
 }
