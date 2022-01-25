@@ -33,49 +33,48 @@ TelemetryDecoder::TelemetryDecoder()
 
 bool TelemetryDecoder::decode(uint8_t pseq, XbusStreamReader &stream)
 {
-    if (stream.available() < xbus::telemetry::stream_s::psize())
+    if (stream.available() < xbus::telemetry::hdr_s::psize())
         return false;
 
-    xbus::telemetry::stream_s hdr;
+    xbus::telemetry::hdr_s hdr;
     hdr.read(&stream);
 
-    uint32_t seq = pseq;
-    seq |= hdr.spec.seq << 2;
-
-    uint8_t dseq = (seq - _seq) & 0x7FFFFFFF;
-    _seq = seq;
-
-    bool seq_ok = dseq == 1;
-
-    _dt = hdr.spec.dt;
-
-    uint8_t &h = _hash.byte[seq & 3];
+    // check hash feed
+    uint8_t &h = _hash.byte[pseq & 3];
     if (h != hdr.feed_hash) {
-        if (h)
+        if (_hash_valid > 0 || h)
             reset();
         h = hdr.feed_hash;
         _hash_valid++;
     } else if (!_is_hash_valid())
         _hash_valid++;
 
-    // check seq and fmt feed
-    if (!seq_ok) {
-        _fmt_pos = 0;
-        _cobs_code = 0;
+    if (_hash_valid > 4)
+        reset(); // this should never happen
+
+    // estimate timestamp
+    uint32_t dts = (uint16_t) (hdr.ts - _ts);
+    _ts = hdr.ts;
+
+    if (!dts)
+        dts = 0x0000FFFF + 1;
+
+    _dt_ms = dts * hdr.ts2ms;
+    _timestamp_ms += _dt_ms;
+
+    // validity check
+    if (_is_hash_valid() && _slots_cnt) {
+        // fmt looks consistent
+        _valid = true;
+
+        // get values from packed stream
+        // seq bits are used to filter rare IDs only
+        return decode_values(stream, pseq);
     }
-    _set_feed_fmt(hdr.feed_fmt);
 
+    // not yet valid stream
     _valid = false;
-
-    if (!_is_hash_valid())
-        return false;
-
-    if (!_slots_cnt)
-        return false;
-
-    // fmt looks consistent
-    _valid = true;
-    return decode_values(stream, seq);
+    return false;
 }
 
 void TelemetryDecoder::reset(bool reset_hash)
@@ -92,7 +91,7 @@ void TelemetryDecoder::reset(bool reset_hash)
 
 uint32_t TelemetryDecoder::get_hash(size_t sz)
 {
-    return apx::crc32(_slots.fields, sz);
+    return apx::crc32(_slots.fields, sz, xbus::telemetry::fmt_version);
 }
 bool TelemetryDecoder::check_hash(size_t sz)
 {
@@ -105,74 +104,7 @@ bool TelemetryDecoder::check_hash(size_t sz)
     return true;
 }
 
-void TelemetryDecoder::_set_feed_fmt(uint8_t v)
-{
-    if (_fmt_pos == 0 && _cobs_code == 0) {
-        if (v != 0) // wait for SOF
-            return;
-        _cobs_code = 0xFF;
-        _cobs_copy = 0;
-        return;
-    }
-    uint8_t *buf = reinterpret_cast<uint8_t *>(&_slots.fields);
-
-    if (v == 0) {
-        // packet delimiter
-        do {
-            if (_fmt_pos == 0) {
-                _cobs_code = 0xFF;
-                _cobs_copy = 0;
-                return;
-            }
-            if (_cobs_copy)
-                break;
-            if (_fmt_pos < (sizeof(field_s) + 1) || ((_fmt_pos - 1) % sizeof(field_s)))
-                break;
-            // check crc_xor
-            uint8_t crc_xor = 0;
-            for (size_t i = 0; i < _fmt_pos; ++i)
-                crc_xor ^= buf[i];
-            if (crc_xor)
-                break;
-            buf[--_fmt_pos] = 0;
-            // check hash
-            if (!check_hash(_fmt_pos))
-                break;
-            // fmt array ok
-            _fmt_pos = 0;
-            _cobs_code = 0;
-            return;
-        } while (0);
-        // packet error
-        if (_fmt_pos) {
-            _slots_cnt = 0;
-            _fmt_pos = 0;
-        }
-        _cobs_code = 0;
-        return;
-    }
-    bool skip = false;
-    if (_cobs_copy == 0) {
-        if (_cobs_code == 0xFF)
-            skip = true;
-        _cobs_copy = _cobs_code = v;
-        v = 0;
-    }
-    _cobs_copy--;
-
-    if (skip)
-        return;
-
-    uint8_t &v_prev = buf[_fmt_pos];
-    if (v_prev != v) {
-        v_prev = v;
-        if (_fmt_pos < (_slots_cnt * sizeof(field_s)))
-            _slots_cnt = 0;
-    }
-    _fmt_pos++;
-}
-
-bool TelemetryDecoder::decode_values(XbusStreamReader &stream, uint8_t seq)
+bool TelemetryDecoder::decode_values(XbusStreamReader &stream, uint8_t pseq)
 {
     if (stream.available() == 0)
         return false;
@@ -196,11 +128,11 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream, uint8_t seq)
         case seq_always:
             break;
         case seq_skip:
-            if (seq & 1)
+            if (pseq & 1)
                 continue;
             break;
         case seq_rare:
-            if (seq & 3)
+            if (pseq & 3)
                 continue;
             break;
         case seq_scheduled:
@@ -320,40 +252,55 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream, uint8_t seq)
     return upd;
 }
 
-bool TelemetryDecoder::decode_format(uint8_t part, uint8_t parts, XbusStreamReader &stream)
+bool TelemetryDecoder::decode_format(XbusStreamReader &stream, xbus::telemetry::format_resp_hdr_s *hdr)
 {
-    if (part == 0) {
-        //prepend hash on first part
-        uint32_t hash;
-        stream >> hash;
-        if (hash != _hash.hash)
-            reset();
-        _hash.hash = hash;
-        _hash_valid = sizeof(hash);
-    }
-    uint8_t *ptr = reinterpret_cast<uint8_t *>(_slots.fields);
-    size_t pos = part * fmt_block_size;
-    size_t sz = stream.available();
-    bool is_final = (part + 1) == parts;
     do {
-        if (is_final && stream.available() > fmt_block_size)
+        if (stream.available() < xbus::telemetry::format_resp_hdr_s::psize())
             break;
-        if (!is_final && stream.available() != fmt_block_size)
+
+        hdr->read(&stream);
+        if (hdr->version != xbus::telemetry::fmt_version)
+            break;
+
+        const size_t block_size = hdr->psz;
+
+        if (!block_size)
+            break;
+
+        if (hdr->part == 0) {
+            // first part
+            if (hdr->hash != _hash.hash)
+                reset();
+            _hash.hash = hdr->hash;
+            _hash_valid = sizeof(hdr->hash);
+        } else {
+            if (hdr->hash != _hash.hash)
+                break;
+        }
+
+        uint8_t *ptr = reinterpret_cast<uint8_t *>(_slots.fields);
+        size_t pos = hdr->part * block_size;
+        size_t sz = stream.available();
+
+        bool is_final = (hdr->part + 1) == hdr->pcnt;
+        if (is_final && stream.available() > block_size)
+            break;
+        if (!is_final && stream.available() != block_size)
             break;
         if ((pos + sz) > sizeof(_slots.fields))
             break;
         stream.read(ptr + pos, sz);
+
         if (is_final) {
             pos += sz;
             if (pos % sizeof(field_s)) {
                 break;
             }
             if (check_hash(pos)) {
-                _fmt_pos = 0;
-                _cobs_code = 0;
                 return true;
             }
         }
+
         // mid part
         if (_slots_cnt == 0)
             return true;
@@ -363,6 +310,7 @@ bool TelemetryDecoder::decode_format(uint8_t part, uint8_t parts, XbusStreamRead
         reset(false);
         return true;
     } while (0);
+
     // error
     reset();
     return false;

@@ -154,9 +154,9 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::gyro::y>(fmt_f16), //fmt_sbyte_01),
     ds<est::nav::gyro::z>(fmt_f16), //fmt_sbyte_01),
 
-    ds<est::nav::gyro::ax>(fmt_f16), //fmt_sbyte_01), //727 deg/s
-    ds<est::nav::gyro::ay>(fmt_f16), //fmt_sbyte_01),
-    ds<est::nav::gyro::az>(fmt_f16), //fmt_sbyte_01),
+    // ds<est::nav::gyro::ax>(fmt_f16), //fmt_sbyte_01), //727 deg/s
+    // ds<est::nav::gyro::ay>(fmt_f16), //fmt_sbyte_01),
+    // ds<est::nav::gyro::az>(fmt_f16), //fmt_sbyte_01),
 
     ds<est::nav::acc::x>(fmt_f16), //fmt_sbyte_01),
     ds<est::nav::acc::y>(fmt_f16), //fmt_sbyte_01),
@@ -189,11 +189,11 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::air::aoa>(fmt_sbyte_01),
 
     ds<est::nav::air::ld>(fmt_f16, seq_rare),
-    ds<est::nav::air::stab>(fmt_byte_u),
     ds<est::nav::air::vse>(fmt_sbyte_01),
     ds<est::nav::air::keas>(fmt_byte_001, seq_rare),
     ds<est::nav::air::ktas>(fmt_f16, seq_rare),
     ds<est::nav::air::stall>(fmt_opt),
+    // ds<est::nav::air::stab>(fmt_byte_u),
 
     ds<est::env::wind::status>(fmt_bit),
     ds<est::env::wind::speed>(fmt_byte_01, seq_rare),
@@ -243,19 +243,19 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<ctr::env::pwr::ice>(fmt_bit),
     ds<ctr::env::pwr::las>(fmt_bit),
 
-    ds<ctr::env::aux::horn>(fmt_bit),
+    // ds<ctr::env::aux::horn>(fmt_bit),
 
     ds<ctr::env::ers::launch>(fmt_bit),
     ds<ctr::env::ers::rel>(fmt_bit),
 
-    ds<ctr::env::light::nav>(fmt_bit),
-    ds<ctr::env::light::taxi>(fmt_bit),
-    ds<ctr::env::light::beacon>(fmt_bit),
-    ds<ctr::env::light::landing>(fmt_bit),
-    ds<ctr::env::light::strobe>(fmt_bit),
+    // ds<ctr::env::light::nav>(fmt_bit),
+    // ds<ctr::env::light::taxi>(fmt_bit),
+    // ds<ctr::env::light::beacon>(fmt_bit),
+    // ds<ctr::env::light::landing>(fmt_bit),
+    // ds<ctr::env::light::strobe>(fmt_bit),
 
-    ds<ctr::env::door::main>(fmt_bit),
-    ds<ctr::env::door::drop>(fmt_bit),
+    // ds<ctr::env::door::main>(fmt_bit),
+    // ds<ctr::env::door::drop>(fmt_bit),
 
     // cmd
 

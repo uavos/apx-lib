@@ -34,6 +34,10 @@
       title: Data packet from GCS to vehicle
       descr: >
         `squawk` [`pid` `data...`] or empty for heartbeat
+    - name: telemetry
+      title: Telemetry data
+      descr: >
+        `squawk` `packed data`
 
 - name: telemetry
   title: Telemetry stream
