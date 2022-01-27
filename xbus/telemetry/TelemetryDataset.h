@@ -175,9 +175,9 @@ static constexpr const ds_field_s dataset_default[] = {
     ds<est::nav::pos::hsrc>(fmt_opt),
 
     ds<est::nav::lpos::status>(fmt_opt),
-    ds<est::nav::lpos::ax>(fmt_sbyte_01),
-    ds<est::nav::lpos::ay>(fmt_sbyte_01),
-    ds<est::nav::lpos::az>(fmt_f16),
+    // ds<est::nav::lpos::ax>(fmt_sbyte_01),
+    // ds<est::nav::lpos::ay>(fmt_sbyte_01),
+    // ds<est::nav::lpos::az>(fmt_f16),
 
     ds<est::nav::ref::status>(fmt_bit),
     ds<est::nav::ref::lat>(fmt_real, seq_scheduled),

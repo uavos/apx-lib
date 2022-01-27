@@ -26,6 +26,7 @@
       title: Vehicle Identification
       descr: >
         `squawk` `uid` [`ident`]
+
     - name: downlink
       title: Data packet from vehicle to GCS
       descr: >
@@ -34,10 +35,15 @@
       title: Data packet from GCS to vehicle
       descr: >
         `squawk` [`pid` `data...`] or empty for heartbeat
+
     - name: telemetry
       title: Telemetry data
       descr: >
         `squawk` `packed data`
+    - name: xpdr
+      title: Transponder data
+      descr: >
+        `squawk` `data`
 
 - name: telemetry
   title: Telemetry stream
@@ -53,7 +59,7 @@
     - name: xpdr
       title: Transponder data
       descr: >
-        `xpdr`
+        `data`
 
 - name: stream
   title: Data streams

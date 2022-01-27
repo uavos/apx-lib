@@ -25,6 +25,8 @@
 #include <xbus/XbusStreamReader.h>
 #include <xbus/XbusStreamWriter.h>
 
+#include <cmath>
+
 namespace xbus {
 namespace telemetry {
 
@@ -150,6 +152,55 @@ struct format_resp_hdr_s
         *s << pcnt;
         *s << psz;
         *s << hash;
+    }
+};
+
+// Vehicle transponder data
+struct xpdr_s
+{
+    static constexpr const uint8_t current_version = 1; // protocol version
+
+    uint8_t version;
+    float lat;
+    float lon;
+    float hmsl;
+    float speed;
+    float vspeed;
+    float bearing;
+    uint8_t mode;
+
+    typedef int16_t hmsl_t;
+    typedef uint16_t speed_t;
+    typedef int16_t bearing_t;
+    typedef int8_t vspeed_t;
+
+    static inline uint16_t psize()
+    {
+        return 1 + sizeof(float) * 2 + sizeof(hmsl_t) + sizeof(speed_t) + sizeof(bearing_t)
+               + 1 + 1;
+    }
+
+    inline void read(XbusStreamReader *s)
+    {
+        *s >> version;
+        *s >> lat;
+        *s >> lon;
+        hmsl = s->read<hmsl_t, float>();
+        speed = s->read<speed_t, float>() / 10.0f;
+        vspeed = s->read<vspeed_t, float>() / 2.f;
+        bearing = s->read<bearing_t, float>() / (32768.0f / M_PI);
+        *s >> mode;
+    }
+    inline void write(XbusStreamWriter *s) const
+    {
+        *s << version;
+        *s << lat;
+        *s << lon;
+        s->write<hmsl_t, float>(hmsl);
+        s->write<speed_t, float>(speed * 10.0f);
+        s->write<vspeed_t, float>(vspeed * 2.f);
+        s->write<bearing_t, float>(bearing * (32768.0f / M_PI));
+        *s << mode;
     }
 };
 
