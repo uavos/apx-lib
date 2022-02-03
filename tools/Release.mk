@@ -2,7 +2,10 @@ GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 
 GIT_REF_RELEASE := release
 
-GIT_VERSION_CMD = git describe --tags --match="v*.*" 2> /dev/null |sed 's/^v//;s/\-/\./;s/\(.*\)-\(.*\)/\1/'
+current_dir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+# GIT_VERSION_CMD = git describe --tags --match="v*.*" 2> /dev/null |sed 's/^v//;s/\-/\./;s/\(.*\)-\(.*\)/\1/'
+GIT_VERSION_CMD = $(current_dir)/git_version.sh
 GIT_VERSION = $(shell $(GIT_VERSION_CMD))
 GIT_BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 

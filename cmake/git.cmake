@@ -63,33 +63,46 @@ if(APX_GIT_TAGS)
     endforeach()
 endif()
 
+# estimate version from git tags
 if(NOT APX_GIT_VERSION)
     execute_process(
-        COMMAND ${GIT_EXECUTABLE} describe --always --tags
-        OUTPUT_VARIABLE APX_GIT_IDENTITY
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        WORKING_DIRECTORY ${APX_GIT_ROOT}
-    )
-
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} describe --always --tags --match "v*.*"
+        COMMAND ${CMAKE_CURRENT_LIST_DIR}/../tools/git_version.sh
         OUTPUT_VARIABLE APX_GIT_VERSION
         OUTPUT_STRIP_TRAILING_WHITESPACE
         WORKING_DIRECTORY ${APX_GIT_ROOT}
     )
-
-    if(APX_GIT_VERSION MATCHES "^v([0-9]+\.[0-9]+)")
-        string(REPLACE "v" "" APX_GIT_VERSION ${APX_GIT_VERSION})
-        string(REPLACE "-" "." APX_GIT_VERSION ${APX_GIT_VERSION})
-        string(REPLACE "." ";" version_list ${APX_GIT_VERSION})
-        list(LENGTH version_list version_size)
-        if(version_size LESS "3")
-            string(APPEND APX_GIT_VERSION ".0")
-        endif()
+    if(APX_GIT_VERSION)
         string(REGEX MATCH "^([0-9]+\.[0-9]+\.[0-9]+)" APX_GIT_VERSION ${APX_GIT_VERSION})
     endif()
 endif()
+# if(NOT APX_GIT_VERSION)
+#     execute_process(
+#         COMMAND ${GIT_EXECUTABLE} describe --always --tags
+#         OUTPUT_VARIABLE APX_GIT_IDENTITY
+#         OUTPUT_STRIP_TRAILING_WHITESPACE
+#         WORKING_DIRECTORY ${APX_GIT_ROOT}
+#     )
 
+#     execute_process(
+#         COMMAND ${GIT_EXECUTABLE} describe --always --tags --match "v*.*"
+#         OUTPUT_VARIABLE APX_GIT_VERSION
+#         OUTPUT_STRIP_TRAILING_WHITESPACE
+#         WORKING_DIRECTORY ${APX_GIT_ROOT}
+#     )
+
+#     if(APX_GIT_VERSION MATCHES "^v([0-9]+\.[0-9]+)")
+#         string(REPLACE "v" "" APX_GIT_VERSION ${APX_GIT_VERSION})
+#         string(REPLACE "-" "." APX_GIT_VERSION ${APX_GIT_VERSION})
+#         string(REPLACE "." ";" version_list ${APX_GIT_VERSION})
+#         list(LENGTH version_list version_size)
+#         if(version_size LESS "3")
+#             string(APPEND APX_GIT_VERSION ".0")
+#         endif()
+#         string(REGEX MATCH "^([0-9]+\.[0-9]+\.[0-9]+)" APX_GIT_VERSION ${APX_GIT_VERSION})
+#     endif()
+# endif()
+
+# just fallback to default version
 if(NOT APX_GIT_VERSION)
     set(APX_GIT_VERSION "1.1.1")
     message(STATUS "** OUT OF TREE BUILD **")
