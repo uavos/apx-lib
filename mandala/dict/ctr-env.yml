@@ -30,8 +30,8 @@
       suffix: Avionics
     - name: servo
       suffix: servo
-    - name: ignition
-      suffix: Ignition
+    - name: eng
+      suffix: Engine
     - name: payload
       suffix: Payload
     - name: agl

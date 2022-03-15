@@ -234,7 +234,7 @@ static constexpr const ds_field_s dataset_default[] = {
 
     ds<ctr::env::pwr::ap>(fmt_bit),
     ds<ctr::env::pwr::servo>(fmt_bit),
-    ds<ctr::env::pwr::ignition>(fmt_bit),
+    ds<ctr::env::pwr::eng>(fmt_bit),
     ds<ctr::env::pwr::payload>(fmt_bit),
     ds<ctr::env::pwr::agl>(fmt_bit),
     ds<ctr::env::pwr::xpdr>(fmt_bit),
