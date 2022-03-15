@@ -146,7 +146,7 @@ static constexpr const mandala::meta_s meta[] = {
 }; // meta array
 
 // constants
-typedef enum {
+typedef enum : option_t {
 {% for i in data.content %}
 {{ mandala_enum_expand(i, 1, []) }}
 {% endfor %}
