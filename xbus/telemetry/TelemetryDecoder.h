@@ -51,8 +51,6 @@ typedef struct
 class TelemetryDecoder
 {
 public:
-    explicit TelemetryDecoder();
-
     bool decode(uint8_t pseq, XbusStreamReader &stream);
 
     bool decode_format(XbusStreamReader &stream, xbus::telemetry::format_resp_hdr_s *hdr);
@@ -70,7 +68,7 @@ public:
     inline uint16_t slots_cnt() { return _slots_cnt; }
 
 protected:
-    xbus::telemetry::dec_slots_s _slots;
+    xbus::telemetry::dec_slots_s _slots{};
     uint16_t _slots_cnt{};
 
     uint64_t _timestamp_ms{};

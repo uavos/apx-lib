@@ -71,7 +71,7 @@ enum seq_e {
 #pragma pack(1)
 struct field_s
 {
-    xbus::pid_s pid; // seq = seq_e skip mode
+    xbus::pid_s pid{}; // seq = seq_e skip mode
     fmt_e fmt : 8;
 };
 static_assert(sizeof(field_s) == 3, "size error");

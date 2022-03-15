@@ -223,7 +223,11 @@ ssize_t Client::read_packet(int fd, void *buf, size_t size)
                 break;
             if (rv < 0) {
                 rv = errno;
+#ifdef __APPLE__
                 if (rv != EAGAIN && rv != EWOULDBLOCK) {
+#else
+                if (rv != EAGAIN) {
+#endif
                     printf("tcp:rx: %li\n", rv);
                     break;
                 }

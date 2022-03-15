@@ -26,11 +26,6 @@
 
 using namespace xbus::telemetry;
 
-TelemetryDecoder::TelemetryDecoder()
-{
-    memset(&_slots, 0, sizeof(_slots));
-}
-
 bool TelemetryDecoder::decode(uint8_t pseq, XbusStreamReader &stream)
 {
     if (stream.available() < xbus::telemetry::hdr_s::psize())
