@@ -222,25 +222,28 @@
         - "on"
 
 - name: rc
-  title: RC
+  title: Remote Control
   content:
-    - name: ovr
-      suffix: override
+    - name: mode
+      title: RC mode
       type: option
       units:
-        - "off"
-        - "on"
+        - "auto"
+        - "manual"
     - name: roll
-      suffix: roll
+      title: RC roll
       units: su
     - name: pitch
-      suffix: pitch
+      title: RC pitch
+      units: su
+    - name: yaw
+      title: RC yaw
       units: su
     - name: thr
-      suffix: throttle
+      title: RC throttle
       units: u
-    - name: yaw
-      suffix: yaw
+    - name: prop
+      title: RC prop
       units: su
 
 - name: cam

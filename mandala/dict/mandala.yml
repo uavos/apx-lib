@@ -45,15 +45,6 @@ uid_bits:
   - 4
   - 4
 
-# Data flow:
-#
-#   |sensors|  ->  |est|  ->  |cmd|  ->  |ctr|
-#   |-----estimators---|
-#                  |--navigators--|
-#                             |--controllers-|
-#                  |---------telemetry-------|
-#                             |----uplink----|
-
 # Parameters are inherited from parent by child fields
 inheritance:
   - type
