@@ -51,25 +51,21 @@
 
     - name: starter
       title: Engine starter
-      type: option
       units:
         - "off"
         - "on"
     - name: ign1
       title: Ignition 1
-      type: option
       units:
         - "off"
         - "on"
     - name: ign2
       title: Ignition 2
-      type: option
       units:
         - "off"
         - "on"
     - name: fpump
       title: Fuel pump
-      type: option
       units:
         - "off"
         - "on"
@@ -101,7 +97,6 @@
       units: u
     - name: gear
       title: Landing gear
-      type: option
       units:
         - down
         - retract

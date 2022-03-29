@@ -21,7 +21,6 @@
 ##
 - name: pwr
   title: Power
-  type: option
   units:
     - "off"
     - "on"
@@ -49,21 +48,18 @@
 
 - name: aux
   title: Auxillary
-  type: option
   units:
     - "off"
     - "on"
   content:
     - name: horn
       title: Horn signal
-      type: option
       units:
         - "off"
         - "on"
 
 - name: ers
   title: Emergency Recovery
-  type: option
   content:
     - name: launch
       title: ERS launch
@@ -78,7 +74,6 @@
 
 - name: light
   title: Lighting
-  type: option
   units:
     - "off"
     - "on"
@@ -96,7 +91,6 @@
 
 - name: door
   title: Doors and latches
-  type: option
   units:
     - "locked"
     - "open"
@@ -121,32 +115,27 @@
 
     - name: rec
       suffix: record
-      type: option
       units:
         - "off"
         - "on"
     - name: shot
       suffix: shot
-      type: option
       units:
         - "off"
         - "single"
         - "series"
     - name: arm
       suffix: arm focus
-      type: option
       units:
         - "off"
         - "on"
     - name: zin
       suffix: zoom in
-      type: option
       units:
         - "off"
         - "on"
     - name: zout
       suffix: zoom out
-      type: option
       units:
         - "off"
         - "on"
@@ -182,7 +171,6 @@
 
     - name: op
       title: Turret op
-      type: option
       units:
         - "off"
         - "arm"

@@ -24,7 +24,6 @@
   content:
     - name: mode
       title: Procedure
-      type: option
       units:
         - EMG
         - RPV
@@ -51,7 +50,6 @@
 
     - name: action
       title: Procedure action
-      type: option
       units:
         - idle
         - next
@@ -73,7 +71,6 @@
 
 - name: reg
   title: Regulators configuration
-  type: option
   units:
     - "off"
     - "on"
@@ -122,7 +119,6 @@
 
 - name: ahrs
   title: AHRS options
-  type: option
   units:
     - "no"
     - "yes"
@@ -198,7 +194,6 @@
   content:
     - name: mode
       title: Engine mode
-      type: option
       units:
         - "auto"
         - "start"
@@ -210,13 +205,11 @@
 
     - name: cut
       title: Throttle cut
-      type: option
       units:
         - "off"
         - "on"
     - name: ovr
       title: Throttle override
-      type: option
       units:
         - "off"
         - "on"
@@ -226,7 +219,6 @@
   content:
     - name: mode
       title: RC mode
-      type: option
       units:
         - "auto"
         - "manual"
@@ -262,14 +254,12 @@
 
     - name: range
       title: Rangefinder
-      type: option
       units:
         - "off"
         - "on"
 
     - name: mode
       title: Shotting mode
-      type: option
       units:
         - "off"
         - "single"
@@ -286,25 +276,21 @@
 
     - name: pf
       title: Picture flip
-      type: option
       units:
         - "off"
         - "on"
     - name: nir
       title: NIR filter
-      type: option
       units:
         - "off"
         - "on"
     - name: fm
       title: Focus mode
-      type: option
       units:
         - "auto"
         - "infinity"
     - name: ft
       title: Focus type
-      type: option
       units:
         - "auto"
         - "manual"
@@ -314,7 +300,6 @@
   content:
     - name: mode
       suffix: mode
-      type: option
       units:
         - "off"
         - "stab"
@@ -359,7 +344,6 @@
   content:
     - name: mode
       suffix: mode
-      type: option
       units:
         - "off"
         - "track"
@@ -391,7 +375,6 @@
   content:
     - name: mode
       suffix: mode
-      type: option
       units:
         - "off"
         - "fixed"

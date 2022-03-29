@@ -25,7 +25,6 @@
     # TODO review est.sys mandala vars
     - name: mode
       suffix: mode
-      type: option
       units:
         - "busy"
         - "ground"
@@ -36,7 +35,6 @@
 
     - name: health
       suffix: health
-      type: option
       units:
         - "unknown"
         - "normal"
@@ -86,7 +84,6 @@
   content:
     - name: status
       title: Wind
-      type: option
       units:
         - "unknown"
         - "available"
@@ -104,7 +101,6 @@
   content:
     - name: status
       suffix: status
-      type: option
       units:
         - "idle"
         - "ok"

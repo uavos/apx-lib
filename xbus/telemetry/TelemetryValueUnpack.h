@@ -29,6 +29,8 @@
 namespace xbus {
 namespace telemetry {
 
+using namespace mandala;
+
 // raw value getter
 
 template<typename Tsrc, typename Tdest = Tsrc>
@@ -110,17 +112,17 @@ size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e
     switch (fmt) {
     default:
         break;
-    case fmt_real:
+    case fmt_f32:
         *type = mandala::type_real;
         return unpack_value<mandala::real_t>(src, dest, size);
-    case fmt_dword:
+    case fmt_u32:
         *type = mandala::type_dword;
         return unpack_value<mandala::dword_t>(src, dest, size);
-    case fmt_word:
+    case fmt_u16:
         *type = mandala::type_word;
         return unpack_value<mandala::word_t>(src, dest, size);
-    case fmt_opt:
-    case fmt_byte:
+    case fmt_u4:
+    case fmt_u8:
         *type = mandala::type_byte;
         return unpack_value<mandala::byte_t>(src, dest, size);
 
@@ -131,51 +133,51 @@ size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e
         *static_cast<mandala::real_t *>(dest) = float_from_f16(*static_cast<uint16_t *>(dest));
         return sizeof(mandala::word_t);
 
-    case fmt_sbyte:
+    case fmt_s8:
         *type = mandala::type_real;
         return unpack_value<int8_t, mandala::real_t>(src, dest, size);
-    case fmt_sbyte_10:
+    case fmt_s8_10:
         *type = mandala::type_real;
         if (!unpack_value<int8_t, mandala::real_t>(src, dest, size))
             break;
         *static_cast<mandala::real_t *>(dest) = *static_cast<mandala::real_t *>(dest) * 10.f;
         return sizeof(int8_t);
-    case fmt_sbyte_01:
+    case fmt_s8_01:
         return unpack_value<int8_t>(src, dest, type, size, 1.f / 10.f);
-    case fmt_sbyte_001:
+    case fmt_s8_001:
         return unpack_value<int8_t>(src, dest, type, size, 1.f / 100.f);
 
-    case fmt_byte_10:
+    case fmt_u8_10:
         *type = mandala::type_dword;
         if (!unpack_value<uint8_t, mandala::dword_t>(src, dest, size))
             break;
         *static_cast<mandala::dword_t *>(dest) = *static_cast<mandala::dword_t *>(dest) * 10;
         return sizeof(uint8_t);
 
-    case fmt_byte_01:
+    case fmt_u8_01:
         return unpack_value<uint8_t>(src, dest, type, size, 1.f / 10.f);
-    case fmt_byte_001:
+    case fmt_u8_001:
         return unpack_value<uint8_t>(src, dest, type, size, 1.f / 100.f);
 
-    case fmt_rad:
+    case fmt_s16_rad:
         *type = mandala::type_real;
         if (!unpack_value<mandala::word_t>(src, dest, size))
             break;
         *static_cast<mandala::real_t *>(dest) = float_from_rad(*static_cast<int16_t *>(dest));
         return sizeof(mandala::word_t);
-    case fmt_rad2:
+    case fmt_s16_rad2:
         *type = mandala::type_real;
         if (!unpack_value<mandala::word_t>(src, dest, size))
             break;
         *static_cast<mandala::real_t *>(dest) = float_from_rad2(*static_cast<int16_t *>(dest));
         return sizeof(mandala::word_t);
 
-    case fmt_byte_u:
+    case fmt_u8_u:
         return unpack_value<uint8_t>(src, dest, type, size, 1.f / 255.f);
-    case fmt_sbyte_u:
+    case fmt_s8_u:
         return unpack_value<int8_t>(src, dest, type, size, 1.f / 127.f);
 
-    case fmt_word_10:
+    case fmt_u16_10:
         *type = mandala::type_dword;
         if (!unpack_value<uint16_t, mandala::dword_t>(src, dest, size))
             break;

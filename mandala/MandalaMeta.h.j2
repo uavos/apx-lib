@@ -1,7 +1,6 @@
 {%- extends 'Mandala.j2' %}
 
 {% set ns = namespace(path_uid={}) %}
-{% set all_units = namespace(value=[]) %}
 
 {%- macro mandala_meta_expand(d, indent=0, path=[], level=0, uid=0, parent=0) -%}
 {% set ind = ' '*indent*indent_size %}
@@ -9,10 +8,25 @@
 {% set path = path+[d.name] %}
 {% set meta = path|join('::') %}
 
+{%- if d.content is defined -%}
+{% set type_id = '{}' %}
+{% else %}
+{% set type_id = 'type_'+d.type %}
+{%- endif -%}
+
 {%- if d.units is string -%}
 {% set units = d.units %}
+{% set units_id = 'units_' + d.units|replace('/','p')|replace('%','percent')|replace('^2','_sq')|replace('^3','_cb') %}
+{% elif d.units and d.units is iterable %}
+{% set units = d.units|join(',') %}
+{% set type_id = 'type_byte' %}
+{% if (d.units|length) == 2 %}
+{% set units_id = 'units_bit' %}
 {% else %}
-{% set units = d.units|default([])|join(',') %}
+{% set units_id = 'units_opt' %}
+{% endif %}
+{% else %}
+{% set units_id = '{}' %}
 {%- endif -%}
 
 {%- if d.suffix is defined -%}
@@ -21,18 +35,26 @@
 {% set title = d.title %}
 {%- endif -%}
 
-{%- if d.units and d.type != 'option' -%}
-{% set units_id = 'units_' + d.units|replace('/','p')|replace('%','percent')|replace('^2','_sq')|replace('^3','_cb') %}
-{% else %}
-{% set units_id = 'units_none' %}
-{%- endif -%}
-
 {%- if level<(data.uid_bits|length-1) -%}
 {% set group = 1 %}
 {% set uid_val = uid %}
 {% else %}
 {% set group = 0 %}
 {% set uid_val = uid+1 %}
+{%- endif -%}
+
+{%- if d.fmt is defined -%}
+{% set fmt = 'fmt_'+d.fmt %}
+{% elif d.content is defined %}
+{% set fmt = '{}' %}
+{% else %}
+{% set fmt = 'default_fmt('+type_id+','+units_id+')' %}
+{%- endif -%}
+
+{%- if d.seq is defined -%}
+{% set seq = 'seq_'+d.seq %}
+{% else %}
+{% set seq = 'default_seq('+type_id+','+units_id+')' %}
 {%- endif -%}
 
 {{ ind }}{
@@ -45,8 +67,10 @@
 {{ ind1 }}.mask = 0x{{ '%0x' % (2**(data.uid_bits|sum)-1-(2**(data.uid_bits[level+1:]|sum)-1)+data.uid_base) }},
 {{ ind1 }}.level = {{ level }},
 {{ ind1 }}.group = {{ group }},
-{{ ind1 }}.type_id = type_{% if d.content is defined %}void{% else %}{{ d.type }}{% endif %},
+{{ ind1 }}.type_id = {{ type_id }},
 {{ ind1 }}.units_id = {{ units_id }},
+{{ ind1 }}.fmt = {{ fmt }},
+{{ ind1 }}.seq = {{ seq }},
 {{ ind }}},
 {% set _dummy = ns.path_uid.update({path|join('.'):uid}) %}
 {% set uid_pow = data.uid_bits[level+2:]|sum %}
@@ -58,44 +82,14 @@
 {%- endfor -%}
 {%- endmacro -%}
 
-{%- macro mandala_enum_expand(d, indent=0, path=[]) -%}
-{% set ind = ' '*indent*indent_size %}
-{% set ind1 = ' '*(indent+1)*indent_size %}
-{% set path = path+[d.name] %}
-
-{%- if d.content -%}
-{% for i in d.content %}
-{{ mandala_enum_expand(i, indent, path) }}
-{%- endfor -%}
-{%- else -%}
-{% if d.type == 'option' %}
-{{ ind }}// {{ path|join('.') }}
-{% for i in d.units %}
-{{ ind }}{{ path[-2:]|join('_') }}_{{ i }} = {{ loop.index0 }},
-{% endfor %}
-
-{% endif %}
-{%- endif -%}
-{%- endmacro -%}
-
-{# collect units #}
-{%- macro collect_units(d) -%}
-{%- if d.content -%}
-{% for i in d.content %}
-{{ collect_units(i) }}
-{%- endfor -%}
-{%- elif d.units and d.type != 'option' -%}
-{% set all_units.value = all_units.value + [d.units|replace('/','p')|replace('%','percent')|replace('^2','_sq')|replace('^3','_cb')] -%}
-{%- endif -%}
-{%- endmacro -%}
-
-
 {%- block content -%}
 // generated file
 
 #pragma once
 
 #include <mandala/MandalaMetaBase.h>
+#include <mandala/MandalaConstants.h>
+#include <mandala/MandalaPackFormat.h>
 
 namespace mandala {
 {% set ind = ' '*indent_size %}
@@ -123,19 +117,6 @@ static constexpr const mandala::uid_t uid_max = 0x{{ '%0x' % (data.uid_base+(2**
 
 static constexpr bool is_bundle(mandala::uid_t uid) { return (uid & ((1 << uid_bits[uid_levels - 1]) - 1)) == 0; }
 
-{% for i in data.content %}
-{{ collect_units(i) }}
-{% endfor %}
-{% set all_units.value = all_units.value|list|unique|sort -%}
-
-// enum of all used units
-enum units_e {
-{{ ind }}units_none,
-{% for i in all_units.value %}
-{{ ind }}units_{{ i }},
-{% endfor %}
-};
-
 // flat array of all elements
 static constexpr const mandala::meta_s meta[] = {
 {% for i in data.content %}
@@ -144,13 +125,6 @@ static constexpr const mandala::meta_s meta[] = {
 {{ mandala_meta_expand(i, 1, [], 0, data.uid_base+loop.index0*uid_mul) }}
 {% endfor %}
 }; // meta array
-
-// constants
-typedef enum : option_t {
-{% for i in data.content %}
-{{ mandala_enum_expand(i, 1, []) }}
-{% endfor %}
-} constants_t;
 
 }; // namespace mandala
 

@@ -25,7 +25,6 @@
   content:
     - name: src
       suffix: source
-      type: option
       units:
         - unknown
         - local
@@ -37,40 +36,7 @@
     - name: cnt
       suffix: devices
       type: byte
-
-    - name: temp
-      suffix: temperature
-      units: C
-
-    - name: clip
-      suffix: total clip count
-      type: byte
-      units: u
-    - name: vib
-      suffix: vibration
-      type: byte
-      units: "%"
-    - name: coning
-      suffix: coning vibration
-      units: rad^2
-
-- name: acc
-  title: Accelerometer
-  content:
-    - name: src
-      suffix: source
-      type: option
-      units:
-        - unknown
-        - local
-        - primary
-        - secondary
-        - failsafe
-        - auxillary
-
-    - name: cnt
-      suffix: devices
-      type: byte
+      fmt: u4
 
     - name: temp
       suffix: temperature
@@ -79,18 +45,22 @@
     - name: clip
       suffix: clip count
       type: byte
-      units: u
+      seq: skip
     - name: vib
       suffix: vibration
       type: byte
       units: "%"
+      seq: skip
+    - name: coning
+      suffix: coning vibration
+      units: rad^2
+      seq: skip
 
-- name: mag
-  title: Magnetometer
+- name: acc
+  title: Accelerometer
   content:
     - name: src
       suffix: source
-      type: option
       units:
         - unknown
         - local
@@ -102,6 +72,39 @@
     - name: cnt
       suffix: devices
       type: byte
+      fmt: u4
+
+    - name: temp
+      suffix: temperature
+      units: C
+
+    - name: clip
+      suffix: clip count
+      type: byte
+      seq: skip
+    - name: vib
+      suffix: vibration
+      type: byte
+      units: "%"
+      seq: skip
+
+- name: mag
+  title: Magnetometer
+  content:
+    - name: src
+      suffix: source
+      units:
+        - unknown
+        - local
+        - primary
+        - secondary
+        - failsafe
+        - auxillary
+
+    - name: cnt
+      suffix: devices
+      type: byte
+      fmt: u4
 
     - name: temp
       suffix: temperature
@@ -111,21 +114,25 @@
       suffix: vibration
       type: byte
       units: "%"
+      seq: skip
 
     - name: norm
       suffix: magnitude
       units: u
+      fmt: u8_01
+      seq: skip
 
     - name: decl
       suffix: declination
       units: rad
+      fmt: u8_001
+      seq: rare
 
 - name: gps
   title: GPS
   content:
     - name: src
       suffix: source
-      type: option
       units:
         - unknown
         - local
@@ -137,10 +144,10 @@
     - name: cnt
       suffix: devices
       type: byte
+      fmt: u4
 
     - name: fix
       suffix: fix type
-      type: option
       units:
         - none
         - 2D
@@ -150,7 +157,6 @@
 
     - name: emi
       suffix: EMI status
-      type: option
       units:
         - unknown
         - ok
@@ -161,21 +167,31 @@
     - name: hacc
       suffix: horizontal position accuracy
       units: m
+      fmt: u8_01
+      seq: skip
     - name: vacc
       suffix: vertical position accuracy
       units: m
+      fmt: u8_01
+      seq: skip
     - name: sacc
       suffix: speed accuracy
       units: m/s
+      fmt: u8_001
+      seq: skip
     - name: pdop
       suffix: position dilution of precision
+      fmt: u8_01
+      seq: skip
 
     - name: sv
       suffix: visible satellites
       type: word
+      fmt: u8
     - name: su
       suffix: used satellites
       type: word
+      fmt: u8
 
     - name: temp
       suffix: temperature
@@ -184,13 +200,13 @@
     - name: hmsl
       suffix: altitude
       units: m
+      seq: skip
 
 - name: baro
   title: Static pressure
   content:
     - name: src
       suffix: source
-      type: option
       units:
         - unknown
         - local
@@ -202,10 +218,10 @@
     - name: cnt
       suffix: devices
       type: byte
+      fmt: u4
 
     - name: status
       title: Baro
-      type: option
       units:
         - "unknown"
         - "available"
@@ -225,7 +241,6 @@
   content:
     - name: src
       suffix: source
-      type: option
       units:
         - unknown
         - local
@@ -237,6 +252,7 @@
     - name: cnt
       suffix: devices
       type: byte
+      fmt: u4
 
     - name: valid
       suffix: validated devices
@@ -244,7 +260,6 @@
 
     - name: status
       title: Pitot
-      type: option
       units:
         - "unknown"
         - "available"
@@ -258,6 +273,7 @@
     - name: acc
       title: Airspeed derivative
       units: m/s^2
+      fmt: s8_01
     - name: temp
       title: Pitot probe temperature
       units: C
@@ -270,7 +286,6 @@
   content:
     - name: src
       title: AGL source
-      type: option
       units:
         - none
         - laser
@@ -278,7 +293,6 @@
         - sonic
     - name: status
       title: AGL
-      type: option
       units:
         - "off"
         - "valid"
@@ -294,7 +308,6 @@
       units: m
     - name: ground
       title: Ground
-      type: option
       units:
         - "unknown"
         - "landed"
@@ -306,9 +319,11 @@
     - name: slip
       title: Slip
       units: rad
+      fmt: s8_001
     - name: aoa
       title: Angle of attack
       units: rad
+      fmt: s8_001
     - name: temp
       title: Ambient air temperature
       units: C
@@ -335,7 +350,6 @@
   content:
     - name: status
       title: LAS status
-      type: option
       units:
         - ok
         - holdon

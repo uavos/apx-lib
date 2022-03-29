@@ -31,7 +31,7 @@
 {{ mandala_enum_expand(i, indent, path) }}
 {%- endfor -%}
 {%- else -%}
-{% if d.type == 'option' %}
+{% if d.units is iterable and d.units is not string %}
 {{ ind }}// {{ path|join('.') }}
 {% for i in d.units %}
 {{ ind }}{{ path[-2:]|join('_') }}_{{ i }} = {{ loop.index0 }},
@@ -51,7 +51,7 @@
 namespace mandala {
 
 // constants
-typedef enum : option_t {
+typedef enum : byte_t {
 {% for i in data.content %}
 {{ mandala_enum_expand(i, 1, []) }}
 {% endfor %}

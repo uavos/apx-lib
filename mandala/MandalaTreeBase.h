@@ -34,24 +34,4 @@ struct tree_base_t
     }
 };
 
-template<typename _Tree>
-struct tree_0_t : public tree_base_t<_Tree>
-{
-};
-
-template<typename _Tree>
-struct tree_1_t : public tree_base_t<_Tree>
-{
-};
-
-template<typename _Tree>
-struct tree_2_t : public tree_base_t<_Tree>
-{
-};
-
-template<typename _DataType, typename _Tree>
-class tree_value_t : public tree_base_t<_Tree>
-{
-};
-
 }; // namespace mandala

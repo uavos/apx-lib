@@ -27,52 +27,22 @@
 
 #include <cmath>
 
+#include <mandala/MandalaMetaTree.h>
+
 namespace xbus {
 namespace telemetry {
 
-// data element format descriptor
-enum fmt_e {
-    fmt_none,
-
-    // raw
-    fmt_real,
-    fmt_dword,
-    fmt_word,
-    fmt_byte,
-
-    // packed bitfields
-    fmt_bit, // one bit
-    fmt_opt, // 4 bits
-
-    // packed real numbers
-    fmt_f16,       // float16
-    fmt_sbyte,     // signed byte
-    fmt_sbyte_10,  // signed/10
-    fmt_sbyte_01,  // signed*10
-    fmt_sbyte_001, // signed*100
-    fmt_byte_10,   // unsigned/10
-    fmt_byte_01,   // unsigned*10
-    fmt_byte_001,  // unsigned*100
-    fmt_rad,       // radians -PI..+PI
-    fmt_rad2,      // radians -PI/2..+PI/2
-    fmt_byte_u,    // units 0..1
-    fmt_sbyte_u,   // signed units -1..+1
-    fmt_word_10,   // unsigned/10
-};
-
-enum seq_e {
-    seq_always,   // transmit every frame on change
-    seq_skip,     // transmit every second frame
-    seq_rare,     // transmit every fourth frame
-    seq_scheduled // transmit in scheduled slots (rare)
-};
+// constants
+static constexpr const uint8_t fmt_version = 2;    // increase this number for GCS to be incompatible with AP
+static constexpr const size_t fmt_block_size = 64; // encoder will reply blocks (size bytes) of the fields array with this default
+static constexpr const size_t slots_size{240};     // max number of fields in the stream
 
 // telemetry field descriptor
 #pragma pack(1)
 struct field_s
 {
     xbus::pid_s pid{}; // seq = seq_e skip mode
-    fmt_e fmt : 8;
+    mandala::fmt_e fmt : 8;
 };
 static_assert(sizeof(field_s) == 3, "size error");
 
@@ -82,11 +52,6 @@ union hash_s {
 };
 static_assert(sizeof(hash_s) == 4, "size error");
 #pragma pack()
-
-// constants
-static constexpr const uint8_t fmt_version = 1;    // increase this number for GCS to be incompatible with AP
-static constexpr const size_t fmt_block_size = 64; // encoder will reply blocks (size bytes) of the fields array with this default
-static constexpr const size_t slots_size{240};     // max number of fields in the stream
 
 // stream header
 struct hdr_s

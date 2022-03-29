@@ -69,12 +69,12 @@ bool TelemetryEncoder::add(const field_s &field)
                 break;
             index++;
         }
-    } else if (field.fmt == fmt_opt) { // opts at end before bitfields
+    } else if (field.fmt == fmt_u4) { // opts at end before bitfields
         while (index < _slots_cnt) {
             auto const &f = _slots.fields[index];
             if (f.fmt == fmt_bit)
                 break;
-            if (f.fmt == fmt_opt)
+            if (f.fmt == fmt_u4)
                 break;
             index++;
         }
@@ -93,7 +93,7 @@ bool TelemetryEncoder::add(const field_s &field)
             auto const &f = _slots.fields[index];
             if (f.fmt == fmt_bit)
                 break;
-            if (f.fmt == fmt_opt)
+            if (f.fmt == fmt_u4)
                 break;
             if (f.pid.uid > field.pid.uid)
                 break;
@@ -272,7 +272,7 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint8_t pseq)
                     (*code) |= code_bit;
                 }
 
-                if (f.fmt == fmt_opt) {
+                if (f.fmt == fmt_u4) {
                     uint8_t v = buf & 0x0F;
                     if (nibble_n == 0) {
                         nibble_n = 1;

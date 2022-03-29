@@ -181,7 +181,7 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream, uint8_t pseq)
                 break;
             stream.reset(stream.pos() + sz);
         }
-        if (f->fmt == fmt_opt) {
+        if (f->fmt == fmt_u4) {
             if (nibble_n == 0) {
                 nibble_n = 1;
                 nibble_v = value & 0xFF;

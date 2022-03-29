@@ -30,6 +30,8 @@
 namespace xbus {
 namespace telemetry {
 
+using namespace mandala;
+
 // type cast and limits
 
 template<typename T>
@@ -91,19 +93,16 @@ template<typename T>
 T raw_value(const void *src, mandala::type_id_e type)
 {
     switch (type) {
-    default:
-        return *static_cast<const mandala::raw_t *>(src);
-    case mandala::type_real:
-        return cast_value<T>(*static_cast<const mandala::real_t *>(src));
-    case mandala::type_dword:
-        return cast_value<T>(*static_cast<const mandala::dword_t *>(src));
-    case mandala::type_word:
-        return cast_value<T>(*static_cast<const mandala::word_t *>(src));
     case mandala::type_byte:
         return cast_value<T>(*static_cast<const mandala::byte_t *>(src));
-    case mandala::type_option:
-        return cast_value<T>(*static_cast<const mandala::option_t *>(src));
+    case mandala::type_word:
+        return cast_value<T>(*static_cast<const mandala::word_t *>(src));
+    case mandala::type_dword:
+        return cast_value<T>(*static_cast<const mandala::dword_t *>(src));
+    case mandala::type_real:
+        return cast_value<T>(*static_cast<const mandala::real_t *>(src));
     }
+    return *static_cast<const mandala::raw_t *>(src);
 }
 
 // packing helpers
@@ -191,20 +190,20 @@ size_t pack_value(const mandala::raw_t &raw, mandala::type_id_e type, void *dest
     switch (fmt) {
     default:
         return 0;
-    case fmt_real: {
+    case fmt_f32: {
         const mandala::real_t v = raw_value<mandala::real_t>(&raw, type);
         return pack_value(v, dest);
     }
-    case fmt_dword: {
+    case fmt_u32: {
         const mandala::dword_t v = raw_value<mandala::dword_t>(&raw, type);
         return pack_value(v, dest);
     }
-    case fmt_word: {
+    case fmt_u16: {
         const mandala::word_t v = raw_value<mandala::word_t>(&raw, type);
         return pack_value(v, dest);
     }
-    case fmt_opt:
-    case fmt_byte: {
+    case fmt_u4:
+    case fmt_u8: {
         const mandala::byte_t v = raw_value<mandala::byte_t>(&raw, type);
         return pack_value(v, dest);
     }
@@ -214,53 +213,53 @@ size_t pack_value(const mandala::raw_t &raw, mandala::type_id_e type, void *dest
         return pack_value(float_to_f16(v), dest);
     }
 
-    case fmt_sbyte: {
+    case fmt_s8: {
         const int8_t v = raw_value<int8_t>(&raw, type);
         return pack_value(v, dest);
     }
-    case fmt_sbyte_10: {
+    case fmt_s8_10: {
         const int8_t v = cast_value<int8_t>(raw_value<int32_t>(&raw, type) / 10);
         return pack_value(v, dest);
     }
-    case fmt_sbyte_01: {
+    case fmt_s8_01: {
         const int8_t v = cast_value<int8_t>(raw_value<float>(&raw, type) * 10.f);
         return pack_value(v, dest);
     }
-    case fmt_sbyte_001: {
+    case fmt_s8_001: {
         const int8_t v = cast_value<int8_t>(raw_value<float>(&raw, type) * 100.f);
         return pack_value(v, dest);
     }
-    case fmt_byte_10: {
+    case fmt_u8_10: {
         const uint8_t v = cast_value<uint8_t>(raw_value<int32_t>(&raw, type) / 10);
         return pack_value(v, dest);
     }
-    case fmt_byte_01: {
+    case fmt_u8_01: {
         const uint8_t v = cast_value<uint8_t>(raw_value<float>(&raw, type) * 10.f);
         return pack_value(v, dest);
     }
-    case fmt_byte_001: {
+    case fmt_u8_001: {
         const uint8_t v = cast_value<uint8_t>(raw_value<float>(&raw, type) * 100.f);
         return pack_value(v, dest);
     }
 
-    case fmt_rad: {
+    case fmt_s16_rad: {
         const mandala::real_t v = raw_value<mandala::real_t>(&raw, type);
         return pack_value(float_to_rad(v), dest);
     }
-    case fmt_rad2: {
+    case fmt_s16_rad2: {
         const mandala::real_t v = raw_value<mandala::real_t>(&raw, type);
         return pack_value(float_to_rad2(v), dest);
     }
 
-    case fmt_byte_u: {
+    case fmt_u8_u: {
         const uint8_t v = cast_value<uint8_t>(raw_value<float>(&raw, type) * 255.f);
         return pack_value(v, dest);
     }
-    case fmt_sbyte_u: {
+    case fmt_s8_u: {
         const int8_t v = cast_value<int8_t>(raw_value<float>(&raw, type) * 127.f);
         return pack_value(v, dest);
     }
-    case fmt_word_10: {
+    case fmt_u16_10: {
         const uint16_t v = cast_value<uint16_t>(raw_value<uint32_t>(&raw, type) / 10);
         return pack_value(v, dest);
     }

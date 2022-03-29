@@ -4,19 +4,25 @@
 
 {%- macro constants_expand(d, indent, level, uid) -%}
 {% set ind = ' '*indent*indent_size %}
-{{ ind }}typedef {{ d.type }}_t type_t;
+
+{%- if d.content is defined -%}
+{% set type = 'void' %}
+{% else %}
+{% if d.units is iterable and d.units is not string %}
+{% set type = 'byte_t' %}
+{% else %}
+{% set type = d.type+'_t' %}
+{% endif %}
+{%- endif -%}
+
+{{ ind }}typedef {{ type }} type_t;
 {{ ind }}static constexpr const meta_s &meta{ mandala::meta[{{ ns.meta_id }}] };
 {{ ind }}static constexpr const uid_t uid{ meta.uid }; //0x{{ '%0x' % uid }}
-{{ ind }}static constexpr const type_id_e type_id{ type_{% if d.content is defined %}void{% else %}{{ d.type }}{% endif %} };
 {%- endmacro -%}
 
 {%- macro mandala_expand(d, indent=0, level=0, uid=0) -%}
 {% set ind = ' '*indent*indent_size %}
-{% if d.content is defined %}
-{% set pub = 'tree_'+level|string+'_t<'+d.name+'>' %}
-{% else %}
-{% set pub = 'tree_value_t<mandala::'+d.type+'_t, '+d.name+'>' %}
-{% endif %}
+{% set pub = 'tree_base_t<'+d.name+'>' %}
 {{ ind }}struct {{ d.name }}: public {{ pub }}
 {{ ind }}{
 {{ constants_expand(d, indent+1, level+1, uid) }}

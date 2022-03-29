@@ -1,0 +1,72 @@
+{%- extends 'Mandala.j2' %}
+
+{% set all_units = namespace(value=[]) %}
+
+{%- macro mandala_enum_expand(d, indent=0, path=[]) -%}
+{% set ind = ' '*indent*indent_size %}
+{% set ind1 = ' '*(indent+1)*indent_size %}
+{% set path = path+[d.name] %}
+
+{%- if d.content -%}
+{% for i in d.content %}
+{{ mandala_enum_expand(i, indent, path) }}
+{%- endfor -%}
+{%- else -%}
+{% if d.units is iterable and d.units is not string %}
+{{ ind }}// {{ path|join('.') }}
+{% for i in d.units %}
+{{ ind }}{{ path[-2:]|join('_') }}_{{ i }} = {{ loop.index0 }},
+{% endfor %}
+
+{% endif %}
+{%- endif -%}
+{%- endmacro -%}
+
+{# collect units #}
+{%- macro collect_units(d) -%}
+{%- if d.content -%}
+{% for i in d.content %}
+{{ collect_units(i) }}
+{%- endfor -%}
+{%- elif d.units is string -%}
+{% set all_units.value = all_units.value + [d.units|replace('/','p')|replace('%','percent')|replace('^2','_sq')|replace('^3','_cb')] -%}
+{%- endif -%}
+{%- endmacro -%}
+
+
+{%- block content -%}
+// generated file
+
+#pragma once
+
+#include <mandala/MandalaMetaBase.h>
+
+namespace mandala {
+
+{% set ind = ' '*indent_size -%}
+
+{%- for i in data.content -%}
+{{ collect_units(i) }}
+{%- endfor -%}
+{%- set all_units.value = all_units.value|list|unique|sort -%}
+
+// enum of all used units
+enum units_e {
+{{ ind }}units_none,
+{{ ind }}units_bit,
+{{ ind }}units_opt,
+{% for i in all_units.value %}
+{{ ind }}units_{{ i }},
+{% endfor %}
+};
+
+// constants
+enum constants_e : byte_t {
+{% for i in data.content %}
+{{ mandala_enum_expand(i, 1, []) }}
+{% endfor %}
+};
+
+}; // namespace mandala
+
+{% endblock %}
