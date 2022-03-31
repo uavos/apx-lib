@@ -2,7 +2,7 @@
 
 {% set ns = namespace(meta_id=0) %}
 
-{%- macro mandala_expand(d, indent=0, level=0, uid=0) -%}
+{%- macro mandala_uid_expand(d, indent=0, level=0, uid=0) -%}
 {% set ind = ' '*indent*indent_size %}
 {%- if d.content is defined -%}
 {{ ind }}namespace {{ d.name }}
@@ -12,7 +12,7 @@
 {% set uid_mul = 2**uid_pow %}
 {% for i in d.content %}
 {% if i.reserved is undefined %}
-{{ mandala_expand(i, indent+1, level+1, uid+loop.index0*uid_mul) }}
+{{ mandala_uid_expand(i, indent+1, level+1, uid+loop.index0*uid_mul) }}
 {% endif %}
 {% endfor %}
 {{ ind }}};
@@ -20,27 +20,6 @@
 {{ ind }}enum { {{ d.name }} = 0x{{ '%0x' % (uid+1) }} };
 {%- endif -%}
 {%- endmacro -%}
-
-{%- macro mandala_enum_expand(d, indent=0, path=[]) -%}
-{% set ind = ' '*indent*indent_size %}
-{% set ind1 = ' '*(indent+1)*indent_size %}
-{% set path = path+[d.name] %}
-
-{%- if d.content -%}
-{% for i in d.content %}
-{{ mandala_enum_expand(i, indent, path) }}
-{%- endfor -%}
-{%- else -%}
-{% if d.units is iterable and d.units is not string %}
-{{ ind }}// {{ path|join('.') }}
-{% for i in d.units %}
-{{ ind }}{{ path[-2:]|join('_') }}_{{ i }} = {{ loop.index0 }},
-{% endfor %}
-
-{% endif %}
-{%- endif -%}
-{%- endmacro -%}
-
 
 {%- block content -%}
 // generated file
@@ -51,17 +30,15 @@
 namespace mandala {
 
 // constants
-typedef enum : byte_t {
-{% for i in data.content %}
-{{ mandala_enum_expand(i, 1, []) }}
-{% endfor %}
-} constants_t;
+enum constants_e : byte_t {
+{{ mandala_constants(1) }}
+};
 
 // tree
 {% for i in data.content %}
 {% set uid_pow = data.uid_bits[1:]|sum %}
 {% set uid_mul = 2**uid_pow %}
-{{ mandala_expand(i, 0, 0, data.uid_base+loop.index0*uid_mul) }}
+{{ mandala_uid_expand(i, 0, 0, data.uid_base+loop.index0*uid_mul) }}
 {% endfor %}
 
 }; // namespace

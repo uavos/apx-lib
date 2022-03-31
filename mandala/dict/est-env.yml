@@ -59,11 +59,13 @@
       title: Fuel capacity
       type: byte
       units: "%"
+      ds: normal
 
     - name: weight
       title: Vehicle weight
       type: word
       units: kg
+      ds: heavy
 
     - name: ttl
       title: Time to live
@@ -81,6 +83,7 @@
 
 - name: wind
   title: Wind estimator
+  ds: minimal
   content:
     - name: status
       title: Wind
@@ -106,13 +109,16 @@
         - "ok"
         - "warning"
         - "failure"
+      ds: normal
 
     - name: rpm
       suffix: RPM
       units: rpm
+      ds: normal
     - name: drpm
       suffix: RPM rate
       units: rpm/s
+      ds: heavy
 
 - name: ats
   title: ATS
@@ -143,13 +149,16 @@
 
     - name: lat
       suffix: latitude
-      units: deg
+      type: dword
+      units: gps
     - name: lon
       suffix: longitude
-      units: deg
+      type: dword
+      units: gps
     - name: hmsl
       suffix: altitude MSL
       units: m
+      fmt: f32
 
 - name: turret
   title: Turret
@@ -167,13 +176,16 @@
 
     - name: lat
       suffix: latitude
-      units: deg
+      type: dword
+      units: gps
     - name: lon
       suffix: longitude
-      units: deg
+      type: dword
+      units: gps
     - name: hmsl
       suffix: altitude MSL
       units: m
+      fmt: f32
 
 - name: usr
   title: User values

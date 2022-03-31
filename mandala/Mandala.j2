@@ -4,5 +4,97 @@
 {% if v %} // {{ v }}{% endif %}
 {% endmacro -%}
 
+{% set ns = namespace(path_uid={}) %}
+
+{%- macro mandala_meta_expand(d, path=[], level=0, uid=0, parent=0) -%}
+{% set path = path+[d.name] %}
+{% set meta = path|join('::') %}
+
+{%- if d.content is defined -%}
+{% set type_id = '{}' %}
+{% else %}
+{% set type_id = 'type_'+d.type %}
+{%- endif -%}
+
+{%- if d.content is undefined and d.units -%}
+{% if d.units is iterable and d.units is not string %}
+{% set units = d.units|join(',') %}
+{% set units_cnt = d.units|length %}
+{% set type_id = 'type_byte' %}
+{% else %}
+{% set units = d.units %}
+{% set units_cnt = 1 %}
+{% set units_label = d.units|replace('/','p')|replace('%','percent')|replace('^2','_sq')|replace('^3','_cb') %}
+{% endif %}
+{% else %}
+{% set units_cnt = 0 %}
+{%- endif -%}
+
+{%- if d.suffix is defined -%}
+{% set title = parent.title+' '+d.suffix %}
+{% else %}
+{% set title = d.title %}
+{%- endif -%}
+
+{%- if level<(data.uid_bits|length-1) -%}
+{% set group = 1 %}
+{% set uid_val = uid %}
+{% else %}
+{% set group = 0 %}
+{% set uid_val = uid+1 %}
+{%- endif -%}
+
+{%- set meta = {
+                  'd' : d,
+                  'name' : d.name,
+                  'title' : title,
+                  'descr' : d.descr | trim | replace('\n',' ') | replace('  ',' '),
+                  'units' : units,
+                  'units_label' : units_label,
+                  'path' : path,
+                  'uid' : uid_val,
+                  'mask' : 2**(data.uid_bits|sum)-1-(2**(data.uid_bits[level+1:]|sum)-1)+data.uid_base,
+                  'level' : level,
+                  'group' : group,
+                  'type_id' : type_id,
+                  'units_cnt' : units_cnt,
+               }
+-%}
+
+{{ caller(meta) }}
+
+{%- set _dummy = ns.path_uid.update({path|join('.'):uid}) %}
+{% set uid_pow = data.uid_bits[level+2:]|sum %}
+{% set uid_mul = 2**uid_pow %}
+{% for i in d.content %}
+{%- if i.reserved is undefined -%}
+{{ mandala_meta_expand(i, path, level+1, uid+loop.index0*uid_mul, d, caller=caller) }}
+{%- endif -%}
+{%- endfor -%}
+{%- endmacro -%}
+
+{%- macro mandala_meta() -%}
+{% for i in data.content %}
+{% set uid_pow = data.uid_bits[1:]|sum %}
+{% set uid_mul = 2**uid_pow %}
+{{ mandala_meta_expand(i, [], 0, data.uid_base+loop.index0*uid_mul, caller=caller) }}
+{% endfor %}
+{%- endmacro -%}
+
+
+{%- macro mandala_constants(indent=0) -%}
+{% set ind = ' '*indent*indent_size -%}
+{% call(m) mandala_meta() %}
+{% if m.d.units and m.d.units is iterable and m.d.units is not string %}
+{{ ind }}// {{ m.path|join('.') }}
+{% for i in m.d.units %}
+{{ ind }}{{ m.path[-2:]|join('_') }}_{{ i }} = {{ loop.index0 }},
+{% endfor %}
+
+{% endif %}
+{% endcall %}
+{%- endmacro -%}
+
+
 {%- block content -%}
 {% endblock %}

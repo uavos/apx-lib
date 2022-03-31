@@ -21,6 +21,7 @@
 ##
 - name: proc
   title: Procedures
+  ds: minimal
   content:
     - name: mode
       title: Procedure
@@ -64,16 +65,19 @@
     - name: loops
       title: Remaining loops
       type: word
+
     - name: timeout
       title: Procedure timeout
       type: word
       units: s
+      ds: aux
 
 - name: reg
   title: Regulators configuration
   units:
     - "off"
     - "on"
+  ds: minimal
   content:
     - name: att
       title: Attitude control
@@ -122,6 +126,7 @@
   units:
     - "no"
     - "yes"
+  ds: minimal
   content:
     - name: inair
       title: AHRS airdata
@@ -141,6 +146,7 @@
 
 - name: att
   title: Attitude regulators
+  ds: minimal
   content:
     - name: roll
       title: Cmd roll
@@ -157,16 +163,20 @@
 
 - name: pos
   title: Position regulators
+  ds: minimal
   content:
     - name: lat
       title: Cmd latitude
-      units: deg
+      type: dword
+      units: gps
     - name: lon
       title: Cmd latitude
-      units: deg
+      type: dword
+      units: gps
     - name: hmsl
       title: Cmd altitude MSL
       units: m
+      fmt: f32
 
     - name: bearing
       title: Cmd bearing
@@ -191,6 +201,7 @@
 
 - name: eng
   title: Engine regulators
+  ds: normal
   content:
     - name: mode
       title: Engine mode
@@ -222,6 +233,7 @@
       units:
         - "auto"
         - "manual"
+      ds: normal
     - name: roll
       title: RC roll
       units: su
@@ -331,13 +343,16 @@
 
     - name: lat
       suffix: latitude
-      units: deg
+      type: dword
+      units: gps
     - name: lon
       suffix: latitude
-      units: deg
+      type: dword
+      units: gps
     - name: hmsl
       suffix: altitude MSL
       units: m
+      fmt: f32
 
 - name: ats
   title: ATS cmd

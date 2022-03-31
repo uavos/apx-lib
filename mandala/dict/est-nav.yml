@@ -21,6 +21,7 @@
 ##
 - name: att
   title: Attitude
+  ds: minimal
   content:
     - name: status
       suffix: status
@@ -65,6 +66,7 @@
 
 - name: pos
   title: Global Position
+  ds: minimal
   content:
     - name: status
       suffix: status
@@ -83,13 +85,16 @@
 
     - name: lat
       title: Latitude
-      units: deg
+      type: dword
+      units: gps
     - name: lon
       title: Longitude
-      units: deg
+      type: dword
+      units: gps
     - name: hmsl
       title: Altitude MSL
       units: m
+      fmt: f32
 
     - name: agl
       title: Altitude above ground
@@ -128,16 +133,20 @@
       units:
         - "no"
         - "yes"
+      ds: minimal
 
     - name: "x"
       suffix: "X"
       units: rad/s
+      ds: normal
     - name: "y"
       suffix: "Y"
       units: rad/s
+      ds: normal
     - name: "z"
       suffix: "Z"
       units: rad/s
+      ds: normal
 
     - name: "ax"
       title: Angular acceleration X
@@ -155,12 +164,14 @@
 
 - name: acc
   title: Acceleration
+  ds: normal
   content:
     - name: valid
       suffix: validity
       units:
         - "no"
         - "yes"
+      ds: minimal
 
     - name: "x"
       suffix: "X"
@@ -184,16 +195,20 @@
         - "warning"
         - "critical"
         - "failure"
+      ds: normal
 
     - name: "ax"
       title: Linear acceleration X
       units: m/s^2
+      ds: heavy
     - name: "ay"
       title: Linear acceleration Y
       units: m/s^2
+      ds: heavy
     - name: "az"
       title: Linear acceleration Z
       units: m/s^2
+      ds: heavy
 
     - name: vx
       title: Velocity X
@@ -217,25 +232,31 @@
 
 - name: ref
   title: Ref point
+  ds: normal
   content:
     - name: status
       suffix: status
       units:
         - "unavailable"
         - "initialized"
+      ds: minimal
 
     - name: lat
       title: Reference latitude
-      units: deg
+      type: dword
+      units: gps
     - name: lon
       title: Reference latitude
-      units: deg
+      type: dword
+      units: gps
     - name: hmsl
       title: MSL Altitude offset
       units: m
+      fmt: f32
 
 - name: air
   title: Air data
+  ds: minimal
   content:
     - name: airspeed
       title: Airspeed
@@ -259,6 +280,7 @@
     - name: rho
       title: Air density
       units: kg/m^3
+      ds: aux
 
     - name: ktas
       title: EAS to TAS multiplier
@@ -271,6 +293,7 @@
     - name: stab
       title: Stability
       units: u
+      ds: aux
 
     - name: stall
       title: STALL
@@ -282,6 +305,7 @@
 
 - name: wpt
   title: Mission navigation
+  ds: minimal
   content:
     - name: status
       title: Maneuver status
@@ -294,21 +318,22 @@
       units: s
       type: word
 
-    - name: dist
-      title: Distance to waypoint
-      units: m
-    - name: hdg
-      title: Waypoint heading
-      units: rad
-
     - name: xtrack
       title: Crosstrack error
       units: m
-
     - name: delta
       title: Touchdown error
       units: m
 
+    - name: dist
+      title: Distance to waypoint
+      units: m
+      ds: aux
+    - name: hdg
+      title: Waypoint heading
+      units: rad
+      ds: aux
     - name: thdg
       title: Tangent heading
       units: rad
+      ds: aux

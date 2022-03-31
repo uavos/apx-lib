@@ -99,7 +99,7 @@ struct gps_status_s
 };
 struct gps_fix_s
 {
-    int32_t llh[3]; // 1e-7 degrees, 1e-3 meters
+    int32_t llh[3]; // [gps] 1e-7 degrees, 1e-3 meters
     int16_t vel[3]; // 1e-2 m/s
 
     uint16_t hacc; // mm
@@ -154,8 +154,8 @@ struct sim_s
 
 struct pos_ll_s
 {
-    double lat;
-    double lon;
+    uint32_t lat; // [gps] units
+    uint32_t lon; // [gps] units
 };
 
 #pragma pack()

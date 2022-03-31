@@ -26,6 +26,7 @@
     - name: rpm
       suffix: RPM
       units: rpm
+      ds: normal
 
     - name: torque
       suffix: torque
@@ -164,6 +165,7 @@
   content:
     - name: level
       suffix: level
+      type: byte
       units: "%"
     - name: rate
       suffix: flow rate
@@ -203,6 +205,7 @@
 
 - name: pwr
   title: Power
+  ds: normal
   content:
     - name: status
       suffix: status
@@ -220,6 +223,7 @@
       title: System current
       units: A
       fmt: u8_01
+      ds: heavy
 
     - name: vsrv
       title: Servo voltage
@@ -236,6 +240,7 @@
       title: Payload current
       units: A
       fmt: u8_01
+      ds: heavy
 
 - name: com
   title: Datalink
@@ -249,17 +254,20 @@
         - "busy"
         - "warning"
         - "failure"
+      ds: normal
 
     - name: rss
       title: Received signal strength
       units: "%"
       type: byte
+      ds: minimal
     - name: snr
       title: Signal to noise ratio
       units: u
     - name: temp
       title: Modem temperature
       units: C
+      ds: normal
 
     - name: voltage
       title: Modem voltage
@@ -309,6 +317,7 @@
 
 - name: ers
   title: Emergency Rescue System
+  ds: normal
   content:
     - name: status
       title: ERS status

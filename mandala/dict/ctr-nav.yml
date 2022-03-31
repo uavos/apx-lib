@@ -22,6 +22,7 @@
 - name: att
   title: Attitude controls
   units: su
+  ds: minimal
   content:
     - name: ail
       title: Ailerons
@@ -36,12 +37,17 @@
     - name: thr
       title: Throttle
       units: u
+      ds: minimal
+
     - name: prop
       title: Prop pitch
       units: su
+      ds: normal
     - name: choke
       title: Choke
       units: u
+      ds: normal
+
     - name: tune
       title: Engine tuning
       units: su
@@ -54,21 +60,25 @@
       units:
         - "off"
         - "on"
+      ds: normal
     - name: ign1
       title: Ignition 1
       units:
         - "off"
         - "on"
+      ds: normal
     - name: ign2
       title: Ignition 2
       units:
         - "off"
         - "on"
+      ds: normal
     - name: fpump
       title: Fuel pump
       units:
         - "off"
         - "on"
+      ds: normal
 
 - name: wing
   title: Wing mechanization
@@ -76,9 +86,11 @@
     - name: flaps
       title: Flaps
       units: u
+      ds: minimal
     - name: airbrk
       title: Airbrakes
       units: u
+      ds: minimal
     - name: slats
       title: Slats
       units: u
@@ -95,11 +107,14 @@
     - name: brake
       title: Brake
       units: u
+      ds: minimal
     - name: gear
       title: Landing gear
       units:
         - down
         - retract
+      ds: normal
     - name: rud
       title: Steering
       units: su
+      ds: minimal

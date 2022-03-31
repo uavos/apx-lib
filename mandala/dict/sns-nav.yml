@@ -41,20 +41,25 @@
     - name: temp
       suffix: temperature
       units: C
+      ds: heavy
 
     - name: clip
       suffix: clip count
       type: byte
       seq: skip
+      ds: normal
+
     - name: vib
       suffix: vibration
       type: byte
       units: "%"
       seq: skip
+      ds: minimal
     - name: coning
       suffix: coning vibration
       units: rad^2
       seq: skip
+      ds: heavy
 
 - name: acc
   title: Accelerometer
@@ -77,16 +82,19 @@
     - name: temp
       suffix: temperature
       units: C
+      ds: heavy
 
     - name: clip
       suffix: clip count
       type: byte
       seq: skip
+      ds: normal
     - name: vib
       suffix: vibration
       type: byte
       units: "%"
       seq: skip
+      ds: minimal
 
 - name: mag
   title: Magnetometer
@@ -109,18 +117,21 @@
     - name: temp
       suffix: temperature
       units: C
+      ds: heavy
 
     - name: vib
       suffix: vibration
       type: byte
       units: "%"
       seq: skip
+      ds: minimal
 
     - name: norm
       suffix: magnitude
       units: u
       fmt: u8_01
       seq: skip
+      ds: normal
 
     - name: decl
       suffix: declination
@@ -154,6 +165,7 @@
         - 3D
         - DIFF
         - RTK
+      ds: minimal
 
     - name: emi
       suffix: EMI status
@@ -169,38 +181,46 @@
       units: m
       fmt: u8_01
       seq: skip
+      ds: heavy
     - name: vacc
       suffix: vertical position accuracy
       units: m
       fmt: u8_01
       seq: skip
+      ds: heavy
     - name: sacc
       suffix: speed accuracy
       units: m/s
       fmt: u8_001
       seq: skip
+      ds: heavy
     - name: pdop
       suffix: position dilution of precision
       fmt: u8_01
       seq: skip
+      ds: normal
 
     - name: sv
       suffix: visible satellites
       type: word
       fmt: u8
+      ds: minimal
     - name: su
       suffix: used satellites
       type: word
       fmt: u8
+      ds: minimal
 
     - name: temp
       suffix: temperature
       units: C
+      ds: heavy
 
     - name: hmsl
       suffix: altitude
       units: m
       seq: skip
+      ds: normal
 
 - name: baro
   title: Static pressure
@@ -228,6 +248,7 @@
         - "warning"
         - "critical"
         - "failure"
+      ds: minimal
 
     - name: mbar
       title: Absolute pressure
@@ -235,6 +256,7 @@
     - name: temp
       title: Barometer temperature
       units: C
+      ds: heavy
 
 - name: pitot
   title: Dynamic pressure
@@ -257,6 +279,7 @@
     - name: valid
       suffix: validated devices
       type: byte
+      ds: normal
 
     - name: status
       title: Pitot
@@ -266,6 +289,7 @@
         - "warning"
         - "critical"
         - "failure"
+      ds: minimal
 
     - name: airspeed
       title: Airspeed
@@ -274,9 +298,11 @@
       title: Airspeed derivative
       units: m/s^2
       fmt: s8_01
+      ds: heavy
     - name: temp
       title: Pitot probe temperature
       units: C
+      ds: heavy
     - name: raw
       title: Dynamic pressure
       units: kPa
@@ -296,6 +322,7 @@
       units:
         - "off"
         - "valid"
+      ds: minimal
 
     - name: laser
       title: Laser AGL altitude
@@ -320,6 +347,7 @@
       title: Slip
       units: rad
       fmt: s8_001
+      ds: heavy
     - name: aoa
       title: Angle of attack
       units: rad
@@ -381,10 +409,12 @@
   content:
     - name: lat
       suffix: latitude
-      units: deg
+      type: dword
+      units: gps
     - name: lon
       suffix: longitude
-      units: deg
+      type: dword
+      units: gps
     - name: hmsl
       suffix: altitude MSL
       units: m
@@ -445,10 +475,12 @@
 
     - name: lat
       title: Visual latitude
-      units: deg
+      type: dword
+      units: gps
     - name: lon
       title: Visual longitude
-      units: deg
+      type: dword
+      units: gps
 
     - name: hmsl
       title: Visual altitude MSL

@@ -37,7 +37,7 @@ typedef float real_t;
 
 typedef uint32_t raw_t;
 
-enum type_id_e {
+enum type_id_e { // 2bits
     type_byte,
     type_word,
     type_dword,
@@ -167,6 +167,16 @@ static constexpr inline T from_raw(raw_t r, type_id_e type_id)
     return T();
 }
 
+// gps units conversion to store double [deg] in i32
+constexpr double from_gps(uint32_t v)
+{
+    return (double) (((int32_t) v) * ((double) 1e-7));
+}
+constexpr uint32_t to_gps(double v)
+{
+    return (uint32_t) ((int32_t) (v / (double) 1e-7));
+}
+
 // Data Specifier [1 byte] - first byte after pid for mandala data transfers
 
 #pragma pack(1)
@@ -201,15 +211,10 @@ struct meta_s
 
     const uid_t uid : sizeof(uid_t) * 8;
     const uid_t mask : sizeof(uid_t) * 8;
-    const uint8_t level : 3;
-    const bool group : 1;
-    const type_id_e type_id : 4;
-
-    const uint8_t units_id;
-
-    // telemetry stream format options
-    const uint8_t fmt;
-    const uint8_t seq;
+    const uint8_t level;
+    const bool group;
+    const type_id_e type_id;
+    const uint8_t units_cnt;
 };
 
 }; // namespace mandala

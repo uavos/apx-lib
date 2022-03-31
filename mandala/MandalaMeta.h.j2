@@ -1,86 +1,5 @@
 {%- extends 'Mandala.j2' %}
 
-{% set ns = namespace(path_uid={}) %}
-
-{%- macro mandala_meta_expand(d, indent=0, path=[], level=0, uid=0, parent=0) -%}
-{% set ind = ' '*indent*indent_size %}
-{% set ind1 = ' '*(indent+1)*indent_size %}
-{% set path = path+[d.name] %}
-{% set meta = path|join('::') %}
-
-{%- if d.content is defined -%}
-{% set type_id = '{}' %}
-{% else %}
-{% set type_id = 'type_'+d.type %}
-{%- endif -%}
-
-{%- if d.units is string -%}
-{% set units = d.units %}
-{% set units_id = 'units_' + d.units|replace('/','p')|replace('%','percent')|replace('^2','_sq')|replace('^3','_cb') %}
-{% elif d.units and d.units is iterable %}
-{% set units = d.units|join(',') %}
-{% set type_id = 'type_byte' %}
-{% if (d.units|length) == 2 %}
-{% set units_id = 'units_bit' %}
-{% else %}
-{% set units_id = 'units_opt' %}
-{% endif %}
-{% else %}
-{% set units_id = '{}' %}
-{%- endif -%}
-
-{%- if d.suffix is defined -%}
-{% set title = parent.title+' '+d.suffix %}
-{% else %}
-{% set title = d.title %}
-{%- endif -%}
-
-{%- if level<(data.uid_bits|length-1) -%}
-{% set group = 1 %}
-{% set uid_val = uid %}
-{% else %}
-{% set group = 0 %}
-{% set uid_val = uid+1 %}
-{%- endif -%}
-
-{%- if d.fmt is defined -%}
-{% set fmt = 'fmt_'+d.fmt %}
-{% elif d.content is defined %}
-{% set fmt = '{}' %}
-{% else %}
-{% set fmt = 'default_fmt('+type_id+','+units_id+')' %}
-{%- endif -%}
-
-{%- if d.seq is defined -%}
-{% set seq = 'seq_'+d.seq %}
-{% else %}
-{% set seq = 'default_seq('+type_id+','+units_id+')' %}
-{%- endif -%}
-
-{{ ind }}{
-{{ ind1 }}.name = "{{ d.name }}",
-{{ ind1 }}.title = "{{ title }}",
-{{ ind1 }}.descr = "{{ d.descr | trim | replace('\n',' ') | replace('  ',' ') }}",
-{{ ind1 }}.units = "{{ units }}",
-{{ ind1 }}.path = "{{ path|join('.') }}",
-{{ ind1 }}.uid = 0x{{ '%0x' % (uid_val) }},
-{{ ind1 }}.mask = 0x{{ '%0x' % (2**(data.uid_bits|sum)-1-(2**(data.uid_bits[level+1:]|sum)-1)+data.uid_base) }},
-{{ ind1 }}.level = {{ level }},
-{{ ind1 }}.group = {{ group }},
-{{ ind1 }}.type_id = {{ type_id }},
-{{ ind1 }}.units_id = {{ units_id }},
-{{ ind1 }}.fmt = {{ fmt }},
-{{ ind1 }}.seq = {{ seq }},
-{{ ind }}},
-{% set _dummy = ns.path_uid.update({path|join('.'):uid}) %}
-{% set uid_pow = data.uid_bits[level+2:]|sum %}
-{% set uid_mul = 2**uid_pow %}
-{% for i in d.content %}
-{%- if i.reserved is undefined -%}
-{{ mandala_meta_expand(i, indent, path, level+1, uid+loop.index0*uid_mul, d) }}
-{%- endif -%}
-{%- endfor -%}
-{%- endmacro -%}
 
 {%- block content -%}
 // generated file
@@ -89,10 +8,11 @@
 
 #include <mandala/MandalaMetaBase.h>
 #include <mandala/MandalaConstants.h>
-#include <mandala/MandalaPackFormat.h>
+#include <mandala/MandalaPack.h>
 
 namespace mandala {
 {% set ind = ' '*indent_size %}
+{% set ind1 = ' '*2*indent_size %}
 
 // uid bits by level (level 0=root)
 static constexpr const size_t uid_levels = {{ data.uid_bits|length }};
@@ -119,12 +39,23 @@ static constexpr bool is_bundle(mandala::uid_t uid) { return (uid & ((1 << uid_b
 
 // flat array of all elements
 static constexpr const mandala::meta_s meta[] = {
-{% for i in data.content %}
-{% set uid_pow = data.uid_bits[1:]|sum %}
-{% set uid_mul = 2**uid_pow %}
-{{ mandala_meta_expand(i, 1, [], 0, data.uid_base+loop.index0*uid_mul) }}
-{% endfor %}
+{% call(m) mandala_meta() %}
+{{ ind }}{
+{{ ind1 }}.name = "{{ m.name }}",
+{{ ind1 }}.title = "{{ m.title }}",
+{{ ind1 }}.descr = "{{ m.descr }}",
+{{ ind1 }}.units = "{{ m.units }}",
+{{ ind1 }}.path = "{{ m.path|join('.') }}",
+{{ ind1 }}.uid = 0x{{ '%0x' % m.uid }},
+{{ ind1 }}.mask = 0x{{ '%0x' % m.mask }},
+{{ ind1 }}.level = {{ m.level }},
+{{ ind1 }}.group = {{ m.group }},
+{{ ind1 }}.type_id = {{ m.type_id }},
+{{ ind1 }}.units_cnt = {{ m.units_cnt }},
+{{ ind }}},
+{% endcall %}
 }; // meta array
+
 
 }; // namespace mandala
 

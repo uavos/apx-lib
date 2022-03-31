@@ -24,17 +24,22 @@
   units:
     - "off"
     - "on"
+  ds: normal
   content:
     - name: ap
       suffix: Avionics
     - name: servo
       suffix: servo
+      ds: minimal
     - name: eng
       suffix: Engine
+      ds: minimal
     - name: payload
       suffix: Payload
+      ds: minimal
     - name: agl
       suffix: AGL
+      ds: minimal
     - name: xpdr
       suffix: XPDR
     - name: satcom
@@ -60,6 +65,7 @@
 
 - name: ers
   title: Emergency Recovery
+  ds: minimal
   content:
     - name: launch
       title: ERS launch

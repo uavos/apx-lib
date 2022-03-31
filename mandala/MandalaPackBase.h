@@ -52,7 +52,7 @@ enum fmt_e { // 5 bits
     fmt_s16_rad2, // radians -PI/2..+PI/2
     fmt_u8_u,     // units 0..1
     fmt_s8_u,     // signed units -1..+1
-    fmt_u16_10,   // unsigned/10
+    fmt_u16_10,   // [rpm] unsigned/10
 };
 
 // values are send on change only
@@ -62,6 +62,15 @@ enum seq_e {      // 2 bits
     seq_skip,     // transmit every second frame
     seq_rare,     // transmit every fourth frame
     seq_scheduled // transmit in scheduled slots (rare)
+};
+
+// datasets for telemetry stream
+enum dataset_e {
+    ds_aux,     // only transmit when selected in aux config
+    ds_minimal, // everything displayed in GCS instruments
+    ds_normal,  // normal op: some extra data for investigations
+    ds_heavy,   // experimental flights extra data
+    ds_auto,    // not in a dataset, but can be added automatically to the stream
 };
 
 constexpr const char *fmt_string(fmt_e fmt)
@@ -144,9 +153,6 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
     case units_rad:
         return fmt_s16_rad;
 
-    case units_deg:
-        return fmt_f32;
-
     case units_radps:
         return fmt_s8_001;
 
@@ -221,6 +227,9 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
 
     case units_V:
         return fmt_f16;
+
+    case units_gps:
+        break;
     }
 
     switch (type) {
@@ -234,7 +243,7 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
         return fmt_u32;
 
     case type_real:
-        return fmt_f32;
+        return fmt_f16;
     }
 
     return fmt_none;
@@ -242,6 +251,7 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
 
 constexpr seq_e default_seq(type_id_e type, units_e units)
 {
+    (void) type;
     switch (units) {
     default:
         break;
@@ -251,6 +261,33 @@ constexpr seq_e default_seq(type_id_e type, units_e units)
     }
 
     return seq_always;
+}
+
+// hard coded uint32 data element format descriptior
+#pragma pack(1)
+union fmt_s {
+    uint32_t _raw;
+
+    struct
+    {
+        uid_t uid;
+        type_id_e type_id : 2;
+        dataset_e ds : 3;
+        uint8_t _rsv5 : 3;
+        fmt_e fmt : 6;
+        seq_e seq : 2;
+    };
+};
+static_assert(sizeof(fmt_s) == sizeof(fmt_s::_raw), "fmt_s size error");
+#pragma pack()
+
+constexpr const fmt_s &fmt_lookup(uid_t uid, const fmt_s *list, size_t size)
+{
+    for (size_t i = 0; i < size; ++i) {
+        if (list[i].uid == uid) // TODO better sorted list search algorithm
+            return list[i];
+    }
+    return *list;
 }
 
 }; // namespace mandala

@@ -49,9 +49,13 @@ uid_bits:
 inheritance:
   - type
   - units
+  - fmt
+  - seq
+  - ds
 
 # defaults:
 type: real
+ds: aux
 
 # 4 classes
 content:
@@ -122,5 +126,5 @@ content:
         content: cmd-env
         title: System data identifiers
         descr: Special protocols and data wrappers.
-        type: byte # void
-
+        type: byte
+        fmt: none
