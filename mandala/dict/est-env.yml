@@ -206,28 +206,65 @@
       title: User value 7
     - name: u8
       title: User value 8
+    - name: u9
+      title: User value 9
+    - name: u10
+      title: User value 10
+    - name: u11
+      title: User value 11
+    - name: u12
+      title: User value 12
+    - name: u13
+      title: User value 13
+      fmt: f32
+    - name: u14
+      title: User value 14
+      fmt: f32
+    - name: u15
+      title: User value 15
+      fmt: f32
 
-    - name: ub1
+- name: usrb
+  title: User bytes
+  type: byte
+  content:
+    - name: u1
       title: User byte 1
-      type: byte
-    - name: ub2
+    - name: u2
       title: User byte 2
-      type: byte
-    - name: ub3
+    - name: u3
       title: User byte 3
-      type: byte
-    - name: ub4
+    - name: u4
       title: User byte 4
-      type: byte
-    - name: ub5
+    - name: u5
       title: User byte 5
-      type: byte
-    - name: ub6
+    - name: u6
       title: User byte 6
-      type: byte
-    - name: ub7
+    - name: u7
       title: User byte 7
-      type: byte
+    - name: u8
+      title: User byte 8
+    - name: u9
+      title: User word 9
+      type: word
+    - name: u10
+      title: User word 10
+      type: word
+    - name: u11
+      title: User word 11
+      type: word
+    - name: u12
+      title: User word 12
+      type: word
+    - name: u13
+      title: User dword 13
+      type: dword
+    - name: u14
+      title: User dword 14
+      type: dword
+    - name: u15
+      title: User dword 15
+      type: dword
 
 - name: haps
   title: HAPS

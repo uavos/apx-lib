@@ -1,79 +1,5 @@
 {%- extends 'Mandala.j2' %}
 
-{% set ns = namespace(path_uid={}) %}
-
-{%- macro mandala_fmt_expand(d, indent=0, path=[], level=0, uid=0, parent=0) -%}
-{% set ind = ' '*indent*indent_size %}
-{% set ind1 = ' '*(indent+1)*indent_size %}
-{% set path = path+[d.name] %}
-{% set meta = path|join('::') %}
-
-{%- if d.content is defined -%}
-{% set type_id = '{}' %}
-{% else %}
-{% set type_id = 'type_'+d.type %}
-{%- endif -%}
-
-{%- if d.units is string -%}
-{% set units = d.units %}
-{% set units_id = 'units_' + d.units|replace('/','p')|replace('%','percent')|replace('^2','_sq')|replace('^3','_cb') %}
-{% elif d.units and d.units is iterable %}
-{% set units = d.units|join(',') %}
-{% set type_id = 'type_byte' %}
-{% if (d.units|length) == 2 %}
-{% set units_id = 'units_bit' %}
-{% else %}
-{% set units_id = 'units_opt' %}
-{% endif %}
-{% else %}
-{% set units_id = '{}' %}
-{%- endif -%}
-
-{%- if d.suffix is defined -%}
-{% set title = parent.title+' '+d.suffix %}
-{% else %}
-{% set title = d.title %}
-{%- endif -%}
-
-{%- if level<(data.uid_bits|length-1) -%}
-{% set group = 1 %}
-{% set uid_val = uid %}
-{% else %}
-{% set group = 0 %}
-{% set uid_val = uid+1 %}
-{%- endif -%}
-
-{%- if d.fmt is defined -%}
-{% set fmt = 'fmt_'+d.fmt %}
-{% elif d.content is defined %}
-{% set fmt = '{}' %}
-{% else %}
-{% set fmt = 'default_fmt('+type_id+','+units_id+')' %}
-{%- endif -%}
-
-{%- if d.seq is defined -%}
-{% set seq = 'seq_'+d.seq %}
-{% elif d.content is defined %}
-{% set seq = '{}' %}
-{% else %}
-{% set seq = 'default_seq('+type_id+','+units_id+')' %}
-{%- endif -%}
-
-{{ ind }}{
-{{ ind1 }}.uid = 0x{{ '%0x' % (uid_val) }},
-{{ ind1 }}.type_id = {{ type_id }},
-{{ ind1 }}.fmt = {{ fmt }},
-{{ ind1 }}.seq = {{ seq }},
-{{ ind }}},
-{% set _dummy = ns.path_uid.update({path|join('.'):uid}) %}
-{% set uid_pow = data.uid_bits[level+2:]|sum %}
-{% set uid_mul = 2**uid_pow %}
-{% for i in d.content %}
-{%- if i.reserved is undefined -%}
-{{ mandala_fmt_expand(i, indent, path, level+1, uid+loop.index0*uid_mul, d) }}
-{%- endif -%}
-{%- endfor -%}
-{%- endmacro -%}
 
 {%- block content -%}
 // generated file
@@ -95,16 +21,16 @@ constexpr const mandala::fmt_s fmt_list[] = {
 {%- call(m) mandala_meta() -%}
 {%- if not m.d.content is defined and m.d.fmt != 'none' -%}
 
+{% set units_id = '{}' %}
+
 {%- if m.units_label -%}
 {% set units_id = 'units_' + m.units_label %}
-{% elif m.d.units is iterable %}
+{% elif m.d.units and m.d.units is iterable %}
 {% if (m.d.units|length) == 2 %}
 {% set units_id = 'units_bit' %}
 {% else %}
 {% set units_id = 'units_opt' %}
 {% endif %}
-{% else %}
-{% set units_id = '{}' %}
 {%- endif -%}
 
 {%- if m.d.fmt is defined -%}
