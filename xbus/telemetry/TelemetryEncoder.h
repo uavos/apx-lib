@@ -59,7 +59,7 @@ public:
     bool encode(XbusStreamWriter &stream, uint8_t pseq, uint64_t timestamp_ms);
     void encode_format(XbusStreamWriter &stream, uint8_t part, const uint8_t size = xbus::telemetry::fmt_block_size);
 
-    void update(const xbus::pid_s &pid, mandala::raw_t raw, mandala::type_id_e type_id);
+    bool update(const xbus::pid_s &pid, mandala::raw_t raw, mandala::type_id_e type_id);
 
     inline auto &enc_slots() { return _slots; }
     inline auto slots_cnt() const { return _slots_cnt; }

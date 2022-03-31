@@ -58,13 +58,20 @@ bool TelemetryDecoder::decode(uint8_t pseq, XbusStreamReader &stream)
     _timestamp_ms += _dt_ms;
 
     // validity check
-    if (_is_hash_valid() && _slots_cnt) {
-        // fmt looks consistent
-        _valid = true;
+    if (_is_hash_valid()) {
+        if (_slots_cnt) {
+            // fmt looks consistent
+            _valid = true;
 
-        // get values from packed stream
-        // seq bits are used to filter rare IDs only
-        return decode_values(stream, pseq);
+            // get values from packed stream
+            // seq bits are used to filter rare IDs only
+            return decode_values(stream, pseq);
+        }
+        // empty dataset stream
+        if (stream.available() == 1 && stream.read<uint8_t>() == 0) {
+            _valid = true;
+            return false;
+        }
     }
 
     // not yet valid stream
@@ -277,14 +284,16 @@ bool TelemetryDecoder::decode_format(XbusStreamReader &stream, xbus::telemetry::
         size_t pos = hdr->part * block_size;
         size_t sz = stream.available();
 
-        bool is_final = (hdr->part + 1) == hdr->pcnt;
+        bool is_final = (hdr->part + 1) == hdr->pcnt || (hdr->part == 0 && hdr->pcnt == 0);
         if (is_final && stream.available() > block_size)
             break;
         if (!is_final && stream.available() != block_size)
             break;
         if ((pos + sz) > sizeof(_slots.fields))
             break;
-        stream.read(ptr + pos, sz);
+
+        if (sz > 0)
+            stream.read(ptr + pos, sz);
 
         if (is_final) {
             pos += sz;

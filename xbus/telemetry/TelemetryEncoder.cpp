@@ -137,18 +137,19 @@ void TelemetryEncoder::clear()
     _update_feeds();
 }
 
-void TelemetryEncoder::update(const xbus::pid_s &pid, mandala::raw_t raw, mandala::type_id_e type_id)
+bool TelemetryEncoder::update(const xbus::pid_s &pid, mandala::raw_t raw, mandala::type_id_e type_id)
 {
     // called by MandalaDataBroker
-    for (size_t i = 0; i < _slots_cnt; ++i) {
+    for (size_t i = 0; i < _slots_cnt; ++i) { // TODO better sorted list lookup
         auto const &f = _slots.fields[i];
         if (f.pid.uid != pid.uid)
             continue;
         if (f.pid.pri != pid.pri && f.pid.pri != xbus::pri_any)
             continue;
         _set_data(i, raw, type_id);
-        return;
+        return true;
     }
+    return false;
 }
 
 void TelemetryEncoder::_set_data(size_t n, mandala::raw_t raw, mandala::type_id_e type_id)
