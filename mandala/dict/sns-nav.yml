@@ -317,6 +317,7 @@
         - laser
         - radio
         - sonic
+      ds: minimal
     - name: status
       title: AGL
       units:

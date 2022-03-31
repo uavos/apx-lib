@@ -35,6 +35,8 @@ TelemetryEncoder::TelemetryEncoder()
 
 bool TelemetryEncoder::add(const field_s &field)
 {
+    _inserted_index = -1;
+
     if (_slots_cnt >= slots_size)
         return false;
 
@@ -102,6 +104,7 @@ bool TelemetryEncoder::add(const field_s &field)
     }
 
     _insert(index, field);
+    _inserted_index = index;
 
     for (_slots_upd_cnt = 0; _slots_upd_cnt < _slots_cnt; ++_slots_upd_cnt) {
         auto const &f = _slots.fields[_slots_upd_cnt];
@@ -137,19 +140,73 @@ void TelemetryEncoder::clear()
     _update_feeds();
 }
 
-bool TelemetryEncoder::update(const xbus::pid_s &pid, mandala::raw_t raw, mandala::type_id_e type_id)
+TelemetryEncoder::result_e TelemetryEncoder::update(const xbus::pid_s &pid, mandala::raw_t raw, mandala::type_id_e type_id, bool sync)
 {
+    const auto uid = pid.uid;
+
     // called by MandalaDataBroker
     for (size_t i = 0; i < _slots_cnt; ++i) { // TODO better sorted list lookup
         auto const &f = _slots.fields[i];
-        if (f.pid.uid != pid.uid)
+        if (f.pid.uid != uid)
             continue;
         if (f.pid.pri != pid.pri && f.pid.pri != xbus::pri_any)
             continue;
         _set_data(i, raw, type_id);
-        return true;
+        return ok;
     }
-    return false;
+
+    if (!sync)
+        return skipped;
+
+    uint16_t pos = _slots_cnt + _sync_cnt;
+
+    // check for already pending sync - update value data
+    for (size_t i = _slots_cnt; i < pos; ++i) {
+        if (_slots.fields[i].pid.uid != uid)
+            continue;
+        _set_data(i, raw, type_id);
+        return pos >= slots_size ? sync_ovf : skipped;
+    }
+
+    // add new slot as pending
+    if (pos >= slots_size)
+        return sync_ovf;
+
+    auto fmt = mandala::fmt(uid);
+    if (fmt.ds == mandala::ds_aux)
+        return skipped;
+
+    pos++;
+    _sync_cnt++;
+
+    auto &f = _slots.fields[pos];
+
+    f.pid = xbus::pid_s(uid, xbus::pri_final, fmt.seq);
+    f.fmt = fmt.fmt;
+    _set_data(pos, raw, type_id);
+
+    return pos >= slots_size ? sync_ovf : synced;
+}
+
+void TelemetryEncoder::sync_flush()
+{
+    auto pos = _slots_cnt + _sync_cnt;
+    for (auto i = _slots_cnt; i < pos; ++i) {
+        auto f = _slots.fields[i];
+        auto flags = _slots.flags[i];
+        auto value = _slots.value[i];
+        auto packed = _slots.packed[i];
+        if (!add(f))
+            break;
+
+        auto dest = _inserted_index;
+        if (dest >= 0) {
+            _slots.flags[dest] = flags;
+            _slots.value[dest] = value;
+            _slots.packed[dest] = packed;
+        }
+    }
+    _sync_cnt = 0;
 }
 
 void TelemetryEncoder::_set_data(size_t n, mandala::raw_t raw, mandala::type_id_e type_id)

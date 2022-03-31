@@ -59,11 +59,21 @@ public:
     bool encode(XbusStreamWriter &stream, uint8_t pseq, uint64_t timestamp_ms);
     void encode_format(XbusStreamWriter &stream, uint8_t part, const uint8_t size = xbus::telemetry::fmt_block_size);
 
-    bool update(const xbus::pid_s &pid, mandala::raw_t raw, mandala::type_id_e type_id);
+    enum result_e {
+        ok,
+        skipped,
+        synced,
+        sync_ovf
+    };
+
+    result_e update(const xbus::pid_s &pid, mandala::raw_t raw, mandala::type_id_e type_id, bool sync = false);
 
     inline auto &enc_slots() { return _slots; }
     inline auto slots_cnt() const { return _slots_cnt; }
     inline auto slots_upd_cnt() const { return _slots_upd_cnt; }
+
+    inline auto sync_cnt() const { return _sync_cnt; }
+    void sync_flush();
 
 private:
     xbus::telemetry::enc_slots_s _slots;
@@ -71,6 +81,9 @@ private:
     uint16_t _slots_upd_cnt; // re-scheduled slots top limit (before bitfields)
 
     uint16_t _enforced_upd{}; // re-scheduling index counter
+
+    uint16_t _sync_cnt{};
+    ssize_t _inserted_index;
 
     void _insert(size_t index, const xbus::telemetry::field_s &field);
 
