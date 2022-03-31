@@ -252,6 +252,7 @@
 
 - name: cam
   title: Camera
+  ds: auto
   content:
     - name: zoom
       title: Cam zoom level
@@ -309,6 +310,7 @@
 
 - name: gimbal
   title: Gimbal cmd
+  ds: auto
   content:
     - name: mode
       suffix: mode

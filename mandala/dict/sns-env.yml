@@ -21,7 +21,7 @@
 ##
 - name: eng
   title: Engine
-
+  ds: auto
   content:
     - name: rpm
       suffix: RPM
@@ -85,6 +85,7 @@
 
 - name: gbox
   title: Gearbox
+  ds: auto
   content:
     - name: status
       suffix: status
@@ -111,6 +112,7 @@
 
 - name: prop
   title: Prop
+  ds: auto
   content:
     - name: status
       suffix: status
@@ -134,6 +136,7 @@
 
 - name: gen
   title: Generator
+  ds: auto
   content:
     - name: status
       suffix: status
@@ -162,6 +165,7 @@
 
 - name: fuel
   title: Fuel
+  ds: auto
   content:
     - name: level
       suffix: level
@@ -179,6 +183,7 @@
 
 - name: bat
   title: Battery
+  ds: auto
   content:
     - name: status
       title: BAT
@@ -244,6 +249,7 @@
 
 - name: com
   title: Datalink
+  ds: auto
   content:
     - name: status
       suffix: status
@@ -296,6 +302,7 @@
 
 - name: aux
   title: Auxillary sensors
+  ds: auto
   content:
     - name: srv
       title: Maintenance service switch

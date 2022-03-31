@@ -355,6 +355,7 @@
     - name: temp
       title: Ambient air temperature
       units: C
+      ds: auto
     - name: buo
       title: Blimp ballonet pressure
       units: kPa
@@ -492,6 +493,7 @@
 
 - name: tcas
   title: Collision avoidance
+  ds: auto
   content:
     - name: dist
       title: Distance to target
