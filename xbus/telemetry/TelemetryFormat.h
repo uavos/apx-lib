@@ -53,6 +53,24 @@ union hash_s {
 static_assert(sizeof(hash_s) == 4, "size error");
 #pragma pack()
 
+constexpr ssize_t field_lookup(mandala::uid_t uid, const field_s *list, ssize_t size)
+{
+    // binary search
+    ssize_t l = 0, r = size - 1;
+    while (l <= r) {
+        size_t m = l + (r - l) / 2;
+        const auto &f = list[m];
+        auto v = f.pid.uid;
+        if (v == uid)
+            return m;
+        if (v < uid)
+            l = m + 1;
+        else
+            r = m - 1;
+    }
+    return -1;
+}
+
 // stream header
 struct hdr_s
 {

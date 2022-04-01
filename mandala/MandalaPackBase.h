@@ -281,13 +281,22 @@ union fmt_s {
 static_assert(sizeof(fmt_s) == sizeof(fmt_s::_raw), "fmt_s size error");
 #pragma pack()
 
-constexpr const fmt_s &fmt_lookup(uid_t uid, const fmt_s *list, size_t size)
+constexpr const fmt_s &fmt_lookup(uid_t uid, const fmt_s *list, ssize_t size)
 {
-    for (size_t i = 0; i < size; ++i) {
-        if (list[i].uid == uid) // TODO better sorted list search algorithm
-            return list[i];
+    // binary search
+    ssize_t l = 0, r = size - 1;
+    while (l <= r) {
+        size_t m = l + (r - l) / 2;
+        const auto &fmt = list[m];
+        auto vuid = fmt.uid;
+        if (vuid == uid)
+            return fmt;
+        if (vuid < uid)
+            l = m + 1;
+        else
+            r = m - 1;
     }
-    return *list;
+    return *list; // not found - return zero uid dmmy element
 }
 
 }; // namespace mandala

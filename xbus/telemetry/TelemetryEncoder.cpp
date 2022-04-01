@@ -40,17 +40,11 @@ bool TelemetryEncoder::add(const field_s &field)
     if (_slots_cnt >= slots_size)
         return false;
 
+    auto uid = field.pid.uid;
+
     // find dups
-    for (size_t i = 0; i < _slots_cnt; ++i) {
-        auto &f = _slots.fields[i];
-        if (f.pid.uid != field.pid.uid)
-            continue;
-        if (f.pid.pri != field.pid.pri)
-            continue;
-        // found duplicate
-        // update record configuration
-        f = field;
-        _update_feeds();
+    auto idx = xbus::telemetry::field_lookup(uid, _slots.fields, _slots_cnt);
+    if (idx >= 0) {
         return true;
     }
 
@@ -117,6 +111,7 @@ bool TelemetryEncoder::add(const field_s &field)
 void TelemetryEncoder::_insert(size_t index, const xbus::telemetry::field_s &field)
 {
     if (index < _slots_cnt) {
+        // shift upper half
         for (size_t src = _slots_cnt - 1, dest = _slots_cnt; dest > index; --src, --dest) {
             _slots.fields[dest] = _slots.fields[src];
             _slots.flags[dest] = _slots.flags[src];
@@ -145,13 +140,10 @@ TelemetryEncoder::result_e TelemetryEncoder::update(const xbus::pid_s &pid, mand
     const auto uid = pid.uid;
 
     // called by MandalaDataBroker
-    for (size_t i = 0; i < _slots_cnt; ++i) { // TODO better sorted list lookup
-        auto const &f = _slots.fields[i];
-        if (f.pid.uid != uid)
-            continue;
-        if (f.pid.pri != pid.pri && f.pid.pri != xbus::pri_any)
-            continue;
-        _set_data(i, raw, type_id);
+
+    auto idx = xbus::telemetry::field_lookup(uid, _slots.fields, _slots_cnt);
+    if (idx >= 0) {
+        _set_data(idx, raw, type_id);
         return ok;
     }
 
@@ -161,10 +153,9 @@ TelemetryEncoder::result_e TelemetryEncoder::update(const xbus::pid_s &pid, mand
     uint16_t pos = _slots_cnt + _sync_cnt;
 
     // check for already pending sync - update value data
-    for (size_t i = _slots_cnt; i < pos; ++i) {
-        if (_slots.fields[i].pid.uid != uid)
-            continue;
-        _set_data(i, raw, type_id);
+    idx = xbus::telemetry::field_lookup(uid, _slots.fields + _slots_cnt, _sync_cnt);
+    if (idx >= 0) {
+        _set_data(idx + _slots_cnt, raw, type_id);
         return pos >= slots_size ? sync_ovf : skipped;
     }
 
