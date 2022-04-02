@@ -30,12 +30,22 @@ template<typename T>
 class Event : public ListNode<apx::Event<T> *>, private do_not_copy
 {
 public:
-    static void signal(apx::Event<T> *arg = nullptr)
+    // call all connected slots, arg can be 'this' to filter local class
+    static void signal(apx::Event<T> *arg)
     {
+        for (auto i : _list) {
+            if (i != arg)
+                i->event(arg);
+        }
+    }
+    static void signal()
+    {
+        apx::Event<T> *arg = {};
         for (auto i : _list) {
             i->event(arg);
         }
     }
+
     static inline size_t size() { return _list.size(); }
     static inline int indexOf(apx::Event<T> *e) { return _list.indexOf(e); }
 
