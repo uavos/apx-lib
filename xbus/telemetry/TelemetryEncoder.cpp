@@ -43,8 +43,7 @@ bool TelemetryEncoder::add(const field_s &field)
     auto uid = field.pid.uid;
 
     // find dups
-    auto idx = xbus::telemetry::field_lookup(uid, _slots.fields, _slots_cnt);
-    if (idx >= 0) {
+    if (slot_lookup(uid) >= 0) {
         return true;
     }
 
@@ -101,8 +100,8 @@ bool TelemetryEncoder::add(const field_s &field)
     _inserted_index = index;
 
     for (_slots_upd_cnt = 0; _slots_upd_cnt < _slots_cnt; ++_slots_upd_cnt) {
-        auto const &f = _slots.fields[_slots_upd_cnt];
-        if (f.fmt == fmt_bit)
+        auto fmt = _slots.fields[_slots_upd_cnt].fmt;
+        if (fmt == fmt_bit)
             break;
     }
 
@@ -130,9 +129,17 @@ void TelemetryEncoder::_insert(size_t index, const xbus::telemetry::field_s &fie
 }
 void TelemetryEncoder::clear()
 {
-    _slots_cnt = _slots_upd_cnt = 0;
+    _slots_cnt = _slots_upd_cnt = _sync_cnt = 0;
     _slots = {};
     _update_feeds();
+}
+ssize_t TelemetryEncoder::slot_lookup(mandala::uid_t uid)
+{
+    for (ssize_t i = 0; i < _slots_cnt; ++i) {
+        if (_slots.fields[i].pid.uid == uid)
+            return i;
+    }
+    return -1;
 }
 
 TelemetryEncoder::result_e TelemetryEncoder::update(const xbus::pid_s &pid, mandala::raw_t raw, mandala::type_id_e type_id, bool sync)
@@ -141,7 +148,7 @@ TelemetryEncoder::result_e TelemetryEncoder::update(const xbus::pid_s &pid, mand
 
     // called by MandalaDataBroker
 
-    auto idx = xbus::telemetry::field_lookup(uid, _slots.fields, _slots_cnt);
+    auto idx = slot_lookup(uid);
     if (idx >= 0) {
         _set_data(idx, raw, type_id);
         return ok;
@@ -153,10 +160,11 @@ TelemetryEncoder::result_e TelemetryEncoder::update(const xbus::pid_s &pid, mand
     uint16_t pos = _slots_cnt + _sync_cnt;
 
     // check for already pending sync - update value data
-    idx = xbus::telemetry::field_lookup(uid, _slots.fields + _slots_cnt, _sync_cnt);
-    if (idx >= 0) {
-        _set_data(idx + _slots_cnt, raw, type_id);
-        return pos >= slots_size ? sync_ovf : skipped;
+    for (size_t i = _slots_cnt; i < pos; ++i) {
+        if (_slots.fields[i].pid.uid == uid) {
+            _set_data(i, raw, type_id);
+            return pos >= slots_size ? sync_ovf : skipped;
+        }
     }
 
     // add new slot as pending

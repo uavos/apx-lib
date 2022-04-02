@@ -26,12 +26,12 @@
 
 // binary search function
 template<typename T>
-ssize_t binary_search(T arr[], size_t size, T x)
+ssize_t binary_search(T x, T arr[], ssize_t size)
 {
-    size_t s = 0;
-    size_t e = size - 1;
+    ssize_t s = 0;
+    ssize_t e = size - 1;
     while (s <= e) {
-        int mid = (s + e) / 2;
+        ssize_t mid = (s + e) / 2;
         if (arr[mid] == x)
             return mid;
         else if (arr[mid] < x)

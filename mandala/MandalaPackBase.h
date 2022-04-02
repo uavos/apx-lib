@@ -286,7 +286,7 @@ constexpr const fmt_s &fmt_lookup(uid_t uid, const fmt_s *list, ssize_t size)
     // binary search
     ssize_t l = 0, r = size - 1;
     while (l <= r) {
-        size_t m = l + (r - l) / 2;
+        ssize_t m = l + (r - l) / 2;
         const auto &fmt = list[m];
         auto vuid = fmt.uid;
         if (vuid == uid)

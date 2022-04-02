@@ -89,6 +89,7 @@ private:
 
     xbus::telemetry::hash_s _hash;
 
+    ssize_t slot_lookup(mandala::uid_t uid);
     void _set_data(size_t n, mandala::raw_t raw, mandala::type_id_e type_id);
 
     void _update_feeds();
