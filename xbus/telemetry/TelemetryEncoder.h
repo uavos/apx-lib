@@ -29,10 +29,11 @@ namespace telemetry {
 
 #pragma pack(1)
 typedef struct
-{
-    mandala::type_id_e type : 4; // raw value format
-    uint8_t _rsv : 3;            // reserved
-    bool upd : 1;                // raw value updated
+{                                // TODO telemetry stream vars auto requests
+    mandala::type_id_e type : 2; // raw value format
+    bool upd : 1;                // raw value updated since transmission
+    bool aux : 1;                // aux slot from config
+    uint8_t to : 4;              // value update timeout counter
 } enc_flags_s;
 #pragma pack()
 
@@ -40,10 +41,10 @@ typedef struct
 {
     field_s fields[slots_size];
     enc_flags_s flags[slots_size];
-    mandala::raw_t value[slots_size];  // raw value
-    mandala::raw_t packed[slots_size]; // packed value
+    mandala::raw_t value[slots_size];  // raw value, as received
+    mandala::raw_t packed[slots_size]; // packed value to monitor changes
 } enc_slots_s;
-// static_assert(sizeof(enc_slots_s) == 12 * slots_size + 1, "size error");
+static_assert(sizeof(enc_slots_s) == 12 * slots_size, "size error");
 
 } // namespace telemetry
 } // namespace xbus
@@ -71,6 +72,7 @@ public:
     inline auto &enc_slots() { return _slots; }
     inline auto slots_cnt() const { return _slots_cnt; }
     inline auto slots_upd_cnt() const { return _slots_upd_cnt; }
+    ssize_t slot_lookup(mandala::uid_t uid);
 
     inline auto sync_cnt() const { return _sync_cnt; }
     void sync_flush();
@@ -89,7 +91,6 @@ private:
 
     xbus::telemetry::hash_s _hash;
 
-    ssize_t slot_lookup(mandala::uid_t uid);
     void _set_data(size_t n, mandala::raw_t raw, mandala::type_id_e type_id);
 
     void _update_feeds();

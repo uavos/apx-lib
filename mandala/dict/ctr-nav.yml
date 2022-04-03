@@ -47,7 +47,6 @@
     - name: choke
       title: Choke
       units: u
-      ds: normal
 
     - name: tune
       title: Engine tuning
@@ -67,19 +66,16 @@
       units:
         - "off"
         - "on"
-      ds: normal
     - name: ign2
       title: Ignition 2
       units:
         - "off"
         - "on"
-      ds: normal
     - name: fpump
       title: Fuel pump
       units:
         - "off"
         - "on"
-      ds: normal
 
 - name: wing
   title: Wing mechanization
@@ -115,7 +111,7 @@
       units:
         - down
         - retract
-      ds: normal
+      ds: auto
     - name: rud
       title: Steering
       units: su

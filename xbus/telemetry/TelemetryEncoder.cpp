@@ -213,6 +213,8 @@ void TelemetryEncoder::_set_data(size_t n, mandala::raw_t raw, mandala::type_id_
     auto &prev = _slots.value[n];
     auto &flags = _slots.flags[n];
 
+    flags.to = 0;
+
     if (prev == raw && flags.type == type_id)
         return;
     prev = raw;

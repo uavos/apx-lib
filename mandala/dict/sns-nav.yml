@@ -348,7 +348,6 @@
       title: Slip
       units: rad
       fmt: s8_001
-      ds: heavy
     - name: aoa
       title: Angle of attack
       units: rad
@@ -494,7 +493,6 @@
 
 - name: tcas
   title: Collision avoidance
-  ds: auto
   content:
     - name: dist
       title: Distance to target
