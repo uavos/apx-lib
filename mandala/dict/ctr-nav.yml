@@ -106,12 +106,13 @@
     - name: brake
       title: Brake
       units: u
+    - name: rud
+      title: Steering
+      units: su
+
     - name: gear
       title: Landing gear
       units:
         - down
         - retract
       ds: auto
-    - name: rud
-      title: Steering
-      units: su
