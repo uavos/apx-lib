@@ -266,8 +266,6 @@ constexpr seq_e default_seq(type_id_e type, units_e units)
 // hard coded uint32 data element format descriptior
 #pragma pack(1)
 union fmt_s {
-    uint32_t _raw;
-
     struct
     {
         uid_t uid;
@@ -277,6 +275,8 @@ union fmt_s {
         fmt_e fmt : 6;
         seq_e seq : 2;
     };
+
+    uint32_t _raw;
 };
 static_assert(sizeof(fmt_s) == sizeof(fmt_s::_raw), "fmt_s size error");
 #pragma pack()
