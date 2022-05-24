@@ -84,7 +84,7 @@ public:
 
     bool remove(T removeNode)
     {
-        if (removeNode != nullptr)
+        if (removeNode == nullptr)
             return false;
 
         // base case
