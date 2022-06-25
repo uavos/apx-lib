@@ -25,8 +25,8 @@
 #include <cstdint>
 
 #include "xcan_msg.h"
+#include <XbusPacket.h>
 #include <common/do_not_copy.h>
-#include <xbus/XbusPacket.h>
 
 namespace xbus {
 

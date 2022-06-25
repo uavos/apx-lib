@@ -1,1 +1,1 @@
-apx_module(DEPENDS shared.common INCLUDES . PREFIX xbus)
+apx_module(DEPENDS shared.common INCLUDES .)

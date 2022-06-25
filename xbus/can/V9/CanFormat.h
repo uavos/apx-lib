@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include <XbusPacket.h>
 #include <common/visibility.h>
 #include <sys/types.h>
-#include <xbus/XbusPacket.h>
 
 #define XCAN_SRC_SHIFT 20 //source address
 #define XCAN_SRC_MASK (255 << XCAN_SRC_SHIFT)

@@ -1,9 +1,1 @@
-apx_module(
-    DEPENDS
-    shared.xbus
-    shared.crc
-    INCLUDES
-    .
-    PREFIX
-    xbus
-)
+apx_module(DEPENDS shared.xbus shared.crc INCLUDES .)

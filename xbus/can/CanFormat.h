@@ -25,7 +25,7 @@
 #include <sys/types.h>
 #include <visibility.h>
 
-#include <xbus/XbusPacket.h>
+#include <XbusPacket.h>
 
 namespace xbus {
 namespace can {

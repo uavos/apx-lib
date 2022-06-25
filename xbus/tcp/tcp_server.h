@@ -23,8 +23,8 @@
 
 #include "tcp_client.h"
 
+#include <XbusPacket.h>
 #include <pthread.h>
-#include <xbus/XbusPacket.h>
 #include <QueueBuffer.h>
 
 namespace xbus {

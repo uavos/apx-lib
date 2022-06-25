@@ -22,8 +22,8 @@
 #pragma once
 
 #include "TelemetryFormat.h"
-#include <mandala/MandalaMetaBase.h>
-#include <xbus/XbusStreamWriter.h>
+#include <MandalaMetaBase.h>
+#include <XbusStreamWriter.h>
 
 #include <cmath>
 

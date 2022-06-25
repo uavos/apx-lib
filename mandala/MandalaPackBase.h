@@ -21,7 +21,7 @@
  */
 #pragma once
 
-#include <mandala/MandalaConstants.h>
+#include <MandalaConstants.h>
 
 namespace mandala {
 

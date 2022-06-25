@@ -21,13 +21,13 @@
  */
 #pragma once
 
-#include <xbus/XbusPacket.h>
-#include <xbus/XbusStreamReader.h>
-#include <xbus/XbusStreamWriter.h>
+#include <XbusPacket.h>
+#include <XbusStreamReader.h>
+#include <XbusStreamWriter.h>
 
 #include <cmath>
 
-#include <mandala/MandalaMetaTree.h>
+#include <MandalaMetaTree.h>
 
 namespace xbus {
 namespace telemetry {

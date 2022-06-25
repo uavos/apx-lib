@@ -24,7 +24,7 @@
 #include <cinttypes>
 #include <sys/types.h>
 
-#include <xbus/XbusPacket.h>
+#include <XbusPacket.h>
 
 namespace mandala {
 

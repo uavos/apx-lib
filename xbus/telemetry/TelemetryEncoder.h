@@ -22,7 +22,7 @@
 #pragma once
 
 #include "TelemetryFormat.h"
-#include <mandala/MandalaMetaBase.h>
+#include <MandalaMetaBase.h>
 
 namespace xbus {
 namespace telemetry {

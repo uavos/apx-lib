@@ -6,15 +6,6 @@ add_custom_command(
     DEPENDS parse_mandala_dict.py ${dict_src}
 )
 
-apx_gensrc(mandala_headers DATA mandala.json PREFIX mandala)
+apx_gensrc(mandala_headers DATA mandala.json)
 
-apx_module(
-    DEPENDS
-    shared.common
-    GENSRC
-    mandala_headers
-    INCLUDES
-    .
-    PREFIX
-    mandala
-)
+apx_module(DEPENDS shared.common GENSRC mandala_headers INCLUDES .)

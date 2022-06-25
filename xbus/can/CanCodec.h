@@ -26,9 +26,9 @@
 
 #include "CanPool.h"
 
+#include <XbusNode.h>
+#include <XbusPacket.h>
 #include <do_not_copy.h>
-#include <xbus/XbusNode.h>
-#include <xbus/XbusPacket.h>
 
 namespace xbus {
 namespace can {

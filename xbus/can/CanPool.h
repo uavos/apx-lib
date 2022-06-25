@@ -28,7 +28,7 @@
 #include "CanFormat.h"
 #include "xcan_msg.h"
 
-#include <xbus/XbusPacket.h>
+#include <XbusPacket.h>
 
 namespace xbus {
 namespace can {
