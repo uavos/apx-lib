@@ -21,38 +21,45 @@
  */
 #pragma once
 
-#include <sys/types.h>
-#include <QueueBuffer.h>
+#include <XbusPacket.h>
 
-class SerialCodec : public QueueBufferT<uint8_t>
+// serial codec over FIFO
+
+class SerialCodec
 {
 public:
-    explicit SerialCodec(uint8_t *buf, size_t size)
-        : QueueBufferT<uint8_t>(buf, size)
-    {}
+    // return encoded/decoded packet data buffer
+    virtual const uint8_t *data() const = 0;
 };
 
 class SerialEncoder : public SerialCodec
 {
 public:
-    explicit SerialEncoder(uint8_t *buf, size_t size)
-        : SerialCodec(buf, size)
-    {}
-    // write and encode data to buffer
+    // encode data to internal buffer:
+    // return encoded packet data size;
+    // updates status property;
+    // each call will always generate packet;
     virtual size_t encode(const void *src, size_t sz) = 0;
-
-    // read encoded data from buffer
-    virtual size_t read_encoded(void *dest, size_t sz) = 0;
 };
 
 class SerialDecoder : public SerialCodec
 {
 public:
-    explicit SerialDecoder(uint8_t *buf, size_t size)
-        : SerialCodec(buf, size)
-    {}
+    // decode encoded data and write packet to internal buffer:
+    // return number of bytes processed which could be less than sz (when pkt is available);
+    // updates status property to detect packet is available;
+    // packet must be read and released when available to free internal buffer;
+    virtual size_t decode(const void *src, size_t sz) = 0;
 
-    enum ErrorType {
+    // return the size of encoded/decoded packet data bytes
+    virtual size_t size() const = 0;
+
+    // decoder status as reported by decode()
+    enum SerialDecoderStatus : uint8_t {
+        Unknown = 0,
+
+        PacketAvailable,
+
         DataAccepted,
         DataDropped,
 
@@ -61,9 +68,8 @@ public:
         ErrorCRC,
     };
 
-    // decode encoded data and write packet to buffer
-    virtual ErrorType decode(const void *src, size_t sz) = 0;
+    inline auto status() const { return _status; }
 
-    // read decoded data from buffer
-    virtual size_t read_decoded(void *dest, size_t sz) = 0;
+protected:
+    SerialDecoderStatus _status{};
 };

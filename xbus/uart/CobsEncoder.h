@@ -22,229 +22,91 @@
 #pragma once
 
 #include <crc.h>
-#include <QueueBuffer.h>
 
 #include "SerialCodec.h"
 
-template<size_t _buf_size, typename T = uint8_t, T _esc = 0>
+// Consistant Overhead Byte Stuffing (COBS) encoder
+// Packetization protocol:
+// - benefit is to have a single byte for each byte of data and minimum overhead (just 1 byte max for xbus)
+// - https://en.wikipedia.org/wiki/Consistent_Overhead_Byte_Stuffing
+// - added CRC16 to each packet at the end
+
+template<
+    size_t _packet_size = xbus::size_packet_max,
+    typename T = uint8_t,
+    T _esc = 0>
 class CobsEncoder : public SerialEncoder
 {
 public:
-    explicit CobsEncoder()
-        : SerialEncoder(_buf, _buf_size)
-    {}
-
-    //    using QueueBuffer<_buf_size, T>::tail;
-    //    using QueueBuffer<_buf_size, T>::size;
-    //    using QueueBuffer<_buf_size, T>::total;
-    //    using QueueBuffer<_buf_size, T>::read_ptr;
-
-    //    using QueueBuffer<_buf_size, T>::head;
-    //    using QueueBuffer<_buf_size, T>::skip_read;
-
-    //write and encode data to fifo
+    // encode packet and return its size
     size_t encode(const void *src, size_t sz) override
     {
-        if (space() < (sz + (2 + 4 + sizeof(uint16_t)))) //estimate
-            return 0;
-
-        size_t head_s = head();
-        size_t size_s = size();
-        do {
-            // start block
-            T *code_ptr = write_ptr();
-            T code = 1;
-            if (!write(code))
-                break;
-
-            // data
-            const T *ptr = static_cast<const T *>(src);
-            size_t cnt = sz + 2;
-            uint16_t crc16 = apx::crc32(src, sz);
-            while (cnt) {
-                if (code != 0xFF) {
-                    T c;
-                    switch (cnt) {
-                    default:
-                        c = *ptr++;
-                        break;
-                    case 1:
-                        c = crc16 >> 8;
-                        break;
-                    case 2:
-                        c = crc16;
-                        break;
-                    }
-                    cnt--;
-                    if (c != _esc) {
-                        if (!write(c))
-                            break;
-                        code++;
-                        continue;
-                    }
-                }
-                // finish block
-                *code_ptr = code;
-                // start block
-                code_ptr = write_ptr();
-                code = 1;
-                if (!write(code))
-                    break;
-            }
-            if (cnt) //error
-                break;
-
-            // finish block
-            *code_ptr = code;
-
-            //append packet delimiter
-            if (!write(_esc))
-                break;
-
-            // all encoded
-            return size() - size_s;
-        } while (0);
-        //error - fifo overflow
-        pop_head(head_s);
-        return 0;
-    }
-
-    inline size_t read_encoded(void *dest, size_t sz) override
-    {
-        return SerialCodec::read(dest, sz);
-    }
-    //    inline size_t size() override
-    //    {
-    //        return QueueBuffer<_buf_size, T>::size();
-    //    }
-    //    inline void reset() override
-    //    {
-    //        QueueBuffer<_buf_size, T>::reset();
-    //    }
-
-private:
-    uint8_t _buf[_buf_size];
-
-    //    using QueueBuffer<_buf_size, T>::space;
-    //    using QueueBuffer<_buf_size, T>::pop_head;
-    //    using QueueBuffer<_buf_size, T>::write;
-    //    using QueueBuffer<_buf_size, T>::write_ptr;
-    //    using QueueBuffer<_buf_size, T>::read;
-};
-
-/*template<size_t _buf_size, typename T = uint8_t, T _esc = 0>
-class CobsEncoder2 : private QueueBuffer<_buf_size, T>, public SerialEncoder
-{
-public:
-    using QueueBuffer<_buf_size, T>::head;
-    using QueueBuffer<_buf_size, T>::tail;
-    using QueueBuffer<_buf_size, T>::size;
-    using QueueBuffer<_buf_size, T>::total;
-    using QueueBuffer<_buf_size, T>::read_ptr;
-    using QueueBuffer<_buf_size, T>::skip_read;
-
-    //write and encode data to fifo
-    size_t encode(const void *src, size_t sz) override
-    {
-        if (!start(sz))
-            return 0;
-
-        const T *ptr = static_cast<const T *>(src);
-
-        uint8_t crc = 0;
-        while (sz--) {
-            crc ^= *ptr;
-            if (!push(*ptr++))
-                return 0;
-        }
-        if (!push(crc))
-            return 0;
-
-        return finish();
-    }
-
-    bool start(size_t sz)
-    {
-        if (space() < (sz + 1 + 2)) //estimate
-            return false;
-
-        _head_s = head();
-        _size_s = size();
+        uint8_t *dest = _buf;
 
         // start block
-        code_ptr = write_ptr();
-        code = 1;
-        if (!write(code))
-            return false;
-        return true;
-    }
-    size_t finish()
-    {
+        T *code_ptr = dest;
+        T code = 1;
+        *dest++ = code;
+
+        // data
+        const T *data = static_cast<const T *>(src);
+        size_t cnt = sz + 2; // crc16 at the end
+        uint16_t crc16 = apx::crc32(src, sz);
+        while (cnt) {
+            if (code != 0xFF) {
+                T c;
+                switch (cnt) {
+                default: // more than one byte to write, write data
+                    c = *data++;
+                    break;
+                case 1: // just one byte left, write crc16 MSB
+                    c = crc16 >> 8;
+                    break;
+                case 2: // just two bytes left, write crc16 LSB
+                    c = crc16;
+                    break;
+                }
+                cnt--;
+                if (c != _esc) {
+                    *dest++ = c;
+                    code++;
+                    continue;
+                }
+            }
+            // finish block
+            *code_ptr = code;
+            // start block
+            code_ptr = dest;
+            code = 1;
+            *dest++ = code;
+        }
+
         // finish block
         *code_ptr = code;
 
         //append packet delimiter
-        if (!write(_esc)) {
-            cancel();
-            return 0;
-        }
+        *dest++ = _esc;
 
         // all encoded
-        return size() - _size_s;
-    }
-    void cancel()
-    {
-        pop_head(_head_s);
-    }
-    bool push(T c)
-    {
-        do {
-            if (code != 0xFF) {
-                if (c != _esc) {
-                    if (!write(c))
-                        break;
-                    code++;
-                    return true;
-                }
-            }
-            // finish block
-            *code_ptr = code;
-            // start block
-            code_ptr = write_ptr();
-            code = 1;
-            if (!write(code))
-                break;
-            if (c == _esc)
-                return true;
-            return push(c);
-        } while (0);
-        cancel();
-        return false;
+        return dest - _buf;
     }
 
-    inline size_t read_encoded(void *dest, size_t sz) override
+    const uint8_t *data() const override
     {
-        return QueueBuffer<_buf_size, T>::read(dest, sz);
-    }
-    inline size_t size() override
-    {
-        return QueueBuffer<_buf_size, T>::size();
-    }
-    inline void reset() override
-    {
-        QueueBuffer<_buf_size, T>::reset();
+        return _buf;
     }
 
 private:
-    size_t _head_s;
-    size_t _size_s;
+    // any packet will always fit in buffer
+    // there's no overflow checks for performance reasons
+    static constexpr size_t overhead(size_t packet_size)
+    {
+        // +1 for packet delimiter
+        // +crc16
+        return (packet_size + 1 + sizeof(uint16_t)) / 255 + 1;
+    }
 
-    T *code_ptr;
-    T code;
-
-    using QueueBuffer<_buf_size, T>::space;
-    using QueueBuffer<_buf_size, T>::pop_head;
-    using QueueBuffer<_buf_size, T>::write;
-    using QueueBuffer<_buf_size, T>::write_ptr;
-    using QueueBuffer<_buf_size, T>::read;
-};*/
+    // any packet will always fit in buffer
+    // there's no overflow checks for performance reasons
+    T _buf[_packet_size + overhead(_packet_size)];
+};

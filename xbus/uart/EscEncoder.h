@@ -21,9 +21,11 @@
  */
 #pragma once
 
-#include <QueueBuffer.h>
-
 #include "SerialCodec.h"
+
+/*
+
+Totally deprecated traces:
 
 template<size_t _buf_size, typename T = uint8_t>
 class EscEncoder : public SerialEncoder
@@ -82,3 +84,4 @@ public:
 private:
     uint8_t _buf[_buf_size];
 };
+*/
