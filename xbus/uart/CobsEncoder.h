@@ -48,25 +48,30 @@ public:
         T code = 1;
         *dest++ = code;
 
-        // data
+        // copy data first
         const T *data = static_cast<const T *>(src);
-        size_t cnt = sz + 2; // crc16 at the end
-        uint16_t crc16 = apx::crc32(src, sz);
-        while (cnt) {
+        for (auto cnt = sz; cnt; --cnt) {
             if (code != 0xFF) {
-                T c;
-                switch (cnt) {
-                default: // more than one byte to write, write data
-                    c = *data++;
-                    break;
-                case 1: // just one byte left, write crc16 MSB
-                    c = crc16 >> 8;
-                    break;
-                case 2: // just two bytes left, write crc16 LSB
-                    c = crc16;
-                    break;
+                auto c = *data++;
+                if (c != _esc) {
+                    *dest++ = c;
+                    code++;
+                    continue;
                 }
-                cnt--;
+            }
+            // finish block
+            *code_ptr = code;
+            // start block
+            code_ptr = dest;
+            code = 1;
+            *dest++ = code;
+        }
+        // copy crc16 at the end
+        uint16_t crc16 = apx::crc32(src, sz);
+        const uint8_t *crc16_ptr = reinterpret_cast<const uint8_t *>(&crc16);
+        for (auto cnt = 2; cnt; --cnt) {
+            if (code != 0xFF) {
+                auto c = *crc16_ptr++;
                 if (c != _esc) {
                     *dest++ = c;
                     code++;
