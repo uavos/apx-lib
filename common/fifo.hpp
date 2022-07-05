@@ -81,6 +81,12 @@ public:
         _w = w; // confirm write
         return cnt;
     }
+    // write one element to fifo
+    bool write(const T &src)
+    {
+        // TODO optimize write element to fifo
+        return write(&src, 1) == 1;
+    }
 
     // read data elements from buffer and release space
     size_t read(void *dest, size_t sz)
@@ -123,6 +129,11 @@ public:
         _r = cnt;
 
         return cnt + rcnt;
+    }
+    // read one element
+    bool read(T *dest)
+    {
+        return read(dest, 1) == 1;
     }
 
     // ---------------------------------------------
@@ -268,10 +279,10 @@ using fifo_static = fifo_staticT<SIZE, T, fifoT<T>>;
 //   Each packet is prepended with size value (word) of elements in a packet.
 //   Packet size is limited to 16 bit.
 template<typename T = uint8_t>
-class packet_fifo : public fifoT<T>
+class fifo_packet : public fifoT<T>
 {
 public:
-    packet_fifo(T *buf, size_t size)
+    fifo_packet(T *buf, size_t size)
         : fifoT<T>(buf, size)
     {}
 
@@ -323,6 +334,6 @@ public:
     }
 };
 template<const size_t SIZE, typename T = uint8_t>
-using packet_fifoT = fifo_staticT<SIZE, T, packet_fifo<T>>;
+using fifo_packetT = fifo_staticT<SIZE, T, fifo_packet<T>>;
 
 } // namespace apx
