@@ -213,7 +213,7 @@ void Server::run()
             if (cnt == 0)
                 continue;
             pthread_mutex_lock(&_mutex);
-            _rx_queue.write_packet(buf, cnt);
+            _rx_fifo.write_packet(buf, cnt);
             pthread_mutex_unlock(&_mutex);
         }
 
@@ -235,7 +235,7 @@ void Server::run()
 size_t Server::read_packet(void *buf, size_t size)
 {
     pthread_mutex_lock(&_mutex);
-    size_t cnt = _rx_queue.read_packet(buf, size);
+    size_t cnt = _rx_fifo.read_packet(buf, size);
     pthread_mutex_unlock(&_mutex);
     return cnt;
 }

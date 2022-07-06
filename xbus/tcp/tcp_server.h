@@ -24,8 +24,8 @@
 #include "tcp_client.h"
 
 #include <XbusPacket.h>
+#include <fifo.hpp>
 #include <pthread.h>
-#include <QueueBuffer.h>
 
 namespace xbus {
 namespace tcp {
@@ -56,7 +56,7 @@ private:
     size_t _tid_cnt{0};
     pthread_mutex_t _mutex = PTHREAD_MUTEX_INITIALIZER;
 
-    QueueBuffer<xbus::size_packet_max * 4> _rx_queue;
+    apx::fifo_packet_static<xbus::size_packet_max * 4> _rx_fifo;
 };
 
 } // namespace tcp

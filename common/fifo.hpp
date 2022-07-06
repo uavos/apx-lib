@@ -63,8 +63,8 @@ public:
     // called on error and is not safe
     void reset()
     {
-        _r = _w; // reset read size (no data there)
-        _w = _r = 0;
+        _w = 0;
+        _r = 0;
     }
 
     // write data to fifo and return number of elements written
@@ -300,7 +300,7 @@ public:
     {}
 
     // write packet to buffer
-    bool packet_write(const void *src, size_t sz)
+    bool write_packet(const void *src, size_t sz)
     {
         size_t w = fifoT<T>::_w;
         size_t r = fifoT<T>::_r;
@@ -320,7 +320,7 @@ public:
     }
 
     // read packet from buffer and release space
-    size_t packet_read(void *dest, size_t sz)
+    size_t read_packet(void *dest, size_t sz)
     {
         size_t w = fifoT<T>::_w;
         size_t r = fifoT<T>::_r;
@@ -347,6 +347,6 @@ public:
     }
 };
 template<const size_t SIZE, typename T = uint8_t>
-using fifo_packetT = fifo_staticT<SIZE, T, fifo_packet<T>>;
+using fifo_packet_static = fifo_staticT<SIZE, T, fifo_packet<T>>;
 
 } // namespace apx
