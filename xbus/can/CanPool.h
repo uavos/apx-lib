@@ -75,8 +75,8 @@ private:
     {
         extid_s extid;
         uint8_t head;
-        uint8_t dlc : 4; // last msg dlc, >0 means tree is done, =0xF means zero length
-        uint8_t to : 4;  // timeout
+        uint8_t dlc; // last msg dlc, >0 means tree is done, =0xFF means zero length
+        uint8_t to;  // timeout
     };
 #pragma pack()
 

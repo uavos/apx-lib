@@ -87,7 +87,7 @@ ErrorType Pool::push(const extid_s &extid, const uint8_t *data, uint8_t dlc)
             return ErrorDLC; //error - size<8, but multipart msg
         return push_new(extid, data, 0);
     case frm_single:
-        return push_new(extid, data, dlc > 0 ? dlc : 0x0F);
+        return push_new(extid, data, dlc > 0 ? dlc : 0xFF);
     default: // sequence
         if (dlc != 8)
             return ErrorDLC; //error - size<8, but multipart middle msg
