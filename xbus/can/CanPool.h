@@ -60,7 +60,7 @@ public:
 
 private:
     static constexpr const uint8_t size_items = (xbus::size_packet_max / 8) * 1.2;
-    static constexpr const uint8_t size_trees = 8; // pids simulaneously
+    static constexpr const uint8_t size_trees = 8; // pids simultaneously
     static constexpr const uint8_t max_idx = 0xFF;
     static constexpr const uint8_t max_seq_idx = size_items;
 

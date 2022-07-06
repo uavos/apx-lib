@@ -76,24 +76,20 @@ size_t Codec::check_crc(void *dest, size_t sz)
 
 ErrorType Codec::push_message(const xcan_msg_s &msg)
 {
-    do {
-        extid_s extid;
-        extid.raw = msg.id;
+    extid_s extid;
+    extid.raw = msg.id;
 
-        if (extid.src == _extid_defaults.src) {
-            updateNodeId();
-            sendAddressing();
-            break;
-        }
+    if (extid.src == _extid_defaults.src) {
+        updateNodeId();
+        sendAddressing();
+        return MsgDropped;
+    }
 
-        if (!accept_filter(extid))
-            return MsgAccepted;
+    if (!accept_filter(extid))
+        return MsgAccepted;
 
-        //process message
-        return pool.push(extid, msg.data, msg.dlc);
-
-    } while (0);
-    return MsgDropped;
+    //process message
+    return pool.push(extid, msg.data, msg.dlc);
 }
 
 void Codec::sendAddressing()

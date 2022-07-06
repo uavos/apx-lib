@@ -84,8 +84,20 @@ public:
     // write one element to fifo
     bool write(const T &src)
     {
-        // TODO optimize write element to fifo
-        return write(&src, 1) == 1;
+        size_t w = _w;
+        size_t r = _r;
+
+        // ensure data fits in buffer with (_size-1) as max free space
+        size_t cnt = _free(r, w);
+        if (!cnt)
+            return false;
+
+        _buf[w++] = src;
+        if (w >= _size)
+            w = 0;
+
+        _w = w; // confirm write
+        return true;
     }
 
     // read data elements from buffer and release space
@@ -131,9 +143,10 @@ public:
         return cnt + rcnt;
     }
     // read one element
-    bool read(T *dest)
+    void read(T *dest)
     {
-        return read(dest, 1) == 1;
+        *dest = *rptr();
+        skip_read(1);
     }
 
     // ---------------------------------------------
