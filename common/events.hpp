@@ -21,17 +21,17 @@
  */
 #pragma once
 
-#include <List.h>
+#include "list.hpp"
 #include <do_not_copy.h>
 
 namespace apx {
 
 template<typename T>
-class Event : public ListNode<apx::Event<T> *>, private do_not_copy
+class Event : public list<Event<T>>, private do_not_copy
 {
 public:
     // call all connected slots, arg can be 'this' to filter local class
-    static void signal(apx::Event<T> *arg)
+    static void signal(Event<T> *arg)
     {
         for (auto i : _list) {
             if (i != arg)
@@ -40,14 +40,14 @@ public:
     }
     static void signal()
     {
-        apx::Event<T> *arg = {};
+        Event<T> *arg = {};
         for (auto i : _list) {
             i->event(arg);
         }
     }
 
     static inline size_t size() { return _list.size(); }
-    static inline int indexOf(apx::Event<T> *e) { return _list.indexOf(e); }
+    static inline int indexOf(Event<T> *e) { return _list.indexOf(e); }
 
     typedef T type_t;
 
@@ -57,14 +57,14 @@ protected:
     inline void connect() { _list.add(this); }
     inline void disconnect() { _list.remove(this); }
 
-    virtual void event(apx::Event<T> *) = 0;
+    virtual void event(Event<T> *) = 0;
 
 private:
-    static List<apx::Event<T> *> _list;
+    static list<Event<T>> _list;
 };
 
 template<typename T>
-List<apx::Event<T> *> apx::Event<T>::_list;
+list<Event<T>> Event<T>::_list;
 
 } // namespace apx
 
