@@ -136,8 +136,4 @@ private:
     Tdata _link{};
 };
 
-// item=list
-template<class T, class Tdata = T *>
-using list_item = list<T, Tdata>;
-
 } // namespace apx

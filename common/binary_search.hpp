@@ -22,7 +22,8 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
+#include <sys/types.h>
 
 // binary search function
 template<typename T>
