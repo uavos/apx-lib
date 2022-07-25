@@ -246,7 +246,7 @@
       type: dword
       units: gps
     - name: lon
-      title: Reference latitude
+      title: Reference longitude
       type: dword
       units: gps
     - name: hmsl
