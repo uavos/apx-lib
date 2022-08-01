@@ -19,23 +19,31 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 #pragma once
 
-#include <inttypes.h>
-#include <sys/types.h>
-#include <visibility.h>
+#include "macro_nargs.h"
 
-#pragma pack(1)
-struct xcan_msg_s
-{
-    uint32_t id;
-    struct
-    {
-        uint8_t dlc : 4; // data length code
-        uint8_t ext : 1; // 0= standard ID (11 bit), 1= extended (29 bit)
-        uint8_t _rsv : 3;
-    };
-    uint8_t data[8];
-};
-#pragma pack()
+/*
+
+#define MY_MACRO    CONCAT(x,y,z)
+
+will expand to xyz
+
+*/
+
+#define CONCAT(...) CONCAT_IMPL((__VA_ARGS__))
+
+#define CONCAT_IMPL(LIST) CONCAT_IMPL1(NARGS LIST, LIST)
+#define CONCAT_IMPL1(N, LIST) CONCAT_IMPL2(N, LIST)
+#define CONCAT_IMPL2(N, LIST) CONCAT_##N LIST
+
+#define CONCAT_S(a) #a
+
+#define CONCAT_1(a) a
+#define CONCAT_2(a, b) a##b
+#define CONCAT_3(a, b, c) a##b##c
+#define CONCAT_4(a, b, c, d) a##b##c##d
+#define CONCAT_5(a, b, c, d, e) a##b##c##d##e
+#define CONCAT_6(a, b, c, d, e, f) a##b##c##d##e##f
+#define CONCAT_7(a, b, c, d, e, f, g) a##b##c##d##e##f##g
+#define CONCAT_8(a, b, c, d, e, f, g, h) a##b##c##d##e##f##g##h

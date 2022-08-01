@@ -63,6 +63,13 @@ if(APX_GIT_TAGS)
     endforeach()
 endif()
 
+execute_process(
+    COMMAND ${GIT_EXECUTABLE} describe --always
+    OUTPUT_VARIABLE APX_GIT_IDENTITY
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    WORKING_DIRECTORY ${APX_GIT_ROOT}
+)
+
 # estimate version from git tags
 if(NOT APX_GIT_VERSION)
     execute_process(
@@ -75,6 +82,7 @@ if(NOT APX_GIT_VERSION)
         string(REGEX MATCH "^([0-9]+\.[0-9]+\.[0-9]+)" APX_GIT_VERSION ${APX_GIT_VERSION})
     endif()
 endif()
+
 # if(NOT APX_GIT_VERSION)
 #     execute_process(
 #         COMMAND ${GIT_EXECUTABLE} describe --always --tags

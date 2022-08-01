@@ -27,7 +27,7 @@ template<class T>
 class Queue
 {
 public:
-    bool empty() const { return _head == nullptr; }
+    bool empty() const { return !_head; }
 
     T front() const { return _head; }
     T back() const { return _tail; }
@@ -36,7 +36,7 @@ public:
     {
         size_t sz = 0;
 
-        for (auto node = front(); node != nullptr; node = node->next_queue_node()) {
+        for (auto node = front(); node; node = node->next_queue_node()) {
             sz++;
         }
 
@@ -46,19 +46,37 @@ public:
     void push(T newNode)
     {
         // error, node already queued or already inserted
-        if ((newNode->next_queue_node() != nullptr) || (newNode == _tail)) {
+        if (newNode->next_queue_node() || (newNode == _tail)) {
             return;
         }
 
-        if (_head == nullptr) {
+        if (!_head) {
             _head = newNode;
         }
 
-        if (_tail != nullptr) {
+        if (_tail) {
             _tail->set_next_queue_node(newNode);
         }
 
         _tail = newNode;
+    }
+
+    void push_front(T newNode)
+    {
+        newNode->set_next_queue_node(_head);
+        if (!_head)
+            _tail = newNode;
+        _head = newNode;
+    }
+
+    void insert_after(T prev, T newNode)
+    {
+        if (!_head || prev == _tail) {
+            push(newNode);
+        } else {
+            newNode->set_next_queue_node(prev->next_queue_node());
+            prev->set_next_queue_node(newNode);
+        }
     }
 
     T pop()
@@ -71,12 +89,12 @@ public:
 
             } else {
                 // only one item left
-                _head = nullptr;
-                _tail = nullptr;
+                _head = {};
+                _tail = {};
             }
 
             // clear next in popped (in might be re-inserted later)
-            ret->set_next_queue_node(nullptr);
+            ret->set_next_queue_node({});
         }
 
         return ret;
@@ -84,22 +102,22 @@ public:
 
     bool remove(T removeNode)
     {
-        if (removeNode != nullptr)
+        if (!removeNode)
             return false;
 
         // base case
         if (removeNode == _head) {
             _head = removeNode->next_queue_node();
-            removeNode->set_next_queue_node(nullptr);
+            removeNode->set_next_queue_node({});
             return true;
         }
 
-        for (T node = _head; node != nullptr; node = node->next_queue_node()) {
+        for (T node = _head; node; node = node->next_queue_node()) {
             // is sibling the node to remove?
             if (node->next_queue_node() == removeNode) {
                 // replace sibling
                 node->set_next_queue_node(removeNode->next_queue_node());
-                removeNode->set_next_queue_node(nullptr);
+                removeNode->set_next_queue_node({});
                 return true;
             }
         }
@@ -128,21 +146,22 @@ public:
     };
 
     Iterator begin() { return Iterator(_head); }
-    Iterator end() { return Iterator(nullptr); }
+    Iterator end() { return Iterator({}); }
 
 private:
-    T _head{nullptr};
-    T _tail{nullptr};
+    T _head{};
+    T _tail{};
 };
 
 template<class T>
 class QueueNode
 {
-private:
+protected:
     friend Queue<T>;
 
     T next_queue_node() const { return _next_queue_node; }
     void set_next_queue_node(T new_next) { _next_queue_node = new_next; }
 
-    T _next_queue_node{nullptr};
+private:
+    T _next_queue_node{};
 };

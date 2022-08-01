@@ -27,7 +27,7 @@
 #include <type_traits>
 
 #include "XbusStream.h"
-#include "endian.h"
+#include "xbus_endian.h"
 
 class XbusStreamReader : public XbusStream
 {
