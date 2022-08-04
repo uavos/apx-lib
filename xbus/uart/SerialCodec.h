@@ -70,6 +70,11 @@ public:
 
     inline auto status() const { return _status; }
 
+    // reset the decoder
+    // can be used to ensure the corrupted data is discarded
+    // f.ex. when the interface is reset or changed
+    virtual void reset() = 0;
+
 protected:
     SerialDecoderStatus _status{};
 };

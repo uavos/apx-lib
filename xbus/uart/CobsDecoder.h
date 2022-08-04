@@ -106,6 +106,12 @@ public:
         return _rsize;
     }
 
+    void reset() override
+    {
+        _status = Unknown;
+        restart();
+    }
+
 private:
     static constexpr size_t overhead()
     {
