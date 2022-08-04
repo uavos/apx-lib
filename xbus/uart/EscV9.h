@@ -21,7 +21,9 @@
  */
 #pragma once
 
-// Totally deprecated traces:
+// Totally deprecated traces.
+// The version 9 of UAVOS AP was using this protocol for the serial packetization.
+// The new COBS protocol is used for the serial packetization as improvement.
 
 /*
 template<size_t _buf_size, typename T = uint8_t>
