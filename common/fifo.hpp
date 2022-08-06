@@ -42,6 +42,7 @@ public:
     {}
 
     inline bool empty() const { return _r == _w; }
+    inline size_t size() const { return _size; }
 
     // return used number of elements
     size_t used() const
@@ -124,12 +125,15 @@ public:
         if (cnt >= sz) {
             // just one block fits
             _cpy(dest, &_buf[r], sz);
-            r += cnt;
+            r += sz;
+            if (r >= _size)
+                r = 0;
             _r = r;
             return sz;
         }
         _cpy(dest, &_buf[r], cnt);
         sz -= cnt;
+        dest = &(static_cast<T *>(dest)[cnt]);
 
         size_t rcnt = cnt; // total read cnt
 
@@ -177,6 +181,9 @@ public:
             r -= _size;
         _r = r;
     }
+
+    inline auto rpos() const { return _r.load(); }
+    inline auto wpos() const { return _w.load(); }
 
     // get current write pointer
     /*const T *wptr() const
@@ -313,9 +320,10 @@ public:
 
         // write whole packet, then modify write pointer
         // to support concurrent reads
-        fifoT<T>::_write(&w, r, &sz, 2);  // Write packet size
-        fifoT<T>::_write(&w, r, src, sz); // Write packet data
-        fifoT<T>::_w = w;                 // confirm write
+        uint16_t sz16 = sz;
+        fifoT<T>::_write(&w, r, &sz16, 2); // Write packet size
+        fifoT<T>::_write(&w, r, src, sz);  // Write packet data
+        fifoT<T>::_w = w;                  // confirm write
         return true;
     }
 
@@ -331,8 +339,9 @@ public:
 
         used_cnt -= 2; // remove packet size word from length count
 
-        size_t cnt;
+        uint16_t cnt;
         fifoT<T>::read(&cnt, 2);
+
         if (cnt < 1 || cnt > used_cnt) {
             // packet corrupted
             fifoT<T>::reset(); // try to reset buffer (at least one packet lost)
