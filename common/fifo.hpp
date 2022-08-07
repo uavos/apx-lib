@@ -82,6 +82,7 @@ public:
         _w = w; // confirm write
         return cnt;
     }
+
     // write one element to fifo
     bool write(const T &src)
     {
@@ -99,6 +100,12 @@ public:
 
         _w = w; // confirm write
         return true;
+    }
+
+    // set write pointer (from DMA ring buffer)
+    inline void update_wpos(size_t w)
+    {
+        _w = w;
     }
 
     // read data elements from buffer and release space
@@ -146,6 +153,7 @@ public:
 
         return cnt + rcnt;
     }
+
     // read one element
     void read(T *dest)
     {
@@ -161,6 +169,7 @@ public:
     {
         return &_buf[_r];
     }
+
     // get continous block read length
     size_t rsize() const
     {
@@ -172,6 +181,7 @@ public:
             return _size - r;
         return 0;
     }
+
     // advance read pointer and free/release memory (useful for dma write)
     void skip_read(size_t sz)
     {
@@ -184,6 +194,7 @@ public:
 
     inline auto rpos() const { return _r.load(); }
     inline auto wpos() const { return _w.load(); }
+    inline T *buf() const { return _buf; }
 
     // get current write pointer
     /*const T *wptr() const
