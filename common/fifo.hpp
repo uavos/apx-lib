@@ -68,8 +68,23 @@ public:
         _r = 0;
     }
 
+    // write data to fifo and return success
+    // ensure data fits in fifo
+    bool write(const void *src, size_t sz)
+    {
+        size_t w = _w;
+        size_t r = _r;
+
+        // ensure data fits in buffer with (_size-1) as max free space
+        size_t cnt = _free(r, w);
+        if (sz > cnt)
+            return false;
+        _write(&w, r, src, sz);
+        _w = w; // confirm write
+        return true;
+    }
     // write data to fifo and return number of elements written
-    size_t write(const void *src, size_t sz)
+    size_t try_write(const void *src, size_t sz)
     {
         size_t w = _w;
         size_t r = _r;

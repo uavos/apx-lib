@@ -111,6 +111,7 @@
     - name: altitude
       title: Flight altitude
       units: m
+      fmt: f32
 
     - name: vspeed
       title: Vertical speed
