@@ -50,9 +50,10 @@ public:
 
         // copy data first
         const T *data = static_cast<const T *>(src);
-        for (auto cnt = sz; cnt; --cnt) {
+        for (auto cnt = sz; cnt;) {
             if (code != 0xFF) {
                 auto c = *data++;
+                cnt--;
                 if (c != _esc) {
                     *dest++ = c;
                     code++;
@@ -69,9 +70,10 @@ public:
         // copy crc16 at the end
         uint16_t crc16 = apx::crc32(src, sz);
         const uint8_t *crc16_ptr = reinterpret_cast<const uint8_t *>(&crc16);
-        for (auto cnt = 2; cnt; --cnt) {
+        for (auto cnt = 2; cnt;) {
             if (code != 0xFF) {
                 auto c = *crc16_ptr++;
+                cnt--;
                 if (c != _esc) {
                     *dest++ = c;
                     code++;

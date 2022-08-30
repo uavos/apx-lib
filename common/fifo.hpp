@@ -131,42 +131,9 @@ public:
         if (r == w)
             return 0;
 
-        if (w > r) {
-            // just one continuous block
-            size_t cnt = w - r;
-            if (cnt > sz)
-                cnt = sz;
-            _cpy(dest, &_buf[r], cnt);
-            r += cnt;
-            _r = r;
-            return cnt;
-        }
-
-        // two linked blocks
-        size_t cnt = _size - r;
-        if (cnt >= sz) {
-            // just one block fits
-            _cpy(dest, &_buf[r], sz);
-            r += sz;
-            if (r >= _size)
-                r = 0;
-            _r = r;
-            return sz;
-        }
-        _cpy(dest, &_buf[r], cnt);
-        sz -= cnt;
-        dest = &(static_cast<T *>(dest)[cnt]);
-
-        size_t rcnt = cnt; // total read cnt
-
-        cnt = w;
-        if (cnt > sz)
-            cnt = sz;
-        _cpy(dest, &_buf[0], cnt);
-
-        _r = cnt;
-
-        return cnt + rcnt;
+        auto cnt = _read(w, &r, dest, sz);
+        _r = r; // confirm read
+        return cnt;
     }
 
     // read one element
@@ -300,6 +267,47 @@ protected:
         w += sz;
         return sz;
     }
+
+    // internal read buffer without bounds checking
+    size_t _read(size_t w, size_t *r_ptr, void *dest, size_t sz)
+    {
+        size_t &r = *r_ptr;
+
+        if (w > r) {
+            // just one continuous block
+            size_t cnt = w - r;
+            if (cnt > sz)
+                cnt = sz;
+            _cpy(dest, &_buf[r], cnt);
+            r += cnt;
+            return cnt;
+        }
+
+        // two linked blocks
+        size_t cnt = _size - r;
+        if (cnt >= sz) {
+            // just one block fits
+            _cpy(dest, &_buf[r], sz);
+            r += sz;
+            if (r >= _size)
+                r = 0;
+            return sz;
+        }
+        _cpy(dest, &_buf[r], cnt);
+        sz -= cnt;
+        dest = &(static_cast<T *>(dest)[cnt]);
+
+        size_t rcnt = cnt; // total read cnt
+
+        cnt = w;
+        if (cnt > sz)
+            cnt = sz;
+        _cpy(dest, &_buf[0], cnt);
+
+        r = cnt;
+
+        return cnt + rcnt;
+    }
 };
 
 // FIFO with static allocation bufffer base template.
@@ -347,9 +355,15 @@ public:
         // write whole packet, then modify write pointer
         // to support concurrent reads
         uint16_t sz16 = sz;
-        fifoT<T>::_write(&w, r, &sz16, 2); // Write packet size
-        fifoT<T>::_write(&w, r, src, sz);  // Write packet data
-        fifoT<T>::_w = w;                  // confirm write
+        fifoT<T>::_buf[w++] = sz16;
+        if (w >= fifoT<T>::_size)
+            w = 0;
+        fifoT<T>::_buf[w++] = sz16 >> 8;
+        if (w >= fifoT<T>::_size)
+            w = 0;
+
+        fifoT<T>::_write(&w, r, src, sz); // Write packet data
+        fifoT<T>::_w = w;                 // confirm write
         return true;
     }
 
@@ -366,7 +380,12 @@ public:
         used_cnt -= 2; // remove packet size word from length count
 
         uint16_t cnt;
-        fifoT<T>::read(&cnt, 2);
+        cnt = fifoT<T>::_buf[r++];
+        if (r >= fifoT<T>::_size)
+            r = 0;
+        cnt |= fifoT<T>::_buf[r++] << 8;
+        if (r >= fifoT<T>::_size)
+            r = 0;
 
         if (cnt < 1 || cnt > used_cnt) {
             // packet corrupted
@@ -375,10 +394,13 @@ public:
         }
         if (cnt > sz) {
             // no space for packet
-            fifoT<T>::skip_read(cnt);
+            fifoT<T>::skip_read(cnt + 2);
             return 0;
         }
-        return fifoT<T>::read(dest, cnt);
+
+        auto rcnt = fifoT<T>::_read(w, &r, dest, cnt);
+        fifoT<T>::_r = r; // confirm read
+        return rcnt;
     }
 };
 template<const size_t SIZE, typename T = uint8_t>
