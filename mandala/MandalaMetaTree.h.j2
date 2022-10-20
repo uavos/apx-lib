@@ -8,7 +8,7 @@
 {%- if d.content is defined -%}
 {% set type = 'void' %}
 {% else %}
-{% if d.units is iterable and d.units is not string %}
+{% if d.units and d.units is iterable and d.units is not string %}
 {% set type = 'byte_t' %}
 {% else %}
 {% set type = d.type+'_t' %}
