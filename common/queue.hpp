@@ -127,6 +127,15 @@ public:
         return false;
     }
 
+    bool contains(const T *n) const
+    {
+        for (auto i : *this) {
+            if (i == n)
+                return true;
+        }
+        return false;
+    }
+
 private:
     Tdata _back{};
 
