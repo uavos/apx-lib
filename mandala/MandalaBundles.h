@@ -31,8 +31,8 @@ namespace bundle {
 #pragma pack(1)
 
 enum {
-    acc_immediate = 1,
-    acc_delta = 2,
+    ins_immediate = 1,
+    ins_delta = 2,
 };
 struct acc_delta_s
 {
@@ -52,10 +52,6 @@ struct acc_immediate_s
     float z;
 };
 
-enum {
-    gyro_immediate = 1,
-    gyro_delta = 2,
-};
 struct gyro_delta_s
 {
     uint32_t dt;
