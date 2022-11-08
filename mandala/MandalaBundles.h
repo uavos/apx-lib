@@ -31,28 +31,10 @@ namespace bundle {
 #pragma pack(1)
 
 enum {
-    ins_immediate = 1,
-    ins_delta = 2,
+    imu_immediate = 1,
+    imu_delta = 2,
 };
-struct acc_delta_s
-{
-    uint32_t dt;
-    float x;
-    float y;
-    float z;
-    float temp;
-    float vib;
-    uint8_t clipping[3];
-};
-struct acc_immediate_s
-{
-    uint32_t dt;
-    float x;
-    float y;
-    float z;
-};
-
-struct gyro_delta_s
+struct imu_delta_s
 {
     uint32_t dt;
     float x;
@@ -63,7 +45,7 @@ struct gyro_delta_s
     float coning;
     uint8_t clipping[3];
 };
-struct gyro_immediate_s
+struct imu_immediate_s
 {
     uint32_t dt;
     float x;
