@@ -224,6 +224,11 @@
       units:
         - "off"
         - "on"
+    - name: hgl
+      title: Heli glider
+      units:
+        - "off"
+        - "on"
 
 - name: rc
   title: Remote Control
