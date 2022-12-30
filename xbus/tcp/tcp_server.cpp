@@ -188,7 +188,7 @@ void Server::run()
         strcpy(line_buf, "Content-Type: application/octet-stream\r\n");
         if (::send(fd, line_buf, strlen(line_buf), 0) <= 0)
             break;
-        sprintf(line_buf, "Server: %s\r\n", _host.path + 1);
+        snprintf(line_buf, 255, "Server: %s\r\n", _host.path + 1);
         if (::send(fd, line_buf, strlen(line_buf), 0) <= 0)
             break;
         strcpy(line_buf, "\r\n");
