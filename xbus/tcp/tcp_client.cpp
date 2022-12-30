@@ -115,7 +115,7 @@ bool Client::connect()
             printf("%s:requesting '%s'...\n", name, _host.path);
 
         char line_buf[256];
-        sprintf(line_buf, "GET %s HTTP/1.0\r\nFrom: %s\r\n\r\n", _host.path, name);
+        snprintf(line_buf, 255, "GET %s HTTP/1.0\r\nFrom: %s\r\n\r\n", _host.path, name);
         if (::send(_client_fd, (const uint8_t *) line_buf, strlen(line_buf), 0) <= 0) {
             err = "send";
             break;
