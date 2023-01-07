@@ -47,7 +47,7 @@ format_file() {
     done
 
     [[ $silent ]] || echo "Reformatting ${file}..."
-    /usr/local/bin/clang-format -style=file -fallback-style=none -i ${file}
+    clang-format -style=file -fallback-style=none -i ${file}
     git add "${file}"
   done
 }
