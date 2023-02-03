@@ -98,11 +98,11 @@ static float float_from_f16(const uint16_t &v)
 
 static float float_from_rad(const int16_t &v)
 {
-    return v / (32768.f / (float) M_PI);
+    return v / (32767.f / (float) M_PI);
 }
 static float float_from_rad2(const int16_t &v)
 {
-    return v / (32768.f / ((float) M_PI / 2.f));
+    return v / (32767.f / ((float) M_PI / 2.f));
 }
 
 // unpack method

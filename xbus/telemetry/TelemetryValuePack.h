@@ -172,7 +172,7 @@ static int16_t float_to_angle(const float &v, float span)
 {
     const float dspan = span * 2.f;
     const float a = v - std::floor(v / dspan + 0.5f) * dspan;
-    return (int16_t) (a * (32768.f / span));
+    return (int16_t) (a * (32767.f / span));
 }
 static inline int16_t float_to_rad(const float &v)
 {

@@ -153,7 +153,7 @@ struct xpdr_s
         hmsl = s->read<hmsl_t, float>();
         speed = s->read<speed_t, float>() / 10.0f;
         vspeed = s->read<vspeed_t, float>() / 2.f;
-        bearing = s->read<bearing_t, float>() / (32768.0f / M_PI);
+        bearing = s->read<bearing_t, float>() / (32767.0f / M_PI);
         *s >> mode;
     }
     inline void write(XbusStreamWriter *s) const
@@ -164,7 +164,7 @@ struct xpdr_s
         s->write<hmsl_t, float>(hmsl);
         s->write<speed_t, float>(speed * 10.0f);
         s->write<vspeed_t, float>(vspeed * 2.f);
-        s->write<bearing_t, float>(bearing * (32768.0f / M_PI));
+        s->write<bearing_t, float>(bearing * (32767.0f / M_PI));
         *s << mode;
     }
 };
