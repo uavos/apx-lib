@@ -136,6 +136,10 @@ public:
         return false;
     }
 
+    // allow queue iterator access
+    using list<T>::begin;
+    using list<T>::end;
+
 private:
     Tdata _back{};
 
