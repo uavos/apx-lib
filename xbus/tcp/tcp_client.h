@@ -56,8 +56,8 @@ public:
     virtual bool connect();
     void close();
 
-    virtual size_t read_packet(void *buf, size_t size);
-    virtual bool write_packet(const void *buf, size_t size);
+    virtual size_t read(void *buf, size_t size);
+    virtual bool write(const void *buf, size_t size);
 
     virtual bool is_connected(void);
 
@@ -75,8 +75,8 @@ protected:
     //line read
     bool readline(int fd, char *line_buf, size_t max_size);
 
-    static ssize_t read_packet(int fd, void *buf, size_t size);
-    static bool write_packet(int fd, const void *buf, size_t size);
+    static ssize_t read(int fd, void *buf, size_t size);
+    static bool write(int fd, const void *buf, size_t size);
 };
 
 } // namespace tcp

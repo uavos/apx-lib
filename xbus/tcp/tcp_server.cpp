@@ -207,13 +207,13 @@ void Server::run()
 
         for (;;) {
             uint8_t buf[xbus::size_packet_max];
-            ssize_t cnt = Client::read_packet(fd, buf, sizeof(buf));
+            ssize_t cnt = Client::read(fd, buf, sizeof(buf));
             if (cnt < 0)
                 break;
             if (cnt == 0)
                 continue;
             pthread_mutex_lock(&_mutex);
-            _rx_fifo.write_packet(buf, cnt);
+            _rx_fifo.write(buf, cnt);
             pthread_mutex_unlock(&_mutex);
         }
 
@@ -232,19 +232,19 @@ void Server::run()
     ::close(fd);
 }
 
-size_t Server::read_packet(void *buf, size_t size)
+size_t Server::read(void *buf, size_t size)
 {
     pthread_mutex_lock(&_mutex);
-    size_t cnt = _rx_fifo.read_packet(buf, size);
+    size_t cnt = _rx_fifo.read(buf, size);
     pthread_mutex_unlock(&_mutex);
     return cnt;
 }
-bool Server::write_packet(const void *buf, size_t size)
+bool Server::write(const void *buf, size_t size)
 {
     bool rv = false;
     pthread_mutex_lock(&_mutex);
     for (size_t i = 0; i < _client_cnt; ++i) {
-        if (Client::write_packet(_client_fd[i], buf, size))
+        if (Client::write(_client_fd[i], buf, size))
             rv = true;
     }
     pthread_mutex_unlock(&_mutex);

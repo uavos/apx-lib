@@ -202,15 +202,15 @@ bool Client::readline(int fd, char *line_buf, size_t max_size)
     return false;
 }
 
-size_t Client::read_packet(void *buf, size_t size)
+size_t Client::read(void *buf, size_t size)
 {
-    ssize_t cnt = read_packet(_client_fd, buf, size);
+    ssize_t cnt = read(_client_fd, buf, size);
     if (cnt >= 0)
         return cnt;
     close();
     return 0;
 }
-ssize_t Client::read_packet(int fd, void *buf, size_t size)
+ssize_t Client::read(int fd, void *buf, size_t size)
 {
     struct pollfd pfd;
     pfd.fd = fd;
@@ -235,34 +235,7 @@ ssize_t Client::read_packet(int fd, void *buf, size_t size)
             }
         }
 
-        uint16_t packet_sz;
-        uint32_t packet_crc32;
-
-        if (::recv(fd, &packet_sz, sizeof(packet_sz), MSG_WAITALL) != sizeof(packet_sz)) {
-            printf("tcp:error: packet_sz (%i)\n", errno);
-            break;
-        }
-        if (packet_sz == 0 || packet_sz > size) {
-            printf("tcp:error: packet size (%u)\n", packet_sz);
-            break;
-        }
-
-        if (::recv(fd, &packet_crc32, sizeof(packet_crc32), MSG_WAITALL) != sizeof(packet_crc32)) {
-            printf("tcp:error: packet_crc32 (%i)\n", errno);
-            break;
-        }
-
-        if (::recv(fd, buf, packet_sz, MSG_WAITALL) != packet_sz) {
-            printf("tcp:error: packet (%i)\n", errno);
-            break;
-        }
-
-        uint32_t crc32 = apx::crc32(buf, packet_sz);
-        if (packet_crc32 != crc32) {
-            printf("tcp:error: CRC (%u)\n", packet_sz);
-            break;
-        }
-        return packet_sz;
+        return ::recv(fd, buf, size, MSG_DONTWAIT);
 
     } while (0);
 
@@ -270,7 +243,7 @@ ssize_t Client::read_packet(int fd, void *buf, size_t size)
     return -1;
 }
 
-bool Client::write_packet(const void *buf, size_t size)
+bool Client::write(const void *buf, size_t size)
 {
     if (!size)
         return true;
@@ -278,29 +251,18 @@ bool Client::write_packet(const void *buf, size_t size)
     if (!is_connected()) {
         return false;
     }
-    if (write_packet(_client_fd, buf, size))
+    if (write(_client_fd, buf, size))
         return true;
     close();
     return false;
 }
-bool Client::write_packet(int fd, const void *buf, size_t size)
+bool Client::write(int fd, const void *buf, size_t size)
 {
-    uint16_t packet_sz = size;
-    uint32_t packet_crc32 = apx::crc32(buf, size);
-
-    do {
-        if (::send(fd, &packet_sz, sizeof(packet_sz), MSG_MORE | MSG_DONTWAIT) != sizeof(packet_sz))
-            break;
-        if (::send(fd, &packet_crc32, sizeof(packet_crc32), MSG_MORE | MSG_DONTWAIT) != sizeof(packet_crc32))
-            break;
-
-        if (::send(fd, buf, size, MSG_DONTWAIT) != (ssize_t) size)
-            break;
-
+    auto rv = ::send(fd, buf, size, MSG_DONTWAIT);
+    if (rv == (ssize_t) size)
         return true;
-    } while (0);
 
-    printf("tcp:send failed (%d)\n", errno);
+    printf("tcp:send failed %d/%d (%d)\n", size, rv, errno);
     return false;
 }
 
