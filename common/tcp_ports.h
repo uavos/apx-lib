@@ -21,6 +21,24 @@
  */
 #pragma once
 
-#define TCP_PORT_SERVER 9280   //http server
-#define TCP_PORT_SIM 9288      //simulator: imu/servo
-#define UDP_PORT_DISCOVER 9200 //discover service
+// TCP ports to listen on for HTTP servers
+
+#define TCP_PORT_SERVER 9280 // GCS http server
+#define TCP_PORT_SIM 9288    // simulator http server
+
+// UDP ports to listen on
+
+// GCS discover service
+#define UDP_PORT_DISCOVER 9200
+
+// downlink/telemetry service
+#define UDP_PORT_GCS_TLM 9210
+
+// uplink service
+#define UDP_PORT_AP_UPLINK 9211
+
+// sensors input service
+#define UDP_PORT_SIM_CTR 9220
+
+// sim sns/ctr forward gate service (sim plugin)
+#define UDP_PORT_GCS_SIM 9222
