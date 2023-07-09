@@ -262,7 +262,7 @@ bool Client::write(int fd, const void *buf, size_t size)
     if (rv == (ssize_t) size)
         return true;
 
-    printf("tcp:send failed %d/%d (%d)\n", size, rv, errno);
+    printf("tcp:send failed (%d)\n", errno);
     return false;
 }
 
