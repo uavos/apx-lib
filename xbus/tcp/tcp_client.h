@@ -54,7 +54,7 @@ public:
     int set_non_blocking();
 
     virtual bool connect();
-    void close();
+    virtual void close();
 
     virtual size_t read(void *buf, size_t size);
     virtual bool write(const void *buf, size_t size);

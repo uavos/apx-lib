@@ -46,14 +46,28 @@ Server::Server(const char *name)
 }
 Server::~Server()
 {
+    close();
+
+    // pthread_mutex_lock(&_mutex);
+    // for (size_t i = 0; i < _tid_cnt; ++i) {
+    //     pthread_join(_tid[i], NULL);
+    // }
+    // pthread_mutex_unlock(&_mutex);
+}
+
+void Server::close()
+{
     if (_server_fd > 0) {
         ::close(_server_fd);
+        _server_fd = -1;
     }
-    /*pthread_mutex_lock(&_mutex);
-    for (size_t i = 0; i < _tid_cnt; ++i) {
-        pthread_join(_tid[i], NULL);
+
+    pthread_mutex_lock(&_mutex);
+    for (size_t i = 0; i < _client_cnt; ++i) {
+        ::close(_client_fd[i]);
     }
-    pthread_mutex_unlock(&_mutex);*/
+    _client_cnt = 0;
+    pthread_mutex_unlock(&_mutex);
 }
 
 bool Server::is_connected(void)
@@ -208,6 +222,7 @@ void Server::run()
         for (;;) {
             uint8_t buf[xbus::size_packet_max];
             ssize_t cnt = Client::read(fd, buf, sizeof(buf));
+
             if (cnt < 0)
                 break;
             if (cnt == 0)

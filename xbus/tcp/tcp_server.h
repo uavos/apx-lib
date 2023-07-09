@@ -37,6 +37,7 @@ public:
     ~Server();
 
     bool connect() override;
+    void close() override;
 
     size_t read(void *buf, size_t size) override;
     bool write(const void *buf, size_t size) override;
