@@ -36,15 +36,16 @@
 
 #include <pthread.h>
 
-using namespace xbus::tcp;
+namespace xbus {
+namespace tcp {
 
-Server::Server(const char *name)
-    : Client(name)
+tcp_server::tcp_server(const char *name)
+    : tcp_client(name)
     , _server_fd(-1)
 {
     tcpdebug = true;
 }
-Server::~Server()
+tcp_server::~tcp_server()
 {
     close();
 
@@ -55,7 +56,7 @@ Server::~Server()
     // pthread_mutex_unlock(&_mutex);
 }
 
-void Server::close()
+void tcp_server::close()
 {
     if (_server_fd > 0) {
         ::close(_server_fd);
@@ -70,17 +71,17 @@ void Server::close()
     pthread_mutex_unlock(&_mutex);
 }
 
-bool Server::is_connected(void)
+bool tcp_server::is_connected(void)
 {
     return _server_fd > 0 && _client_cnt > 0;
 }
 
 static void *_thread_trampoline(void *arg)
 {
-    static_cast<Server *>(arg)->run();
+    static_cast<tcp_server *>(arg)->run();
     return nullptr;
 }
-bool Server::create_thread()
+bool tcp_server::create_thread()
 {
     printf("%s:create thread %lu\n", name, _tid_cnt);
     fflush(stdout);
@@ -97,7 +98,7 @@ bool Server::create_thread()
     return false;
 }
 
-bool Server::connect()
+bool tcp_server::connect()
 {
     const char *err = nullptr;
     do {
@@ -156,7 +157,7 @@ bool Server::connect()
     return false;
 }
 
-void Server::run()
+void tcp_server::run()
 {
     struct sockaddr_storage serverStorage;
     socklen_t addr_size = sizeof serverStorage;
@@ -202,7 +203,7 @@ void Server::run()
         strcpy(line_buf, "Content-Type: application/octet-stream\r\n");
         if (::send(fd, line_buf, strlen(line_buf), 0) <= 0)
             break;
-        snprintf(line_buf, 255, "Server: %s\r\n", _host.path + 1);
+        snprintf(line_buf, 255, "tcp_server: %s\r\n", _host.path + 1);
         if (::send(fd, line_buf, strlen(line_buf), 0) <= 0)
             break;
         strcpy(line_buf, "\r\n");
@@ -221,7 +222,7 @@ void Server::run()
 
         for (;;) {
             uint8_t buf[xbus::size_packet_max];
-            ssize_t cnt = Client::read(fd, buf, sizeof(buf));
+            ssize_t cnt = tcp_client::read(fd, buf, sizeof(buf));
 
             if (cnt < 0)
                 break;
@@ -247,26 +248,26 @@ void Server::run()
     ::close(fd);
 }
 
-size_t Server::read(void *buf, size_t size)
+size_t tcp_server::read(void *buf, size_t size)
 {
     pthread_mutex_lock(&_mutex);
     size_t cnt = _rx_fifo.read(buf, size);
     pthread_mutex_unlock(&_mutex);
     return cnt;
 }
-bool Server::write(const void *buf, size_t size)
+bool tcp_server::write(const void *buf, size_t size)
 {
     bool rv = false;
     pthread_mutex_lock(&_mutex);
     for (size_t i = 0; i < _client_cnt; ++i) {
-        if (Client::write(_client_fd[i], buf, size))
+        if (tcp_client::write(_client_fd[i], buf, size))
             rv = true;
     }
     pthread_mutex_unlock(&_mutex);
     return rv;
 }
 
-/*bool Server::connect_task()
+/*bool tcp_server::connect_task()
 {
     const char *err = nullptr;
     switch (init_stage) {
@@ -327,7 +328,7 @@ bool Server::write(const void *buf, size_t size)
         //printf("[%s]d (%i).\n",name,fd);
         if (fd >= 0) {
             if (tcpdebug)
-                printf("[%s]Client socket connected.\n", name);
+                printf("[%s]tcp_client socket connected.\n", name);
             //set options
             int optval = 1;
             setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
@@ -366,7 +367,7 @@ bool Server::write(const void *buf, size_t size)
         strcpy(line_buf, "Content-Type: application/octet-stream\r\n");
         if (::send(fd, line_buf, strlen(line_buf), 0) <= 0)
             break;
-        sprintf(line_buf, "Server: %s\r\n", host.path + 1);
+        sprintf(line_buf, "tcp_server: %s\r\n", host.path + 1);
         if (::send(fd, line_buf, strlen(line_buf), 0) <= 0)
             break;
         strcpy(line_buf, "\r\n");
@@ -374,7 +375,7 @@ bool Server::write(const void *buf, size_t size)
             break;
         err = nullptr;
         init_stage = 100;
-        printf("[%s]Client connected (%s)\n", name, host.path);
+        printf("[%s]tcp_client connected (%s)\n", name, host.path);
         return true;
     case 20:
         //error - reconnect
@@ -402,3 +403,6 @@ bool Server::write(const void *buf, size_t size)
     }
     return false;
 }*/
+
+} // namespace tcp
+} // namespace xbus

@@ -30,11 +30,11 @@
 namespace xbus {
 namespace tcp {
 
-class Server : public Client
+class tcp_server : public tcp_client
 {
 public:
-    explicit Server(const char *name = "server");
-    ~Server();
+    explicit tcp_server(const char *name = "server");
+    ~tcp_server();
 
     bool connect() override;
     void close() override;

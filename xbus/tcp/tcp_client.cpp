@@ -41,9 +41,10 @@
 #define MSG_MORE 0
 #endif
 
-using namespace xbus::tcp;
+namespace xbus {
+namespace tcp {
 
-Client::Client(const char *name)
+tcp_client::tcp_client(const char *name)
     : silent(false)
     , tcpdebug(false)
     , name(name)
@@ -52,12 +53,12 @@ Client::Client(const char *name)
     memset(&_host.addr, 0, sizeof(_host.addr));
     _host.path = "";
 }
-Client::~Client()
+tcp_client::~tcp_client()
 {
     close();
 }
 
-void Client::set_host(const char *host, uint port, const char *path)
+void tcp_client::set_host(const char *host, uint port, const char *path)
 {
     _host.addr.sin_family = AF_INET;
     _host.addr.sin_addr.s_addr = host ? inet_addr(host) : INADDR_ANY;
@@ -66,7 +67,7 @@ void Client::set_host(const char *host, uint port, const char *path)
     printf("%s:connecting to %s:%u%s\n", name, inet_ntoa(_host.addr.sin_addr), ntohs(_host.addr.sin_port), _host.path);
 }
 
-bool Client::connect()
+bool tcp_client::connect()
 {
     const char *err = nullptr;
     do {
@@ -168,19 +169,19 @@ bool Client::connect()
     return false;
 }
 
-bool Client::is_connected(void)
+bool tcp_client::is_connected(void)
 {
     return _client_fd >= 0 && _host.stream;
 }
 
-void Client::close()
+void tcp_client::close()
 {
     if (_client_fd >= 0)
         ::close(_client_fd);
     _client_fd = -1;
 }
 
-bool Client::readline(int fd, char *line_buf, size_t max_size)
+bool tcp_client::readline(int fd, char *line_buf, size_t max_size)
 {
     char *ptr = line_buf;
     size_t rcnt = max_size - 1;
@@ -202,7 +203,7 @@ bool Client::readline(int fd, char *line_buf, size_t max_size)
     return false;
 }
 
-size_t Client::read(void *buf, size_t size)
+size_t tcp_client::read(void *buf, size_t size)
 {
     ssize_t cnt = read(_client_fd, buf, size);
     if (cnt >= 0)
@@ -210,7 +211,7 @@ size_t Client::read(void *buf, size_t size)
     close();
     return 0;
 }
-ssize_t Client::read(int fd, void *buf, size_t size)
+ssize_t tcp_client::read(int fd, void *buf, size_t size)
 {
     struct pollfd pfd;
     pfd.fd = fd;
@@ -243,7 +244,7 @@ ssize_t Client::read(int fd, void *buf, size_t size)
     return -1;
 }
 
-bool Client::write(const void *buf, size_t size)
+bool tcp_client::write(const void *buf, size_t size)
 {
     if (!size)
         return true;
@@ -256,7 +257,7 @@ bool Client::write(const void *buf, size_t size)
     close();
     return false;
 }
-bool Client::write(int fd, const void *buf, size_t size)
+bool tcp_client::write(int fd, const void *buf, size_t size)
 {
     auto rv = ::send(fd, buf, size, MSG_DONTWAIT);
     if (rv == (ssize_t) size)
@@ -266,7 +267,7 @@ bool Client::write(int fd, const void *buf, size_t size)
     return false;
 }
 
-int Client::set_non_blocking()
+int tcp_client::set_non_blocking()
 {
     int flags;
     /* If they have O_NONBLOCK, use the Posix way to do it */
@@ -281,3 +282,6 @@ int Client::set_non_blocking()
     return ioctl(_client_fd, FIOBIO, &flags);
 #endif
 }
+
+} // namespace tcp
+} // namespace xbus
