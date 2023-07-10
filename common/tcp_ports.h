@@ -31,14 +31,17 @@
 // GCS discover service
 #define UDP_PORT_DISCOVER 9200
 
-// downlink/telemetry service
+// GCS downlink/telemetry service
 #define UDP_PORT_GCS_TLM 9210
 
-// uplink service
+// AP uplink service
 #define UDP_PORT_AP_UPLINK 9211
 
-// sensors input service
+// SIM controls input service
 #define UDP_PORT_SIM_CTR 9220
 
-// sim sns/ctr forward gate service (sim plugin)
+// AP sim sensors input service
+#define UDP_PORT_AP_SNS 9221
+
+// GCS sns/ctr forward gate service (gcs sim plugin)
 #define UDP_PORT_GCS_SIM 9222
