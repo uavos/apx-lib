@@ -50,7 +50,8 @@ public:
     size_t read(void *buf, size_t size);
     bool write(const void *buf, size_t size);
 
-    bool is_connected(void);
+    bool is_connected();
+    bool dataAvailable();
 
 private:
     int _fd{-1};

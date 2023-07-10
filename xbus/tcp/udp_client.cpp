@@ -123,7 +123,7 @@ size_t udp_client::read(void *buf, size_t size)
         return cnt;
 
     if (!_silent) {
-        printf("udp:receive failed (%d)\n", errno);
+        printf("%s:receive failed (%d)\n", _name, errno);
         fflush(stdout);
     }
 
@@ -143,12 +143,29 @@ bool udp_client::write(const void *buf, size_t size)
         return true;
 
     if (!_silent) {
-        printf("udp:send failed (%d)\n", errno);
+        printf("%s:send failed (%d)\n", _name, errno);
         fflush(stdout);
     }
 
     close();
     return false;
+}
+
+bool udp_client::dataAvailable()
+{
+    if (!is_connected())
+        return false;
+
+    int bytes_available;
+    if (::ioctl(_fd, FIONREAD, &bytes_available) < 0) {
+        if (!_silent) {
+            printf("%s:ioctl failed (%d)\n", _name, errno);
+            fflush(stdout);
+        }
+        return false;
+    }
+
+    return bytes_available > 0;
 }
 
 } // namespace tcp
