@@ -30,7 +30,7 @@ release-tags:
 	@echo "Updating tags..."
 	@mkdir -p docs/releases
 	@apx-changelog --ref $(GIT_REF_RELEASE) --title $(APX_PROJECT_TITLE) \
-		--ver $(GIT_VERSION)
+		--ver $(GIT_VERSION) \
 		$(APX_RELEASE_REPO:%=--releases=%) \
 		--log CHANGELOG.md --out docs/releases/release-$(GIT_VERSION).md
 	@git add CHANGELOG.md docs/releases/release-$(GIT_VERSION).md
