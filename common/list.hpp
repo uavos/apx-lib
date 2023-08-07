@@ -86,13 +86,13 @@ public:
         _link = n;
     }
 
-    // insert 'n' after 'after' node or add to the tail if 'after' is nullptr
-    inline void insert(T *n, T *after)
+    // insert 'n' after 'after' node or at head if 'after' is nullptr
+    inline void insert_after(T *n, T *after)
     {
         if (after)
             after->insert(n);
         else
-            add(n);
+            insert(n);
     }
 
     // search and remove arg node
