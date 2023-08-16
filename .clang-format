@@ -61,8 +61,6 @@ ForEachMacros:
 IncludeCategories:
   - Regex: "^<Q.*"
     Priority: 200
-  - Regex: "^<nuttx.*"
-    Priority: -1
 IncludeIsMainRegex: "(Test)?$"
 IndentCaseLabels: false
 IndentWidth: 4
