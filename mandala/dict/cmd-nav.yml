@@ -134,7 +134,7 @@
       title: Block GPS
     - name: nomag
       title: Block magnetometer
-    - name: hsrc
+    - name: hsel
       title: Select height source
       units:
         - "baro"

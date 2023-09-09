@@ -216,12 +216,6 @@
       units: C
       ds: heavy
 
-    - name: hmsl
-      suffix: altitude
-      units: m
-      seq: skip
-      ds: normal
-
 - name: baro
   title: Static pressure
   content:

@@ -81,45 +81,6 @@
       title: Correlator output
       units: K
 
-- name: wind
-  title: Wind estimator
-  ds: minimal
-  content:
-    - name: status
-      title: Wind
-      units:
-        - "unknown"
-        - "available"
-
-    - name: speed
-      title: Wind speed
-      units: m/s
-    - name: heading
-      title: Wind heading
-      units: rad
-
-- name: eng
-  title: Engine
-  descr: Engine estimated and filtered values
-  content:
-    - name: status
-      suffix: status
-      units:
-        - "idle"
-        - "ok"
-        - "warning"
-        - "failure"
-      ds: normal
-
-    - name: rpm
-      suffix: RPM
-      units: rpm
-      ds: normal
-    - name: drpm
-      suffix: RPM rate
-      units: rpm/s
-      ds: heavy
-
 - name: ats
   title: ATS
   content:
@@ -200,85 +161,6 @@
       units: m
       fmt: f32
 
-- name: usr
-  title: User values
-  content:
-    - name: u1
-      title: User value 1
-    - name: u2
-      title: User value 2
-    - name: u3
-      title: User value 3
-    - name: u4
-      title: User value 4
-    - name: u5
-      title: User value 5
-    - name: u6
-      title: User value 6
-    - name: u7
-      title: User value 7
-    - name: u8
-      title: User value 8
-    - name: u9
-      title: User value 9
-    - name: u10
-      title: User value 10
-    - name: u11
-      title: User value 11
-    - name: u12
-      title: User value 12
-    - name: u13
-      title: User value 13
-      fmt: f32
-    - name: u14
-      title: User value 14
-      fmt: f32
-    - name: u15
-      title: User value 15
-      fmt: f32
-
-- name: usrb
-  title: User bytes
-  type: byte
-  content:
-    - name: u1
-      title: User byte 1
-    - name: u2
-      title: User byte 2
-    - name: u3
-      title: User byte 3
-    - name: u4
-      title: User byte 4
-    - name: u5
-      title: User byte 5
-    - name: u6
-      title: User byte 6
-    - name: u7
-      title: User byte 7
-    - name: u8
-      title: User byte 8
-    - name: u9
-      title: User word 9
-      type: word
-    - name: u10
-      title: User word 10
-      type: word
-    - name: u11
-      title: User word 11
-      type: word
-    - name: u12
-      title: User word 12
-      type: word
-    - name: u13
-      title: User dword 13
-      type: dword
-    - name: u14
-      title: User dword 14
-      type: dword
-    - name: u15
-      title: User dword 15
-      type: dword
-
 - name: haps
   title: HAPS
   content:
@@ -327,3 +209,178 @@
     - name: ail2
       suffix: aileron2
       units: su
+
+- name: usr
+  title: User values (float 16 bits)
+  fmt: f16
+  content:
+    - name: u1
+      title: usr 1
+    - name: u2
+      title: usr 2
+    - name: u3
+      title: usr 3
+    - name: u4
+      title: usr 4
+    - name: u5
+      title: usr 5
+    - name: u6
+      title: usr 6
+    - name: u7
+      title: usr 7
+    - name: u8
+      title: usr 8
+    - name: u9
+      title: usr 9
+    - name: u10
+      title: usr 10
+    - name: u11
+      title: usr 11
+    - name: u12
+      title: usr 12
+    - name: u13
+      title: usr 13
+    - name: u14
+      title: usr 14
+    - name: u15
+      title: usr 15
+
+- name: usrb
+  title: User bytes (8 bits)
+  type: byte
+  content:
+    - name: b1
+      title: usrb 1
+    - name: b2
+      title: usrb 2
+    - name: b3
+      title: usrb 3
+    - name: b4
+      title: usrb 4
+    - name: b5
+      title: usrb 5
+    - name: b6
+      title: usrb 6
+    - name: b7
+      title: usrb 7
+    - name: b8
+      title: usrb 8
+    - name: b9
+      title: usrb 9
+    - name: b10
+      title: usrb 10
+    - name: b11
+      title: usrb 11
+    - name: b12
+      title: usrb 12
+    - name: b13
+      title: usrb 13
+    - name: b14
+      title: usrb 14
+    - name: b15
+      title: usrb 15
+
+- name: usrw
+  title: User words (16 bits)
+  type: word
+  content:
+    - name: w1
+      title: usrw 1
+    - name: w2
+      title: usrw 2
+    - name: w3
+      title: usrw 3
+    - name: w4
+      title: usrw 4
+    - name: w5
+      title: usrw 5
+    - name: w6
+      title: usrw 6
+    - name: w7
+      title: usrw 7
+    - name: w8
+      title: usrw 8
+    - name: w9
+      title: usrw 9
+    - name: w10
+      title: usrw 10
+    - name: w11
+      title: usrw 11
+    - name: w12
+      title: usrw 12
+    - name: w13
+      title: usrw 13
+    - name: w14
+      title: usrw 14
+    - name: w15
+      title: usrw 15
+
+- name: usrf
+  title: User precision values (float 32 bits)
+  fmt: f32
+  content:
+    - name: f1
+      title: usrf 1
+    - name: f2
+      title: usrf 2
+    - name: f3
+      title: usrf 3
+    - name: f4
+      title: usrf 4
+    - name: f5
+      title: usrf 5
+    - name: f6
+      title: usrf 6
+    - name: f7
+      title: usrf 7
+    - name: f8
+      title: usrf 8
+    - name: f9
+      title: usrf 9
+    - name: f10
+      title: usrf 10
+    - name: f11
+      title: usrf 11
+    - name: f12
+      title: usrf 12
+    - name: f13
+      title: usrf 13
+    - name: f14
+      title: usrf 14
+    - name: f15
+      title: usrf 15
+
+- name: usrx
+  title: User double words (32 bits)
+  type: dword
+  content:
+    - name: x1
+      title: usrx 1
+    - name: x2
+      title: usrx 2
+    - name: x3
+      title: usrx 3
+    - name: x4
+      title: usrx 4
+    - name: x5
+      title: usrx 5
+    - name: x6
+      title: usrx 6
+    - name: x7
+      title: usrx 7
+    - name: x8
+      title: usrx 8
+    - name: x9
+      title: usrx 9
+    - name: x10
+      title: usrx 10
+    - name: x11
+      title: usrx 11
+    - name: x12
+      title: usrx 12
+    - name: x13
+      title: usrx 13
+    - name: x14
+      title: usrx 14
+    - name: x15
+      title: usrx 15

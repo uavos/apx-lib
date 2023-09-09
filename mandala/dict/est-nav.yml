@@ -19,113 +19,6 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
-- name: att
-  title: Attitude
-  ds: minimal
-  content:
-    - name: status
-      suffix: status
-      units:
-        - "unknown"
-        - "ok"
-        - "busy"
-        - "warning"
-        - "critical"
-        - "failure"
-    - name: valid
-      suffix: validity
-      units:
-        - "no"
-        - "yes"
-
-    - name: roll
-      suffix: roll
-      units: rad
-    - name: pitch
-      suffix: pitch
-      units: rad
-    - name: yaw
-      suffix: yaw
-      units: rad
-
-    - name: mag
-      title: Magnetometer
-      units:
-        - "unknown"
-        - "3D"
-        - "HDG"
-        - "blocked"
-        - "warning"
-        - "failure"
-
-    - name: rest
-      title: At rest
-      units:
-        - "no"
-        - "yes"
-
-- name: pos
-  title: Global Position
-  ds: minimal
-  content:
-    - name: status
-      suffix: status
-      units:
-        - "unknown"
-        - "ok"
-        - "busy"
-        - "warning"
-        - "critical"
-        - "failure"
-    - name: valid
-      suffix: validity
-      units:
-        - "no"
-        - "yes"
-
-    - name: lat
-      title: Latitude
-      type: dword
-      units: gps
-    - name: lon
-      title: Longitude
-      type: dword
-      units: gps
-    - name: hmsl
-      title: Altitude MSL
-      units: m
-      fmt: f32
-
-    - name: agl
-      title: Altitude above ground
-      units: m
-
-    - name: bearing
-      title: Moving direction
-      units: rad
-
-    - name: speed
-      title: Ground speed
-      units: m/s
-
-    - name: altitude
-      title: Flight altitude
-      units: m
-      fmt: f32
-
-    - name: vspeed
-      title: Vertical speed
-      units: m/s
-
-    - name: hsrc
-      title: Height source
-      units:
-        - "none"
-        - "baro"
-        - "gps"
-        - "range"
-        - "vision"
-
 - name: gyro
   title: Angular rate
   content:
@@ -183,6 +76,88 @@
     - name: "z"
       suffix: "Z"
       units: m/s^2
+
+- name: att
+  title: Attitude
+  ds: minimal
+  content:
+    - name: status
+      suffix: status
+      units:
+        - "unknown"
+        - "ok"
+        - "busy"
+        - "warning"
+        - "critical"
+        - "failure"
+    - name: valid
+      suffix: validity
+      units:
+        - "no"
+        - "yes"
+
+    - name: roll
+      suffix: roll
+      units: rad
+    - name: pitch
+      suffix: pitch
+      units: rad
+    - name: yaw
+      suffix: yaw
+      units: rad
+
+- name: pos
+  title: Global Position
+  ds: minimal
+  content:
+    - name: status
+      suffix: status
+      units:
+        - "unknown"
+        - "ok"
+        - "busy"
+        - "warning"
+        - "critical"
+        - "failure"
+    - name: valid
+      suffix: validity
+      units:
+        - "no"
+        - "yes"
+
+    - name: lat
+      title: Latitude
+      type: dword
+      units: gps
+    - name: lon
+      title: Longitude
+      type: dword
+      units: gps
+    - name: hmsl
+      title: Altitude MSL
+      units: m
+      fmt: f32
+
+    - name: bearing
+      title: Moving direction
+      units: rad
+
+    - name: speed
+      title: Ground speed
+      units: m/s
+
+    - name: altitude
+      title: Flight altitude
+      units: m
+      fmt: f32
+
+    - name: vspeed
+      title: Vertical speed
+      units: m/s
+
+    - name: agl
+      title: Altitude above ground
+      units: m
 
 - name: lpos
   title: Local position
@@ -255,6 +230,24 @@
       units: m
       fmt: f32
 
+    - name: rlat
+      title: Raw latitude
+      type: dword
+      units: gps
+      seq: skip
+      ds: normal
+    - name: rlon
+      title: Raw longitude
+      type: dword
+      units: gps
+      seq: skip
+      ds: normal
+    - name: rhmsl
+      title: Raw MSL Altitude
+      units: m
+      seq: skip
+      ds: normal
+
 - name: air
   title: Air data
   ds: minimal
@@ -303,6 +296,83 @@
         - "ok"
         - "warning"
         - "critical"
+
+- name: ahrs
+  title: AHRS state
+  ds: normal
+  content:
+    - name: rest
+      title: At rest
+      units:
+        - "no"
+        - "yes"
+    - name: mag
+      title: Magnetometer
+      units:
+        - "unknown"
+        - "3D"
+        - "HDG"
+        - "blocked"
+        - "warning"
+        - "failure"
+
+    - name: href
+      title: Height reference
+      units:
+        - "none"
+        - "baro"
+        - "gps"
+        - "range"
+        - "vision"
+    - name: herr
+      title: Height MSL error
+      units: m
+
+    - name: eph
+      title: Estimated horizontal position error
+      units: m
+    - name: epv
+      title: Estimated vertical position error
+      units: m
+
+- name: wind
+  title: Wind estimator
+  ds: minimal
+  content:
+    - name: status
+      title: Wind
+      units:
+        - "unknown"
+        - "available"
+
+    - name: speed
+      title: Wind speed
+      units: m/s
+    - name: heading
+      title: Wind heading
+      units: rad
+
+- name: eng
+  title: Engine
+  descr: Engine estimated and filtered values
+  content:
+    - name: status
+      suffix: status
+      units:
+        - "idle"
+        - "ok"
+        - "warning"
+        - "failure"
+      ds: normal
+
+    - name: rpm
+      suffix: RPM
+      units: rpm
+      ds: normal
+    - name: drpm
+      suffix: RPM rate
+      units: rpm/s
+      ds: heavy
 
 - name: wpt
   title: Mission navigation

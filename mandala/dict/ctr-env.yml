@@ -51,19 +51,6 @@
     - name: las
       suffix: Landing Assistance
 
-- name: aux
-  title: Auxillary
-  units:
-    - "off"
-    - "on"
-  ds: auto
-  content:
-    - name: horn
-      title: Horn signal
-      units:
-        - "off"
-        - "on"
-
 - name: ers
   title: Emergency Recovery
   ds: minimal
@@ -108,6 +95,93 @@
       title: Main door
     - name: drop
       title: Drop-off
+
+- name: aux
+  title: Auxillary
+  units:
+    - "off"
+    - "on"
+  ds: auto
+  content:
+    - name: horn
+      title: Horn signal
+      units:
+        - "off"
+        - "on"
+
+- name: sw
+  title: User switches
+  units:
+    - "off"
+    - "on"
+  ds: auto
+  content:
+    - name: sw1
+      title: Switch 1
+    - name: sw2
+      title: Switch 2
+    - name: sw3
+      title: Switch 3
+    - name: sw4
+      title: Switch 4
+    - name: sw5
+      title: Switch 5
+    - name: sw6
+      title: Switch 6
+    - name: sw7
+      title: Switch 7
+    - name: sw8
+      title: Switch 8
+    - name: sw9
+      title: Switch 9
+    - name: sw10
+      title: Switch 10
+    - name: sw11
+      title: Switch 11
+    - name: sw12
+      title: Switch 12
+    - name: sw13
+      title: Switch 13
+    - name: sw14
+      title: Switch 14
+    - name: sw15
+      title: Switch 15
+
+- name: tune
+  title: User tuning
+  units: su
+  ds: auto
+  content:
+    - name: t1
+      title: Tuning 1
+    - name: t2
+      title: Tuning 2
+    - name: t3
+      title: Tuning 3
+    - name: t4
+      title: Tuning 4
+    - name: t5
+      title: Tuning 5
+    - name: t6
+      title: Tuning 6
+    - name: t7
+      title: Tuning 7
+    - name: t8
+      title: Tuning 8
+    - name: t9
+      title: Tuning 9
+    - name: t10
+      title: Tuning 10
+    - name: t11
+      title: Tuning 11
+    - name: t12
+      title: Tuning 12
+    - name: t13
+      title: Tuning 13
+    - name: t14
+      title: Tuning 14
+    - name: t15
+      title: Tuning 15
 
 - name: cam
   title: Camera
@@ -186,79 +260,3 @@
         - "shoot"
         - "shooting"
         - "reload"
-
-- name: usr
-  title: User controls
-  content:
-    - name: u1
-      title: User ctr 1
-    - name: u2
-      title: User ctr 2
-    - name: u3
-      title: User ctr 3
-    - name: u4
-      title: User ctr 4
-    - name: u5
-      title: User ctr 5
-    - name: u6
-      title: User ctr 6
-    - name: u7
-      title: User ctr 7
-    - name: u8
-      title: User ctr 8
-
-    - name: ub1
-      type: byte
-      title: User ctr byte 1
-    - name: ub2
-      type: byte
-      title: User ctr byte 2
-    - name: ub3
-      type: byte
-      title: User ctr byte 3
-    - name: ub4
-      type: byte
-      title: User ctr byte 4
-    - name: ub5
-      type: byte
-      title: User ctr byte 5
-    - name: ub6
-      type: byte
-      title: User ctr byte 6
-    - name: ub7
-      type: byte
-      title: User ctr byte 7
-
-- name: scr
-  title: Script controls
-  content:
-    - name: s1
-      title: Scr 1
-    - name: s2
-      title: Scr 2
-    - name: s3
-      title: Scr 3
-    - name: s4
-      title: Scr 4
-    - name: s5
-      title: Scr 5
-    - name: s6
-      title: Scr 6
-    - name: s7
-      title: Scr 7
-    - name: s8
-      title: Scr 8
-    - name: s9
-      title: Scr 9
-    - name: s10
-      title: Scr 10
-    - name: s11
-      title: Scr 11
-    - name: s12
-      title: Scr 12
-    - name: s13
-      title: Scr 13
-    - name: s14
-      title: Scr 14
-    - name: s15
-      title: Scr 15
