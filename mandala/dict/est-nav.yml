@@ -230,24 +230,6 @@
       units: m
       fmt: f32
 
-    - name: rlat
-      title: Raw latitude
-      type: dword
-      units: gps
-      seq: skip
-      ds: normal
-    - name: rlon
-      title: Raw longitude
-      type: dword
-      units: gps
-      seq: skip
-      ds: normal
-    - name: rhmsl
-      title: Raw MSL Altitude
-      units: m
-      seq: skip
-      ds: normal
-
 - name: air
   title: Air data
   ds: minimal
@@ -299,13 +281,14 @@
 
 - name: ahrs
   title: AHRS state
-  ds: normal
+  ds: minimal
   content:
     - name: rest
       title: At rest
       units:
         - "no"
         - "yes"
+
     - name: mag
       title: Magnetometer
       units:
@@ -324,16 +307,34 @@
         - "gps"
         - "range"
         - "vision"
+
     - name: herr
       title: Height MSL error
       units: m
+      ds: minimal
+      seq: skip
 
     - name: eph
       title: Estimated horizontal position error
       units: m
+      ds: normal
+      seq: skip
     - name: epv
       title: Estimated vertical position error
       units: m
+      ds: normal
+      seq: skip
+
+    - name: dn
+      title: Delta North
+      units: m
+      ds: normal
+      seq: rare
+    - name: de
+      title: Delta East
+      units: m
+      ds: normal
+      seq: rare
 
 - name: wind
   title: Wind estimator

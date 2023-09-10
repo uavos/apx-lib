@@ -139,6 +139,18 @@
       fmt: u8_001
       seq: rare
 
+    - name: bias
+      suffix: bias
+      units: u
+      fmt: u8_001
+      seq: rare
+      ds: normal
+    - name: bval
+      suffix: bias validity
+      units: "%"
+      seq: rare
+      ds: normal
+
 - name: gps
   title: GPS
   content:
