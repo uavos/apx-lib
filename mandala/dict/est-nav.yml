@@ -308,12 +308,6 @@
         - "range"
         - "vision"
 
-    - name: herr
-      title: Height MSL error
-      units: m
-      ds: minimal
-      seq: skip
-
     - name: eph
       title: Estimated horizontal position error
       units: m
@@ -335,6 +329,11 @@
       units: m
       ds: normal
       seq: rare
+    - name: dh
+      title: Delta Height
+      units: m
+      ds: minimal
+      seq: skip
 
 - name: wind
   title: Wind estimator
