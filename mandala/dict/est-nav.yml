@@ -280,7 +280,7 @@
         - "critical"
 
 - name: ahrs
-  title: AHRS state
+  title: AHRS status
   ds: minimal
   content:
     - name: rest
