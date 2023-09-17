@@ -19,6 +19,9 @@ version:
 branch: 
 	@echo "Current branch: $(GIT_BRANCH)"
 
+prev: version
+	@echo "Previous release: $(GIT_PREV)"
+
 release: release-tags release-push
 
 release-tags:
