@@ -23,7 +23,7 @@ release: release-tags release-push
 
 release-tags:
 	@echo "Requesting release..."
-#	@if ! git diff-index --quiet HEAD ; then echo "Commit changes first"; exit 1; fi
+	@if ! git diff-index --quiet HEAD ; then echo "Commit changes first"; exit 1; fi
 	@git fetch origin $(GIT_REF_RELEASE)
 	@if [[ $(shell git rev-list HEAD ^origin/$(GIT_REF_RELEASE) --count) -eq "1" ]]; then echo "** NO CHANGES **" && exit 1; fi
 	
@@ -34,8 +34,8 @@ release-tags:
 		$(APX_RELEASE_REPO:%=--releases=%) \
 		--log CHANGELOG.md --out docs/releases/release-$(GIT_VERSION).md
 	@git add CHANGELOG.md docs/releases/release-$(GIT_VERSION).md
-#	@git commit -am "Release $(GIT_VERSION)"
-#	@git tag release-$(GIT_VERSION)
+	@git commit -am "Release $(GIT_VERSION)"
+	@git tag release-$(GIT_VERSION)
 	
 release-push:
 	@echo "Release push..."
