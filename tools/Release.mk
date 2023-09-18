@@ -9,7 +9,8 @@ GIT_VERSION_CMD = $(current_dir)/git_version.sh
 GIT_VERSION = $(shell $(GIT_VERSION_CMD))
 GIT_BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 
-GIT_PREV = $(shell git describe --abbrev=0 --tags $(shell git rev-list --tags='release-*' --skip=1 --max-count=1))
+GIT_REL_PREV = $(shell git describe --abbrev=0 --tags $(shell git rev-list --tags='release-*' --skip=1 --max-count=1))
+GIT_REL_LAST = $(shell git describe --abbrev=0 --tags $(shell git rev-list --tags='release-*' --max-count=1))
 
 APX_PROJECT_TITLE := $(if $(APX_PROJECT_TITLE),$(APX_PROJECT_TITLE),"APX Software")
 
@@ -20,7 +21,8 @@ branch:
 	@echo "Current branch: $(GIT_BRANCH)"
 
 prev: version
-	@echo "Previous release: $(GIT_PREV)"
+	@echo "Previous release: $(GIT_REL_PREV)"
+	@echo "Latest release: $(GIT_REL_LAST)"
 
 release: release-tags release-push
 
@@ -48,9 +50,23 @@ release-push:
 	git push origin $(GIT_REF_RELEASE) -f
 
 release-rollback:
-	@echo "Rollback release to '$(GIT_PREV)'"
+	@echo "Rollback release to '$(GIT_REL_PREV)'"
 	@if ! git diff-index --quiet HEAD ; then echo "Commit changes first"; exit 1; fi
 	@git checkout release
-	@git reset --hard "$(GIT_PREV)"
+	@git reset --hard "$(GIT_REL_PREV)"
 	@git push origin release -f
 	@git checkout $(GIT_BRANCH)
+
+release-redo:
+	@echo "Redo release to '$(GIT_REL_LAST)'"
+	@if ! git diff-index --quiet HEAD ; then echo "Commit changes first"; exit 1; fi
+	# move release-XXX tag to current commit
+	@git push -f origin :refs/tags/$(GIT_REL_LAST)
+	@git tag -f "$(GIT_REL_LAST)"
+	# move release branch to current commit
+	@git branch -f $(GIT_REF_RELEASE)
+	# push changes
+	@git push origin $(GIT_BRANCH)
+	@git push origin $(GIT_BRANCH) --tags
+	@git push origin $(GIT_REF_RELEASE) -f
+
