@@ -112,6 +112,10 @@ public:
         restart();
     }
 
+    // allow buffer sharing
+    auto buf() { return _buf; }
+    auto buf_size() const { return sizeof(_buf); }
+
 private:
     static constexpr size_t overhead()
     {
