@@ -103,6 +103,10 @@ public:
         return _buf;
     }
 
+    // allow buffer sharing
+    auto buf() { return _buf; }
+    auto buf_size() const { return sizeof(_buf); }
+
 private:
     // any packet will always fit in buffer
     // there's no overflow checks for performance reasons
