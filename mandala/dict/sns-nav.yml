@@ -450,52 +450,30 @@
   title: Visual navigation
   descr: Used for global position estimation and dead-reckoning.
   content:
-    - name: vx
-      title: Visual velocity X
-      units: m/s
-    - name: vy
-      title: Visual velocity Y
-      units: m/s
-    - name: vz
-      title: Visual velocity Z
-      units: m/s
+    - name: src
+      suffix: source
+      units:
+        - unknown
+        - local
+        - primary
+        - secondary
+        - failsafe
+        - auxillary
 
-    - name: dx
-      title: Visual delta X
-      units: m
-    - name: dy
-      title: Visual delta Y
-      units: m
-    - name: dz
-      title: Visual delta Z
-      units: m
+    - name: cnt
+      suffix: devices
+      type: byte
+      fmt: u4
 
-    - name: roll
-      title: Visual roll
-      units: rad
-    - name: pitch
-      title: Visual pitch
-      units: rad
-    - name: yaw
-      title: Visual yaw
-      units: rad
-
-    - name: lat
-      title: Visual latitude
-      type: dword
-      units: gps
-    - name: lon
-      title: Visual longitude
-      type: dword
-      units: gps
-
-    - name: hmsl
-      title: Visual altitude MSL
-      units: m
-
-    - name: altitude
-      title: Visual altitude
-      units: m
+    - name: status
+      title: Baro
+      units:
+        - "unknown"
+        - "available"
+        - "warning"
+        - "critical"
+        - "failure"
+      ds: minimal
 
 - name: tcas
   title: Collision avoidance

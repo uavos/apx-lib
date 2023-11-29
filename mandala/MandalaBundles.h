@@ -93,6 +93,13 @@ struct gps_yaw_s
     float yaw_offset;
 };
 
+struct vps_s // Visual Positioning System
+{
+    float x; // [m] Local X position
+    float y; // [m] Local Y position
+    float z; // [m] Local Z position
+};
+
 struct baro_s
 {
     float mbar;
