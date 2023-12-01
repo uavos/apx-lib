@@ -139,7 +139,7 @@ bool udp_client::write(const void *buf, size_t size)
     if (!is_connected()) {
         return false;
     }
-    if (::sendto(_fd, buf, size, MSG_DONTWAIT, (sockaddr *) &_dest_addr, sizeof(_dest_addr)) == (ssize_t) size)
+    if (::sendto(_fd, buf, size, 0, (sockaddr *) &_dest_addr, sizeof(_dest_addr)) == (ssize_t) size)
         return true;
 
     if (!_silent) {
