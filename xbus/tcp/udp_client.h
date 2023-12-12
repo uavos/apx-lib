@@ -21,6 +21,7 @@
  */
 #pragma once
 
+#include <atomic>
 #include <inttypes.h>
 #include <netinet/in.h>
 #include <termios.h>
@@ -54,7 +55,7 @@ public:
     bool dataAvailable();
 
 private:
-    int _fd{-1};
+    std::atomic<int> _fd{-1};
 
 protected:
     const char *_name;

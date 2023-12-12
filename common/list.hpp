@@ -26,7 +26,7 @@
 
 namespace apx {
 
-template<class T, class Tdata = T *>
+template<class T>
 class list
 {
 public:
@@ -49,14 +49,11 @@ public:
         inline Iterator &operator++()
         {
             if (node)
-                node = node->list<T, Tdata>::link();
+                node = node->list<T>::link();
             return *this;
         }
     };
-    inline auto begin() const
-    {
-        return Iterator(link());
-    }
+    inline auto begin() const { return Iterator(link()); }
     inline auto end() const { return Iterator(nullptr); }
 
     // append arg node to the tail
@@ -69,7 +66,7 @@ public:
 
             T *next = i->link();
             if (!next) {
-                n->list<T, Tdata>::_link = nullptr;
+                n->list<T>::_link = nullptr;
                 i->_link = n;
                 return;
             }
@@ -102,8 +99,8 @@ public:
         for (auto i = this; i;) {
             T *next = i->link();
             if (next == n) {
-                i->_link = (T *) n->list<T, Tdata>::link();
-                n->list<T, Tdata>::_link = nullptr;
+                i->_link = (T *) n->list<T>::link();
+                n->list<T>::_link = nullptr;
                 return;
             }
             i = next;
@@ -133,7 +130,7 @@ public:
     }
 
 private:
-    Tdata _link{};
+    T *_link{};
 };
 
 } // namespace apx

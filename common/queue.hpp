@@ -25,11 +25,11 @@
 
 namespace apx {
 
-template<class T, class Tdata = T *>
-using queue_item = list<T, Tdata>;
+template<class T>
+using queue_item = list<T>;
 
-template<class T, class Tdata = T *>
-class queue : private list<T, Tdata>
+template<class T>
+class queue : private list<T>
 {
 public:
     inline T *front() const { return link(); }
@@ -141,7 +141,7 @@ public:
     using list<T>::end;
 
 private:
-    Tdata _back{};
+    T *_back{};
 
     using list<T>::link;
 };
