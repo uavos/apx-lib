@@ -466,7 +466,7 @@
       fmt: u4
 
     - name: status
-      title: Baro
+      title: VPS
       units:
         - "unknown"
         - "available"
@@ -474,6 +474,26 @@
         - "critical"
         - "failure"
       ds: minimal
+
+    - name: x
+      suffix: position X
+      units: m
+    - name: y
+      suffix: position Y
+      units: m
+    - name: z
+      suffix: position Z
+      units: m
+
+    - name: vx
+      suffix: velocity X
+      units: m/s
+    - name: vy
+      suffix: velocity Y
+      units: m/s
+    - name: vz
+      suffix: velocity Z
+      units: m/s
 
 - name: tcas
   title: Collision avoidance
