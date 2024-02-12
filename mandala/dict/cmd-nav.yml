@@ -90,6 +90,7 @@
         - track
         - loiter
         - hover
+        - runway
 
     - name: spd
       title: Airspeed control
