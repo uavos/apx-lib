@@ -88,9 +88,9 @@
         - hdg
         - direct
         - track
+        - runway
         - loiter
         - hover
-        - runway
 
     - name: spd
       title: Airspeed control
