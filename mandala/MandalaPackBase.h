@@ -211,7 +211,7 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
         return fmt_u16_10;
 
     case units_rpmps:
-        return fmt_s8_10;
+        return fmt_f16;
 
     case units_s:
         break;
