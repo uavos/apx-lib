@@ -381,8 +381,10 @@
     - name: status
       title: Maneuver status
       units:
-        - "ongoing"
-        - "ok"
+        - "unknown"
+        - "level"
+        - "left"
+        - "right"
 
     - name: eta
       title: Estimated time of arrival
