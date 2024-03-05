@@ -77,6 +77,11 @@
       type: word
       units: km
 
+    - name: ltt
+      title: Last Transmission Timeout. Time since last uplink transmission.
+      type: word
+      units: s
+
     - name: corr
       title: Correlator output
       units: K
