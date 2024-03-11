@@ -98,6 +98,10 @@ struct vps_s // Visual Positioning System
     float x; // [m] Local X position
     float y; // [m] Local Y position
     float z; // [m] Local Z position
+
+    float vx; // [m/s] Local X velocity
+    float vy; // [m/s] Local Y velocity
+    float vz; // [m/s] Local Z velocity
 };
 
 struct baro_s
