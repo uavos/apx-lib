@@ -192,6 +192,7 @@
     - name: vspeed
       title: Cmd vspeed
       units: m/s
+
     - name: tecs
       title: TECS weighting factor
       units: u
@@ -199,6 +200,13 @@
     - name: radius
       title: Loiter radius
       units: m
+
+    - name: vx
+      title: Cmd velocity x
+      units: m/s
+    - name: vy
+      title: Cmd velocity y
+      units: m/s
 
 - name: eng
   title: Engine regulators

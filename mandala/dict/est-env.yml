@@ -55,6 +55,11 @@
         Number of milliseconds passed since system powered on. Value updated by `telemetry` module.
         Used for telemetry purposes only.
 
+    - name: ltt
+      title: Last Transmission Timeout. Time since last GCS communication.
+      type: word
+      units: s
+
     - name: fuel
       title: Fuel capacity
       type: byte
