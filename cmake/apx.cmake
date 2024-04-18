@@ -35,10 +35,6 @@ define_property(
     FULL_DOCS "List of YAML files with metadata of all used APX modules"
 )
 
-if(APPLE)
-    set(Python3_ROOT_DIR "/usr/bin")
-endif()
-
 find_package(
     Python3
     COMPONENTS Interpreter
