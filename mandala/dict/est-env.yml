@@ -251,8 +251,10 @@
       title: usr 15
 
 - name: usrb
-  title: User bytes (8 bits)
-  type: byte
+  title: User bit
+  units:
+    - "off"
+    - "on"
   content:
     - name: b1
       title: usrb 1
@@ -284,6 +286,41 @@
       title: usrb 14
     - name: b15
       title: usrb 15
+
+- name: usrc
+  title: User bytes (8 bits)
+  type: byte
+  content:
+    - name: c1
+      title: usrc 1
+    - name: c2
+      title: usrc 2
+    - name: c3
+      title: usrc 3
+    - name: c4
+      title: usrc 4
+    - name: c5
+      title: usrc 5
+    - name: c6
+      title: usrc 6
+    - name: c7
+      title: usrc 7
+    - name: c8
+      title: usrc 8
+    - name: c9
+      title: usrc 9
+    - name: c10
+      title: usrc 10
+    - name: c11
+      title: usrc 11
+    - name: c12
+      title: usrc 12
+    - name: c13
+      title: usrc 13
+    - name: c14
+      title: usrc 14
+    - name: c15
+      title: usrc 15
 
 - name: usrw
   title: User words (16 bits)
