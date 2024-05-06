@@ -95,13 +95,11 @@ struct gps_yaw_s
 
 struct vps_s // Visual Positioning System
 {
-    float x; // [m] Local X position
-    float y; // [m] Local Y position
-    float z; // [m] Local Z position
+    float pos[3]; // [m] Local position
+    float vel[3]; // [m/s] Local velocity
 
-    float vx; // [m/s] Local X velocity
-    float vy; // [m/s] Local Y velocity
-    float vz; // [m/s] Local Z velocity
+    float pos_var[3]; // [m^2] Position variance
+    float vel_var[3]; // [m^2/s^2] Velocity variance
 };
 
 struct baro_s
