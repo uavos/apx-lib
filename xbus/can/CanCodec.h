@@ -82,16 +82,16 @@ protected:
      */
     virtual bool send_message(const xcan_msg_s &msg) = 0;
 
+    /**
+     * @brief Prepare and send addressing packet.
+     */
+    virtual void sendAddressing();
+
     virtual void lock_push(bool locked) = 0;
 
     virtual bool accept_filter(const extid_s &extid) = 0;
 
 private:
-    /**
-     * @brief Prepare and send addressing packet.
-     */
-    void sendAddressing();
-
     xcan_msg_s txmsg;
 
     size_t check_crc(void *dest, size_t sz);
