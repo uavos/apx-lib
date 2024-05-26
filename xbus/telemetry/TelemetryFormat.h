@@ -126,25 +126,29 @@ namespace xpdr {
 
 static constexpr const uint8_t version = 1; // dataset version (hdr.feed_hash)
 
-static constexpr const mandala::fmt_s dataset[] = {
+struct field_s
+{
+    constexpr field_s(mandala::uid_t uid, mandala::fmt_e fmt)
+        : uid{uid}
+        , fmt{fmt}
+    {}
+    constexpr field_s(mandala::uid_t uid)
+        : uid{uid}
+        , fmt{mandala::fmt(uid).fmt}
+    {}
 
-    mandala::fmt(mandala::est::nav::pos::lat::uid),
-    mandala::fmt(mandala::est::nav::pos::lon::uid),
-    mandala::fmt(mandala::est::nav::pos::hmsl::uid),
-    mandala::fmt(mandala::est::nav::pos::speed::uid),
-    {
-        .uid = mandala::est::nav::pos::bearing::uid,
-        .type_id = mandala::type_real,
-        .fmt = mandala::fmt_s8_rad,
-    },
-    mandala::fmt(mandala::est::nav::pos::vspeed::uid),
-    mandala::fmt(mandala::cmd::nav::proc::mode::uid),
-    {
-        .uid = mandala::est::nav::att::yaw::uid,
-        .type_id = mandala::type_real,
-        .fmt = mandala::fmt_s8_rad,
-    },
+    mandala::uid_t uid;
+    mandala::fmt_e fmt : 8;
+};
 
+static constexpr const field_s dataset[] = {
+    {mandala::est::nav::pos::lat::uid},
+    {mandala::est::nav::pos::lon::uid},
+    {mandala::est::nav::pos::hmsl::uid},
+    {mandala::est::nav::pos::speed::uid},
+    {mandala::est::nav::pos::bearing::uid, mandala::fmt_s8_rad},
+    {mandala::est::nav::pos::vspeed::uid, mandala::fmt_s8},
+    {mandala::cmd::nav::proc::mode::uid},
 };
 static constexpr const size_t dataset_size = sizeof(dataset) / sizeof(dataset[0]);
 } // namespace xpdr

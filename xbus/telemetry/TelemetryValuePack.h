@@ -111,8 +111,6 @@ template<typename T>
 size_t pack_value(const T &v, void *dest)
 {
     T &v0 = *static_cast<T *>(dest);
-    if (v == v0)
-        return 0;
     v0 = v;
     return sizeof(T);
 }
@@ -273,6 +271,7 @@ size_t pack_value(const mandala::raw_t &raw, mandala::type_id_e type, void *dest
         return pack_value(v, dest);
     }
     }
+    return 0;
 }
 
 } // namespace telemetry

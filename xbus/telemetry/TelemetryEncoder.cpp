@@ -107,9 +107,9 @@ bool TelemetryEncoder::add(const field_s &field)
 
     // resync xpdr slots index hash
     for (size_t i = 0; i < xpdr::dataset_size; ++i) {
-        auto uid = xpdr::dataset[i].uid;
+        auto ds_uid = xpdr::dataset[i].uid;
         for (size_t j = 0; j < _slots_cnt; ++j) {
-            if (_slots.fields[j].pid.uid == uid) {
+            if (_slots.fields[j].pid.uid == ds_uid) {
                 // XPDR data slot found
                 _xpdr_slot_idx[i] = j;
                 break;
@@ -264,7 +264,7 @@ bool TelemetryEncoder::encode_xpdr(XbusStreamWriter &stream, uint64_t timestamp_
 
         if (index >= _slots_cnt)
             continue;
-        auto const fmt = _slots.fields[index].fmt;
+        auto const fmt = xpdr::dataset[i].fmt;
         auto const &value = _slots.value[index];
         auto const type = _slots.flags[index].type;
         mandala::raw_t buf;
@@ -352,8 +352,10 @@ void TelemetryEncoder::encode_values(XbusStreamWriter &stream, uint8_t pseq)
 
             auto &value = _slots.value[index];
             auto &buf = _slots.packed[index];
-            size_t sz = xbus::telemetry::pack_value(value, flags.type, &buf, f.fmt);
-            if (sz) {
+            mandala::raw_t raw;
+            size_t sz = xbus::telemetry::pack_value(value, flags.type, &raw, f.fmt);
+            if (buf != raw) {
+                buf = raw;
                 if (code_zero >= 2) {
                     // two or more consequtive zero codes
                     stream.reset(stream.pos() - code_zero);

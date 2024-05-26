@@ -26,7 +26,7 @@
 namespace mandala {
 
 // telemetry stream element format descriptor
-enum fmt_e { // 5 bits
+enum fmt_e : uint8_t { // 5 bits
     fmt_none,
 
     // raw
