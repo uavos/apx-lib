@@ -53,6 +53,7 @@ enum fmt_e { // 5 bits
     fmt_u8_u,     // units 0..1
     fmt_s8_u,     // signed units -1..+1
     fmt_u16_10,   // [rpm] unsigned/10
+    fmt_s8_rad,   // radians -PI..+PI as one byte (used by XPDR)
 };
 
 // values are send on change only
@@ -119,6 +120,8 @@ constexpr const char *fmt_string(fmt_e fmt)
         return "s8_u";
     case fmt_u16_10:
         return "u16_10";
+    case fmt_s8_rad:
+        return "s8_rad";
     }
     return "unknown";
 }

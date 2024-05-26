@@ -26,26 +26,32 @@
 
 using namespace xbus::telemetry;
 
-bool TelemetryDecoder::decode(uint8_t pseq, XbusStreamReader &stream)
+bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
 {
     if (stream.available() < xbus::telemetry::hdr_s::psize())
         return false;
+
+    bool is_xpdr = pid.uid == mandala::cmd::env::telemetry::xpdr::uid;
 
     xbus::telemetry::hdr_s hdr;
     hdr.read(&stream);
 
     // check hash feed
-    uint8_t &h = _hash.byte[pseq & 3];
-    if (h != hdr.feed_hash) {
-        if (_hash_valid > 0 || h)
-            reset();
-        h = hdr.feed_hash;
-        _hash_valid++;
-    } else if (!_is_hash_valid())
-        _hash_valid++;
+    if (!is_xpdr) {
+        uint8_t &h = _hash.byte[pid.seq & 3];
+        if (h != hdr.feed_hash) {
+            if (_hash_valid > 0 || h)
+                reset();
+            h = hdr.feed_hash;
+            _hash_valid++;
+        } else if (!_is_hash_valid())
+            _hash_valid++;
 
-    if (_hash_valid > 4)
-        reset(); // this should never happen
+        if (_hash_valid > 4)
+            reset(); // this should never happen
+    } else {
+        _valid = hdr.feed_hash == xpdr::version;
+    }
 
     // estimate timestamp
     uint32_t dts = (uint16_t) (hdr.ts - _ts);
@@ -58,25 +64,29 @@ bool TelemetryDecoder::decode(uint8_t pseq, XbusStreamReader &stream)
     _timestamp_ms += _dt_ms;
 
     // validity check
-    if (_is_hash_valid()) {
-        if (_slots_cnt) {
-            // fmt looks consistent
-            _valid = true;
+    if (!is_xpdr) {
+        if (_is_hash_valid()) {
+            if (_slots_cnt) {
+                // fmt looks consistent
+                _valid = true;
 
-            // get values from packed stream
-            // seq bits are used to filter rare IDs only
-            return decode_values(stream, pseq);
+                // get values from packed stream
+                // seq bits are used to filter rare IDs only
+                return decode_values(stream, pid.seq);
+            }
+            // empty dataset stream
+            if (stream.available() == 1 && stream.read<uint8_t>() == 0) {
+                _valid = true;
+                return false;
+            }
         }
-        // empty dataset stream
-        if (stream.available() == 1 && stream.read<uint8_t>() == 0) {
-            _valid = true;
-            return false;
-        }
+        // not yet valid stream
+        _valid = false;
+        return false;
     }
 
-    // not yet valid stream
-    _valid = false;
-    return false;
+    // XPDR stream
+    return _valid && decode_xpdr(stream);
 }
 
 void TelemetryDecoder::reset(bool reset_hash)
@@ -236,14 +246,13 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream, uint8_t pseq)
             cnt--;
 
             auto &value = _slots.value[index];
-            //if (value != v) {
+
             // always update
             value = v;
             auto &flags = _slots.flags[index];
             flags.type = mandala::type_byte;
             flags.upd = true;
             upd = true;
-            //}
         }
     }
 
@@ -252,6 +261,28 @@ bool TelemetryDecoder::decode_values(XbusStreamReader &stream, uint8_t pseq)
         return false;
     }
     return upd;
+}
+
+bool TelemetryDecoder::decode_xpdr(XbusStreamReader &stream)
+{
+    if (stream.available() == 0)
+        return false;
+
+    // unpack XPDR dataset
+    size_t index = 0;
+    for (const auto &ds : xpdr::dataset) {
+        auto &value = _xpdr_slots.value[index];
+        auto &type = _xpdr_slots.value_type[index];
+        size_t sz = unpack_value(stream.ptr(), &value, &type, ds.fmt, stream.available());
+
+        if (!sz || sz > stream.available())
+            return false;
+
+        // continue to the next slot
+        index++;
+        stream.reset(stream.pos() + sz);
+    }
+    return true;
 }
 
 bool TelemetryDecoder::decode_format(XbusStreamReader &stream, xbus::telemetry::format_resp_hdr_s *hdr)

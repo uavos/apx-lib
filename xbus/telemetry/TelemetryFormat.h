@@ -28,6 +28,7 @@
 #include <cmath>
 
 #include <MandalaMetaTree.h>
+#include <MandalaPack.h>
 
 namespace xbus {
 namespace telemetry {
@@ -35,7 +36,7 @@ namespace telemetry {
 // constants
 static constexpr const uint8_t fmt_version = 2;    // increase this number for GCS to be incompatible with AP
 static constexpr const size_t fmt_block_size = 64; // encoder will reply blocks (size bytes) of the fields array with this default
-static constexpr const size_t slots_size{240};     // max number of fields in the stream
+static constexpr const size_t slots_size{240};     // max number of fields in the stream (<255)
 
 // telemetry field descriptor
 #pragma pack(1)
@@ -121,53 +122,32 @@ struct format_resp_hdr_s
 };
 
 // Vehicle transponder data
-struct xpdr_s
-{
-    static constexpr const uint8_t current_version = 1; // protocol version
+namespace xpdr {
 
-    uint8_t version;
-    float lat;
-    float lon;
-    float hmsl;
-    float speed;
-    float vspeed;
-    float bearing;
-    uint8_t mode;
+static constexpr const uint8_t version = 1; // dataset version (hdr.feed_hash)
 
-    typedef int16_t hmsl_t;
-    typedef uint16_t speed_t;
-    typedef int16_t bearing_t;
-    typedef int8_t vspeed_t;
+static constexpr const mandala::fmt_s dataset[] = {
 
-    static inline uint16_t psize()
+    mandala::fmt(mandala::est::nav::pos::lat::uid),
+    mandala::fmt(mandala::est::nav::pos::lon::uid),
+    mandala::fmt(mandala::est::nav::pos::hmsl::uid),
+    mandala::fmt(mandala::est::nav::pos::speed::uid),
     {
-        return 1 + sizeof(float) * 2 + sizeof(hmsl_t) + sizeof(speed_t) + sizeof(bearing_t)
-               + 1 + 1;
-    }
+        .uid = mandala::est::nav::pos::bearing::uid,
+        .type_id = mandala::type_real,
+        .fmt = mandala::fmt_s8_rad,
+    },
+    mandala::fmt(mandala::est::nav::pos::vspeed::uid),
+    mandala::fmt(mandala::cmd::nav::proc::mode::uid),
+    {
+        .uid = mandala::est::nav::att::yaw::uid,
+        .type_id = mandala::type_real,
+        .fmt = mandala::fmt_s8_rad,
+    },
 
-    inline void read(XbusStreamReader *s)
-    {
-        *s >> version;
-        *s >> lat;
-        *s >> lon;
-        hmsl = s->read<hmsl_t, float>();
-        speed = s->read<speed_t, float>() / 10.0f;
-        vspeed = s->read<vspeed_t, float>() / 2.f;
-        bearing = s->read<bearing_t, float>() / (32767.0f / M_PI);
-        *s >> mode;
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        *s << version;
-        *s << lat;
-        *s << lon;
-        s->write<hmsl_t, float>(hmsl);
-        s->write<speed_t, float>(speed * 10.0f);
-        s->write<vspeed_t, float>(vspeed * 2.f);
-        s->write<bearing_t, float>(bearing * (32767.0f / M_PI));
-        *s << mode;
-    }
 };
+static constexpr const size_t dataset_size = sizeof(dataset) / sizeof(dataset[0]);
+} // namespace xpdr
 
 } // namespace telemetry
 } // namespace xbus

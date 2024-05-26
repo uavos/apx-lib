@@ -105,6 +105,18 @@ bool TelemetryEncoder::add(const field_s &field)
             break;
     }
 
+    // resync xpdr slots index hash
+    for (size_t i = 0; i < xpdr::dataset_size; ++i) {
+        auto uid = xpdr::dataset[i].uid;
+        for (size_t j = 0; j < _slots_cnt; ++j) {
+            if (_slots.fields[j].pid.uid == uid) {
+                // XPDR data slot found
+                _xpdr_slot_idx[i] = j;
+                break;
+            }
+        }
+    }
+
     return true;
 }
 void TelemetryEncoder::_insert(size_t index, const xbus::telemetry::field_s &field)
@@ -132,9 +144,11 @@ void TelemetryEncoder::clear()
     _slots_cnt = _slots_upd_cnt = _sync_cnt = 0;
     _slots = {};
     _update_feeds();
+    memset(_xpdr_slot_idx, 0xFF, sizeof(_xpdr_slot_idx));
 }
 ssize_t TelemetryEncoder::slot_lookup(mandala::uid_t uid)
 {
+    // TODO implement binary search like mandala::fmt_lookup
     for (ssize_t i = 0; i < _slots_cnt; ++i) {
         if (_slots.fields[i].pid.uid == uid)
             return i;
@@ -229,12 +243,38 @@ bool TelemetryEncoder::encode(XbusStreamWriter &stream, uint8_t pseq, uint64_t t
 {
     hdr_s hdr;
     hdr.ts = timestamp_ms / hdr.ts2ms;
-
     hdr.feed_hash = _hash.byte[pseq & 3];
-
     hdr.write(&stream);
 
     encode_values(stream, pseq);
+
+    return true;
+}
+
+bool TelemetryEncoder::encode_xpdr(XbusStreamWriter &stream, uint64_t timestamp_ms)
+{
+    hdr_s hdr;
+    hdr.ts = timestamp_ms / hdr.ts2ms;
+    hdr.feed_hash = xpdr::version;
+    hdr.write(&stream);
+
+    // pack XPDR dataset
+    for (size_t i = 0; i < xpdr::dataset_size; ++i) {
+        size_t index = _xpdr_slot_idx[i];
+
+        if (index >= _slots_cnt)
+            continue;
+        auto const fmt = _slots.fields[index].fmt;
+        auto const &value = _slots.value[index];
+        auto const type = _slots.flags[index].type;
+        mandala::raw_t buf;
+        size_t sz = xbus::telemetry::pack_value(value, type, &buf, fmt);
+
+        if (!sz)
+            return false;
+
+        stream.write(&buf, sz);
+    }
 
     return true;
 }

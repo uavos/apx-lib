@@ -72,7 +72,7 @@ static float float_from_f16(const uint16_t &v)
             do {
                 e++;
                 hm <<= 1;
-            } while ((hm & 0x0400u) == 0);                              // Shift until leading bit overflows into exponent bit
+            } while ((hm & 0x0400u) == 0); // Shift until leading bit overflows into exponent bit
             xs = static_cast<uint32_t>(hs) << 16;                       // Sign bit
             xes = (he >> 10) - 15 + 127 - e;                            // Exponent unbias the halfp, then bias the single
             xe = static_cast<uint32_t>(xes) << 23;                      // Exponent
@@ -96,13 +96,15 @@ static float float_from_f16(const uint16_t &v)
     return isnan(f) ? 0.f : f;
 }
 
-static float float_from_rad(const int16_t &v)
+template<typename T>
+static float float_from_rad(const T &v)
 {
-    return v / (32767.f / (float) M_PI);
+    return v / ((float) std::numeric_limits<T>::max() / (float) M_PI);
 }
-static float float_from_rad2(const int16_t &v)
+template<typename T>
+static float float_from_rad2(const T &v)
 {
-    return v / (32767.f / ((float) M_PI / 2.f));
+    return v / ((float) std::numeric_limits<T>::max() / ((float) M_PI / 2.f));
 }
 
 // unpack method
@@ -110,8 +112,10 @@ static float float_from_rad2(const int16_t &v)
 size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e fmt, size_t size)
 {
     switch (fmt) {
-    default:
-        break;
+    case fmt_none:
+    case fmt_bit:
+        return 0;
+
     case fmt_f32:
         *type = mandala::type_real;
         return unpack_value<mandala::real_t>(src, dest, size);
@@ -161,16 +165,22 @@ size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e
 
     case fmt_s16_rad:
         *type = mandala::type_real;
-        if (!unpack_value<mandala::word_t>(src, dest, size))
+        if (!unpack_value<int16_t>(src, dest, size))
             break;
         *static_cast<mandala::real_t *>(dest) = float_from_rad(*static_cast<int16_t *>(dest));
-        return sizeof(mandala::word_t);
+        return sizeof(int16_t);
     case fmt_s16_rad2:
         *type = mandala::type_real;
-        if (!unpack_value<mandala::word_t>(src, dest, size))
+        if (!unpack_value<int16_t>(src, dest, size))
             break;
         *static_cast<mandala::real_t *>(dest) = float_from_rad2(*static_cast<int16_t *>(dest));
-        return sizeof(mandala::word_t);
+        return sizeof(int16_t);
+    case fmt_s8_rad:
+        *type = mandala::type_real;
+        if (!unpack_value<int8_t>(src, dest, size))
+            break;
+        *static_cast<mandala::real_t *>(dest) = float_from_rad(*static_cast<int8_t *>(dest));
+        return sizeof(int8_t);
 
     case fmt_u8_u:
         return unpack_value<uint8_t>(src, dest, type, size, 1.f / 255.f);

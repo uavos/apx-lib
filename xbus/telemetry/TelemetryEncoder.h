@@ -59,6 +59,7 @@ public:
 
     bool encode(XbusStreamWriter &stream, uint8_t pseq, uint64_t timestamp_ms);
     void encode_format(XbusStreamWriter &stream, uint8_t part, const uint8_t size = xbus::telemetry::fmt_block_size);
+    bool encode_xpdr(XbusStreamWriter &stream, uint64_t timestamp_ms);
 
     enum result_e {
         ok,
@@ -78,6 +79,8 @@ public:
     void sync_flush();
 
 private:
+    xbus::telemetry::hash_s _hash;
+
     xbus::telemetry::enc_slots_s _slots;
     uint16_t _slots_cnt;
     uint16_t _slots_upd_cnt; // re-scheduled slots top limit (before bitfields)
@@ -87,12 +90,10 @@ private:
     uint16_t _sync_cnt{};
     ssize_t _inserted_index;
 
+    uint8_t _xpdr_slot_idx[xbus::telemetry::xpdr::dataset_size];
+
     void _insert(size_t index, const xbus::telemetry::field_s &field);
-
-    xbus::telemetry::hash_s _hash;
-
     void _set_data(size_t n, mandala::raw_t raw, mandala::type_id_e type_id);
-
     void _update_feeds();
 
     void encode_values(XbusStreamWriter &stream, uint8_t pseq);

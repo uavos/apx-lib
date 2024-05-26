@@ -39,11 +39,16 @@ typedef struct
 typedef struct
 {
     field_s fields[slots_size];
-    uint8_t crc_cobs_dummy;
     dec_flags_s flags[slots_size];
     mandala::raw_t value[slots_size]; // value
 } dec_slots_s;
 //static_assert(sizeof(dec_slot_s) == 8 * slots_size + 1, "size error");
+
+typedef struct
+{
+    mandala::raw_t value[xpdr::dataset_size];
+    mandala::type_id_e value_type[xpdr::dataset_size];
+} dec_xpdr_s;
 
 } // namespace telemetry
 } // namespace xbus
@@ -51,7 +56,7 @@ typedef struct
 class TelemetryDecoder
 {
 public:
-    bool decode(uint8_t pseq, XbusStreamReader &stream);
+    bool decode(const xbus::pid_s &pid, XbusStreamReader &stream);
 
     bool decode_format(XbusStreamReader &stream, xbus::telemetry::format_resp_hdr_s *hdr);
 
@@ -67,9 +72,15 @@ public:
     inline xbus::telemetry::dec_slots_s &dec_slots() { return _slots; }
     inline uint16_t slots_cnt() { return _slots_cnt; }
 
+    // XPDR
+    inline auto &xpdr_slots() { return _xpdr_slots; }
+    inline uint16_t xpdr_slots_cnt() { return xbus::telemetry::xpdr::dataset_size; }
+
 protected:
     xbus::telemetry::dec_slots_s _slots{};
     uint16_t _slots_cnt{};
+
+    xbus::telemetry::dec_xpdr_s _xpdr_slots{};
 
     uint64_t _timestamp_ms{};
     uint32_t _dt_ms{};
@@ -86,4 +97,5 @@ protected:
     bool check_hash(size_t sz);
 
     bool decode_values(XbusStreamReader &stream, uint8_t pseq);
+    bool decode_xpdr(XbusStreamReader &stream);
 };

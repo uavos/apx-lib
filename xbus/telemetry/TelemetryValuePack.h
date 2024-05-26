@@ -168,19 +168,22 @@ static uint16_t float_to_f16(const float &v)
     }
     return hp;
 }
-static int16_t float_to_angle(const float &v, float span)
+template<typename T = int16_t>
+static T float_to_angle(const float &v, float span)
 {
     const float dspan = span * 2.f;
     const float a = v - std::floor(v / dspan + 0.5f) * dspan;
-    return (int16_t) (a * (32767.f / span));
+    return (T) (a * ((float) std::numeric_limits<T>::max() / span));
 }
-static inline int16_t float_to_rad(const float &v)
+template<typename T>
+static inline T float_to_rad(const float &v)
 {
-    return float_to_angle(v, M_PI);
+    return float_to_angle<T>(v, M_PI);
 }
-static inline int16_t float_to_rad2(const float &v)
+template<typename T>
+static inline T float_to_rad2(const float &v)
 {
-    return float_to_angle(v, M_PI / 2.f);
+    return float_to_angle<T>(v, M_PI / 2.f);
 }
 
 // pack method
@@ -188,8 +191,10 @@ static inline int16_t float_to_rad2(const float &v)
 size_t pack_value(const mandala::raw_t &raw, mandala::type_id_e type, void *dest, fmt_e fmt)
 {
     switch (fmt) {
-    default:
+    case fmt_none:
+    case fmt_bit:
         return 0;
+
     case fmt_f32: {
         const mandala::real_t v = raw_value<mandala::real_t>(&raw, type);
         return pack_value(v, dest);
@@ -244,11 +249,15 @@ size_t pack_value(const mandala::raw_t &raw, mandala::type_id_e type, void *dest
 
     case fmt_s16_rad: {
         const mandala::real_t v = raw_value<mandala::real_t>(&raw, type);
-        return pack_value(float_to_rad(v), dest);
+        return pack_value(float_to_rad<int16_t>(v), dest);
     }
     case fmt_s16_rad2: {
         const mandala::real_t v = raw_value<mandala::real_t>(&raw, type);
-        return pack_value(float_to_rad2(v), dest);
+        return pack_value(float_to_rad2<int16_t>(v), dest);
+    }
+    case fmt_s8_rad: {
+        const mandala::real_t v = raw_value<mandala::real_t>(&raw, type);
+        return pack_value(float_to_rad<int8_t>(v), dest);
     }
 
     case fmt_u8_u: {
