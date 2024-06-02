@@ -109,7 +109,7 @@ static float float_from_rad2(const T &v)
 
 // unpack method
 
-size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e fmt, size_t size)
+static size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, fmt_e fmt, size_t size)
 {
     switch (fmt) {
     case fmt_none:

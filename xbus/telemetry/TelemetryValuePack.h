@@ -186,7 +186,7 @@ static inline T float_to_rad2(const float &v)
 
 // pack method
 
-size_t pack_value(const mandala::raw_t &raw, mandala::type_id_e type, void *dest, fmt_e fmt)
+static size_t pack_value(const mandala::raw_t &raw, mandala::type_id_e type, void *dest, fmt_e fmt)
 {
     switch (fmt) {
     case fmt_none:
