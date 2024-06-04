@@ -97,14 +97,20 @@ static float float_from_f16(const uint16_t &v)
 }
 
 template<typename T>
+static float float_from_angle(const T &v, float span)
+{
+    return v / ((float) std::numeric_limits<T>::max() / span);
+}
+
+template<typename T>
 static float float_from_rad(const T &v)
 {
-    return v / ((float) std::numeric_limits<T>::max() / (float) M_PI);
+    return float_from_angle<T>(v, (float) M_PI);
 }
 template<typename T>
 static float float_from_rad2(const T &v)
 {
-    return v / ((float) std::numeric_limits<T>::max() / ((float) M_PI / 2.f));
+    return float_from_angle<T>(v, (float) M_PI / 2.f);
 }
 
 // unpack method
