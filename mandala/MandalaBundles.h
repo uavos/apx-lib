@@ -145,6 +145,13 @@ struct pos_ll_s
     uint32_t lon; // [gps] units
 };
 
+struct pos_llh_s
+{
+    uint32_t lat; // [gps] units
+    uint32_t lon; // [gps] units
+    float hmsl;   // [gps] m
+};
+
 #pragma pack()
 
 typedef uint8_t vcp_id_t;
