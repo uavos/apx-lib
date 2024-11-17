@@ -167,16 +167,6 @@ static constexpr inline T from_raw(raw_t r, type_id_e type_id)
     return T();
 }
 
-// gps units conversion to store double [deg] in i32
-constexpr double from_gps(uint32_t v)
-{
-    return (double) (((int32_t) v) * ((double) 1e-7));
-}
-constexpr uint32_t to_gps(double v)
-{
-    return (uint32_t) ((int32_t) (v / (double) 1e-7));
-}
-
 // Data Specifier [1 byte] - first byte after pid for mandala data transfers
 
 #pragma pack(1)

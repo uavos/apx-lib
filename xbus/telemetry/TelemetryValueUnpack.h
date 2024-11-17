@@ -52,7 +52,7 @@ size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type, size_
     return sizeof(T);
 }
 
-static float float_from_f16(const uint16_t &v)
+static float float_from_f16(const uint16_t v)
 {
     if (v == 0)
         return 0.f;
@@ -97,18 +97,18 @@ static float float_from_f16(const uint16_t &v)
 }
 
 template<typename T>
-static float float_from_angle(const T &v, float span)
+static float float_from_angle(const T v, float span)
 {
     return v / ((float) std::numeric_limits<T>::max() / span);
 }
 
 template<typename T>
-static float float_from_rad(const T &v)
+static float float_from_rad(const T v)
 {
     return float_from_angle<T>(v, (float) M_PI);
 }
 template<typename T>
-static float float_from_rad2(const T &v)
+static float float_from_rad2(const T v)
 {
     return float_from_angle<T>(v, (float) M_PI / 2.f);
 }
@@ -126,6 +126,7 @@ static size_t unpack_value(const void *src, void *dest, mandala::type_id_e *type
         *type = mandala::type_real;
         return unpack_value<mandala::real_t>(src, dest, size);
     case fmt_u32:
+    case fmt_a32:
         *type = mandala::type_dword;
         return unpack_value<mandala::dword_t>(src, dest, size);
     case fmt_u16:
