@@ -88,6 +88,8 @@
       title: Controls assignments
     - name: display
       title: Visualization
+    - name: usr
+      title: User data
 
 - name: script
   title: Scripting commands
