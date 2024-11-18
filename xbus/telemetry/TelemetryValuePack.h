@@ -108,14 +108,14 @@ T raw_value(const void *src, mandala::type_id_e type)
 // packing helpers
 
 template<typename T>
-size_t pack_value(const T &v, void *dest)
+size_t pack_value(const T v, void *dest)
 {
     T &v0 = *static_cast<T *>(dest);
     v0 = v;
     return sizeof(T);
 }
 
-static uint16_t float_to_f16(const float &v)
+static uint16_t float_to_f16(const float v)
 {
     //IEEE 754r
     if (v == 0.f)
@@ -167,19 +167,19 @@ static uint16_t float_to_f16(const float &v)
     return hp;
 }
 template<typename T = int16_t>
-static T float_to_angle(const float &v, float span)
+static T float_to_angle(const float v, float span)
 {
     const float dspan = span * 2.f;
     const float a = v - std::floor(v / dspan + 0.5f) * dspan;
     return (T) (a * ((float) std::numeric_limits<T>::max() / span));
 }
 template<typename T>
-static inline T float_to_rad(const float &v)
+static inline T float_to_rad(const float v)
 {
     return float_to_angle<T>(v, M_PI);
 }
 template<typename T>
-static inline T float_to_rad2(const float &v)
+static inline T float_to_rad2(const float v)
 {
     return float_to_angle<T>(v, M_PI / 2.f);
 }
@@ -197,7 +197,8 @@ static size_t pack_value(const mandala::raw_t &raw, mandala::type_id_e type, voi
         const mandala::real_t v = raw_value<mandala::real_t>(&raw, type);
         return pack_value(v, dest);
     }
-    case fmt_u32: {
+    case fmt_u32:
+    case fmt_a32: {
         const mandala::dword_t v = raw_value<mandala::dword_t>(&raw, type);
         return pack_value(v, dest);
     }

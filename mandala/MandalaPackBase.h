@@ -29,7 +29,7 @@ namespace mandala {
 enum fmt_e : uint8_t { // 5 bits
     fmt_none,
 
-    // raw
+    // raw not packed, sent as-is
     fmt_u8,
     fmt_u16,
     fmt_u32,
@@ -38,6 +38,9 @@ enum fmt_e : uint8_t { // 5 bits
     // packed bitfields
     fmt_bit, // one bit
     fmt_u4,  // 4 bits
+
+    // angle degrees * 1e-7 (used for GPS lat,lon)
+    fmt_a32, // also stores in mandala as dword
 
     // packed real numbers (13)
     fmt_f16,      // float16
@@ -88,6 +91,8 @@ constexpr const char *fmt_string(fmt_e fmt)
         return "u32";
     case fmt_f32:
         return "f32";
+    case fmt_a32:
+        return "a32";
 
     case fmt_bit:
         return "bit";
@@ -232,7 +237,7 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
         return fmt_f16;
 
     case units_gps:
-        break;
+        return fmt_a32;
     }
 
     switch (type) {
@@ -300,6 +305,15 @@ constexpr const fmt_s &fmt_lookup(uid_t uid, const fmt_s *list, ssize_t size)
             r = m - 1;
     }
     return *list; // not found - return zero uid dmmy element
+}
+
+constexpr uint32_t deg_to_a32(const double v)
+{
+    return (uint32_t) ((int32_t) (v / (double) 1e-7));
+}
+constexpr double a32_to_deg(uint32_t v)
+{
+    return (double) (((int32_t) v) * ((double) 1e-7));
 }
 
 }; // namespace mandala
