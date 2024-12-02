@@ -139,33 +139,6 @@
       units: m
       fmt: f32
 
-- name: turret
-  title: Turret
-  descr: Turret axis est
-  content:
-    - name: roll
-      suffix: roll
-      units: rad
-    - name: pitch
-      suffix: pitch
-      units: rad
-    - name: yaw
-      suffix: yaw
-      units: rad
-
-    - name: lat
-      suffix: latitude
-      type: dword
-      units: gps
-    - name: lon
-      suffix: longitude
-      type: dword
-      units: gps
-    - name: hmsl
-      suffix: altitude MSL
-      units: m
-      fmt: f32
-
 - name: haps
   title: HAPS
   content:

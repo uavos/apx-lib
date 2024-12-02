@@ -238,25 +238,3 @@
     - name: yaw
       title: ATS ctr yaw
       units: su
-
-- name: turret
-  title: Turret controls
-  content:
-    - name: roll
-      title: Turret ctr roll
-      units: su
-    - name: pitch
-      title: Turret ctr pitch
-      units: su
-    - name: yaw
-      title: Turret ctr yaw
-      units: su
-
-    - name: op
-      title: Turret op
-      units:
-        - "off"
-        - "arm"
-        - "shoot"
-        - "shooting"
-        - "reload"
