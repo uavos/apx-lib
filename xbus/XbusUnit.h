@@ -26,12 +26,12 @@
 #include "XbusStreamWriter.h"
 
 namespace xbus {
-namespace vehicle {
+namespace unit {
 
 typedef uint16_t squawk_t;
 
-// Vehicle IDENT
-typedef uint8_t uid_t[12]; //global unique vehicle id
+// Unit IDENT
+typedef uint8_t uid_t[12]; //global unique id
 
 struct ident_s
 {
@@ -50,5 +50,5 @@ struct ident_s
     // strings: callsign
 };
 
-} // namespace vehicle
+} // namespace unit
 } // namespace xbus

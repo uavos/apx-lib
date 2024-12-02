@@ -67,7 +67,7 @@
       ds: normal
 
     - name: weight
-      title: Vehicle weight
+      title: Unit weight
       type: word
       units: kg
       ds: heavy

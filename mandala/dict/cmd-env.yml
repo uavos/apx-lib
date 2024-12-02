@@ -19,20 +19,20 @@
 ## You should have received a copy of the GNU Lesser General Public License
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
-- name: vehicle
-  title: Vehicle object data
+- name: unit
+  title: Unit object data
   content:
     - name: ident
-      title: Vehicle Identification
+      title: Unit Identification
       descr: >
         `squawk` `uid` [`ident`]
 
     - name: downlink
-      title: Data packet from vehicle to GCS
+      title: Data packet from unit to GCS
       descr: >
         `squawk` `uid_seq` `pid` `data...`
     - name: uplink
-      title: Data packet from GCS to vehicle
+      title: Data packet from GCS to unit
       descr: >
         `squawk` [`pid` `data...`] or empty for heartbeat
 

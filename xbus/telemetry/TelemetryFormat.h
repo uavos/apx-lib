@@ -121,7 +121,7 @@ struct format_resp_hdr_s
     }
 };
 
-// Vehicle transponder data
+// Transponder data
 namespace xpdr {
 
 static constexpr const uint8_t version = 1; // dataset version (hdr.feed_hash)

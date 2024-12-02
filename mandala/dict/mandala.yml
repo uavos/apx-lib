@@ -21,7 +21,7 @@
 ##
 name: mandala
 title: Mandala
-descr: Vehicle state data structure.
+descr: System state data structure.
 
 # Parameters:
 #
@@ -66,7 +66,7 @@ content:
       - name: nav
         content: sns-nav
         title: Navigation
-        descr: Sensors used for vehicle navigation and controls.
+        descr: Sensors used for navigation and controls.
           Used as input for position and attitude estimators and
           for filters to supply aerodynamic controls.
 
@@ -74,18 +74,18 @@ content:
         content: sns-env
         title: Environment
         descr: Environmental sensors.
-          Data used as inputs for filters to estimate vehicle state
+          Data used as inputs for filters to estimate system state
           and safety conditions.
 
   - name: ctr
     title: Controls
-    descr: Controls for vehicle drives and servos.
+    descr: Controls for servo drives.
       Published by regulators.
     content:
       - name: nav
         content: ctr-nav
         title: Navigation
-        descr: Controls used for vehicle stabilization.
+        descr: Controls used for stabilization.
           Data published by controllers for aerodynamic controls.
 
       - name: env
@@ -96,19 +96,19 @@ content:
 
   - name: est
     title: Estimators
-    descr: Current vehicle state.
+    descr: Current system state.
       Estimated values of sensors and current navigator status.
     content:
       - name: nav
         content: est-nav
         title: Navigation
-        descr: Estimated data used for vehicle regulators.
+        descr: Estimated data used for regulators.
           Filtered sensor data.
 
       - name: env
         content: est-env
         title: Environment
-        descr: Processed data of current vehicle conditions.
+        descr: Processed data of current environmental conditions.
           Can be overridden by GCS uplink.
 
   - name: cmd
