@@ -66,6 +66,25 @@ private:
 template<typename T>
 list<Event<T>> Event<T>::_list;
 
+template<typename T>
+class EventValue
+{
+public:
+    typedef Event<EventValue<T>> evt;
+
+    void set(const T v)
+    {
+        _value = v;
+        evt::signal(this);
+    }
+
+    inline T value() const { return _value; }
+    inline operator T() const { return value(); }
+
+private:
+    T _value{};
+};
+
 } // namespace apx
 
 #define EVENT(_name) \
