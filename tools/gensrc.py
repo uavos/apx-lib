@@ -241,6 +241,14 @@ def sort_modules(list_dicts):
                 break
     return res
 
+# reorder items recursively based on 'order'
+def order_items(list_dicts):
+    list_dicts.sort(key=lambda x: x['order'] if 'order' in x else 1000)
+    for i in list_dicts:
+        if 'content' in i:
+            i['content'] = order_items(i['content'])
+    return list_dicts
+
 
 def render(template, data):
     loader = FileSystemLoader(os.path.dirname(os.path.abspath(template)))
@@ -251,6 +259,7 @@ def render(template, data):
     env.filters['expand_constants'] = expand_constants
     env.filters['sort_modules'] = sort_modules
     env.filters['merge_defaults'] = merge_defaults
+    env.filters['order_items'] = order_items
     template = env.get_template(os.path.basename((template)))
     return template.render(data=data)
 
