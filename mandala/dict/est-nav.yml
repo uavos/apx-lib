@@ -279,8 +279,8 @@
         - "warning"
         - "critical"
 
-- name: ahrs
-  title: AHRS status
+- name: ins
+  title: INS status
   ds: minimal
   content:
     - name: rest

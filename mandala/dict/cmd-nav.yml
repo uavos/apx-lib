@@ -122,15 +122,15 @@
     - name: airbrk
       title: Airbrakes control
 
-- name: ahrs
-  title: AHRS options
+- name: ins
+  title: INS options
   units:
     - "no"
     - "yes"
   ds: minimal
   content:
     - name: inair
-      title: AHRS in air
+      title: INS in air
       units:
         - "no"
         - "yes"
