@@ -130,7 +130,11 @@
   ds: minimal
   content:
     - name: inair
-      title: AHRS airdata
+      title: AHRS in air
+      units:
+        - "no"
+        - "yes"
+        - "hover"
     - name: nogps
       title: Block GPS
     - name: nomag
