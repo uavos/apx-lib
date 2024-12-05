@@ -243,7 +243,7 @@ def sort_modules(list_dicts):
 
 # reorder items recursively based on 'order'
 def order_items(list_dicts):
-    list_dicts.sort(key=lambda x: x['order'] if 'order' in x else 1000)
+    list_dicts.sort(key=lambda x: x['order'] if 'order' in x else 0)
     for i in list_dicts:
         if 'content' in i:
             i['content'] = order_items(i['content'])
