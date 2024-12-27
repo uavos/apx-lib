@@ -141,15 +141,13 @@ struct sim_s
 
 struct pos_ll_s
 {
-    uint32_t lat; // [gps] units
-    uint32_t lon; // [gps] units
+    uint32_t lat; // [gps] 1e-7 degrees
+    uint32_t lon; // [gps] 1e-7 degrees
 };
 
-struct pos_llh_s
+struct pos_llh_s : public pos_ll_s
 {
-    uint32_t lat; // [gps] units
-    uint32_t lon; // [gps] units
-    float hmsl;   // [gps] m
+    float hmsl; // [gps] m
 };
 
 struct haps_center_s
