@@ -40,11 +40,16 @@ struct file_hdr_s
     uint8_t format{FORMAT};
     uint8_t _rsv[1];
 
-    uint16_t payload_offset{sizeof(file_hdr_s)}; // payload offset bytes
+    static constexpr const uint16_t PLD_OFFSET = 128;
+    uint16_t pld_offset{PLD_OFFSET}; // payload offset bytes
 
     uint32_t crc32; // payload CRC (exl this file header)
 
+    // 12 bytes so far
+
     title_t title;
+
+    // 44 bytes so far
 
     // payload structure
 
@@ -94,6 +99,7 @@ struct file_hdr_s
         } flags;
     };*/
 };
+static_assert(sizeof(file_hdr_s) <= file_hdr_s::PLD_OFFSET, "file_hdr_s size");
 
 struct pos_ll_s
 {
