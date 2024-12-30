@@ -54,7 +54,8 @@ struct file_hdr_s
         uint16_t off; // offset in bytes from payload start
         uint16_t cnt; // number of elements
     };
-    struct pld_hdr_s
+
+    struct
     {
         // fixed length items
         pld_item_s rw;
@@ -65,8 +66,7 @@ struct file_hdr_s
         // variable length items
         pld_item_s act; // array of actions
         pld_item_s geo; // array of geofence objects
-    };
-    pld_hdr_s pld_hdr;
+    } items;
 
     // unit parameters
     // affect map display and editor
@@ -216,12 +216,12 @@ struct act_scr_s : act_s
 };
 static_assert(sizeof(act_scr_s) == 16, "act_scr_s size");
 
-struct act_shot_s : act_s
+struct act_cam_s : act_s
 {
     uint16_t dist; //distance for series
     uint8_t opt;   //0=single,1=start,2=stop
 };
-static_assert(sizeof(act_shot_s) == 4, "act_shot_s size");
+static_assert(sizeof(act_cam_s) == 4, "act_cam_s size");
 
 #pragma pack()
 
