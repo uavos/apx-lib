@@ -42,8 +42,7 @@ struct file_hdr_s
 
     static constexpr const uint16_t PLD_OFFSET = 128;
     uint16_t pld_offset{PLD_OFFSET}; // payload offset bytes
-
-    uint32_t crc32; // payload CRC (exl this file header)
+    uint32_t pld_crc32;              // payload CRC (exl this file header)
 
     // 12 bytes so far
 
@@ -110,13 +109,9 @@ struct pos_ll_s
 // Waypoint
 struct wp_s : pos_ll_s
 {
-    int16_t alt;    // [m] AGL or AMSL
-    uint8_t action; // index of action in act array
+    int16_t alt; // [m] AGL or AMSL
+    uint8_t act; // index of action in act array, start from 1
 
-    enum type_e {
-        DIRECT,
-        TRACK,
-    };
     struct
     {
         bool amsl : 1; // altitude in AMSL
@@ -134,15 +129,16 @@ struct rw_s : pos_ll_s
     int16_t dN;
     int16_t dE;
 
-    enum turn_e {
-        LEFT,
-        RIGHT,
+    enum type_e {
+        CLEFT,  // circle left
+        CRIGHT, // circle right
     };
     struct
     {
-        uint16_t approach : 15; // [m] approach length
-        turn_e turn : 1;
+        uint16_t approach : 14; // [m] approach length
+        type_e type : 2;        // approach type
     };
+    static constexpr const uint16_t APPROACH_MAX = (1 << 14) - 1;
 };
 static_assert(sizeof(rw_s) == 16, "rw_s size");
 
@@ -156,11 +152,11 @@ static_assert(sizeof(tw_s) == 8, "tw_s size");
 // Point of Interest
 struct pi_s : pos_ll_s
 {
-    int16_t hmsl;
-    int16_t radius;
+    int16_t hmsl;   // altitude [m] MSL to look at
+    int16_t radius; // [m] loiter radius, 0=hover at point
 
-    uint8_t loops;
-    uint16_t timeout;
+    uint8_t loops;    // number of loops to loiter
+    uint16_t timeout; // timeout minutes
 };
 static_assert(sizeof(pi_s) == 15, "pi_s size");
 
@@ -187,21 +183,21 @@ static_assert(sizeof(geo_s) == 12, "geo_s size");
 
 struct act_s
 {
-    enum act_e {
+    enum act_e : uint8_t {
         ACT_SEQ,   // actions sequence
         ACT_SPEED, // change speed
-        ACT_PI,    // go to POI
+        ACT_POI,   // go to POI
         ACT_SCR,   // run script
-        ACT_CAM,   // control camera
     };
-    act_e type;
+    act_e type : 8;
 };
 
 struct act_seq_s : act_s
 {
-    uint8_t next[3]; //indices of actions to execute, 0=stop
+    static constexpr const uint8_t MAX = 7;
+    uint8_t next[MAX]; //indices of actions to execute, 0=stop
 };
-static_assert(sizeof(act_seq_s) == 4, "act_seq_s size");
+static_assert(sizeof(act_seq_s) == 8, "act_seq_s size");
 
 struct act_speed_s : act_s
 {
@@ -209,11 +205,11 @@ struct act_speed_s : act_s
 };
 static_assert(sizeof(act_speed_s) == 2, "act_speed_s size");
 
-struct act_pi_s : act_s
+struct act_poi_s : act_s
 {
     uint8_t index; //linked POI [0...n]
 };
-static_assert(sizeof(act_pi_s) == 2, "act_pi_s size");
+static_assert(sizeof(act_poi_s) == 2, "act_poi_s size");
 
 struct act_scr_s : act_s
 {
@@ -221,13 +217,6 @@ struct act_scr_s : act_s
     scr_t scr;
 };
 static_assert(sizeof(act_scr_s) == 16, "act_scr_s size");
-
-struct act_cam_s : act_s
-{
-    uint16_t dist; //distance for series
-    uint8_t opt;   //0=single,1=start,2=stop
-};
-static_assert(sizeof(act_cam_s) == 4, "act_cam_s size");
 
 #pragma pack()
 
