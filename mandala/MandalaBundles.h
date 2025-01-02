@@ -157,6 +157,7 @@ struct haps_center_s
     float roll;
     float left_cmd_roll;
     float right_cmd_roll;
+    float err_shape;
     float cmd_pitch;
     float cmd_airspeed;
     float rc_roll;
@@ -177,6 +178,7 @@ struct haps_lr_s
     float airspeed;
     float cmd_pitch;
     float ctr_elevator;
+    float ctr_haps_ailerons;
 };
 
 #pragma pack()
