@@ -33,26 +33,20 @@ typedef char title_t[32];
 
 struct file_hdr_s
 {
-    uint32_t size; // variable length file total size
-
+    uint32_t size;      // variable length file total size (incl this header)
+    uint32_t pld_crc32; // payload CRC (exl this file header)
     // file format version
     static constexpr const uint8_t FORMAT = 1;
     uint8_t format{FORMAT};
-    uint8_t _rsv[1];
+    uint8_t _rsv[7]{};
+};
+static_assert(sizeof(file_hdr_s) == 16, "size");
 
-    static constexpr const uint16_t PLD_OFFSET = 128;
-    uint16_t pld_offset{PLD_OFFSET}; // payload offset bytes
-    uint32_t pld_crc32;              // payload CRC (exl this file header)
-
-    // 12 bytes so far
-
+struct pld_hdr_s
+{
     title_t title;
 
-    // 44 bytes so far
-
-    // payload structure
-
-    // element offsets in payload
+    // payload allocation
     struct pld_item_s
     {
         uint16_t off; // offset in bytes from payload start
@@ -98,7 +92,8 @@ struct file_hdr_s
         } flags;
     };*/
 };
-static_assert(sizeof(file_hdr_s) <= file_hdr_s::PLD_OFFSET, "file_hdr_s size");
+// 32 + 6 * 4 = 56 bytes
+static_assert(sizeof(pld_hdr_s) == 56, "size");
 
 struct pos_ll_s
 {
@@ -109,18 +104,9 @@ struct pos_ll_s
 // Waypoint
 struct wp_s : pos_ll_s
 {
-    int16_t alt; // [m] AGL or AMSL
     uint8_t act; // index of action in act array, start from 1
-
-    struct
-    {
-        bool amsl : 1; // altitude in AMSL
-        bool xtrk : 1; // cross track control
-        bool vtrk : 1; // vertical track control
-        uint8_t _rsv : 5;
-    };
 };
-static_assert(sizeof(wp_s) == 12, "wp_s size");
+static_assert(sizeof(wp_s) == 9, "size");
 
 // Runway
 struct rw_s : pos_ll_s
@@ -140,14 +126,14 @@ struct rw_s : pos_ll_s
     };
     static constexpr const uint16_t APPROACH_MAX = (1 << 14) - 1;
 };
-static_assert(sizeof(rw_s) == 16, "rw_s size");
+static_assert(sizeof(rw_s) == 16, "size");
 
 // Taxiway
 struct tw_s : pos_ll_s
 {
     // just a sequence of waypoints on the ground
 };
-static_assert(sizeof(tw_s) == 8, "tw_s size");
+static_assert(sizeof(tw_s) == 8, "size");
 
 // Point of Interest
 struct pi_s : pos_ll_s
@@ -158,7 +144,7 @@ struct pi_s : pos_ll_s
     uint8_t loops;    // number of loops to loiter
     uint16_t timeout; // timeout minutes
 };
-static_assert(sizeof(pi_s) == 15, "pi_s size");
+static_assert(sizeof(pi_s) == 15, "size");
 
 // Airspace Geofence
 struct geo_s : pos_ll_s
@@ -177,7 +163,7 @@ struct geo_s : pos_ll_s
     uint16_t radius; // [m] radius
     // points follow
 };
-static_assert(sizeof(geo_s) == 12, "geo_s size");
+static_assert(sizeof(geo_s) == 12, "size");
 
 // Actions
 
@@ -185,9 +171,11 @@ struct act_s
 {
     enum act_e : uint8_t {
         ACT_SEQ,   // actions sequence
-        ACT_SPEED, // change speed
-        ACT_POI,   // go to POI
-        ACT_SCR,   // run script
+        ACT_ALT,   // change altitude immediately
+        ACT_TRK,   // change track control immediately
+        ACT_SPEED, // change speed immediately
+        ACT_POI,   // go to POI after wp reached
+        ACT_SCR,   // run script after wp reached
     };
     act_e type : 8;
 };
@@ -197,26 +185,48 @@ struct act_seq_s : act_s
     static constexpr const uint8_t MAX = 7;
     uint8_t next[MAX]; //indices of actions to execute, 0=stop
 };
-static_assert(sizeof(act_seq_s) == 8, "act_seq_s size");
+static_assert(sizeof(act_seq_s) == 8, "size");
+
+struct act_alt_s : act_s
+{
+    int16_t alt; // [m] AGL or AMSL
+    struct
+    {
+        bool amsl : 1; // altitude in AMSL
+        bool atrk : 1; // altitude track control
+        uint8_t _rsv : 6;
+    };
+};
+static_assert(sizeof(act_alt_s) == 4, "size");
+
+struct act_trk_s : act_s
+{
+    struct
+    {
+        bool xtrk : 1; // cross track control
+        uint8_t _rsv : 6;
+    };
+};
+static_assert(sizeof(act_trk_s) == 2, "size");
 
 struct act_speed_s : act_s
 {
     uint8_t speed; //0=cruise
 };
-static_assert(sizeof(act_speed_s) == 2, "act_speed_s size");
+static_assert(sizeof(act_speed_s) == 2, "size");
 
 struct act_poi_s : act_s
 {
     uint8_t index; //linked POI [0...n]
 };
-static_assert(sizeof(act_poi_s) == 2, "act_poi_s size");
+static_assert(sizeof(act_poi_s) == 2, "size");
 
 struct act_scr_s : act_s
 {
     typedef char scr_t[15]; //public func @name
     scr_t scr;
 };
-static_assert(sizeof(act_scr_s) == 16, "act_scr_s size");
+static_assert(sizeof(act_scr_s) == 16, "size");
 
 #pragma pack()
 
