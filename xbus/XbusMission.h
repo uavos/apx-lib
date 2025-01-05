@@ -182,10 +182,10 @@ struct act_s
 
 struct act_seq_s : act_s
 {
-    static constexpr const uint8_t MAX = 7;
-    uint8_t next[MAX]; //indices of actions to execute, 0=stop
+    uint8_t cnt; // number of indices of actions array size
+    // indices follow
 };
-static_assert(sizeof(act_seq_s) == 8, "size");
+static_assert(sizeof(act_seq_s) == 2, "size");
 
 struct act_alt_s : act_s
 {
