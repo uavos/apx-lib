@@ -170,12 +170,16 @@ static_assert(sizeof(geo_s) == 12, "size");
 struct act_s
 {
     enum act_e : uint8_t {
-        ACT_SEQ,   // actions sequence
-        ACT_ALT,   // change altitude immediately
-        ACT_TRK,   // change track control immediately
-        ACT_SPEED, // change speed immediately
-        ACT_POI,   // go to POI after wp reached
-        ACT_SCR,   // run script after wp reached
+        ACT_SEQ, // actions sequence
+
+        // following actions executed immediately when wp is selected
+        ATR_ALT, // change altitude immediately
+        ATR_TRK, // change track control immediately
+
+        // following actions executed after wp reached
+        TRG_SPEED, // change speed after wp reached
+        TRG_POI,   // go to POI after wp reached
+        TRG_SCR,   // run script after wp reached
     };
     act_e type : 8;
 };
@@ -223,10 +227,10 @@ static_assert(sizeof(act_poi_s) == 2, "size");
 
 struct act_scr_s : act_s
 {
-    typedef char scr_t[15]; //public func @name
-    scr_t scr;
+    // script name follows as 0-terminated string
+    static constexpr const size_t MAX = 32; // incl 0
 };
-static_assert(sizeof(act_scr_s) == 16, "size");
+static_assert(sizeof(act_scr_s) == 1, "size");
 
 #pragma pack()
 
