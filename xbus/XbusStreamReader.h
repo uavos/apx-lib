@@ -214,7 +214,10 @@ void XbusStreamReader::read(_T &data)
         break;
 
     default:
-        return;
+        // support struct with fixed size
+        // i.e. stream >> struct{uint32_t a; uint16_t b;};
+        memcpy(&data, &_buf[_pos], sizeof(_T));
+        break;
     }
     _pos += sizeof(_T);
 }

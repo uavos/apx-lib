@@ -152,7 +152,10 @@ size_t XbusStreamWriter::write(const _Tin data)
         break;
 
     default:
-        return 0;
+        // support struct with fixed size
+        // i.e. stream << struct{uint32_t a; uint16_t b;};
+        memcpy(&_buf[_pos], &data, sizeof(_T));
+        break;
     }
     _pos += sizeof(_T);
     return sizeof(_T);
