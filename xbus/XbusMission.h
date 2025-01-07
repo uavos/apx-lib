@@ -27,364 +27,212 @@
 namespace xbus {
 namespace mission {
 
-typedef char title_t[16];
+#pragma pack(1)
 
-enum item_e { //4bits
-    STOP = 0,
-    WP,
-    RW,
-    TW,
-    PI,
-    ACT,
-    DIS,
-    EMG
-};
-
-struct hdr_s
-{
-    uint8_t type;   //wp,rw,scr, ..
-    uint8_t option; //left,right,line,hdg, ..
-
-    static inline uint16_t psize() { return sizeof(uint8_t); }
-    inline void read(XbusStreamReader *s)
-    {
-        uint8_t v;
-        *s >> v;
-        type = v & 0x0F;
-        option = v >> 4;
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        uint8_t v = (type & 0x0F) | ((option << 4) & 0xF0);
-        *s << v;
-    }
-};
+typedef char title_t[32];
 
 struct file_hdr_s
 {
-    uint32_t size;
+    uint32_t size;      // variable length file total size (incl this header)
+    uint32_t pld_crc32; // payload CRC (exl this file header)
+    // file format version
+    static constexpr const uint8_t FORMAT = 1;
+    uint8_t format{FORMAT};
+    uint8_t _rsv[7]{};
+};
+static_assert(sizeof(file_hdr_s) == 16, "size");
 
+struct pld_hdr_s
+{
     title_t title;
 
-    struct stats_s
+    // payload allocation
+    struct pld_item_s
     {
-        uint16_t wp;
-        uint16_t rw;
-        uint16_t tw;
-        uint16_t pi;
-        uint16_t dis;
-        uint16_t emg;
-    };
-    stats_s cnt;
-    stats_s off;
-
-    static inline uint16_t psize()
-    {
-        return sizeof(uint32_t) + sizeof(title_t)
-               + sizeof(uint16_t) * 6 * 2;
-    }
-    inline void read(XbusStreamReader *s)
-    {
-        *s >> size;
-        s->read(title, sizeof(title));
-        *s >> cnt.wp;
-        *s >> cnt.rw;
-        *s >> cnt.tw;
-        *s >> cnt.pi;
-        *s >> cnt.dis;
-        *s >> cnt.emg;
-        *s >> off.wp;
-        *s >> off.rw;
-        *s >> off.tw;
-        *s >> off.pi;
-        *s >> off.dis;
-        *s >> off.emg;
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        *s << size;
-        s->write(title, sizeof(title));
-        *s << cnt.wp;
-        *s << cnt.rw;
-        *s << cnt.tw;
-        *s << cnt.pi;
-        *s << cnt.dis;
-        *s << cnt.emg;
-        *s << off.wp;
-        *s << off.rw;
-        *s << off.tw;
-        *s << off.pi;
-        *s << off.dis;
-        *s << off.emg;
-    }
-
-    inline constexpr uint16_t count(item_e type) const
-    {
-        switch (type) {
-        default:
-            return 0;
-        case WP:
-            return cnt.wp;
-        case RW:
-            return cnt.rw;
-        case TW:
-            return cnt.tw;
-        case PI:
-            return cnt.pi;
-        case DIS:
-            return cnt.dis;
-        case EMG:
-            return cnt.emg;
-        }
-    }
-    inline constexpr uint16_t offset(item_e type) const
-    {
-        switch (type) {
-        default:
-            return 0;
-        case WP:
-            return off.wp;
-        case RW:
-            return off.rw;
-        case TW:
-            return off.tw;
-        case PI:
-            return off.pi;
-        case DIS:
-            return off.dis;
-        case EMG:
-            return off.emg;
-        }
-    }
-};
-
-struct wp_s
-{
-    float lat;
-    float lon;
-    uint16_t alt;
-
-    enum {
-        DIRECT,
-        TRACK,
+        uint16_t off; // offset in bytes from payload start
+        uint16_t cnt; // number of elements
     };
 
-    static inline uint16_t psize() { return sizeof(float) * 2 + sizeof(int16_t); }
-    inline void read(XbusStreamReader *s)
+    struct
     {
-        *s >> lat;
-        *s >> lon;
-        *s >> alt;
-    }
-    inline void write(XbusStreamWriter *s) const
+        // fixed length items
+        pld_item_s rw;
+        pld_item_s pi;
+        pld_item_s wp;
+        pld_item_s tw;
+
+        // variable length items
+        pld_item_s act; // array of actions
+        pld_item_s geo; // array of geofence objects
+    } items;
+
+    // unit parameters
+    // affect map display and editor
+    // data is only used by GCS
+    /*struct unit_s
     {
-        *s << lat;
-        *s << lon;
-        *s << alt;
-    }
+        uint16_t speed; // [m/s] cruise airspeed IAS
+        uint16_t turn;  // [m] turn radius at sea level on cruise speed
+
+        uint16_t alt;   // [m] max altitude MSL
+        uint16_t endce; // [min] maximum flight endurance
+
+        uint8_t climb; // [m/s] max climbing rate
+        uint8_t sink;  // [m/s] max sinking rate
+
+        uint16_t _rsv;
+
+        union {
+            uint32_t _raw;
+            struct
+            {
+                bool type : 4; // 0=generic, 1=CTOL, 2=VTOL, 3=HTPL, etc
+                bool _rsv : 4;
+            };
+        } flags;
+    };*/
+};
+// 32 + 6 * 4 = 56 bytes
+static_assert(sizeof(pld_hdr_s) == 56, "size");
+
+struct pos_ll_s
+{
+    uint32_t lat; // [gps] 1e-7 degrees
+    uint32_t lon; // [gps] 1e-7 degrees
 };
 
-struct rw_s
+// Waypoint
+struct wp_s : pos_ll_s
 {
-    float lat;
-    float lon;
+    uint8_t act; // index of action in act array, start from 1
+};
+static_assert(sizeof(wp_s) == 9, "size");
+
+// Runway
+struct rw_s : pos_ll_s
+{
     int16_t hmsl;
     int16_t dN;
     int16_t dE;
-    uint16_t approach;
 
-    enum {
-        LEFT,
-        RIGHT,
+    enum type_e {
+        CLEFT,  // circle left
+        CRIGHT, // circle right
     };
-
-    static inline uint16_t psize()
+    struct
     {
-        return sizeof(float) * 2 + sizeof(int16_t) + sizeof(int16_t) + sizeof(int16_t)
-               + sizeof(uint16_t);
-    }
-    inline void read(XbusStreamReader *s)
-    {
-        *s >> lat;
-        *s >> lon;
-        *s >> hmsl;
-        *s >> dN;
-        *s >> dE;
-        *s >> approach;
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        *s << lat;
-        *s << lon;
-        *s << hmsl;
-        *s << dN;
-        *s << dE;
-        *s << approach;
-    }
+        uint16_t approach : 14; // [m] approach length
+        type_e type : 2;        // approach type
+    };
+    static constexpr const uint16_t APPROACH_MAX = (1 << 14) - 1;
 };
+static_assert(sizeof(rw_s) == 16, "size");
 
-struct tw_s
+// Taxiway
+struct tw_s : pos_ll_s
 {
-    float lat;
-    float lon;
-
-    static inline uint16_t psize() { return sizeof(float) * 2; }
-    inline void read(XbusStreamReader *s)
-    {
-        *s >> lat;
-        *s >> lon;
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        *s << lat;
-        *s << lon;
-    }
+    // just a sequence of waypoints on the ground
 };
+static_assert(sizeof(tw_s) == 8, "size");
 
-struct pi_s
+// Point of Interest
+struct pi_s : pos_ll_s
 {
-    float lat;
-    float lon;
-    int16_t hmsl;
-    int16_t radius;
-    uint8_t loops;
-    uint16_t timeout;
+    int16_t hmsl;   // altitude [m] MSL to look at
+    int16_t radius; // [m] loiter radius, 0=hover at point
 
-    static inline uint16_t psize()
-    {
-        return sizeof(float) * 2 + sizeof(int16_t) + sizeof(int16_t) + sizeof(uint8_t)
-               + sizeof(uint16_t);
-    }
-    inline void read(XbusStreamReader *s)
-    {
-        *s >> lat;
-        *s >> lon;
-        *s >> hmsl;
-        *s >> radius;
-        *s >> loops;
-        *s >> timeout;
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        *s << lat;
-        *s << lon;
-        *s << hmsl;
-        *s << radius;
-        *s << loops;
-        *s << timeout;
-    }
+    uint8_t loops;    // number of loops to loiter
+    uint16_t timeout; // timeout minutes
 };
+static_assert(sizeof(pi_s) == 15, "size");
 
-struct area_s
+// Airspace Geofence
+struct geo_s : pos_ll_s
 {
-    float lat;
-    float lon;
-
-    static inline uint16_t psize(uint8_t pointsCnt) { return sizeof(float) * 2 * pointsCnt; }
-    inline void read(XbusStreamReader *s)
+    enum type_e {
+        CIRCLE,
+        POLYGON,
+    };
+    uint8_t n; // number of points
+    struct
     {
-        *s >> lat;
-        *s >> lon;
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        *s << lat;
-        *s << lon;
-    }
+        type_e type : 4;
+        bool inclusive : 1; // 0=inside, 1=outside
+        uint8_t _rsv : 3;
+    };
+    uint16_t radius; // [m] radius
+    // points follow
 };
+static_assert(sizeof(geo_s) == 12, "size");
 
 // Actions
 
-enum act_e {
-    ACT_SPEED,
-    ACT_PI,
-    ACT_SCR,
-    ACT_SHOT,
+struct act_s
+{
+    enum act_e : uint8_t {
+        ACT_SEQ, // actions sequence
+
+        // following actions executed immediately when wp is selected
+        ATR_ALT, // change altitude immediately
+        ATR_TRK, // change track control immediately
+
+        // following actions executed after wp reached
+        TRG_SPEED, // change speed after wp reached
+        TRG_POI,   // go to POI after wp reached
+        TRG_SCR,   // run script after wp reached
+    };
+    act_e type : 8;
 };
 
-struct act_speed_s
+struct act_seq_s : act_s
+{
+    uint8_t cnt; // number of indices of actions array size
+    // indices follow
+};
+static_assert(sizeof(act_seq_s) == 2, "size");
+
+struct act_alt_s : act_s
+{
+    int16_t alt; // [m] AGL or AMSL
+    struct
+    {
+        bool amsl : 1; // altitude in AMSL
+        bool atrk : 1; // altitude track control
+        uint8_t _rsv : 6;
+    };
+};
+static_assert(sizeof(act_alt_s) == 4, "size");
+
+struct act_trk_s : act_s
+{
+    struct
+    {
+        bool xtrk : 1; // cross track control
+        uint8_t _rsv : 6;
+    };
+};
+static_assert(sizeof(act_trk_s) == 2, "size");
+
+struct act_speed_s : act_s
 {
     uint8_t speed; //0=cruise
-
-    static inline uint16_t psize() { return sizeof(uint8_t); }
-    inline void read(XbusStreamReader *s) { *s >> speed; }
-    inline void write(XbusStreamWriter *s) const { *s << speed; }
 };
+static_assert(sizeof(act_speed_s) == 2, "size");
 
-struct act_pi_s
+struct act_poi_s : act_s
 {
     uint8_t index; //linked POI [0...n]
-
-    static inline uint16_t psize() { return sizeof(uint8_t); }
-    inline void read(XbusStreamReader *s) { *s >> index; }
-    inline void write(XbusStreamWriter *s) const { *s << index; }
 };
+static_assert(sizeof(act_poi_s) == 2, "size");
 
-struct act_scr_s
+struct act_scr_s : act_s
 {
-    typedef char scr_t[16]; //public func @name
-    scr_t scr;
-
-    static inline uint16_t psize() { return sizeof(scr_t); }
-    inline void read(XbusStreamReader *s) { s->read(scr, sizeof(scr)); }
-    inline void write(XbusStreamWriter *s) const { s->write(scr, sizeof(scr)); }
+    // script name follows as 0-terminated string
+    static constexpr const size_t MAX = 32; // incl 0
 };
+static_assert(sizeof(act_scr_s) == 1, "size");
 
-struct act_shot_s
-{
-    uint16_t dist; //distance for series
-    uint8_t opt;   //0=single,1=start,2=stop
-
-    static inline uint16_t psize() { return sizeof(uint16_t); }
-    inline void read(XbusStreamReader *s)
-    {
-        uint16_t v;
-        *s >> v;
-        dist = v & 0x0FFF;
-        opt = v >> 12;
-    }
-    inline void write(XbusStreamWriter *s) const
-    {
-        uint16_t v = (dist & 0x0FFF) | ((opt << 12) & 0xF000);
-        *s << v;
-    }
-};
-
-inline constexpr uint16_t action_psize(uint8_t option)
-{
-    switch (static_cast<act_e>(option)) {
-    case ACT_SPEED:
-        return act_speed_s::psize();
-    case ACT_PI:
-        return act_pi_s::psize();
-    case ACT_SCR:
-        return act_scr_s::psize();
-    case ACT_SHOT:
-        return act_shot_s::psize();
-    }
-    return 0;
-}
-
-inline constexpr uint16_t psize(item_e type, uint8_t option)
-{
-    switch (type) {
-    case WP:
-        return wp_s::psize();
-    case RW:
-        return rw_s::psize();
-    case TW:
-        return tw_s::psize();
-    case PI:
-        return pi_s::psize();
-    case ACT:
-        return action_psize(option);
-    case DIS:
-    case EMG:
-        return area_s::psize(option);
-    default:
-        return 0;
-    }
-}
+#pragma pack()
 
 } // namespace mission
 } // namespace xbus
