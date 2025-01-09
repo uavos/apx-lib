@@ -141,8 +141,8 @@ struct pi_s : pos_ll_s
     int16_t hmsl;   // altitude [m] MSL to look at
     int16_t radius; // [m] loiter radius, 0=hover at point
 
-    uint8_t loops;    // number of loops to loiter
-    uint16_t timeout; // timeout minutes
+    uint8_t orbs;  // number of orbits to loiter
+    uint16_t time; // timeout minutes
 };
 static_assert(sizeof(pi_s) == 15, "size");
 
