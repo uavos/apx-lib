@@ -62,11 +62,11 @@
       title: Maneuver adjust
       units: m
 
-    - name: loops
-      title: Remaining loops
+    - name: orbs
+      title: Remaining orbits
       type: word
 
-    - name: timeout
+    - name: time
       title: Procedure timeout
       type: word
       units: s
