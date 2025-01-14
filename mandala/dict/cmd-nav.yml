@@ -79,18 +79,26 @@
     - "on"
   ds: minimal
   content:
-    - name: att
-      title: Attitude control
-    - name: pos
-      title: Position control
+    - name: tilt
+      title: Roll and Pitch control
+
+    - name: yaw
+      title: Yaw control
       units:
         - "off"
-        - hdg
+        - "fixed"
+        - "slip"
+        - "taxi"
+        - "track"
+
+    - name: hdg
+      title: Heading control
+      units:
+        - "off"
+        - fixed
         - direct
         - track
-        - runway
         - loiter
-        - hover
 
     - name: spd
       title: Airspeed control
@@ -103,14 +111,10 @@
 
     - name: eng
       title: Engine control
-    - name: yaw
-      title: Yaw control
-      units:
-        - "off"
-        - "hdg"
-        - "slip"
-        - "taxi"
-        - "track"
+
+    - name: hover
+      title: Hover control
+
     - name: str
       title: Steering control
     - name: taxi
