@@ -114,6 +114,10 @@
 
     - name: hover
       title: Hover control
+      units:
+        - "off"
+        - "vel"
+        - "pos"
 
     - name: str
       title: Steering control
