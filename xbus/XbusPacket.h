@@ -83,7 +83,7 @@ union pid_s {
         uint8_t seq : 2; // sequence counter
     };
 
-    explicit pid_s()
+    constexpr explicit pid_s()
         : _raw(0)
     {}
 

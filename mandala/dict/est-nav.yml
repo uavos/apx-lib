@@ -392,8 +392,13 @@
     - name: xtrack
       title: Crosstrack error
       units: m
-    - name: delta
-      title: Touchdown error
+
+    - name: ltrack
+      title: Distance along track
+      units: m
+
+    - name: derr
+      title: Destination distance error
       units: m
 
     - name: dist
@@ -404,7 +409,12 @@
       title: Waypoint heading
       units: rad
       ds: aux
+
+    - name: tdist
+      title: Track length
+      units: m
+      ds: aux
     - name: thdg
-      title: Tangent heading
+      title: Track heading
       units: rad
       ds: aux
