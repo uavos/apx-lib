@@ -145,9 +145,6 @@
     - name: shape
       suffix: dihedral angle
       units: rad
-    - name: cshape
-      suffix: cmd dihedral angle
-      units: rad
 
     - name: roll
       suffix: central roll
@@ -167,11 +164,11 @@
       suffix: pitch2
       units: rad
 
-    - name: cpitch1
-      suffix: cmd pitch1
+    - name: yaw1
+      suffix: yaw1
       units: rad
-    - name: cpitch2
-      suffix: cmd pitch2
+    - name: yaw2
+      suffix: yaw2
       units: rad
 
     - name: spd1
@@ -180,13 +177,6 @@
     - name: spd2
       suffix: airspeed2
       units: m/s
-
-    - name: ail1
-      suffix: aileron1
-      units: su
-    - name: ail2
-      suffix: aileron2
-      units: su
 
 - name: usr
   title: User values (float 16 bits)

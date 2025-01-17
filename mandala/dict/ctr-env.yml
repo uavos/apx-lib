@@ -238,3 +238,20 @@
     - name: yaw
       title: ATS ctr yaw
       units: su
+
+- name: haps
+  title: HAPS
+  content:
+    - name: ail1
+      suffix: aileron1
+      units: su
+    - name: ail2
+      suffix: aileron2
+      units: su
+
+    - name: elv1
+      suffix: elevator1
+      units: su
+    - name: elv2
+      suffix: elevator2
+      units: su

@@ -335,7 +335,7 @@
         - "manual"
 
 - name: gimbal
-  title: Gimbal cmd
+  title: Gimbal
   ds: auto
   content:
     - name: mode
@@ -383,7 +383,7 @@
       fmt: f32
 
 - name: ats
-  title: ATS cmd
+  title: ATS
   content:
     - name: mode
       suffix: mode
@@ -412,3 +412,17 @@
     - name: r
       suffix: yaw rate
       units: rad/s
+
+- name: haps
+  title: HAPS
+  content:
+    - name: cshape
+      suffix: cmd dihedral angle
+      units: rad
+
+    - name: cpitch1
+      suffix: cmd pitch1
+      units: rad
+    - name: cpitch2
+      suffix: cmd pitch2
+      units: rad
