@@ -174,8 +174,8 @@ public:
         _r = r;
     }
 
-    inline auto rpos() const { return _r.load(); }
-    inline auto wpos() const { return _w.load(); }
+    inline size_t rpos() const { return _r; }
+    inline size_t wpos() const { return _w; }
     inline T *buf() const { return _buf; }
 
     // get current write pointer

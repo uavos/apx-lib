@@ -129,6 +129,10 @@
       title: Flaps control
     - name: airbrk
       title: Airbrakes control
+      units:
+        - "off"
+        - "tecs"
+        - "dist"
 
 - name: ins
   title: INS options
