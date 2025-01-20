@@ -253,6 +253,10 @@
       title: Energy variometer correction
       units: m/s
 
+    - name: tas
+      title: True Airspeed
+      units: m/s
+
     - name: rho
       title: Air density
       units: kg/m^3
