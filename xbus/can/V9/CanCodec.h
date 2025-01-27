@@ -26,11 +26,10 @@
 
 #include "xcan_msg.h"
 #include <XbusPacket.h>
-#include <common/do_not_copy.h>
 
 namespace xbus {
 
-class CanCodec : public do_not_copy
+class CanCodec
 {
 public:
     enum ErrorType {

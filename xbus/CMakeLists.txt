@@ -1,1 +1,1 @@
-apx_module(DEPENDS shared.common INCLUDES .)
+apx_module(INCLUDES .)

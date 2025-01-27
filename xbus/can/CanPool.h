@@ -23,7 +23,6 @@
 #pragma once
 
 #include <cstdint>
-#include <do_not_copy.h>
 
 #include "CanFormat.h"
 #include "xcan_msg.h"
@@ -45,7 +44,7 @@ enum ErrorType {
     ErrorOrphan,
 };
 
-class Pool : private do_not_copy
+class Pool
 {
 public:
     void init();

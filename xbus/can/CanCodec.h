@@ -28,12 +28,11 @@
 
 #include <XbusNode.h>
 #include <XbusPacket.h>
-#include <do_not_copy.h>
 
 namespace xbus {
 namespace can {
 
-class Codec : public do_not_copy
+class Codec
 {
 public:
     explicit Codec();
