@@ -23,7 +23,6 @@
 #pragma once
 
 #include <XbusPacket.h>
-#include <common/visibility.h>
 #include <sys/types.h>
 
 #define XCAN_SRC_SHIFT 20 //source address

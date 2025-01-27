@@ -22,7 +22,6 @@
 #pragma once
 
 #include <sys/types.h>
-#include <visibility.h>
 
 #include "XbusStreamReader.h"
 #include "XbusStreamWriter.h"

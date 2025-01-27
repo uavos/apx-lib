@@ -25,7 +25,7 @@
 #include <netinet/in.h>
 #include <termios.h>
 
-#include <tcp_ports.h>
+#include "tcp_ports.h"
 
 #ifndef SOCK_NONBLOCK
 #define SOCK_NONBLOCK O_NONBLOCK

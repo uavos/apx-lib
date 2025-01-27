@@ -21,7 +21,6 @@
  */
 #pragma once
 
-#include <atomic>
 #include <cstddef>
 
 namespace apx {

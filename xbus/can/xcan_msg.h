@@ -24,7 +24,6 @@
 
 #include <inttypes.h>
 #include <sys/types.h>
-#include <visibility.h>
 
 #pragma pack(1)
 struct xcan_msg_s

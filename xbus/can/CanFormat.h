@@ -23,7 +23,6 @@
 #pragma once
 
 #include <sys/types.h>
-#include <visibility.h>
 
 #include "xcan_msg.h"
 #include <XbusPacket.h>

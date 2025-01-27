@@ -23,10 +23,13 @@
 
 #include <stdint.h>
 #include <sys/types.h>
-#include <visibility.h>
 
-__BEGIN_DECLS
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 uint32_t CRC32_SW(const void *data, size_t sz, uint32_t crc);
 
-__END_DECLS
+#ifdef __cplusplus
+}
+#endif
