@@ -36,15 +36,6 @@
       descr: >
         `squawk` [`pid` `data...`] or empty for heartbeat
 
-    - name: telemetry
-      title: Telemetry data
-      descr: >
-        `squawk` `packed data`
-    - name: xpdr
-      title: Transponder data
-      descr: >
-        `squawk` `data`
-
 - name: telemetry
   title: Telemetry stream
   content:
