@@ -32,42 +32,42 @@ typedef uint16_t pid_raw_t;
 
 constexpr const size_t size_packet_max = 512;
 
-enum pri_e {
-    pri_final = 0,
-    pri_primary,
-    pri_secondary,
-    pri_failsafe,
-    pri_auxilary,
+namespace cmd {
 
-    // special cases
+static constexpr uint16_t base = 0x0700;
 
-    // nmt
-    pri_response = 6, // response not request
-    pri_request = 7,  // request not response
+enum class cmd_e {
+    unit,
+    telemetry,
+    stream,
+    sim,
+    script,
 
-    // redundancy
-    pri_any = 7,    // telemetry value accepts any priority
-    pri_select = 7, // sub selects priority automatically
+    node = 15,
 };
 
-constexpr const char *pri_text(uint8_t pri)
-{
-    switch (pri) {
-    default:
-        break;
-    case pri_final:
-        return "local";
-    case pri_primary:
-        return "primary";
-    case pri_secondary:
-        return "secondary";
-    case pri_failsafe:
-        return "failsafe";
-    case pri_auxilary:
-        return "auxilary";
-    }
-    return "";
-}
+namespace telemetry {
+enum {
+    data = cmd::base + (((uint16_t) cmd_e::telemetry) << 8),
+    format,
+    xpdr,
+};
+} // namespace telemetry
+
+} // namespace cmd
+
+enum ext_e : uint8_t {
+    ext_none = 0, // local network packet <pid><data>
+    ext_unit,     // unit addressed <pid><squawk><uuid[n]><data>
+    ext_rsv1,     // reserved
+    ext_rsv2,     // reserved
+};
+
+enum pri_e : uint8_t {
+    pri_broadcast = 0,
+    pri_response = 0,
+    pri_request,
+};
 
 // Packet identifier [16 bits]
 #pragma pack(1)
@@ -77,9 +77,9 @@ union pid_s {
     struct
     {
         uint16_t uid : 11; // dictionary
-
-        pri_e pri : 3;   // [0,7] sub index, 1=request not response
-        uint8_t seq : 2; // sequence counter
+        ext_e ext : 2;     // protocol extension
+        pri_e pri : 1;     // priority (request, response)
+        uint8_t seq : 2;   // sequence counter
     };
 
     constexpr explicit pid_s()
@@ -92,7 +92,7 @@ union pid_s {
     }
 
     // _seq!=0 indicates valid uid (_raw!=0)
-    constexpr explicit pid_s(uint16_t _uid, pri_e _pri, uint8_t _seq)
+    constexpr explicit pid_s(uint16_t _uid, pri_e _pri, uint8_t _seq = 0)
         : uid(_uid)
         , pri(_pri)
         , seq(_seq)

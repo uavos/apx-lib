@@ -194,7 +194,7 @@ TelemetryEncoder::result_e TelemetryEncoder::update(const xbus::pid_s &pid, mand
 
     auto &f = _slots.fields[pos];
 
-    f.pid = xbus::pid_s(uid, xbus::pri_final, fmt.seq);
+    f.pid = xbus::pid_s(uid, xbus::pri_response, fmt.seq);
     f.fmt = fmt.fmt;
     _set_data(pos, raw, type_id);
 

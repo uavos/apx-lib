@@ -32,6 +32,19 @@ typedef uint8_t guid_t[12]; //global unique node id
 
 typedef uint32_t hash_t;
 
+namespace cmd {
+enum {
+    search, // Search nodes broadcast request, re <uid>
+    ident,  // Node identification `ident_s` `strings:name+version+hardware` `filenames`
+    file,   // File operations `name` `fop_e` [`data`]
+    reboot, // System reboot `type_e`
+    msg,    // Text message `type_e` `string`
+    upd,    // Update parameter `fid_t` `data`
+    mod,    // Modules tree `op_e`
+    usr,    // Node specific command `cmd_s` [`data`]
+};
+} // namespace cmd
+
 //---------------------------
 // ident
 //---------------------------
