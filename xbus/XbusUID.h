@@ -38,9 +38,8 @@ static constexpr bool match(uint16_t v)
 enum class _cmd_e {
     unit,
     telemetry,
-    stream,
+    aux,
     sim,
-    script,
 
     node = 15,
 };
@@ -52,17 +51,56 @@ struct _base_s
     static constexpr auto match = cmd::match<0xFFF0>;
 };
 
+// nodes network management
 struct node : _base_s<_cmd_e::node>
 {
     enum {
-        search = uid,
-        ident,
-        file,
-        reboot,
-        msg,
-        upd,
-        mod,
-        usr,
+        search = uid, // Search nodes broadcast request, replies <uid>
+        ident,        // Node identification <ident_s><strings:name+version+hardware><filenames>
+        file,         // File operations <name><fop_e>[<data>]
+        reboot,       // System reboot <type_e>
+        msg,          // Text message <type_e><string>
+        upd,          // Update parameter <fid_t><data>
+        mod,          // Modules tree <op_e>
+        usr,          // Node specific command <cmd_s>[<data>]
+    };
+};
+
+// inter-unit communication
+struct unit : _base_s<_cmd_e::unit>
+{
+    enum {
+        ident = uid, // unit identity and squawk assignment
+        heartbeat,   // unit heartbeat
+    };
+};
+
+// telemetry data stream
+struct telemetry : _base_s<_cmd_e::telemetry>
+{
+    enum {
+        data = uid, // telemetry data stream
+        format,     // telemetry format
+        xpdr,       // transponder data
+    };
+};
+
+// auxiliary data objects
+struct aux : _base_s<_cmd_e::aux>
+{
+    enum {
+        vcp = uid, // virtual com port data
+        scr,       // script call request
+    };
+};
+
+// simulation data
+struct sim : _base_s<_cmd_e::sim>
+{
+    enum {
+        sensors = uid, // sensors data
+        controls,      // controls data
+        cfg,           // datarefs mapping
     };
 };
 
