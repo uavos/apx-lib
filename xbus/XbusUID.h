@@ -90,7 +90,8 @@ struct aux : _base_s<_cmd_e::aux>
 {
     enum {
         vcp = uid, // virtual com port data
-        scr,       // script call request
+        vmexec,    // node script call request
+        jsexec,    // GCS JScript call request
     };
 };
 
@@ -98,9 +99,9 @@ struct aux : _base_s<_cmd_e::aux>
 struct sim : _base_s<_cmd_e::sim>
 {
     enum {
-        sensors = uid, // sensors data
-        controls,      // controls data
-        cfg,           // datarefs mapping
+        sns = uid, // sensors data
+        ctr,       // controls data
+        cfg,       // datarefs mapping
     };
 };
 

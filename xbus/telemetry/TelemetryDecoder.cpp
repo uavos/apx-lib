@@ -31,7 +31,7 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
     if (stream.available() < xbus::telemetry::hdr_s::psize())
         return false;
 
-    bool is_xpdr = pid.uid == mandala::cmd::env::telemetry::xpdr::uid;
+    bool is_xpdr = pid.uid == xbus::cmd::telemetry::xpdr;
 
     xbus::telemetry::hdr_s hdr;
     hdr.read(&stream);
