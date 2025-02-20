@@ -41,11 +41,6 @@ enum eid_e : uint8_t {
     eid_rsv2,     // reserved
 };
 
-enum pri_e : uint8_t {
-    pri_response = 0,
-    pri_request,
-};
-
 // Packet identifier [16 bits]
 #pragma pack(1)
 union pid_s {
@@ -55,7 +50,7 @@ union pid_s {
     {
         uint16_t uid : 11; // UID
         eid_e eid : 2;     // UID extension
-        pri_e pri : 1;     // priority (1=request, 0=response)
+        bool req : 1;      // direction (1=request, 0=response)
         uint8_t seq : 2;   // sequence counter
     };
 
@@ -69,16 +64,10 @@ union pid_s {
     }
 
     // _seq!=0 indicates valid uid (_raw!=0)
-    constexpr explicit pid_s(uint16_t _uid, pri_e _pri, uint8_t _seq)
+    constexpr explicit pid_s(uint16_t _uid, bool _req, uint8_t _seq)
         : uid(_uid)
         , eid(eid_none)
-        , pri(_pri)
-        , seq(_seq)
-    {}
-    constexpr explicit pid_s(uint16_t _uid, uint8_t _seq)
-        : uid(_uid)
-        , eid(eid_none)
-        , pri(pri_response)
+        , req(_req)
         , seq(_seq)
     {}
 
