@@ -23,6 +23,8 @@
 
 #include <sys/types.h>
 
+#include "XbusUID.h"
+
 #include "XbusStreamReader.h"
 #include "XbusStreamWriter.h"
 
@@ -32,39 +34,14 @@ typedef uint16_t pid_raw_t;
 
 constexpr const size_t size_packet_max = 512;
 
-namespace cmd {
-
-static constexpr uint16_t base = 0x0700;
-
-enum class cmd_e {
-    unit,
-    telemetry,
-    stream,
-    sim,
-    script,
-
-    node = 15,
-};
-
-namespace telemetry {
-enum {
-    data = cmd::base + (((uint16_t) cmd_e::telemetry) << 8),
-    format,
-    xpdr,
-};
-} // namespace telemetry
-
-} // namespace cmd
-
-enum ext_e : uint8_t {
-    ext_none = 0, // local network packet <pid><data>
-    ext_unit,     // unit addressed <pid><squawk><uuid[n]><data>
-    ext_rsv1,     // reserved
-    ext_rsv2,     // reserved
+enum eid_e : uint8_t {
+    eid_none = 0, // local network packet <pid><data>
+    eid_unit,     // unit addressed <pid><squawk><uuid[n]><data>
+    eid_rsv1,     // reserved
+    eid_rsv2,     // reserved
 };
 
 enum pri_e : uint8_t {
-    pri_broadcast = 0,
     pri_response = 0,
     pri_request,
 };
@@ -76,9 +53,9 @@ union pid_s {
 
     struct
     {
-        uint16_t uid : 11; // dictionary
-        ext_e ext : 2;     // protocol extension
-        pri_e pri : 1;     // priority (request, response)
+        uint16_t uid : 11; // UID
+        eid_e eid : 2;     // UID extension
+        pri_e pri : 1;     // priority (1=request, 0=response)
         uint8_t seq : 2;   // sequence counter
     };
 
@@ -92,9 +69,16 @@ union pid_s {
     }
 
     // _seq!=0 indicates valid uid (_raw!=0)
-    constexpr explicit pid_s(uint16_t _uid, pri_e _pri, uint8_t _seq = 0)
+    constexpr explicit pid_s(uint16_t _uid, pri_e _pri, uint8_t _seq)
         : uid(_uid)
+        , eid(eid_none)
         , pri(_pri)
+        , seq(_seq)
+    {}
+    constexpr explicit pid_s(uint16_t _uid, uint8_t _seq)
+        : uid(_uid)
+        , eid(eid_none)
+        , pri(pri_response)
         , seq(_seq)
     {}
 
@@ -111,11 +95,11 @@ union pid_s {
         *s << _raw;
     }
 
-    constexpr pid_s(const pid_raw_t &v)
+    constexpr pid_s(pid_raw_t v)
         : _raw(v)
     {}
 
-    constexpr pid_s &operator=(const pid_raw_t &v)
+    constexpr pid_s &operator=(pid_raw_t v)
     {
         _raw = v;
         return *this;
