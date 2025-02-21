@@ -175,8 +175,14 @@ union spec_s {
 
     struct
     {
-        type_id_e type : 4; // data format
-        uint8_t _rsv : 4;   //
+        type_id_e type : 2;    // data format
+        uint8_t _rsv3 : 5;     //
+        uint8_t is_bundle : 1; // bundle
+    };
+    struct
+    {
+        uint8_t bundle_id : 7; // bundle specific ID
+        uint8_t _rsv7 : 1;
     };
 
     explicit spec_s()
