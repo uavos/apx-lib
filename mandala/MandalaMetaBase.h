@@ -37,11 +37,13 @@ typedef float real_t;
 
 typedef uint32_t raw_t;
 
-enum type_id_e { // 2bits
+enum type_id_e { // 3bits
     type_byte,
     type_word,
     type_dword,
     type_real,
+
+    type_bundle,
 };
 
 constexpr const char *type_string(type_id_e type)
@@ -55,6 +57,8 @@ constexpr const char *type_string(type_id_e type)
         return "dword";
     case type_real:
         return "real";
+    case type_bundle:
+        return "bundle";
     }
     return "unknown";
 }
@@ -64,7 +68,7 @@ T read(type_id_e type, XbusStreamReader &stream)
 {
     switch (type) {
     default:
-        return T();
+        break;
     case type_byte:
         return stream.read<byte_t, T>();
     case type_word:
@@ -74,12 +78,15 @@ T read(type_id_e type, XbusStreamReader &stream)
     case type_real:
         return stream.read<real_t, T>();
     }
+    return T();
 }
 
 template<typename T>
 void write(const T &v, type_id_e type, XbusStreamWriter &stream)
 {
     switch (type) {
+    default:
+        break;
     case type_byte:
         return stream.write<byte_t, T>(v);
     case type_word:
@@ -89,7 +96,6 @@ void write(const T &v, type_id_e type, XbusStreamWriter &stream)
     case type_real:
         return stream.write<real_t, T>(v);
     }
-    return stream.write<T>(v);
 }
 
 constexpr type_id_e type_id(const byte_t &)
@@ -112,6 +118,8 @@ constexpr type_id_e type_id(const real_t &)
 constexpr size_t type_size(type_id_e type)
 {
     switch (type) {
+    default:
+        break;
     case type_byte:
         return sizeof(byte_t);
     case type_word:
@@ -155,6 +163,8 @@ template<typename T>
 static constexpr inline T from_raw(raw_t r, type_id_e type_id)
 {
     switch (type_id) {
+    default:
+        break;
     case type_byte:
         return (T) from_raw<byte_t>(r);
     case type_word:
@@ -175,7 +185,7 @@ union spec_s {
 
     struct
     {
-        type_id_e type : 4; // data format
+        type_id_e type : 3; // data format
         uint8_t _rsv : 4;   //
     };
 

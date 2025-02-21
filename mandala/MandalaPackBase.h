@@ -241,6 +241,8 @@ constexpr fmt_e default_fmt(type_id_e type, units_e units)
     }
 
     switch (type) {
+    default:
+        break;
     case type_byte:
         return fmt_u8;
 

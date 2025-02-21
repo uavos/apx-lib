@@ -93,6 +93,8 @@ template<typename T>
 T raw_value(const void *src, mandala::type_id_e type)
 {
     switch (type) {
+    default:
+        break;
     case mandala::type_byte:
         return cast_value<T>(*static_cast<const mandala::byte_t *>(src));
     case mandala::type_word:
