@@ -47,7 +47,7 @@ enum class _cmd_e {
 template<_cmd_e BASE>
 struct _base_s
 {
-    static constexpr uint16_t uid = cmd::uid + (((uint16_t) BASE) << 8);
+    static constexpr uint16_t uid = cmd::uid + (((uint16_t) BASE) << 4);
     static constexpr auto match = cmd::match<0xFFF0>;
 };
 
