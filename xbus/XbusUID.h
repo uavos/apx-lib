@@ -29,10 +29,10 @@ namespace cmd {
 
 static constexpr uint16_t uid = 0x0700;
 
-template<uint16_t MASK = 0xFF00>
+template<uint16_t MASK = 0xFF00, uint16_t UID = uid>
 static constexpr bool match(uint16_t v)
 {
-    return (v & MASK) == uid;
+    return (v & MASK) == UID;
 }
 
 enum class _cmd_e {
@@ -48,7 +48,7 @@ template<_cmd_e BASE>
 struct _base_s
 {
     static constexpr uint16_t uid = cmd::uid + (((uint16_t) BASE) << 4);
-    static constexpr auto match = cmd::match<0xFFF0>;
+    static constexpr auto match = cmd::match<0xFFF0, uid>;
 };
 
 // nodes network management
