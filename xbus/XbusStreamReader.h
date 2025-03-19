@@ -92,35 +92,47 @@ public:
 
     const char *read_string(size_t max_size)
     {
-        if (available() < 1) {
+        // max_size must include null-terminator
+
+        const auto tail = available();
+        if (!tail)
             return nullptr;
-        }
+        if (max_size > tail)
+            max_size = tail;
+
         const char *s = reinterpret_cast<const char *>(ptr());
-        size_t len = strnlen(s, max_size);
-        if (len > max_size)
-            return nullptr;
-        //check ASCII
-        const uint8_t *c = reinterpret_cast<const uint8_t *>(s);
-        if (len == max_size && max_size == available()) {
-            // string is NOT null-terminated
-            // not the best way of doing the fix though
-            size_t p = _pos + len;
-            if (p <= _size)
-                const_cast<uint8_t *>(_buf)[p] = 0;
-            else
-                return nullptr;
-        }
-        while (*c) {
-            const uint8_t &v = *c++;
+
+        //check ASCII constraints and find string length
+        size_t len = 0;
+        for (auto c = s; max_size; c++) {
+            const auto v = *c;
+            if (v == 0) // end of string
+                break;
+
+            max_size--;
+            len++;
+
             if (v == '\n')
                 continue;
             if (v == '\r')
                 continue;
             if (v == '\t')
                 continue;
-            if (v < 32 || v >= 127)
-                return nullptr;
+            if (v >= 32 && v < 127)
+                continue;
+
+            // invalid character
+            max_size = 0;
+            break;
         }
+
+        if (!max_size) {
+            // null terminator not found
+            reset(pos() + tail); // discard the rest of the buffer
+            return nullptr;
+        }
+
+        // skip the string including null terminator
         reset(pos() + len + 1);
         return s;
     }
