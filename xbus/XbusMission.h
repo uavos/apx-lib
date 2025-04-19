@@ -65,32 +65,6 @@ struct pld_hdr_s
         pld_item_s act; // array of actions
         pld_item_s geo; // array of geofence objects
     } items;
-
-    // unit parameters
-    // affect map display and editor
-    // data is only used by GCS
-    /*struct unit_s
-    {
-        uint16_t speed; // [m/s] cruise airspeed IAS
-        uint16_t turn;  // [m] turn radius at sea level on cruise speed
-
-        uint16_t alt;   // [m] max altitude MSL
-        uint16_t endce; // [min] maximum flight endurance
-
-        uint8_t climb; // [m/s] max climbing rate
-        uint8_t sink;  // [m/s] max sinking rate
-
-        uint16_t _rsv;
-
-        union {
-            uint32_t _raw;
-            struct
-            {
-                bool type : 4; // 0=generic, 1=CTOL, 2=VTOL, 3=HTPL, etc
-                bool _rsv : 4;
-            };
-        } flags;
-    };*/
 };
 // 32 + 6 * 4 = 56 bytes
 static_assert(sizeof(pld_hdr_s) == 56, "size");
@@ -147,23 +121,66 @@ struct pi_s : pos_ll_s
 static_assert(sizeof(pi_s) == 15, "size");
 
 // Airspace Geofence
-struct geo_s : pos_ll_s
+// https://pilotinstitute.com/airspace-explained/
+struct geo_s
 {
-    enum type_e {
-        CIRCLE,
-        POLYGON,
+    enum role_e {
+        SAFE, // FlyZone, allowed area, detect when outide
+        DENY, // NoFlyZone, try to avoid
+        TERM, // immediately terminate flight when inside
+        AUX,  // no effect but distance to border is reported
     };
-    uint8_t n; // number of points
-    struct
+    enum shape_e {
+        CIRCLE,  // point with radius
+        POLYGON, // polygon with points, also has circle to optimize
+        LINE,    // active on the left side of the line
+    };
+    struct // 8 bits
     {
-        type_e type : 4;
-        bool inclusive : 1; // 0=inside, 1=outside
-        uint8_t _rsv : 3;
+        role_e role : 3;
+        shape_e shape : 3;
+        uint8_t _rsv : 2;
     };
-    uint16_t radius; // [m] radius
-    // points follow
+    struct // 8 bits
+    {
+        bool name : 1;     // has name [str]
+        bool height : 1;   // has height limits [u16,u16] [m MSL] (bottom, top) 0=unlimited
+        bool inverted : 1; // inverted shape, valid is when outside of geofence
+        bool cone : 1;     // cone shape - expands with altitude
+    } flags;
+
+    // optional fields
+    const char name[0]; // [str] name of geofence, 0-terminated string
+    struct geo_height_s
+    {
+        uint16_t bottom; // [m] MSL
+        uint16_t top;    // [m] MSL
+    } height[0];         // optional, only if flags.height is set
 };
-static_assert(sizeof(geo_s) == 12, "size");
+static_assert(sizeof(geo_s) == 2, "size");
+
+struct geo_circle_s
+{
+    pos_ll_s pos;    // center of circle
+    uint16_t radius; // [m*100] radius of circle
+};
+static_assert(sizeof(geo_circle_s) == sizeof(pos_ll_s) + 2, "size");
+
+struct geo_polygon_s
+{
+    geo_circle_s circle; // circle around polygon (to optimize)
+
+    uint8_t cnt;        // number of points
+    pos_ll_s points[1]; // [cnt] points of polygon follow
+};
+static_assert(sizeof(geo_polygon_s) == sizeof(geo_circle_s) + 1 + 1 * sizeof(pos_ll_s), "size");
+
+struct geo_line_s
+{
+    pos_ll_s p1; // start point
+    pos_ll_s p2; // end point
+};
+static_assert(sizeof(geo_line_s) == 2 * sizeof(pos_ll_s), "size");
 
 // Actions
 
