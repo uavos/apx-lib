@@ -378,3 +378,38 @@
     - name: range
       title: Payload range
       units: m
+
+- name: scr
+  title: Script values (float 32 bits)
+  fmt: f32
+  content:
+    - name: s1
+      title: scr 1
+    - name: s2
+      title: scr 2
+    - name: s3
+      title: scr 3
+    - name: s4
+      title: scr 4
+    - name: s5
+      title: scr 5
+    - name: s6
+      title: scr 6
+    - name: s7
+      title: scr 7
+    - name: s8
+      title: scr 8
+    - name: s9
+      title: scr 9
+    - name: s10
+      title: scr 10
+    - name: s11
+      title: scr 11
+    - name: s12
+      title: scr 12
+    - name: s13
+      title: scr 13
+    - name: s14
+      title: scr 14
+    - name: s15
+      title: scr 15
