@@ -163,6 +163,7 @@ struct haps_center_s
     float rc_yaw;
     float ctr_throttle;
     float ctr_rudder;
+    float ctr_ailerons;
     uint8_t EMG_MODE : 1;
     uint8_t RESET_PID : 1;
     uint8_t unused : 6;
@@ -176,7 +177,6 @@ struct haps_lr_s
     float airspeed;
     float cmd_pitch;
     float ctr_elevator;
-    float ctr_haps_ailerons;
 };
 
 #pragma pack()
