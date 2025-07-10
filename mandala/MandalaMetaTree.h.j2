@@ -17,7 +17,7 @@
 
 {{ ind }}typedef {{ type }} type_t;
 {{ ind }}static constexpr const meta_s &meta{ mandala::meta[{{ ns.meta_id }}] };
-{{ ind }}static constexpr const uid_t uid{ meta.uid }; //0x{{ '%0x' % uid }}
+{{ ind }}static constexpr const uid_t uid{ meta.uid };
 {%- endmacro -%}
 
 {%- macro mandala_expand(d, indent=0, level=0, uid=0) -%}
