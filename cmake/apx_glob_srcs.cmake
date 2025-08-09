@@ -1,11 +1,5 @@
 function(apx_glob_srcs)
 
-    if(ARGN)
-        set(SRCS "${ARGN}")
-    else()
-        set(SRCS "*.[chsS]*;*.yml")
-    endif()
-
     # message(STATUS "SRC_GLOB: ${SRCS}")
 
     set(srcs)
