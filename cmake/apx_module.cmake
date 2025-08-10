@@ -5,14 +5,14 @@ function(apx_module)
         NAME apx_module
         ONE_VALUE
             MODULE_NAME # name of the module, if not set, will be guessed from the path
-            BEFORE      # insert module before this one in the init list
+            BEFORE      # init this module before specified module
             TYPE        # type of library to create (STATIC, SHARED, INTERFACE)
         MULTI_VALUE
             INCLUDES    # include directories
             SRCS        # source files to compile
             DEPENDS     # modules to depend on
             GENSRC      # generate source files from templates
-            RES         # files to copy as-is to output directory
+            ASSETS      # paths to copy as-is to output directory
         OPTIONS
             INIT        # call init function on node boot
             CUSTOM      # do not create any libraries, just a custom target
@@ -79,7 +79,7 @@ function(apx_module)
     if(NOT SRCS AND NOT CUSTOM)
         set(SRCS "*.[chsS]*;*.yml") # default search patterns
     endif()
-    apx_glob_srcs(${SRCS})
+    apx_glob_srcs(SRCS)
     # message(STATUS "SRC: ${SRCS}")
 
     # check if src contains headers only - i.e. interface
@@ -144,6 +144,43 @@ function(apx_module)
                 target_include_directories(${MODULE} INTERFACE ${gensrc_dir})
             endif()
         endforeach()
+    endif()
+
+    # assets copying
+    if(ASSETS)
+        apx_glob_srcs(ASSETS)
+        set(assets_dest ${CMAKE_BINARY_DIR}/assets)
+        set(assets_dirs)
+        foreach(asset ${ASSETS})
+            get_filename_component(dir ${asset} DIRECTORY)
+            get_filename_component(dir ${assets_dest}/${dir} ABSOLUTE)
+            if(NOT dir IN_LIST assets_dirs)
+                list(APPEND assets_dirs ${dir})
+            endif()
+        endforeach()
+        add_custom_command(
+            OUTPUT assets.stamp
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${assets_dirs}
+            COMMENT "Copying assets for ${MODULE}..."
+            VERBATIM
+        )
+        foreach(asset ${ASSETS})
+            get_filename_component(dir ${asset} DIRECTORY)
+            get_filename_component(dest_dir ${assets_dest}/${dir} ABSOLUTE)
+            add_custom_command(
+                OUTPUT assets.stamp
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/${asset} ${dest_dir}
+                DEPENDS ${asset}
+                APPEND
+            )
+        endforeach()
+        add_custom_command(
+            OUTPUT assets.stamp
+            COMMAND ${CMAKE_COMMAND} -E touch assets.stamp
+            APPEND
+        )
+        add_custom_target(${MODULE}.assets DEPENDS assets.stamp)
+        add_dependencies(${MODULE} ${MODULE}.assets)
     endif()
 
     # dependencies linking
