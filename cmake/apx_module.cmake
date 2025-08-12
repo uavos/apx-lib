@@ -154,9 +154,16 @@ function(apx_module)
         foreach(asset ${ASSETS})
             get_filename_component(dir ${asset} DIRECTORY)
             get_filename_component(dir ${assets_dest}/${dir} ABSOLUTE)
-            if(NOT dir IN_LIST assets_dirs)
-                list(APPEND assets_dirs ${dir})
+            # message(STATUS "Asset: ${asset}")
+            # skip absolute dirs
+            if(dir IN_LIST assets_dirs
+               OR asset MATCHES "^\/."
+               OR asset MATCHES "^\.\.\/."
+            )
+                continue()
             endif()
+            # message(STATUS "Dir: ${dir}")
+            list(APPEND assets_dirs ${dir})
         endforeach()
         add_custom_command(
             OUTPUT assets.stamp
@@ -165,8 +172,12 @@ function(apx_module)
             VERBATIM
         )
         foreach(asset ${ASSETS})
-            get_filename_component(dir ${asset} DIRECTORY)
-            get_filename_component(dest_dir ${assets_dest}/${dir} ABSOLUTE)
+            if(asset MATCHES "^\/." OR asset MATCHES "^\.\.\/.")
+                set(dest_dir ${assets_dest})
+            else()
+                get_filename_component(dir ${asset} DIRECTORY)
+                get_filename_component(dest_dir ${assets_dest}/${dir} ABSOLUTE)
+            endif()
             add_custom_command(
                 OUTPUT assets.stamp
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/${asset} ${dest_dir}
