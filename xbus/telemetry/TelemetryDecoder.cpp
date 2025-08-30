@@ -50,7 +50,8 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
         if (_hash_valid > 4)
             reset(); // this should never happen
     } else {
-        _valid = hdr.feed_hash == xpdr::version;
+        if (hdr.feed_hash != xpdr::version)
+            return true; // XPDR stream is always valid, but version mismatch
     }
 
     // estimate timestamp
@@ -86,7 +87,7 @@ bool TelemetryDecoder::decode(const xbus::pid_s &pid, XbusStreamReader &stream)
     }
 
     // XPDR stream
-    return _valid && decode_xpdr(stream);
+    return decode_xpdr(stream);
 }
 
 void TelemetryDecoder::reset(bool reset_hash)
