@@ -148,6 +148,7 @@ function(apx_module)
 
     # assets copying
     if(ASSETS)
+        message(STATUS "ASSETS: ${ASSETS}")
         apx_glob_srcs(ASSETS)
         set(assets_dest ${CMAKE_BINARY_DIR}/assets)
         set(assets_dirs)

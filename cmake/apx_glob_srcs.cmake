@@ -9,30 +9,34 @@ function(apx_glob_srcs paths_var)
         # message(STATUS "NEXT: ${src} ${CMAKE_CURRENT_SOURCE_DIR}")
 
         # check for recursive glob options (dir or ** in path)
-        set(glob_type GLOB)
+        set(glob_type)
         # if folder, add /** to search recursively
         if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${src}/" OR EXISTS "${src}/")
             set(src "${src}/**")
         endif()
         if(src MATCHES "\\*\\*")
             set(glob_type GLOB_RECURSE)
+        elseif(src MATCHES "\\*")
+            set(glob_type GLOB)
         endif()
 
         # expand glob
         # message(STATUS "DIR: ${src}")
-        file(
-            ${glob_type}
-            src_exp
-            RELATIVE
-            ${CMAKE_CURRENT_SOURCE_DIR}
-            LIST_DIRECTORIES
-            FALSE
-            ${src}
-        )
-        if(src_exp)
-            set(src ${src_exp})
-        else()
-            # message(STATUS "paths glob missing: ${src}")
+        if(glob_type)
+            file(
+                ${glob_type}
+                src_exp
+                RELATIVE
+                ${CMAKE_CURRENT_SOURCE_DIR}
+                LIST_DIRECTORIES
+                FALSE
+                ${src}
+            )
+            if(src_exp)
+                set(src ${src_exp})
+            else()
+                # message(STATUS "paths glob missing: ${src}")
+            endif()
         endif()
 
         # filter out paths with glob symbols and begin with underscore
@@ -42,10 +46,14 @@ function(apx_glob_srcs paths_var)
                 continue()
             endif()
             get_filename_component(fname ${fsrc} NAME)
-            if(fname MATCHES "^[\\._].+")
+            if(fname MATCHES "^_.+") # ignore files starting with underscore
                 # message(FATAL_ERROR ${fname})
                 continue()
             endif()
+            # if(fname MATCHES "^\\.+") # hidden files
+            #     # message(FATAL_ERROR ${fname})
+            #     continue()
+            # endif()
             list(APPEND srcs ${fsrc})
         endforeach()
     endforeach()
