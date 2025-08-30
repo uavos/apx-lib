@@ -9,34 +9,30 @@ function(apx_glob_srcs paths_var)
         # message(STATUS "NEXT: ${src} ${CMAKE_CURRENT_SOURCE_DIR}")
 
         # check for recursive glob options (dir or ** in path)
-        set(glob_type)
+        set(glob_type GLOB)
         # if folder, add /** to search recursively
         if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${src}/" OR EXISTS "${src}/")
             set(src "${src}/**")
         endif()
         if(src MATCHES "\\*\\*")
             set(glob_type GLOB_RECURSE)
-        elseif(src MATCHES "\\*")
-            set(glob_type GLOB)
         endif()
 
         # expand glob
         # message(STATUS "DIR: ${src}")
-        if(glob_type)
-            file(
-                ${glob_type}
-                src_exp
-                RELATIVE
-                ${CMAKE_CURRENT_SOURCE_DIR}
-                LIST_DIRECTORIES
-                FALSE
-                ${src}
-            )
-            if(src_exp)
-                set(src ${src_exp})
-            else()
-                # message(STATUS "paths glob missing: ${src}")
-            endif()
+        file(
+            ${glob_type}
+            src_exp
+            RELATIVE
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            LIST_DIRECTORIES
+            FALSE
+            ${src}
+        )
+        if(src_exp)
+            set(src ${src_exp})
+        else()
+            # message(STATUS "paths glob missing: ${src}")
         endif()
 
         # filter out paths with glob symbols and begin with underscore
