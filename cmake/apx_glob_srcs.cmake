@@ -1,27 +1,27 @@
-function(apx_glob_srcs)
+function(apx_glob_srcs paths_var)
 
-    if(ARGN)
-        set(SRCS "${ARGN}")
-    else()
-        set(SRCS "*.[chsS]*;*.yml")
-    endif()
+    set(paths ${${paths_var}})
+    # message(STATUS "SRC_GLOB: ${paths}")
 
-    # message(STATUS "SRC_GLOB: ${SRCS}")
-
+    # expand all source files to srcs list
     set(srcs)
-    foreach(src ${SRCS})
+    foreach(src ${paths})
         # message(STATUS "NEXT: ${src} ${CMAKE_CURRENT_SOURCE_DIR}")
-        set(glob GLOB)
+
+        # check for recursive glob options (dir or ** in path)
+        set(glob_type GLOB)
+        # if folder, add /** to search recursively
         if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${src}/" OR EXISTS "${src}/")
             set(src "${src}/**")
         endif()
         if(src MATCHES "\\*\\*")
-            set(glob GLOB_RECURSE)
+            set(glob_type GLOB_RECURSE)
         endif()
 
+        # expand glob
         # message(STATUS "DIR: ${src}")
         file(
-            ${glob}
+            ${glob_type}
             src_exp
             RELATIVE
             ${CMAKE_CURRENT_SOURCE_DIR}
@@ -32,23 +32,29 @@ function(apx_glob_srcs)
         if(src_exp)
             set(src ${src_exp})
         else()
-            # message(STATUS "SRCS glob missing: ${src}")
+            # message(STATUS "paths glob missing: ${src}")
         endif()
 
+        # filter out paths with glob symbols and begin with underscore
         foreach(fsrc ${src})
             if(fsrc MATCHES "[\\*\\?]+")
-                # message(STATUS "SRCS glob not expanded: ${fsrc}")
+                # message(STATUS "paths glob not expanded: ${fsrc}")
                 continue()
             endif()
             get_filename_component(fname ${fsrc} NAME)
-            if(fname MATCHES "^[\\._].+")
+            if(fname MATCHES "^_.+") # ignore files starting with underscore
                 # message(FATAL_ERROR ${fname})
                 continue()
             endif()
+            # if(fname MATCHES "^\\.+") # hidden files
+            #     # message(FATAL_ERROR ${fname})
+            #     continue()
+            # endif()
             list(APPEND srcs ${fsrc})
         endforeach()
     endforeach()
 
+    # check if srcs contains directories or not existing files
     foreach(src ${srcs})
         if(src MATCHES "^/")
             file(RELATIVE_PATH src ${CMAKE_CURRENT_SOURCE_DIR} ${src})
@@ -57,16 +63,16 @@ function(apx_glob_srcs)
             message(FATAL_ERROR "Not found: ${src}")
         endif()
         if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${src}/")
-            message(FATAL_ERROR "SRCS glob expanded to directory: ${src}")
+            message(FATAL_ERROR "paths glob expanded to directory: ${src}")
         endif()
     endforeach()
 
+    # message(STATUS "SRC_GLOB_OUT: ${srcs}")
+
     # return value
-    set(SRCS
+    set(${paths_var}
         ${srcs}
         PARENT_SCOPE
     )
-
-    # message(STATUS "SRC_GLOB_OUT: ${srcs}")
 
 endfunction()

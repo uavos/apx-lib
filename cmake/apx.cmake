@@ -44,7 +44,7 @@ set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
 
 include(apx_parse_function_args)
 
-include(apx_srcs)
+include(apx_glob_srcs)
 include(apx_module)
 include(apx_use_module)
 include(apx_gensrc)
