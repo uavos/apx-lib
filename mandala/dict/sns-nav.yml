@@ -318,11 +318,9 @@
       units:
         - "off"
         - "on"
-      ds: heavy
     - name: htemp
       title: Pitot heater temperature
       units: C
-      ds: heavy
 
 - name: agl
   title: Altitude above ground sensors
