@@ -48,6 +48,8 @@
       suffix: RF amplifier
     - name: ice
       suffix: Anti-ice
+    - name: hpt
+      suffix: Heater Pitot
     - name: las
       suffix: Landing Assistance
 

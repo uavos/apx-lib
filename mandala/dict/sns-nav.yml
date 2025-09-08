@@ -313,6 +313,13 @@
       title: Dynamic pressure
       units: kPa
 
+    - name: hstatus
+      title: Heater status
+    - name: htemp
+      title: Heater Pitot temperature probe
+      units: C
+      ds: heavy
+
 - name: agl
   title: Altitude above ground sensors
   content:
