@@ -315,6 +315,10 @@
 
     - name: hstatus
       title: Pitot heater status
+      units:
+        - "off"
+        - "on"
+      ds: heavy
     - name: htemp
       title: Pitot heater temperature
       units: C
