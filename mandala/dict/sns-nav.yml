@@ -314,9 +314,9 @@
       units: kPa
 
     - name: hstatus
-      title: Heater status
+      title: Pitot heater status
     - name: htemp
-      title: Heater Pitot temperature probe
+      title: Pitot heater temperature
       units: C
       ds: heavy
 

@@ -49,7 +49,7 @@
     - name: ice
       suffix: Anti-ice
     - name: hpt
-      suffix: Heater Pitot
+      suffix: Pitot heater
     - name: las
       suffix: Landing Assistance
 
