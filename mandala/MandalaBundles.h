@@ -179,6 +179,16 @@ struct haps_lr_s
     float ctr_elevator;
 };
 
+struct swarm_s
+{
+    uint8_t id;
+    uint8_t mode;
+    float cmd_airspeed; // m/s
+    float cmd_altitude; // m
+    float cmd_bearing;  // degrees
+    int32_t cmd_llh[3]; // 1e-7 degrees, 1e-3 meters
+};
+
 #pragma pack()
 
 typedef uint8_t vcp_id_t;

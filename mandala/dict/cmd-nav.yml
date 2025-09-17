@@ -430,3 +430,43 @@
     - name: cpitch2
       suffix: cmd pitch2
       units: rad
+
+- name: swarm
+  title: SWARM
+  content:
+    - name: mode
+      suffix: mode
+      units:
+        - "off"
+        - "auto"
+        - "manual"
+
+    - name: dx
+      suffix: offset X
+      units: m
+    - name: dy
+      suffix: offset Y
+      units: m
+    - name: dz
+      suffix: offset Z
+      units: m
+
+    - name: lat
+      suffix: latitude
+      type: dword
+      units: gps
+    - name: lon
+      suffix: latitude
+      type: dword
+      units: gps
+    - name: hmsl
+      suffix: altitude MSL
+      units: m
+      fmt: f32
+
+    - name: bearing
+      suffix: bearing
+      units: rad
+    - name: speed
+      suffix: speed
+      units: m/s
