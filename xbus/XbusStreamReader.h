@@ -199,37 +199,29 @@ void XbusStreamReader::_get_data(_T &src, _Tout &data)
 template<typename _T>
 void XbusStreamReader::read(_T &data)
 {
-    if ((_pos + sizeof(_T)) > _size) {
+    const auto dsize = sizeof(_T);
+
+    if ((_pos + dsize) > _size) {
         _pos = _size;
         data = {};
         return;
     }
 
-    switch (sizeof(_T)) {
-    case 1:
+    if constexpr (dsize == 1) {
         data = static_cast<_T>(_buf[_pos]);
-        break;
-
-    case 2:
+    } else if constexpr (dsize == 2) {
         uint16_t data_le16;
         _get_data(data_le16, data);
-        break;
-
-    case 4:
+    } else if constexpr (dsize == 4) {
         uint32_t data_le32;
         _get_data(data_le32, data);
-        break;
-
-    case 8:
+    } else if constexpr (dsize == 8) {
         uint64_t data_le64;
         _get_data(data_le64, data);
-        break;
-
-    default:
+    } else {
         // support struct with fixed size
         // i.e. stream >> struct{uint32_t a; uint16_t b;};
-        memcpy(&data, &_buf[_pos], sizeof(_T));
-        break;
+        memcpy(&data, &_buf[_pos], dsize);
     }
-    _pos += sizeof(_T);
+    _pos += dsize;
 }
