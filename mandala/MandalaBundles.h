@@ -179,7 +179,7 @@ struct haps_lr_s
     float ctr_elevator;
 };
 
-union swarm_h {
+union swarmid_s {
     uint32_t raw;
     struct
     {
@@ -192,9 +192,11 @@ union swarm_h {
 
 struct swarm_s
 {
+    uint8_t mode;
     float cmd_airspeed; // m/s
     float cmd_altitude; // m
-    float cmd_bearing;  // degrees
+    float cmd_bearing;  // rad
+    float bearing;      // rad
     int32_t cmd_llh[3]; // 1e-7 degrees, 1e-3 meters
 };
 
