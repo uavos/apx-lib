@@ -179,20 +179,23 @@ struct haps_lr_s
     float ctr_elevator;
 };
 
+enum {
+    swarm_followme = 1,
+    swarm_data = 2,
+};
+
 union swarmid_s {
-    uint32_t raw;
+    uint16_t raw;
     struct
     {
-        uint16_t src : 10;
-        uint16_t dst : 10;
-        uint8_t msg_type : 4;
-        uint8_t unused : 8;
+        uint16_t src : 11;
+        uint8_t type : 4;
+        uint8_t ext : 1;
     };
 };
 
 struct swarm_s
 {
-    uint8_t mode;
     float cmd_airspeed; // m/s
     float cmd_altitude; // m
     float cmd_bearing;  // rad
