@@ -187,7 +187,7 @@
       type: dword
       units: gps
     - name: lon
-      title: Cmd latitude
+      title: Cmd longitude
       type: dword
       units: gps
     - name: hmsl
@@ -378,7 +378,7 @@
       type: dword
       units: gps
     - name: lon
-      suffix: latitude
+      suffix: longitude
       type: dword
       units: gps
     - name: hmsl
@@ -456,7 +456,7 @@
       type: dword
       units: gps
     - name: lon
-      suffix: latitude
+      suffix: longitude
       type: dword
       units: gps
     - name: hmsl
