@@ -199,6 +199,7 @@ struct swarm_s
     float cmd_airspeed; // m/s
     float cmd_altitude; // m
     float cmd_bearing;  // rad
+    float cmd_lacc;     // m/s^2
     float bearing;      // rad
     int32_t cmd_llh[3]; // 1e-7 degrees, 1e-3 meters
 };
