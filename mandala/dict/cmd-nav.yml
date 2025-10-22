@@ -224,11 +224,6 @@
       title: Cmd velocity y
       units: m/s
 
-    - name: lacc
-      title: Cmd lateral acceleration
-      units: m/s^2
-      ds: aux
-
 - name: eng
   title: Engine regulators
   ds: normal
