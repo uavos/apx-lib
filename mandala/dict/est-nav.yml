@@ -428,7 +428,7 @@
   ds: aux
   content:
     - name: safe
-      title: Geofence safety status
+      title: Geofence safety
       units:
         - "off"
         - "ok"
@@ -447,7 +447,7 @@
         negative values indicate distance inside allowed area.
 
     - name: avoid
-      title: Geofence avoidance status
+      title: Geofence avoidance
       units:
         - "off"
         - "ok"
@@ -466,7 +466,7 @@
         avoidance area.
 
     - name: term
-      title: Geofence flight termination status
+      title: Geofence termination
       units:
         - "off"
         - "ok"
@@ -486,7 +486,7 @@
         termination area.
 
     - name: aux
-      title: Auxiliary geofence status
+      title: Auxiliary geofence
       units:
         - "off"
         - "inside"
