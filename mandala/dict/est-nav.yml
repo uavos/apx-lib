@@ -422,3 +422,85 @@
       title: Track heading
       units: rad
       ds: aux
+
+- name: geo
+  title: Geofence navigation
+  ds: aux
+  content:
+    - name: safe
+      title: Geofence safety status
+      units:
+        - "off"
+        - "ok"
+        - "warning"
+        - "critical"
+      descr: |
+        Geofence safety status indicates whether the vehicle is within allowed areas.
+        `ok` means inside allowed geofences, `warning` means close to the edge,
+        `critical` means outside allowed geofences.
+    - name: sdist
+      title: Distance to nearest geofence boundary
+      units: m
+      descr: |
+        Distance to the nearest geofence boundary.
+        Positive values indicate distance outside allowed area,
+        negative values indicate distance inside allowed area.
+
+    - name: avoid
+      title: Geofence avoidance status
+      units:
+        - "off"
+        - "ok"
+        - "active"
+      descr: |
+        Geofence avoidance status indicates whether geofence avoidance maneuvers
+        are active. `ok` means avoidance is ready but not active, `active` means
+        avoidance maneuvers are currently being executed. `off` means geofence
+        avoidance is disabled or there are no geofences defined.
+    - name: adist
+      title: Distance to nearest avoidance boundary
+      units: m
+      descr: |
+        Distance to the nearest avoidance geofence edge. Negative values indicate
+        distance inside avoidance area, positive values indicate distance outside
+        avoidance area.
+
+    - name: term
+      title: Geofence flight termination status
+      units:
+        - "off"
+        - "ok"
+        - "active"
+      descr: |
+        Geofence flight termination status indicates whether geofence termination
+        procedures are active. `ok` means termination is ready but not active,
+        `active` means termination procedures are currently being executed.
+        `off` means geofence termination is disabled or there are no geofences
+        defined.
+    - name: tdist
+      title: Distance to nearest termination boundary
+      units: m
+      descr: |
+        Distance to the nearest termination geofence edge. Negative values indicate
+        distance inside termination area, positive values indicate distance outside
+        termination area.
+
+    - name: aux
+      title: Auxiliary geofence status
+      units:
+        - "off"
+        - "inside"
+        - "outside"
+      descr: |
+        Auxiliary geofence status can be used for additional geofence-related
+        information as needed by specific implementations. `off` means auxiliary
+        geofence functions are disabled or not defined. `inside` means the
+        vehicle is within the auxiliary geofence area, `outside` means it is
+        outside the auxiliary geofence area.
+    - name: xdist
+      title: Distance to nearest auxiliary boundary
+      units: m
+      descr: |
+        Distance to the nearest auxiliary geofence edge. Negative values indicate
+        distance inside auxiliary area, positive values indicate distance outside
+        auxiliary area.
