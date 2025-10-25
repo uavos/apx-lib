@@ -470,13 +470,15 @@
       units:
         - "off"
         - "ok"
+        - "warning"
         - "active"
       descr: |
         Geofence flight termination status indicates whether geofence termination
-        procedures are active. `ok` means termination is ready but not active,
+        procedures are active.
+        `off` means geofence termination is disabled or there are no geofences.
+        `ok` means termination is ready but not active.
+        `warning` means the vehicle is close to the termination boundary.
         `active` means termination procedures are currently being executed.
-        `off` means geofence termination is disabled or there are no geofences
-        defined.
     - name: tdist
       title: Distance to nearest termination boundary
       units: m
