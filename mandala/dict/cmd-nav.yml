@@ -470,3 +470,37 @@
     - name: speed
       suffix: speed
       units: m/s
+
+- name: guide
+  title: Guide
+  content:
+    - name: mode
+      suffix: mode
+      units:
+        - "off"
+        - "pos"
+        - "rel"
+
+    - name: lat
+      suffix: latitude
+      type: dword
+      units: gps
+    - name: lon
+      suffix: longitude
+      type: dword
+      units: gps
+    - name: hmsl
+      suffix: altitude MSL
+      units: m
+      fmt: f32
+
+    - name: hp
+      suffix: horizontal position
+      units: rad
+    - name: vp
+      suffix: vertical position
+      units: rad
+    - name: dist
+      suffix: distance
+      units: m
+
