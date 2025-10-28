@@ -478,8 +478,10 @@
       suffix: mode
       units:
         - "off"
-        - "pos"
-        - "rel"
+        - "REL"
+        - "ABS"
+        - "POI"
+        - "ISR"
 
     - name: lat
       suffix: latitude
@@ -495,10 +497,10 @@
       fmt: f32
 
     - name: hp
-      suffix: horizontal position
+      suffix: horizontal offset
       units: rad
     - name: vp
-      suffix: vertical position
+      suffix: vertical offset
       units: rad
     - name: dist
       suffix: distance
