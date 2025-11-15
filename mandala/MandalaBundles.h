@@ -196,6 +196,7 @@ union swarmid_s {
 
 struct swarm_s
 {
+    swarmid_s id;
     float cmd_airspeed; // m/s
     float cmd_altitude; // m
     float cmd_bearing;  // rad
