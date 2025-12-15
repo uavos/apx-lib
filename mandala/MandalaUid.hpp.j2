@@ -7,6 +7,11 @@
 {%- if d.content is defined -%}
 {{ ind }}namespace {{ d.name }}
 {{ ind }}{
+{% set has_leaf = d.content | selectattr("content", "undefined") | list | length > 0 %}
+{% if has_leaf %}
+{{ ind }}    enum { bundle = 0x{{ '%0x' % uid }} };
+{%- endif %}
+
 {% set ns.meta_id = ns.meta_id+1 %}
 {% set uid_pow = data.uid_bits[level+2:]|sum %}
 {% set uid_mul = 2**uid_pow %}

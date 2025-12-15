@@ -130,10 +130,21 @@ struct geo_s
         TERM, // immediately terminate flight when inside
         AUX,  // no effect but distance to border is reported
     };
+    static constexpr const char *role_str[] = {
+        "safe",
+        "deny",
+        "term",
+        "aux",
+    };
     enum shape_e {
         CIRCLE,  // point with radius
         POLYGON, // polygon with points, also has circle to optimize
         LINE,    // active on the left side of the line
+    };
+    static constexpr const char *shape_str[] = {
+        "circle",
+        "polygon",
+        "line",
     };
     struct // 8 bits
     {
@@ -143,19 +154,23 @@ struct geo_s
     };
     struct // 8 bits
     {
-        bool name : 1;     // has name [str]
-        bool height : 1;   // has height limits [u16,u16] [m MSL] (bottom, top) 0=unlimited
-        bool inverted : 1; // inverted shape, valid is when outside of geofence
-        bool cone : 1;     // cone shape - expands with altitude
+        bool name : 1;   // has name [str]
+        bool bottom : 1; // has height limit [u16] [m MSL] (bottom) 0=unlimited
+        bool top : 1;    // has height limit [u16] [m MSL] (top) 0=unlimited
+        // bool inverted : 1; // inverted shape, valid is when outside of geofence
+        // bool cone : 1;     // cone shape - expands with altitude
     } flags;
 
     // optional fields
     const char name[0]; // [str] name of geofence, 0-terminated string
-    struct geo_height_s
+    struct geo_bottom_s
     {
-        uint16_t bottom; // [m] MSL
-        uint16_t top;    // [m] MSL
-    } height[0];         // optional, only if flags.height is set
+        uint16_t hmsl; // [m] MSL
+    } bottom[0];       // optional, only if flags.bottom is set
+    struct geo_top_s
+    {
+        uint16_t hmsl; // [m] MSL
+    } top[0];          // optional, only if flags.top is set
 };
 static_assert(sizeof(geo_s) == 2, "size");
 
