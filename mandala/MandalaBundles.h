@@ -167,35 +167,6 @@ struct pos_llh_s : public pos_ll_s
     float hmsl; // [gps] m
 };
 
-struct haps_center_s
-{
-    float roll;
-    float left_cmd_roll;
-    float right_cmd_roll;
-    float err_shape;
-    float cmd_pitch;
-    float cmd_airspeed;
-    float rc_roll;
-    float rc_pitch;
-    float rc_yaw;
-    float ctr_throttle;
-    float ctr_rudder;
-    float ctr_ailerons;
-    uint8_t EMG_MODE : 1;
-    uint8_t RESET_PID : 1;
-    uint8_t unused : 6;
-};
-
-struct haps_lr_s
-{
-    float roll;
-    float pitch;
-    float yaw;
-    float airspeed;
-    float cmd_pitch;
-    float ctr_elevator;
-};
-
 enum {
     swarm_followme = 1,
     swarm_data = 2,
