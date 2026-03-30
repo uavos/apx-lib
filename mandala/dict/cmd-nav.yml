@@ -151,6 +151,10 @@
       title: Block GPS
     - name: nomag
       title: Block magnetometer
+      units:
+        - "no"
+        - "yes"
+        - "fixed"
     - name: hsel
       title: Select height source
       units:

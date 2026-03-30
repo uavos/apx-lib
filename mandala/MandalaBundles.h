@@ -62,16 +62,33 @@ struct mag_s
     float vib;
 };
 
-enum {
+enum gps_status_e {
     gps_status = 1,
     gps_fix = 2,
     gps_yaw = 4,
 };
+enum gps_emi_e {
+    emi_unknown = 0,
+    emi_ok,
+    emi_warning,
+    emi_critical,
+};
 struct gps_status_s
 {
     uint32_t time;
-    uint8_t status;
-    uint8_t emi;
+    enum gps_fix_e {
+        fix_none = 0,
+        fix_2D = 1,
+        fix_3D = 2,
+        fix_DIFF = 3,
+        fix_RTK = 4,
+    } fix : 8; // reflects mandala::gps_fix_*
+    enum gps_emi_e {
+        emi_unknown = 0, // no EMI detection available
+        emi_ok,          // no EMI detected
+        emi_warning,     // EMI detected, but fix ok
+        emi_critical,    // EMI detected, fix is not reliable
+    } emi;
     uint8_t su;
     uint8_t sv;
 };
