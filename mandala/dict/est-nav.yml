@@ -350,7 +350,7 @@
       type: word
     - name: event
       title: EKF information event status
-      type: word
+      type: dword
 
 - name: wind
   title: Wind estimator
