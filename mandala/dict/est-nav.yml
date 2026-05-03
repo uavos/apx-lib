@@ -339,6 +339,19 @@
       ds: minimal
       seq: skip
 
+    - name: statusl
+      title: EKF mode status low
+      type: dword
+    - name: statush
+      title: EKF mode status high
+      type: dword
+    - name: fault
+      title: EKF internal fault status
+      type: word
+    - name: event
+      title: EKF information event status
+      type: dword
+
 - name: wind
   title: Wind estimator
   ds: minimal
