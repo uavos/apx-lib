@@ -474,3 +474,67 @@
     - name: speed
       suffix: speed
       units: m/s
+
+- name: guide
+  title: GUIDE
+  content:
+    - name: mode
+      suffix: mode
+      units:
+        - "off"
+        - "point"
+        - "cam"
+        - "radar"
+
+    - name: lat
+      suffix: latitude
+      type: dword
+      units: gps
+    - name: lon
+      suffix: longitude
+      type: dword
+      units: gps
+    - name: hmsl
+      suffix: altitude MSL
+      units: m
+      fmt: f32
+
+    - name: vn
+      suffix: velocity north
+      units: m/s
+    - name: ve
+      suffix: velocity east
+      units: m/s
+    - name: vd
+      suffix: velocity down
+      units: m/s
+
+    - name: elv
+      suffix: elevation
+      units: rad
+    - name: head
+      suffix: heading
+      units: rad
+    - name: dist
+      suffix: distance
+      units: m
+    - name: status
+      suffix: tracking status
+      units:
+        - "off"
+        - "lost"
+        - "track"
+
+    - name: delay
+      suffix: time delay
+      type: word
+      units: ms
+    - name: height
+      suffix: target height
+      type: word
+      units: m
+    - name: trigger
+      suffix: trigger
+      units:
+        - "off"
+        - "on"
