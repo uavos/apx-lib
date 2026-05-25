@@ -436,7 +436,7 @@
       units: rad
 
 - name: swarm
-  title: SWARM
+  title: Swarm
   content:
     - name: mode
       suffix: mode
@@ -476,16 +476,23 @@
       units: m/s
 
 - name: guide
-  title: GUIDE
+  title: Guide
   content:
     - name: mode
       suffix: mode
       units:
-        - "off"
-        - "point"
-        - "cam"
-        - "radar"
+        - "disabled"
+        - "stby"
+        - "active"
+        - "pos"
+        - "aid"
 
+    - name: spos
+      suffix: position status
+      units:
+        - "set"
+        - "sns"
+        - "est"
     - name: lat
       suffix: latitude
       type: dword
@@ -499,6 +506,11 @@
       units: m
       fmt: f32
 
+    - name: svel
+      suffix: velocity status
+      units:
+        - "sns"
+        - "est"
     - name: vn
       suffix: velocity north
       units: m/s
@@ -509,31 +521,42 @@
       suffix: velocity down
       units: m/s
 
+    - name: said
+      suffix: aiding status
+      units:
+        - "off"
+        - "est"
+        - "sns"
+    - name: gate
+      suffix: tracking gate
+      units: "%"
     - name: elv
       suffix: elevation
       units: rad
     - name: head
       suffix: heading
       units: rad
+
+    - name: sdist
+      suffix: distance status
+      units:
+        - "off"
+        - "est"
+        - "dme"
+        - "ev"
     - name: dist
       suffix: distance
       units: m
-    - name: status
-      suffix: tracking status
-      units:
-        - "off"
-        - "lost"
-        - "track"
 
-    - name: delay
-      suffix: time delay
+    - name: tdelay
+      suffix: target delay
       type: word
       units: ms
-    - name: height
-      suffix: target height
+    - name: tdist
+      suffix: target distance
       type: word
       units: m
-    - name: trigger
+    - name: trg
       suffix: trigger
       units:
         - "off"
