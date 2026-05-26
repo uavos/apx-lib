@@ -483,13 +483,14 @@
       units:
         - "disabled"
         - "stby"
-        - "active"
+        - "app"
         - "pos"
         - "aid"
 
     - name: spos
       suffix: position status
       units:
+        - "off"
         - "set"
         - "sns"
         - "est"
@@ -509,6 +510,7 @@
     - name: svel
       suffix: velocity status
       units:
+        - "off"
         - "sns"
         - "est"
     - name: vn
@@ -529,7 +531,7 @@
         - "sns"
     - name: gate
       suffix: tracking gate
-      units: "%"
+      units: u
     - name: elv
       suffix: elevation
       units: rad
