@@ -494,18 +494,6 @@
         - "set"
         - "sns"
         - "est"
-    - name: lat
-      suffix: latitude
-      type: dword
-      units: gps
-    - name: lon
-      suffix: longitude
-      type: dword
-      units: gps
-    - name: hmsl
-      suffix: altitude MSL
-      units: m
-      fmt: f32
 
     - name: svel
       suffix: velocity status
@@ -513,15 +501,6 @@
         - "off"
         - "sns"
         - "est"
-    - name: vn
-      suffix: velocity north
-      units: m/s
-    - name: ve
-      suffix: velocity east
-      units: m/s
-    - name: vd
-      suffix: velocity down
-      units: m/s
 
     - name: said
       suffix: aiding status
