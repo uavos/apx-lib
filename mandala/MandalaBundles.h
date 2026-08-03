@@ -168,6 +168,33 @@ struct pos_llh_s : public pos_ll_s
 };
 
 enum {
+    ats_pos = 1,
+    ats_bias = 2,
+    ats_scan = 3,
+};
+
+struct ats_pos_s
+{
+    uint8_t type; // ats_pos
+    pos_llh_s pos;
+};
+
+struct ats_bias_s
+{
+    uint8_t type; // ats_bias
+    float yaw;
+    float pitch;
+};
+
+struct ats_scan_s
+{
+    uint8_t type; // ats_scan
+    uint8_t time; // [s] dwell time at scan point
+    float yaw;    // [rad]
+    float pitch;  // [rad]
+};
+
+enum {
     swarm_followme = 1,
     swarm_data = 2,
 };
