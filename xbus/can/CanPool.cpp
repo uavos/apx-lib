@@ -132,7 +132,7 @@ ErrorType Pool::push_next(const extid_s &extid, const uint8_t *data, uint8_t dlc
         if ((t.extid.raw ^ extid.raw) & mf_id_mask)
             continue;
         // tree found - check sequence
-        uint8_t t_frm;
+        uint8_t t_frm = 0;
         if (dlc == 0) {
             t_frm = t.extid.frm;
             uint8_t frm = extid.frm;
