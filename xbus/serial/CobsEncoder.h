@@ -112,12 +112,29 @@ private:
     // there's no overflow checks for performance reasons
     static constexpr size_t overhead(size_t packet_size)
     {
-        // +1 for packet delimiter
-        // +crc16
-        return (packet_size + 1 + sizeof(uint16_t)) / 255 + 1;
+        // Worst case - no _esc bytes anywhere in the stream: the
+        // payload plus the appended crc16 encode as blocks of up to
+        // 254 data bytes, each led by one code byte, plus the packet
+        // delimiter. NOTE the divisor is 254 (a 0xFF code covers 254
+        // data bytes), not 255, and the crc16 rides INSIDE the encoded
+        // stream - either mistake shaves bytes off the buffer that a
+        // full-size packet then silently overruns.
+        const size_t stream = packet_size + sizeof(uint16_t); // payload + crc16
+        return sizeof(uint16_t)       // the crc16 bytes themselves
+               + (stream + 253) / 254 // one code byte per started block
+               + 1;                   // packet delimiter
     }
 
     // any packet will always fit in buffer
     // there's no overflow checks for performance reasons
     T _buf[_packet_size + overhead(_packet_size)];
+
+    // independently derived worst-case write count of encode():
+    // 1 initial code byte + data + crc16 + one extra code byte after
+    // every full 254-byte run + the delimiter. Guards overhead()
+    // against a future "optimization" - encode() has no bounds checks.
+    static_assert(sizeof(_buf) / sizeof(T)
+                      >= 1 + _packet_size + sizeof(uint16_t)
+                             + (_packet_size + sizeof(uint16_t) - 1) / 254 + 1,
+                  "COBS worst case must fit the buffer");
 };

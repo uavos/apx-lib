@@ -142,7 +142,11 @@ private:
 
     inline constexpr bool write_decoded_byte(T c)
     {
-        if (_rcnt >= _packet_size) {
+        // the decoded stream is the payload PLUS its crc16 - capping
+        // at the payload size alone refuses the crc bytes of a
+        // full-size packet, silently dropping (ErrorOverflow) every
+        // packet larger than _packet_size - 2
+        if (_rcnt >= _packet_size + overhead()) {
             return false;
         }
         _buf[_rcnt++] = c;
