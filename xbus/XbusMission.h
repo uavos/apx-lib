@@ -212,6 +212,7 @@ struct act_s
         TRG_SPEED, // change speed after wp reached
         TRG_POI,   // go to POI after wp reached
         TRG_SCR,   // run script after wp reached
+        TRG_CAM,   // camera control after wp reached
     };
     act_e type : 8;
 };
@@ -263,6 +264,28 @@ struct act_scr_s : act_s
     static constexpr const size_t MAX = 32; // incl 0
 };
 static_assert(sizeof(act_scr_s) == 1, "size");
+
+struct act_cam_s : act_s
+{
+    enum mode_e {
+        OFF,    // no shot
+        SINGLE, // single snapshot
+        DIST,   // distance triggered
+        TIME,   // time triggered
+    };
+    uint8_t mode;
+
+    // optional fields
+    struct cam_dist_s
+    {
+        uint16_t dist; // [m] distance between shots
+    } opt_dist[0];     // optional, only if mode is DIST
+    struct cam_time_s
+    {
+        uint16_t time; // [ms] time between shots
+    } opt_time[0];     // optional, only if mode is TIME
+};
+static_assert(sizeof(act_cam_s) == 2, "size");
 
 #pragma pack()
 
