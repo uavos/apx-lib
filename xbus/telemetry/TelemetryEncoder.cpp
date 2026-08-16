@@ -142,7 +142,7 @@ void TelemetryEncoder::_insert(size_t index, const xbus::telemetry::field_s &fie
 void TelemetryEncoder::clear()
 {
     _slots_cnt = _slots_upd_cnt = _sync_cnt = 0;
-    _slots = {};
+    memset(&_slots, 0, sizeof(_slots));
     _update_feeds();
     memset(_xpdr_slot_idx, 0xFF, sizeof(_xpdr_slot_idx));
 }
