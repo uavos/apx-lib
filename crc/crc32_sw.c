@@ -21,6 +21,8 @@
  */
 #include "crc32_sw.h"
 
+#include <string.h>
+
 uint32_t stm_crc_slow(uint32_t crc, uint32_t data)
 {
     int i;
@@ -77,19 +79,16 @@ static uint32_t stm_crc(uint32_t crc, uint32_t data)
 
 uint32_t CRC32_SW(const void *data, size_t sz, uint32_t crc)
 {
-    const uint32_t *p32 = (const uint32_t *) (data);
-    while (sz >= sizeof(uint32_t)) {
-        crc = stm_crc(*p32++, crc);
-        sz -= sizeof(uint32_t);
+    // data is usually not word aligned (packet buffers, strings): read the words with memcpy
+    const uint8_t *p = (const uint8_t *) data;
+    uint32_t w;
+    for (; sz >= sizeof(uint32_t); sz -= sizeof(uint32_t), p += sizeof(uint32_t)) {
+        memcpy(&w, p, sizeof(w));
+        crc = stm_crc(w, crc);
     }
     if (!sz)
         return crc;
-    if (sz == 3)
-        crc = stm_crc(*p32 & 0x00FFFFFF, crc);
-    else if (sz == 2)
-        crc = stm_crc(*p32 & 0x0000FFFF, crc);
-    else
-        crc = stm_crc(*p32 & 0x000000FF, crc);
-
-    return crc;
+    w = 0;
+    memcpy(&w, p, sz);
+    return stm_crc(w, crc);
 }
