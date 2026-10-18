@@ -306,18 +306,18 @@
         - "on"
 
     - name: mode
-      title: Shotting mode
+      title: Shooting mode
       units:
         - "off"
         - "single"
         - "distance"
         - "time"
     - name: dshot
-      title: Shotting distance
+      title: Shooting distance
       type: word
       units: m
     - name: tshot
-      title: Shotting time
+      title: Shooting time
       type: word
       units: ms
 
