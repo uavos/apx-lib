@@ -24,7 +24,7 @@
 #include "TelemetryFormat.h"
 #include <MandalaMetaBase.h>
 
-#include <math.h>
+#include <cmath>
 
 namespace xbus {
 namespace telemetry {
@@ -93,7 +93,7 @@ static float float_from_f16(const uint16_t v)
         }
     }
     const float &f = *static_cast<const mandala::real_t *>(static_cast<const void *>(&xp));
-    return isnan(f) ? 0.f : f;
+    return std::isnan(f) ? 0.f : f;
 }
 
 template<typename T>
